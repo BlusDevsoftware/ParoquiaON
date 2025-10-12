@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: paroquiaon-db
+    environment:
+      POSTGRES_DB: paroquiaon
+      POSTGRES_USER: paroquiaon
+      POSTGRES_PASSWORD: paroquiaon123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - paroquiaon-network
+
+  # Redis para cache
+  redis:
+    image: redis:7-alpine
+    container_name: paroquiaon-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - paroquiaon-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: paroquiaon-backend
+    environment:
+      - DATABASE_URL=postgresql://paroquiaon:paroquiaon123@postgres:5432/paroquiaon
+      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=development
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+    networks:
+      - paroquiaon-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: paroquiaon-frontend
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_SUPABASE_URL=your_supabase_url
+      - VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+    networks:
+      - paroquiaon-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  paroquiaon-network:
+    driver: bridge
