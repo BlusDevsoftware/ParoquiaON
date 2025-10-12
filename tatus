@@ -1,0 +1,5 @@
+[33mcommit b3bb52c1c686a76bb4f489b45ccea50a1065d833[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: BlusDevsoftware <bluedevdesenvolvimento@gmail.com>
+Date:   Thu Jun 12 14:41:47 2025 -0300
+
+    fix: corrige mensagem de erro ao criar colaborador

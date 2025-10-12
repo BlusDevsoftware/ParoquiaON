@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParoquiaON - Recebimento</title>
+    <link rel="icon" type="image/png" href="assets/images/logo2.png">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/login.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="scripts/auth-guard.js"></script>
+    <script src="scripts/apply-auth-protection.js"></script>
+
+    <style>
+        /* Estilos seguindo o padrão do sistema */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding-bottom: 80px; /* Igual à aba movimento comissões */
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            padding: 20px 24px;
+            border: 1px solid #eef2f7;
+        }
+
+        .card.clickable { cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card.clickable:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(33,150,243,0.15); }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            color: #2b2f36;
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+
+        .card-header i {
+            color: #0d6efd;
+            font-size: 1.1em;
+            background: #eaf2ff;
+            border-radius: 50%;
+            padding: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-value {
+            font-size: 1.7em;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 6px;
+        }
+
+        .card-change {
+            font-size: 0.85em;
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        .filters-container {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 4px rgba(33,150,243,0.08);
+            padding: 18px 24px;
+            margin-bottom: 24px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f4faff;
+            border: 1.5px solid #90caf9;
+            border-radius: 8px;
+            padding: 6px 14px;
+            color: #1565c0;
+            font-size: 1em;
+            box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+        }
+
+        .search-box input[type='text'] {
+            border: none;
+            background: transparent;
+            color: #1565c0;
+            font-size: 1em;
+            outline: none;
+            margin-left: 8px;
+            width: 220px;
+            min-width: 160px;
+            max-width: 100%;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-options select,
+        .filter-options input[type='date'] {
+            border: 1.5px solid #90caf9;
+            border-radius: 8px;
+            background: #f4faff;
+            color: #1565c0;
+            font-size: 1em;
+            padding: 7px 12px;
+            box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 180px;
+            min-width: 140px;
+        }
+
+        .filter-options select:focus,
+        .filter-options input[type='date']:focus {
+            outline: none;
+            border-color: #1976D2;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.15);
+        }
+
+        .btn-filter {
+            background: #1976D2;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9em;
+        }
+
+        .btn-filter:hover {
+            background: #1565c0;
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: #1976D2;
+            border: 1.5px solid #2196F3;
+        }
+
+        .btn-secondary:hover {
+            background: #f4faff;
+        }
+
+        .titulos-grid-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+
+
+
+
+        .titulos-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            align-content: start;
+            justify-content: start;
+        }
+
+        .titulos-grid-container {
+            max-height: 85vh;
+            width: 100%;
+            height: 96.5%;
+            overflow-y: auto;
+            position: relative;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+            background: #fff;
+            margin-bottom: 16px;
+            padding-bottom: 24px; /* espaço inferior consistente */
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .titulos-grid-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .titulos-grid-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .titulos-grid-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .titulos-grid-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .titulo-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+            border: 1px solid #e3f2fd;
+            padding: 10px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+            width: auto;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 160px;
+        }
+
+        .titulo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(33,150,243,0.15);
+        }
+
+        .titulo-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #90caf9;
+        }
+
+        .titulo-card.PENDENTE::before { background: #FF9800; }
+        .titulo-card.VENCIDO::before { background: #f44336; }
+        .titulo-card.PAGO::before { background: #4CAF50; }
+        .titulo-card.CLIENTE-NÃO-PAGOU::before { background: #f57c00; }
+        .titulo-card.AGLUTINADO::before { background: #7b1fa2; }
+
+        .titulo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .titulo-cliente {
+            font-weight: 600;
+            color: #1565c0;
+            font-size: 1em;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .titulo-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .titulo-status.pendente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .titulo-status.atrasado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .titulo-status.recebido {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .titulo-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 1em;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .titulo-valor {
+            font-size: 1em;
+            font-weight: 700;
+            color: #1976D2;
+            text-align: center;
+            margin: 6px 0;
+            padding: 6px;
+            background: #f4faff;
+            border-radius: 6px;
+            border: 1px solid #e3f2fd;
+        }
+
+        .titulo-observacoes {
+            font-size: 0.75em;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .titulo-acoes {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-acao {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-visualizar {
+            background: #e3f2fd;
+            color: #1976D2;
+        }
+
+        .btn-visualizar:hover {
+            background: #bbdefb;
+        }
+
+        .btn-editar {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .btn-editar:hover {
+            background: #ffe0b2;
+        }
+
+        .btn-comprovante { background-color: #198754 !important; color: #fff !important; }
+        .btn-comprovante i { color: #fff !important; }
+        .btn-comprovante:hover { opacity: 0.9; }
+        .btn-comprovante-missing { background-color: #dc3545 !important; color: #fff !important; }
+        .btn-comprovante-missing i { color: #fff !important; }
+        .btn-comprovante-missing:hover { opacity: 0.9; }
+
+        .comprovante-btn { background-color: #198754 !important; color: #fff !important; }
+        .comprovante-btn i { color: #fff !important; }
+        .comprovante-btn:hover { opacity: 0.9; }
+        .comprovante-missing { background-color: #dc3545 !important; color: #fff !important; }
+        .comprovante-missing i { color: #fff !important; }
+        .comprovante-missing:hover { opacity: 0.9; }
+
+        .timeline-btn {
+            min-width: 28px;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,152,0,0.15);
+            color: #ff9800;
+            border: 1.5px solid #ffcc80;
+            font-weight: 500;
+            margin: 0 auto;
+            transition: background 0.18s, border 0.18s, color 0.18s;
+            border-radius: 4px;
+        }
+        .timeline-btn i { font-size: 1em; color: #ff9800; }
+        .timeline-btn:hover {
+            background: rgba(255,152,0,0.28);
+            border-color: #ff9800;
+            color: #e65100;
+        }
+
+        .table-scroll {
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+            background: #fff;
+            margin-bottom: 16px;
+            padding-bottom: 24px;
+            flex: 1 1 auto;
+        }
+
+        /* Expandir tabela quando ocultar totalizadores */
+        .table-scroll.expanded {
+            max-height: 92vh;
+        }
+
+        .table-scroll table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-scroll th, .table-scroll td {
+            border: 1px solid #eee;
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        .table-scroll th {
+            background: #e3f2fd;
+            color: #1565c0;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .table-scroll td {
+            background: #fff;
+            color: #333;
+        }
+
+        .table-scroll tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-PAGO {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-PENDENTE {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-VENCIDO {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-CLIENTE-NÃO-PAGOU {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-AGLUTINADO {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            margin: 0 2px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover { opacity: 0.8; }
+        .action-btn i { font-size: 14px; }
+
+        .view-btn { background-color: #0d6efd; color: white; }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            margin-top: 0;
+        }
+
+        .pagination button {
+            padding: 6px 10px;
+            border: 1px solid #90caf9;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1565c0;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .pagination button:hover {
+            background: #f4faff;
+            border-color: #1976D2;
+        }
+
+        .pagination button.active {
+            background: #1976D2;
+            color: white;
+            border-color: #1976D2;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Agrupamento */
+        .group-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1976D2;
+            font-weight: 700;
+            background: #e3f2fd;
+            border: 1px solid #e3f2fd;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 12px 20px 4px 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spinner {
+            border: 6px solid #e3f2fd;
+            border-top: 6px solid #1976D2;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-options {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-options select,
+            .filter-options input[type='date'] {
+                width: 100%;
+            }
+            
+            #barraInferior {
+                left: 0; /* Em mobile, a sidebar pode estar oculta */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
+            <img src="assets/images/logo2.png" alt="ParoquiaON Logo" style="height: 2.5em; margin-right: 10px;">
+            <h1><span class="white">Paroquia</span><span class="highlight">ON</span></h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html"><i class="fas fa-home"></i><span>Minha Comunidade</span></a></li>
+            <li><a href="agenda.html"><i class="fas fa-calendar-alt"></i><span>Agenda</span></a></li>
+            <li><a href="comunidades.html"><i class="fas fa-users"></i><span>Comunidades</span></a></li>
+            <li><a href="pastorais.html"><i class="fas fa-church"></i><span>Pastorais</span></a></li>
+            <li><a href="pilares.html"><i class="fas fa-columns"></i><span>Pilares</span></a></li>
+            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i><span>Locais</span></a></li>
+            <li><a href="acoes.html"><i class="fas fa-tasks"></i><span>Ações</span></a></li>
+            <li><a href="pessoas.html"><i class="fas fa-user"></i><span>Pessoas</span></a></li>
+            <li><a href="usuarios.html"><i class="fas fa-user-cog"></i><span>Usuários</span></a></li>
+            <li><a href="perfil.html"><i class="fas fa-user-shield"></i><span>Perfil</span></a></li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-chart-bar"></i><span>Relatórios</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="recebimento.html" class="active"><i class="fas fa-money-bill-wave"></i><span>Recebimento</span></a></li>
+                    <li><a href="conferencia.html"><i class="fas fa-check-circle"></i><span>Conferência</span></a></li>
+                    <li><a href="dinamico.html"><i class="fas fa-chart-line"></i><span>Dinâmico</span><span class="beta-tag">beta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-cog"></i><span>Configurações</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="manutencao-bd.html"><i class="fas fa-database"></i><span>Manutenção BD</span></a></li>
+                    <li><a href="sincronizar.html"><i class="fas fa-sync"></i><span>Sincronizar</span></a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="logout-button">
+            <a href="index.html" data-logout><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="welcome-text">
+                <h1>Relatório de Recebimento</h1>
+                <p>Meu Dashboard Financeiro - Acompanhe sua situação financeira</p>
+            </div>
+            <div class="user-info">
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="dashboard-cards" id="dashboardCards">
+            <div class="card clickable" id="cardTotalRecebido" onclick="filtrarPorCard('PAGO')">
+                <div class="card-header">
+                    <h3>Total Recebido</h3>
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="card-value" id="totalRecebido">R$ 0,00</div>
+                <div class="card-change" id="totalRecebidoChange">&nbsp;</div>
+            </div>
+            <div class="card clickable" id="cardPendente" onclick="filtrarPorCard('PENDENTE')">
+                <div class="card-header">
+                    <h3>Pendentes</h3>
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="card-value" id="totalPendente">R$ 0,00</div>
+                <div class="card-change" id="totalPendenteChange">&nbsp;</div>
+            </div>
+            <div class="card clickable" id="cardClienteNaoPagou" onclick="filtrarPorCard('CLIENTE NÃO PAGOU')">
+                <div class="card-header">
+                    <h3>Cliente Não Pagou</h3>
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="card-value" id="totalAtrasado">R$ 0,00</div>
+                <div class="card-change" id="totalAtrasadoChange">&nbsp;</div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Média Mensal</h3>
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="card-value" id="mediaMensal">R$ 0,00</div>
+                <div class="card-change" id="mediaMensalChange">&nbsp;</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input id="busca" type="text" placeholder="Buscar títulos...">
+            </div>
+            <div class="filter-options">
+                <select id="periodo">
+                    <option value="mes_atual">Mês Atual</option>
+                    <option value="ultimos_3_meses">Últimos 3 Meses</option>
+                    <option value="ultimos_6_meses">Últimos 6 Meses</option>
+                    <option value="ano_atual">Ano Atual</option>
+                    <option value="personalizado">Personalizado</option>
+                </select>
+                <select id="status">
+                    <option value="">Todos os Status</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="PAGO">Pago</option>
+                    <option value="VENCIDO">Vencido</option>
+                    <option value="CLIENTE NÃO PAGOU">Cliente não pagou</option>
+                    <option value="AGLUTINADO">Aglutinado</option>
+                </select>
+                <select id="colaborador">
+                    <option value="">Todos os Colaboradores</option>
+                    <option value="cliente1">Cliente A</option>
+                    <option value="cliente2">Cliente B</option>
+                    <option value="cliente3">Cliente C</option>
+                </select>
+                <input type="date" id="data_inicial" placeholder="Data inicial">
+                <span style="margin: 0 6px; color: #1976D2; font-weight: bold;">até</span>
+                <input type="date" id="data_final" placeholder="Data final">
+                <button class="btn-filter" onclick="aplicarFiltros()">
+                    <i class="fas fa-filter"></i>
+                    Aplicar
+                </button>
+                <button class="btn-filter btn-secondary" onclick="limparFiltros()">
+                    <i class="fas fa-times"></i>
+                    Limpar
+                </button>
+            </div>
+        </div>
+
+
+
+        <!-- Grid de Títulos a Receber -->
+        <div class="titulos-grid-section">
+            <div class="titulos-grid-container" style="position: relative;">
+                <div id="loader-recebimento" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7); z-index: 2; display: flex; justify-content: center; align-items: center;">
+                    <div class="spinner"></div>
+                </div>
+                <div class="titulos-grid" id="titulosGrid">
+                    <!-- Cards de títulos serão inseridos dinamicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Commissions Table -->
+        <div class="table-scroll" style="position: relative;">
+            <div id="loader-tabela-recebimento" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7); z-index: 2; display: flex; justify-content: center; align-items: center;">
+                <div class="spinner"></div>
+            </div>
+            <table id="recebimentoTable">
+                <thead>
+                    <tr>
+                        <th style="width:40px;"></th>
+                        <th>Nº Título</th>
+                        <th>Data da Geração</th>
+                        <th>Data de Vencimento</th>
+                        <th>Colaborador</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="recebimentoTableBody">
+                    <!-- Dados serão carregados dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação e Ações -->
+        <div class="filters-container" id="barraInferior" style="position: fixed; bottom: 20px; left: 250px; z-index: 1000; background: #fff; border-top: 1px solid #e3f2fd; justify-content: space-between; padding: 8px 24px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); height: 60px; box-sizing: border-box; margin: 0 24px; border-radius: 10px; border: 1px solid #e3f2fd;">
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button class="btn-filter btn-secondary" onclick="alternarVisualizacao(this)" style="padding: 6px 12px; font-size: 0.85em;">
+                    <i class="fas fa-list"></i>
+                    Ver Tabela
+                </button>
+                <button id="toggleTotaisBtnReceb" class="btn-filter btn-secondary" style="padding: 6px 12px; font-size: 0.85em; border-color:#1976D2; color:#1976D2;">
+                    <i class="fas fa-chart-pie"></i>
+                    Ocultar totais
+                </button>
+                <select id="statusAgrupar" onchange="aplicarAgrupamento()" style="border: 1.5px solid #90caf9; border-radius: 8px; background: #f4faff; color: #1565c0; padding: 5px 10px; font-size: 0.85em;">
+                    <option value="">Sem agrupamento</option>
+                    <option value="PAGO">Pago</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="VENCIDO">Vencido</option>
+                    <option value="CLIENTE NÃO PAGOU">Cliente não pagou</option>
+                    <option value="AGLUTINADO">Aglutinado</option>
+                    <option value="TODOS">Todos os Status</option>
+                </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <label for="exibirQtd" style="color:#1565c0; font-weight:600;">Exibir</label>
+                <select id="exibirQtd" onchange="aplicarPaginacaoQuantidade()" style="border: 1.5px solid #90caf9; border-radius: 8px; background: #f4faff; color: #1565c0; padding: 5px 10px;">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="todos">Todos</option>
+                </select>
+                <span id="contadorTitulos" style="color:#1565c0; font-weight:600;">Títulos: 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle submenu
+        document.querySelectorAll('.submenu-trigger').forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.parentElement.classList.toggle('active');
+            });
+        });
+
+        // Variáveis globais para dados
+        let todosTitulos = [];
+        let titulosFiltrados = [];
+        let mapaColaboradores = {};
+        let mapaPastorais = {};
+        let limiteExibicao = 20; // padrão
+        let agrupamentoAtivo = false;
+        let criterioAgrupamento = 'status';
+        let statusAgruparSelecionado = '';
+
+        // Função para carregar colaboradores
+        async function carregarColaboradores() {
+            try {
+                const colaboradores = await window.api.get('/colaboradores');
+                if (Array.isArray(colaboradores)) {
+                    colaboradores.forEach(colab => {
+                        mapaColaboradores[colab.codigo] = colab.nome;
+                    });
+                    // Preencher filtro de colaborador
+                    const selectColab = document.getElementById('colaborador');
+                    if (selectColab) {
+                        selectColab.innerHTML = '<option value="">Todos os Colaboradores</option>';
+                        colaboradores.forEach(colab => {
+                            selectColab.innerHTML += `<option value="${colab.nome}">${colab.nome}</option>`;
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Erro ao carregar colaboradores:', e);
+            }
+        }
+
+        // Função para carregar clientes
+        async function carregarPastorais() {
+            try {
+                const clientes = await window.api.get('/clientes');
+                if (Array.isArray(clientes)) {
+                    clientes.forEach(cli => {
+                        mapaPastorais[cli.id || cli.codigo] = cli.nome;
+                    });
+                }
+            } catch (e) {
+                console.error('Erro ao carregar clientes:', e);
+            }
+        }
+
+        // Funções para controlar o spinner
+        function mostrarSpinner() {
+            document.getElementById('loader-recebimento').style.display = 'flex';
+            document.getElementById('loader-tabela-recebimento').style.display = 'flex';
+        }
+        
+        function ocultarSpinner() {
+            document.getElementById('loader-recebimento').style.display = 'none';
+            document.getElementById('loader-tabela-recebimento').style.display = 'none';
+        }
+
+        // Função para carregar títulos da API
+        async function carregarTitulos() {
+            try {
+                // Mostrar spinner
+                mostrarSpinner();
+                
+                // Garante estado zerado antes de iniciar fetch
+                zerarCards();
+                await carregarColaboradores();
+                await carregarPastorais();
+                const data = await window.api.get('/movimento_comissoes');
+
+                // Atualizar status para VENCIDO quando vencimento < hoje e não pago
+                const todayStr = new Date().toISOString().split('T')[0];
+                const atualizacoes = [];
+                const titulos = Array.isArray(data) ? data : [];
+                
+                titulos.forEach(t => {
+                    const statusAtual = (t.status || '').toUpperCase();
+                    const venc = t.data_vencimento;
+                    const naoPago = statusAtual !== 'PAGO';
+                    const naoAglutinado = statusAtual !== 'AGLUTINADO';
+                    
+                    if (naoPago && naoAglutinado && venc && typeof venc === 'string' && venc < todayStr && statusAtual !== 'VENCIDO') {
+                        t.status = 'VENCIDO';
+                        atualizacoes.push(
+                            window.api.put(`/movimento_comissoes/${t.id}`, { status: 'VENCIDO' }).catch(() => {})
+                        );
+                    }
+
+                    // Normalizar colaborador para exibir nome
+                    // Considera possíveis formas vindas da API: codigo em t.colaborador ou t.colaborador_codigo
+                    if (t && mapaColaboradores) {
+                        const possivelCodigo = t.colaborador_codigo || t.colaborador_codigo_id || t.colaborador_id || t.colaborador;
+                        if (possivelCodigo && mapaColaboradores[possivelCodigo]) {
+                            t.colaborador = mapaColaboradores[possivelCodigo];
+                        }
+                    }
+                });
+
+                // Disparar atualizações em background
+                if (atualizacoes.length) {
+                    Promise.allSettled(atualizacoes).catch(() => {});
+                }
+
+                todosTitulos = titulos;
+                titulosFiltrados = [...todosTitulos];
+                
+                // Debug: verificar se há títulos aglutinados
+                const titulosAgl = titulos.filter(t => String(t.status||'').toUpperCase() === 'AGLUTINADO');
+                console.log('Títulos AGLUTINADO encontrados:', titulosAgl.length);
+                if (titulosAgl.length > 0) {
+                    console.log('Primeiro título AGLUTINADO:', titulosAgl[0]);
+                    console.log('Campos:', Object.keys(titulosAgl[0]));
+                }
+                
+                // Atualizar cards totalizadores com animação após pequeno delay para garantir zeros iniciais
+                setTimeout(() => {
+                atualizarCardsTotalizadores();
+                    atualizarCardsComAnimacao();
+                }, 50);
+                
+                // Carregar visualizações
+                carregarGridTitulos();
+                carregarTabela();
+                // Sincronizar após conteúdo dinâmico ser inserido
+                requestAnimationFrame(sincronizarAlturaConteudo);
+                
+                // Ocultar spinner
+                ocultarSpinner();
+                
+            } catch (e) {
+                console.error('Erro ao carregar títulos:', e);
+                // Ocultar spinner em caso de erro
+                ocultarSpinner();
+                
+                // Fallback para dados mockados em caso de erro
+                todosTitulos = [
+                    {
+                        id: 1,
+                        numero_titulo: 'TIT-001',
+                        data_geracao: '2024-02-20',
+                        data_vencimento: '2024-03-20',
+                        colaborador: 'João Silva',
+                        tipo: 'Comissão',
+                        descricao: 'Comissão referente a venda #123',
+                        valor: 1500.00,
+                        status: 'PAGO',
+                        observacoes: 'Pagamento referente a venda #123'
+                    }
+                ];
+                titulosFiltrados = [...todosTitulos];
+                carregarGridTitulos();
+                carregarTabela();
+                setTimeout(() => {
+                    atualizarCardsTotalizadores();
+                    atualizarCardsComAnimacao();
+                }, 50);
+                requestAnimationFrame(sincronizarAlturaConteudo);
+                
+                // Ocultar spinner no fallback
+                ocultarSpinner();
+            }
+        }
+
+        // Função para atualizar cards totalizadores
+        function atualizarCardsTotalizadores() {
+            const pagos = todosTitulos.filter(t => t.status === 'PAGO');
+            const totalRecebido = pagos.reduce((sum, t) => sum + parseFloat(t.valor || 0), 0);
+            
+            const pendentes = todosTitulos.filter(t => t.status === 'PENDENTE');
+            const totalPendente = pendentes.reduce((sum, t) => sum + parseFloat(t.valor || 0), 0);
+            
+            const inadimplentes = todosTitulos.filter(t => t.status === 'CLIENTE NÃO PAGOU');
+            const totalClienteNaoPagou = inadimplentes.reduce((sum, t) => sum + parseFloat(t.valor || 0), 0);
+            
+            const mediaMensal = totalRecebido / 6; // Simplificado para demonstração
+
+            document.getElementById('totalRecebido').textContent = `R$ ${totalRecebido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalPendente').textContent = `R$ ${totalPendente.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalAtrasado').textContent = `R$ ${totalClienteNaoPagou.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('mediaMensal').textContent = `R$ ${mediaMensal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+            // Quantidades como na aba de movimento de comissão
+            const recebidosQtd = pagos.length;
+            const pendentesQtd = pendentes.length;
+            const inadimplentesQtd = inadimplentes.length;
+
+            const plural = (n) => n === 1 ? 'título' : 'títulos';
+            const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+            setText('totalRecebidoChange', `${recebidosQtd} ${plural(recebidosQtd)}`);
+            setText('totalPendenteChange', `${pendentesQtd} ${plural(pendentesQtd)}`);
+            setText('totalAtrasadoChange', `${inadimplentesQtd} ${plural(inadimplentesQtd)}`);
+            setText('mediaMensalChange', 'Últimos 6 meses');
+        }
+
+        // Anima a contagem de valores nos cards
+        function animarNumero(elemento, valorFinal) {
+            const el = typeof elemento === 'string' ? document.getElementById(elemento) : elemento;
+            if (!el) return;
+            // Garante que começamos do zero e com prefixo consistente
+            const prefixo = 'R$ ';
+            el.textContent = `${prefixo}0,00`;
+            const duracao = 600;
+            const inicio = performance.now();
+            const startVal = 0;
+            function frame(now) {
+                const p = Math.min(1, (now - inicio) / duracao);
+                const eased = p < 0.5 ? 2*p*p : -1 + (4 - 2*p)*p; // easeInOutQuad
+                const atual = Math.round(eased * valorFinal);
+                el.textContent = `${prefixo}${atual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                if (p < 1) requestAnimationFrame(frame);
+            }
+            requestAnimationFrame(frame);
+        }
+
+        function zerarCards() {
+            const ids = ['totalRecebido', 'totalPendente', 'totalAtrasado', 'mediaMensal'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = 'R$ 0,00';
+            });
+            const changes = ['totalRecebidoChange','totalPendenteChange','totalAtrasadoChange','mediaMensalChange'];
+            changes.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '&nbsp;';
+            });
+        }
+
+        function atualizarCardsComAnimacao() {
+            const pagos = todosTitulos.filter(t => t.status === 'PAGO');
+            const pendentes = todosTitulos.filter(t => t.status === 'PENDENTE');
+            const inadimplentes = todosTitulos.filter(t => t.status === 'CLIENTE NÃO PAGOU');
+            const totalRecebido = pagos.reduce((s, t) => s + parseFloat(t.valor || 0), 0);
+            const totalPendente = pendentes.reduce((s, t) => s + parseFloat(t.valor || 0), 0);
+            const totalClienteNaoPagou = inadimplentes.reduce((s, t) => s + parseFloat(t.valor || 0), 0);
+            const mediaMensal = totalRecebido / 6;
+            animarNumero('totalRecebido', Math.floor(totalRecebido));
+            animarNumero('totalPendente', Math.floor(totalPendente));
+            animarNumero('totalAtrasado', Math.floor(totalClienteNaoPagou));
+            animarNumero('mediaMensal', Math.floor(mediaMensal));
+
+            const plural = (n) => n === 1 ? 'título' : 'títulos';
+            const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+            setText('totalRecebidoChange', `${pagos.length} ${plural(pagos.length)}`);
+            setText('totalPendenteChange', `${pendentes.length} ${plural(pendentes.length)}`);
+            setText('totalAtrasadoChange', `${inadimplentes.length} ${plural(inadimplentes.length)}`);
+            setText('mediaMensalChange', 'Últimos 6 meses');
+        }
+
+        function filtrarPorCard(status) {
+            // Aplica o status e recarrega
+            const sel = document.getElementById('status');
+            if (sel) sel.value = status === 'PAGO' ? 'PAGO' : status;
+            aplicarFiltros();
+            // Garante que cards fiquem visíveis após filtro
+            const btnToggle = document.querySelector('#barraInferior button');
+            if (btnToggle && document.querySelector('.titulos-grid-section').style.display === 'none') {
+                btnToggle.click();
+            }
+        }
+
+        // Carregar grid de títulos
+        function carregarGridTitulos() {
+            const grid = document.getElementById('titulosGrid');
+            grid.innerHTML = '';
+
+            const renderCard = (titulo) => {
+                const card = document.createElement('div');
+                card.className = `titulo-card ${titulo.status.replace(/\s+/g, '-')}`;
+                card.onclick = () => visualizarTitulo(titulo.numero_titulo);
+                const esc = (s) => String(s || '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+                const nomeColabRaw = mapaColaboradores[titulo.colaborador] || mapaColaboradores[titulo.colaborador_codigo] || titulo.colaborador || '';
+                const nomeColab = (function(n){ const p = String(n).trim().split(/\s+/).filter(Boolean); return p.slice(0,2).join(' '); })(nomeColabRaw);
+                const hasComprovante = Boolean(titulo.comprovante_url || (Array.isArray(titulo.anexos) && titulo.anexos.length) || titulo.comprovante);
+                card.innerHTML = `
+                    <div class="titulo-header">
+                        <h4 class="titulo-cliente">${esc(titulo.numero_titulo)}</h4>
+                        <span class="titulo-status ${titulo.status.replace(/\s+/g, '-')}">${getStatusText(titulo.status)}</span>
+                    </div>
+                    <div class="titulo-info">
+                        <div class="info-item">
+                            <span class="info-label">Colaborador</span>
+                            <span class="info-value">${esc(nomeColab)}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Tipo</span>
+                            <span class="info-value">${esc(titulo.tipo)}</span>
+                        </div>
+                    </div>
+                    <div class="titulo-info">
+                        <div class="info-item">
+                            <span class="info-label">Geração</span>
+                            <span class="info-value">${formatarData(titulo.data_geracao)}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Vencimento</span>
+                            <span class="info-value">${formatarData(titulo.data_vencimento)}</span>
+                        </div>
+                    </div>
+                    <div class="titulo-valor">R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                    <div class="titulo-observacoes">${esc(titulo.descricao)}</div>
+                    <div class="titulo-acoes">
+                        <button class="timeline-btn" onclick="event.stopPropagation(); abrirTimeline('${titulo.numero_titulo}')" title="Linha do Tempo">
+                            <i class="fas fa-clock"></i>
+                        </button>
+                        <button class="btn-acao btn-visualizar" onclick="event.stopPropagation(); visualizarTitulo('${titulo.numero_titulo}')">
+                            <i class="fas fa-eye"></i> Visualizar
+                        </button>
+                        <button class="btn-acao ${hasComprovante ? 'btn-comprovante' : 'btn-comprovante-missing'}" onclick="event.stopPropagation(); visualizarComprovante('${titulo.numero_titulo}')">
+                            <i class="fas fa-file-invoice"></i> Comprovante
+                        </button>
+                    </div>`;
+                grid.appendChild(card);
+            };
+
+            if (agrupamentoAtivo && criterioAgrupamento === 'status') {
+                const grupos = titulosFiltrados.reduce((acc, t)=>{ const k = String(t.status||'Sem status'); (acc[k]=acc[k]||[]).push(t); return acc; },{});
+                
+                if (statusAgruparSelecionado === 'TODOS') {
+                    // Agrupar todos os status
+                    const ordem = ['PAGO','PENDENTE','VENCIDO','CLIENTE NÃO PAGOU','AGLUTINADO'];
+                    ordem.forEach(chave => {
+                        if (grupos[chave]) {
+                            limitarListaParaExibicao(grupos[chave]).forEach(renderCard);
+                        }
+                    });
+                    return;
+                } else if (statusAgruparSelecionado && grupos[statusAgruparSelecionado]) {
+                    // Agrupar apenas pelo status selecionado
+                    const chave = statusAgruparSelecionado;
+                    limitarListaParaExibicao(grupos[chave]).forEach(renderCard);
+                    return;
+                }
+            }
+
+            limitarListaParaExibicao(titulosFiltrados).forEach(renderCard);
+        }
+
+        // Carregar tabela com dados
+        function carregarTabela() {
+            const tbody = document.getElementById('recebimentoTableBody');
+            tbody.innerHTML = '';
+
+            const renderRow = (titulo) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><button class="timeline-btn" title="Linha do Tempo" onclick="abrirTimeline('${titulo.numero_titulo}')">
+                        <i class="fas fa-clock"></i>
+                    </button></td>
+                    <td>${titulo.numero_titulo}</td>
+                    <td>${formatarData(titulo.data_geracao)}</td>
+                    <td>${formatarData(titulo.data_vencimento)}</td>
+                    <td>${titulo.colaborador}</td>
+                    <td>${titulo.tipo}</td>
+                    <td>${titulo.descricao}</td>
+                    <td>R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                    <td><span class="status-badge status-${titulo.status.replace(/\s+/g, '-')}">${getStatusText(titulo.status)}</span></td>
+                    <td>
+                        <button class="action-btn view-btn" title="Visualizar" onclick="visualizarTitulo('${titulo.numero_titulo}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn ${ (titulo.comprovante_url || (Array.isArray(titulo.anexos) && titulo.anexos.length) || titulo.comprovante) ? 'comprovante-btn' : 'comprovante-missing' }" title="Visualizar Comprovante" onclick="visualizarComprovante('${titulo.numero_titulo}')">
+                            <i class="fas fa-file-invoice"></i>
+                        </button>
+                    </td>`;
+                return row;
+            };
+
+            if (agrupamentoAtivo && criterioAgrupamento === 'status') {
+                const grupos = titulosFiltrados.reduce((acc, t)=>{ const k = String(t.status||'Sem status'); (acc[k]=acc[k]||[]).push(t); return acc; },{});
+                
+                if (statusAgruparSelecionado === 'TODOS') {
+                    // Agrupar todos os status na tabela
+                    const ordem = ['PAGO','PENDENTE','VENCIDO','CLIENTE NÃO PAGOU','AGLUTINADO'];
+                    ordem.forEach(chave => {
+                        if (grupos[chave]) {
+                            limitarListaParaExibicao(grupos[chave]).forEach(t => tbody.appendChild(renderRow(t)));
+                        }
+                    });
+                    return;
+                } else if (statusAgruparSelecionado && grupos[statusAgruparSelecionado]) {
+                    // Agrupar apenas pelo status selecionado na tabela
+                    const chave = statusAgruparSelecionado;
+                    limitarListaParaExibicao(grupos[chave]).forEach(t => tbody.appendChild(renderRow(t)));
+                    return;
+                }
+            }
+
+            limitarListaParaExibicao(titulosFiltrados).forEach(t => tbody.appendChild(renderRow(t)));
+        }
+
+        function limitarListaParaExibicao(lista) {
+            const contador = document.getElementById('contadorTitulos');
+            if (contador) {
+                contador.textContent = `Títulos: ${lista.length}`;
+            }
+            if (String(limiteExibicao) === 'todos') return lista;
+            const limite = parseInt(limiteExibicao, 10);
+            if (!isNaN(limite)) return lista.slice(0, limite);
+            return lista;
+        }
+
+        function aplicarPaginacaoQuantidade() {
+            const sel = document.getElementById('exibirQtd');
+            if (!sel) return;
+            limiteExibicao = sel.value;
+            carregarGridTitulos();
+            carregarTabela();
+            requestAnimationFrame(sincronizarAlturaConteudo);
+        }
+
+
+
+        function aplicarAgrupamento() {
+            const selectStatus = document.getElementById('statusAgrupar');
+            if (selectStatus.value === '') {
+                agrupamentoAtivo = false;
+                statusAgruparSelecionado = '';
+            } else {
+                agrupamentoAtivo = true;
+                statusAgruparSelecionado = selectStatus.value;
+            }
+            carregarGridTitulos();
+            carregarTabela();
+            requestAnimationFrame(sincronizarAlturaConteudo);
+        }
+
+        // Funções auxiliares
+        function formatarData(data) {
+            return new Date(data).toLocaleDateString('pt-BR');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'PAGO': 'Pago',
+                'PENDENTE': 'Pendente',
+                'VENCIDO': 'Vencido',
+                'CLIENTE NÃO PAGOU': 'Cliente não pagou',
+                'AGLUTINADO': 'Aglutinado'
+            };
+            return statusMap[status] || status;
+        }
+
+        // Utilidades globais
+        function escapeHTML(s) {
+            return String(s || '').replace(/[&<>\"]/g, function(m) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]); });
+        }
+
+        function formatColaboradorNome(nome) {
+            const partes = String(nome || '').trim().split(/\s+/).filter(Boolean);
+            if (partes.length === 0) return '';
+            return partes.slice(0, 2).join(' ');
+        }
+
+        function aplicarFiltros() {
+            const status = document.getElementById('status').value;
+            const colaborador = document.getElementById('colaborador').value;
+            const dataInicial = document.getElementById('data_inicial').value;
+            const dataFinal = document.getElementById('data_final').value;
+            const periodo = document.getElementById('periodo').value;
+            const busca = (document.getElementById('busca')?.value || '').trim().toLowerCase();
+
+            // Aplicar filtros
+            titulosFiltrados = todosTitulos.filter(titulo => {
+                let passa = true;
+
+                // Filtro por status
+                if (status && titulo.status !== status) {
+                    passa = false;
+                }
+
+                // Filtro por colaborador
+                if (colaborador && titulo.colaborador !== colaborador) {
+                    passa = false;
+                }
+
+                // Filtro por período
+                if (dataInicial && titulo.data_geracao < dataInicial) {
+                    passa = false;
+                }
+
+                if (dataFinal && titulo.data_geracao > dataFinal) {
+                    passa = false;
+                }
+
+                // Filtro por busca livre (nº título, colaborador, descrição)
+                if (busca) {
+                    const texto = `${String(titulo.numero_titulo || '')} ${String(titulo.colaborador || '')} ${String(titulo.descricao || '')}`.toLowerCase();
+                    if (!texto.includes(busca)) {
+                        passa = false;
+                    }
+                }
+
+                return passa;
+            });
+
+            // Atualizar visualizações
+            carregarGridTitulos();
+            carregarTabela();
+            aplicarPaginacaoQuantidade();
+        }
+
+        function limparFiltros() {
+            document.getElementById('periodo').value = 'mes_atual';
+            document.getElementById('status').value = '';
+            const colabSel = document.getElementById('colaborador');
+            if (colabSel) colabSel.value = '';
+            document.getElementById('data_inicial').value = '';
+            document.getElementById('data_final').value = '';
+            const buscaInput = document.getElementById('busca');
+            if (buscaInput) buscaInput.value = '';
+            
+            // Resetar filtros
+            titulosFiltrados = [...todosTitulos];
+            carregarGridTitulos();
+            carregarTabela();
+            aplicarPaginacaoQuantidade();
+        }
+
+        function exportarDados() {
+            alert('Exportando dados...');
+            // Implementar exportação para Excel/PDF
+        }
+
+        function atualizarDados() {
+            alert('Atualizando dados...');
+            // Implementar atualização em tempo real
+        }
+
+        function mudarPagina(pagina) {
+            alert(`Mudando para página: ${pagina}`);
+            // Implementar paginação
+        }
+
+        async function visualizarTitulo(numeroTitulo) {
+            const titulo = todosTitulos.find(t => t.numero_titulo === numeroTitulo);
+            if (!titulo) { mostrarModalInfo('Título não encontrado.'); return; }
+
+            const nomeColab = mapaColaboradores[titulo.colaborador] || mapaColaboradores[titulo.colaborador_codigo] || titulo.colaborador || '';
+            const nomeExibicao = (function(n){ const p = String(n).trim().split(/\s+/).filter(Boolean); return p.join(' '); })(nomeColab);
+
+            const isPago = String(titulo.status||'').toUpperCase() === 'PAGO';
+            const titulosParciais = todosTitulos.filter(t => t.id_titulo_origem === titulo.id);
+            const isParcial = titulosParciais.length > 0;
+            
+            // Debug: verificar campos do título
+            console.log('Título completo:', titulo);
+            console.log('Status:', titulo.status);
+            console.log('tipo_aglutinacao:', titulo.tipo_aglutinacao);
+            console.log('ids_aglutinados:', titulo.ids_aglutinados);
+            
+            const idsAgl = titulo.ids_aglutinados ? (Array.isArray(titulo.ids_aglutinados) ? titulo.ids_aglutinados : titulo.ids_aglutinados.toString().split(',').map(id => id.trim())) : [];
+            let titulosAglutinados = [];
+            const isAglutinado = String(titulo.status||'').toUpperCase()==='AGLUTINADO' || (idsAgl.length>0) || Boolean(titulo.tipo_aglutinacao);
+            
+            console.log('isAglutinado:', isAglutinado);
+            console.log('idsAgl:', idsAgl);
+            
+            // Se for aglutinado, buscar os títulos originais da API
+            if (isAglutinado && idsAgl.length > 0) {
+                try {
+                    console.log('Título aglutinado detectado, IDs:', idsAgl);
+                    // Converter string de IDs em array se for string
+                    const ids = typeof idsAgl === 'string' ? idsAgl.split(',').map(id => id.trim()) : idsAgl;
+                    console.log('IDs processados:', ids);
+                    
+                    // Buscar cada título original da API
+                    for (const id of ids) {
+                        try {
+                            console.log('Buscando título ID:', id);
+                            const response = await window.api.get(`/movimento_comissoes/${id}`);
+                            if (response && (response.data || response.id)) {
+                                const tituloData = response.data || response;
+                                titulosAglutinados.push(tituloData);
+                                console.log('Título encontrado:', tituloData.numero_titulo);
+                            }
+                        } catch (error) {
+                            console.error('Erro ao carregar título original ID', id, ':', error);
+                        }
+                    }
+                    console.log('Total de títulos aglutinados carregados:', titulosAglutinados.length);
+                } catch (error) {
+                    console.error('Erro ao carregar títulos aglutinados:', error);
+                }
+            }
+
+            // Pilares do título (tenta vários formatos de campo)
+            let produtosArr = Array.isArray(titulo.produtos) ? titulo.produtos
+                : (Array.isArray(titulo.itens) ? titulo.itens
+                : (Array.isArray(titulo.items) ? titulo.items : []));
+
+            // Compatibilidade com Movimento: item_id no formato "codigo-nome,codigo-nome"
+            if ((!produtosArr || produtosArr.length === 0) && typeof titulo.item_id === 'string' && titulo.item_id.trim()) {
+                const itensStr = titulo.item_id.split(',').map(s => s.trim()).filter(Boolean);
+                produtosArr = itensStr.map((item, idx) => {
+                    const match = item.match(/^(\d{5})-(.+)$/);
+                    if (match) {
+                        const nome = match[2].trim();
+                        const unit = Number(titulo.valor_venda || titulo.valor || 0);
+                        return { nome, quantidade: 1, valor_unitario: unit, valor_total: unit };
+                    }
+                    return { nome: item, quantidade: 1, valor_unitario: Number(titulo.valor_venda||0), valor_total: Number(titulo.valor_venda||0) };
+                });
+            }
+            const produtosHTML = produtosArr.map((p, idx) => {
+                const nome = p.nome || p.descricao || p.nome_produto || `Produto ${idx+1}`;
+                const qtd = Number(p.quantidade ?? p.qtd ?? 1);
+                const unit = Number(p.valor_unitario ?? p.unitario ?? p.preco_unitario ?? 0);
+                const total = Number(p.valor_total ?? (qtd * unit));
+                return `<tr>
+                    <td style=\"padding: 10px 8px; text-align: left; color: #333;\">${nome}</td>
+                    <td style=\"padding: 10px 8px; text-align: center; color: #666;\">${qtd}</td>
+                    <td style=\"padding: 10px 8px; text-align: right; color: #666;\">R$ ${unit.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    <td style=\"padding: 10px 8px; text-align: right; color: #333; font-weight: 600;\">R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                </tr>`;
+            }).join('');
+
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; display: flex; align-items: center; justify-content: center;';
+
+            const content = document.createElement('div');
+            content.style.cssText = 'background:#fff; border-radius:16px; max-width: 800px; width: 95vw; min-width: 320px; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding:0; display:flex; flex-direction:column; max-height: 90vh;';
+
+            const header = document.createElement('div');
+            header.style.cssText = 'padding:24px 36px 0 36px; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:16px 16px 0 0;';
+            header.innerHTML = `<h2 style="margin:0; font-size:1.3em; color:#1976D2; display:flex; align-items:center; gap:10px; font-weight:700;"><i class="fas fa-eye"></i> Visualizar Título</h2><button style="background:none; border:none; font-size:1.5em; color:#666; cursor:pointer; padding:5px; transition:color 0.3s; border-radius:50%;"><i class="fas fa-times"></i></button>`;
+
+            const body = document.createElement('div');
+            body.style.cssText = 'padding:20px 28px 0 28px; flex:1 1 auto; min-height:140px; text-align:left; background:#fff; overflow-y:auto; max-height: 68vh;';
+            const secaoBaixa = isPago ? `
+                    <div class=\"form-section\" style=\"margin-top:22px; padding-top:16px; border-top:1px solid #eee;\">
+                        <h3 style=\"margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;\"><i class=\"fas fa-receipt\"></i> Dados da Baixa</h3>
+                        <div style=\"display:flex; gap:16px; flex-wrap:wrap;\">
+                            <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Data Pagamento</div><div style=\"font-weight:600; color:#1f2937;\">${titulo.data_pagamento?formatarData(titulo.data_pagamento):'-'}</div></div>
+                            <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Valor Pago</div><div style=\"font-weight:600; color:#1f2937;\">R$ ${(Number(titulo.valor_pago||titulo.valor||0)).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
+                    </div>
+                    </div>` : '';
+
+            const listaHTML = (arr) => arr.map(t=>`<li style=\"padding:8px 0; display:flex; justify-content:space-between; border-bottom:1px dashed #eee;\"><span>${t.numero_titulo}</span><span style=\"color:#6b7280;\">${getStatusText(t.status)} • R$ ${Number(t.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></li>`).join('');
+
+            const secaoParciais = isParcial ? `
+                    <div class=\"form-section\" style=\"margin-top:22px; padding-top:16px; border-top:1px solid #eee;\">
+                        <h3 style=\"margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;\"><i class=\"fas fa-stream\"></i> Títulos Parciais Gerados</h3>
+                        <ul style=\"list-style:none; margin:0; padding:0;\">${listaHTML(titulosParciais)}</ul>
+                    </div>`: '';
+
+            const secaoAgl = isAglutinado ? `
+                    <div class=\"form-section\" style=\"margin-top:22px; padding-top:16px; border-top:1px solid #eee;\">
+                        <h3 style=\"margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;\"><i class=\"fas fa-layer-group\"></i> Títulos Aglutinados</h3>
+                        ${titulosAglutinados.length ? `<ul style=\"list-style:none; margin:0; padding:0;\">${listaHTML(titulosAglutinados)}</ul>` : '<div style=\"color:#6b7280;\">Sem lista de títulos aglutinados.</div>'}
+                    </div>` : '';
+
+            body.innerHTML = `
+                <form style="margin:0;">
+                    <!-- Informações Principais -->
+                    <div class="form-section" style="margin-bottom:24px;">
+                        <h3 style="margin-bottom:16px; font-size:1.1em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;"><i class="fas fa-info-circle"></i> Informações Principais</h3>
+                        <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Número do Título</label>
+                                <input type="text" value="${numeroTitulo}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Status</label>
+                                <input type="text" value="${getStatusText(titulo.status)}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Colaborador</label>
+                                <input type="text" value="${nomeExibicao}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                        </div>
+                        <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Tipo</label>
+                                <input type="text" value="${titulo.tipo || ''}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Valor</label>
+                                <input type="text" value="R$ ${Number(titulo.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Valores e Datas -->
+                    <div class="form-section" style="margin-bottom:24px;">
+                        <h3 style="margin-bottom:16px; font-size:1.1em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;"><i class="fas fa-dollar-sign"></i> Valores e Datas</h3>
+                        <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Valor</label>
+                                <input type="text" value="R$ ${Number(titulo.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Data da Geração</label>
+                                <input type="text" value="${formatarData(titulo.data_geracao)}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Data de Vencimento</label>
+                                <input type="text" value="${formatarData(titulo.data_vencimento)}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                        </div>
+                        <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Usuário do Lançamento</label>
+                                <input type="text" value="${titulo.usuario_lancamento || 'admin'}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Informações de Pagamento -->
+                    ${isPago ? `
+                    <div class="form-section" style="margin-bottom:24px;">
+                        <h3 style="margin-bottom:16px; font-size:1.1em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;"><i class="fas fa-credit-card"></i> Informações de Pagamento</h3>
+                        <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Data do Pagamento</label>
+                                <input type="text" value="${titulo.data_pagamento ? formatarData(titulo.data_pagamento) : 'Não informado'}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Valor Pago</label>
+                                <input type="text" value="R$ ${Number(titulo.valor_pago||titulo.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                        </div>
+                        <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1; min-width:200px;">
+                                <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Observações do Pagamento</label>
+                                <input type="text" value="${titulo.observacoes || 'Nenhuma observação'}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            </div>
+                        </div>
+                    </div>` : ''}
+
+                    <!-- Descrição -->
+                    <div class="form-section" style="margin-bottom:24px;">
+                        <h3 style="margin-bottom:16px; font-size:1.1em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;"><i class="fas fa-list"></i> Descrição</h3>
+                        <div style="background:#fff; border-radius:8px; border:1px solid #e3f2fd; padding:12px; color:#555;">
+                            ${String(titulo.descricao||titulo.observacoes||'Sem observações.').replace(/[&<>]/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}
+                        </div>
+                    </div>
+                    ${isAglutinado ? `
+                    <div class=\"form-section\" style=\"margin-top:22px; padding-top:16px; border-top:1px solid #eee;\">
+                        <h3 style=\"margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;\"><i class=\"fas fa-layer-group\"></i> Títulos Aglutinados</h3>
+                        <div style=\"background:#fff; border-radius:8px; border:1px solid #e3f2fd; padding:12px;\">
+                            ${titulosAglutinados.length ? `
+                            <table style=\"width:100%; border-collapse:collapse;\">
+                                <thead>
+                                    <tr>
+                                        <th style=\"padding: 12px 8px; text-align: left; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;\">Nº Título</th>
+                                        <th style=\"padding: 12px 8px; text-align: center; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;\">Colaborador</th>
+                                        <th style=\"padding: 12px 8px; text-align: center; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;\">Status</th>
+                                        <th style=\"padding: 12px 8px; text-align: right; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;\">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${titulosAglutinados.map(t => `
+                                        <tr>
+                                            <td style=\"padding: 10px 8px; text-align: left; color: #333;\">${t.numero_titulo || t.id}</td>
+                                            <td style=\"padding: 10px 8px; text-align: center; color: #666;\">${t.colaborador || ''}</td>
+                                            <td style=\"padding: 10px 8px; text-align: center; color: #666;\">${getStatusText(t.status)}</td>
+                                            <td style=\"padding: 10px 8px; text-align: right; color: #333; font-weight: 600;\">R$ ${Number(t.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>` : '<div style=\"color:#6c757d; font-style:italic; text-align:center; padding:16px;\">Nenhum título aglutinado encontrado.</div>'}
+                        </div>
+                    </div>` : (produtosArr.length ? `
+                    <div class=\"form-section\" style=\"margin-top:22px; padding-top:16px; border-top:1px solid #eee;\">
+                        <h3 style=\"margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;\"><i class=\"fas fa-list\"></i> Pilares do Título</h3>
+                        <div style=\"background:#fff; border-radius:8px; border:1px solid #e3f2fd; padding:12px;\">
+                            <table style=\"width:100%; border-collapse:collapse;\">
+                                <thead>
+                                    <tr>
+                                        <th style=\"padding: 12px 8px; text-align: left; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;\">Produto</th>
+                                        <th style=\"padding: 12px 8px; text-align: center; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;\">Qtd</th>
+                                        <th style=\"padding: 12px 8px; text-align: right; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;\">Valor Unit.</th>
+                                        <th style=\"padding: 12px 8px; text-align: right; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;\">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${produtosHTML}
+                                </tbody>
+                            </table>
+                    </div>
+                    </div>` : '')}
+
+                    <div class="form-section" style="margin-top:22px; padding-top:16px; border-top:1px solid #eee;">
+                        <h3 style="margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;"><i class="fas fa-paperclip"></i> Comprovante de Pagamento</h3>
+                        <div id="comprovante-container-r" style="background:#fff; border-radius:8px; padding:16px; border:1px solid #e3f2fd;">
+                            <div id="comprovante-info-r" style="display:none;">
+                                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                                    <i class="fas fa-file-alt" style="font-size:1.3em; color:#4CAF50;"></i>
+                                    <div>
+                                        <div style="font-weight:500; color:#333; font-size:0.9em;">Comprovante anexado</div>
+                                        <div style="font-size:0.8em; color:#666;">Clique no botão abaixo para visualizar</div>
+                                    </div>
+                                </div>
+                                <button type="button" id="btnVisualizarComprovanteR" style="background:#1976D2; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; display:flex; align-items:center; gap:6px; font-weight:500;">
+                                    <i class="fas fa-eye"></i> Visualizar Comprovante
+                                </button>
+                            </div>
+                            <div id="sem-comprovante-r" style="text-align:center; color:#6c757d; font-style:italic; padding:16px;">
+                                <i class="fas fa-info-circle" style="margin-right:8px;"></i>
+                                Nenhum comprovante anexado a este título
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            `;
+
+            const footer = document.createElement('div');
+            footer.style.cssText = 'display:flex; justify-content:flex-end; gap:10px; margin-top:20px; padding:20px 36px 24px 36px; border-top:1px solid #eee; background:#f8f9fa; border-radius:0 0 16px 16px;';
+            footer.innerHTML = `<button type="button" onclick="this.closest('.modal').remove()" style="padding:10px 20px; border-radius:6px; font-size:14px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:8px; background-color:#f5f5f5; color:#333; border:1px solid #ddd;">Fechar</button>`;
+
+            content.appendChild(header);
+            content.appendChild(body);
+            content.appendChild(footer);
+            modal.appendChild(content);
+                document.body.appendChild(modal);
+
+            header.querySelector('button').onclick = () => modal.remove();
+            modal.addEventListener('click', (e)=>{ if (e.target === modal) modal.remove(); });
+
+            // Configurar bloco de comprovante como no Movimento
+            (function(){
+                const temComprovante = Boolean(titulo.comprovante_url || (Array.isArray(titulo.anexos)&&titulo.anexos.length) || titulo.comprovante);
+                const info = document.getElementById('comprovante-info-r');
+                const vazio = document.getElementById('sem-comprovante-r');
+                const btn = document.getElementById('btnVisualizarComprovanteR');
+                if (temComprovante) {
+                    if (info) info.style.display = 'block';
+                    if (vazio) vazio.style.display = 'none';
+                    if (btn) btn.onclick = function(){ visualizarComprovante(numeroTitulo); };
+                } else {
+                    if (info) info.style.display = 'none';
+                    if (vazio) vazio.style.display = 'block';
+                }
+            })();
+        }
+
+        function editarTitulo(cliente) {
+            alert(`Editando título do cliente: ${cliente}`);
+            // Implementar modal de edição
+        }
+
+        async function visualizarComprovante(numeroTitulo) {
+            try {
+                const titulo = todosTitulos.find(t => t.numero_titulo === numeroTitulo) || {};
+                // Prioriza exatamente como no Movimento: usar comprovante_url
+                let url = titulo.comprovante_url || null;
+
+                // Fallbacks caso não exista a URL direta
+                if (!url && Array.isArray(titulo.anexos) && titulo.anexos.length) {
+                    const anexo = titulo.anexos.find(a => a.url) || titulo.anexos[0];
+                    if (anexo && anexo.url) url = anexo.url;
+                }
+                if (!url && titulo.comprovante) {
+                    const b64 = String(titulo.comprovante);
+                    url = b64.startsWith('data:') ? b64 : `data:application/octet-stream;base64,${b64}`;
+                }
+                if (!url && (titulo.id || numeroTitulo)) {
+                    try {
+                        const resp = await window.api.get(`/movimento_comissoes/${titulo.id || numeroTitulo}/comprovante`);
+                        if (resp && (resp.url || resp.base64)) {
+                            url = resp.url || (resp.base64.startsWith('data:') ? resp.base64 : `data:application/octet-stream;base64,${resp.base64}`);
+                        }
+                    } catch (_) {}
+                }
+
+                if (url) {
+                    window.open(url, '_blank');
+                } else {
+                    mostrarModalInfo('Nenhum comprovante anexado a este título.');
+                }
+            } catch (e) {
+                console.error('Erro ao abrir comprovante:', e);
+                mostrarModalInfo('Não foi possível abrir o comprovante.');
+            }
+        }
+
+        function mostrarModalInfo(mensagem) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.cssText = `
+                position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 5000;
+                display: flex; align-items: center; justify-content: center;`;
+
+            const box = document.createElement('div');
+            box.style.cssText = `
+                background: #fff; border-radius: 12px; padding: 20px 24px; max-width: 420px; width: 92%;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center;`;
+            box.innerHTML = `
+                <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 12px;">
+                    <h3 style="margin:0; color:#1f2937; font-size: 1.05em; font-weight:700; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-info-circle" style="color:#0d6efd;"></i> Aviso
+                    </h3>
+                    <button style="background:none;border:none;font-size:1.4em;color:#6b7280;cursor:pointer;" title="Fechar">&times;</button>
+                </div>
+                <div style="color:#4b5563; font-size:0.95em;">${mensagem}</div>
+                <div style="margin-top: 16px;">
+                    <button style="background:#0d6efd;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;">OK</button>
+                </div>`;
+
+            const close = () => modal.remove();
+            box.querySelector('button[title="Fechar"]').onclick = close;
+            box.querySelector('button:not([title])').onclick = close;
+            modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+
+            modal.appendChild(box);
+            document.body.appendChild(modal);
+        }
+
+        function abrirTimeline(numeroTitulo) {
+            console.log('Abrir timeline do título:', numeroTitulo);
+            // Buscar o título nos dados reais
+            const titulo = todosTitulos.find(t => t.numero_titulo === numeroTitulo);
+            if (titulo) {
+                // Simular dados de timeline para demonstração
+                const eventosTimeline = [
+                    {
+                        data: titulo.data_geracao,
+                        evento: 'Título Gerado',
+                        descricao: `Título ${numeroTitulo} foi criado com valor de R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`
+                    },
+                    {
+                        data: titulo.data_vencimento,
+                        evento: 'Data de Vencimento',
+                        descricao: `Vencimento previsto para ${formatarData(titulo.data_vencimento)}`
+                    }
+                ];
+
+                // Se o título for PAGO, adicionar evento de pagamento
+                if (titulo.status === 'PAGO') {
+                    eventosTimeline.push({
+                        data: titulo.data_vencimento,
+                        evento: 'Título Pago',
+                        descricao: `Pagamento realizado no valor de R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`
+                    });
+                }
+
+                // Se o título for VENCIDO, adicionar evento de vencimento
+                if (titulo.status === 'VENCIDO') {
+                    eventosTimeline.push({
+                        data: titulo.data_vencimento,
+                        evento: 'Título Vencido',
+                        descricao: `Título vencido em ${formatarData(titulo.data_vencimento)}`
+                    });
+                }
+
+                // Mostrar modal com timeline
+                mostrarModalTimeline(titulo, eventosTimeline);
+            }
+        }
+
+        function mostrarModalTimeline(titulo, eventos) {
+            // Criar modal de timeline
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.5);
+                z-index: 4000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                max-width: 600px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+                position: relative;
+            `;
+
+            let eventosHTML = '';
+            eventos.forEach((evento, index) => {
+                eventosHTML += `
+                    <div style="display: flex; margin-bottom: 20px; position: relative;">
+                        <div style="
+                            width: 12px;
+                            height: 12px;
+                            background: #ff9800;
+                            border-radius: 50%;
+                            margin-right: 16px;
+                            margin-top: 4px;
+                            flex-shrink: 0;
+                        "></div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: #333; margin-bottom: 4px;">
+                                ${evento.evento}
+                            </div>
+                            <div style="color: #666; font-size: 0.9em; margin-bottom: 4px;">
+                                ${formatarData(evento.data)}
+                            </div>
+                            <div style="color: #555; font-size: 0.95em;">
+                                ${evento.descricao}
+                            </div>
+                        </div>
+                        ${index < eventos.length - 1 ? `
+                            <div style="
+                                position: absolute;
+                                left: 5px;
+                                top: 16px;
+                                width: 2px;
+                                height: 20px;
+                                background: #e0e0e0;
+                            "></div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            modalContent.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; color: #333; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-clock" style="color: #ff9800;"></i>
+                        Linha do Tempo - ${titulo.numero_titulo}
+                    </h2>
+                    <button onclick="this.closest('.modal').remove()" style="
+                        background: none;
+                        border: none;
+                        font-size: 1.5em;
+                        color: #666;
+                        cursor: pointer;
+                        padding: 5px;
+                    ">&times;</button>
+                </div>
+                <div style="margin-bottom: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px;">
+                    <div style="font-weight: 600; color: #333; margin-bottom: 4px;">
+                        ${titulo.numero_titulo} - ${titulo.colaborador}
+                    </div>
+                    <div style="color: #666; font-size: 0.9em;">
+                        Valor: R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})} | Status: ${getStatusText(titulo.status)}
+                    </div>
+                </div>
+                <div style="padding-left: 8px;">
+                    ${eventosHTML}
+                </div>
+            `;
+
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+
+            // Fechar modal ao clicar fora
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        function mostrarApenasGrid() {
+            const gridSection = document.querySelector('.titulos-grid-section');
+            const tableSection = document.querySelector('.table-scroll');
+            const paginationSection = document.querySelector('.filters-container:last-of-type');
+            
+            // Mostrar apenas a grid
+            gridSection.style.display = 'block';
+            tableSection.style.display = 'none';
+            paginationSection.style.display = 'flex';
+        }
+
+        function alternarVisualizacao(btn) {
+            const gridSection = document.querySelector('.titulos-grid-section');
+            const tableSection = document.querySelector('.table-scroll');
+            const paginationSection = document.querySelector('.filters-container:last-of-type');
+            
+            if (gridSection.style.display === 'none') {
+                // Mostrar grid, esconder tabela
+                gridSection.style.display = 'block';
+                tableSection.style.display = 'none';
+                paginationSection.style.display = 'flex';
+                
+                // Atualizar texto do botão
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-list"></i> Ver Tabela';
+                }
+            } else {
+                // Mostrar tabela, esconder grid
+                gridSection.style.display = 'none';
+                tableSection.style.display = 'block';
+                paginationSection.style.display = 'flex';
+                
+                // Atualizar texto do botão
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-th-large"></i> Ver Cards';
+                }
+            }
+
+            // Sincronizar altura após alternar
+            requestAnimationFrame(sincronizarAlturaConteudo);
+            setTimeout(sincronizarAlturaConteudo, 60);
+        }
+
+        // Calcula e aplica a mesma altura máxima para grid e tabela (evita sobrepor a barra inferior)
+        function sincronizarAlturaConteudo() {
+            try {
+                const barra = document.getElementById('barraInferior');
+                const gridContainer = document.querySelector('.titulos-grid-container');
+                const tableContainer = document.querySelector('.table-scroll');
+                if (!gridContainer || !tableContainer) return;
+
+                const topGrid = gridContainer.getBoundingClientRect().top;
+                const topTable = tableContainer.getBoundingClientRect().top;
+                const limiteInferior = barra ? barra.getBoundingClientRect().top : window.innerHeight;
+                const folga = 20; // folga para manter espaçamento inferior igual ao superior da grid
+
+                const disponivelGrid = Math.max(200, Math.floor(limiteInferior - topGrid - folga));
+                const disponivelTable = Math.max(200, Math.floor(limiteInferior - topTable - folga));
+
+                gridContainer.style.maxHeight = disponivelGrid + 'px';
+                gridContainer.style.height = disponivelGrid + 'px';
+                tableContainer.style.maxHeight = disponivelTable + 'px';
+                tableContainer.style.height = disponivelTable + 'px';
+            } catch (_) {}
+        }
+
+        // Inicializar quando a página carregar
+        window.addEventListener('DOMContentLoaded', function() {
+            // Zerar cards antes de qualquer carregamento para evitar flash
+            zerarCards();
+            // Carregar dados da API
+            carregarTitulos();
+            
+            // Iniciar mostrando apenas os cards (grid)
+            mostrarApenasGrid();
+
+            // Sincronizar altura após montar layout inicial
+            setTimeout(() => {
+                ajustarBarraInferior();
+                sincronizarAlturaConteudo();
+            }, 50);
+
+            // Botão para mostrar/ocultar totalizadores e expandir área de conteúdo
+            (function initToggleTotaisReceb(){
+                const btn = document.getElementById('toggleTotaisBtnReceb');
+                const cards = document.getElementById('dashboardCards');
+                const tableContainer = document.querySelector('.table-scroll');
+                const gridContainer = document.querySelector('.titulos-grid-container');
+                if (!btn || !cards) return;
+
+                let totaisVisiveis = true;
+                btn.addEventListener('click', function(){
+                    totaisVisiveis = !totaisVisiveis;
+                    if (totaisVisiveis) {
+                        cards.style.display = '';
+                        if (tableContainer) tableContainer.classList.remove('expanded');
+                        btn.innerHTML = '<i class="fas fa-chart-pie"></i> Ocultar totais';
+                    } else {
+                        cards.style.display = 'none';
+                        if (tableContainer) tableContainer.classList.add('expanded');
+                        btn.innerHTML = '<i class="fas fa-chart-pie"></i> Mostrar totais';
+                    }
+                    // Recalcular alturas após a alteração
+                    requestAnimationFrame(sincronizarAlturaConteudo);
+                    setTimeout(sincronizarAlturaConteudo, 60);
+                });
+            })();
+        });
+
+        // Atualização automática removida - sistema sem recarregamentos
+        // setInterval(function() {
+        //     // Aqui você pode implementar atualização automática
+        //     console.log('Verificando atualizações...');
+        }, 300000);
+
+        // Ajustar posição da barra inferior quando necessário
+        function ajustarBarraInferior() {
+            const barra = document.getElementById('barraInferior');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (barra && sidebar) {
+                const sidebarWidth = sidebar.offsetWidth;
+                const margin = 48; // 24px de cada lado
+                barra.style.left = sidebarWidth + 'px';
+                barra.style.width = `calc(100vw - ${sidebarWidth}px - ${margin}px)`;
+            }
+        }
+
+        // Ajustar quando a janela for redimensionada
+        window.addEventListener('resize', function() {
+            ajustarBarraInferior();
+            sincronizarAlturaConteudo();
+        });
+        
+        // Ajustar quando a sidebar for expandida/recolhida
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(ajustarBarraInferior, 100);
+        });
+    </script>
+    <script src="scripts/config/api.js"></script>
+    <script src="scripts/navigation.js"></script>
+    <script>
+    window.addEventListener('DOMContentLoaded', function() {
+        if (typeof initializeMenu === 'function') {
+            initializeMenu();
+        }
+        document.querySelectorAll('.nav-menu a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                var modais = ['paymentModal', 'viewModal', 'baixaModal'];
+                modais.forEach(function(id) {
+                    var modal = document.getElementById(id);
+                    if (modal) modal.style.display = 'none';
+                });
+            });
+        });
+    });
+    </script>
+    <script src="scripts/hamburger-menu.js"></script>
+</body>
+</html> 

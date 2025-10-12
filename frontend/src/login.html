@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParoquiaON - Login</title>
+    <link rel="icon" type="image/png" href="assets/images/logo2.png">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/login.css">
+    <style>
+        .loading-spinner {
+            display: none;
+            margin-left: 8px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-entrar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-entrar:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            display: none;
+            color: #28a745;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Formas decorativas -->
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h2>Bem vindo ao <span class="highlight">Gestor de Comissões</span></h2>
+                <p>Preencha os dados do login para acessar</p>
+            </div>
+            
+            <div class="error-message" style="display: none;"></div>
+            <div class="success-message" style="display: none;"></div>
+
+            <!-- Formulário de Login Normal -->
+            <form action="/login" method="POST" class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="usuario">Usuário</label>
+                    <div class="input-group">
+                        <input type="text" id="usuario" name="usuario" placeholder="Digite seu usuário" required>
+                        <i class="input-icon fas fa-user"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <div class="input-group">
+                        <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+                        <i class="input-icon fas fa-eye toggle-password"></i>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember">
+                        <span>Lembrar-me</span>
+                    </label>
+                    
+                </div>
+                <button type="submit" class="btn-entrar">
+                    <span class="btn-text">Entrar</span>
+                    <i class="fas fa-arrow-right btn-icon"></i>
+                    <i class="fas fa-spinner loading-spinner"></i>
+                </button>
+            </form>
+
+            <!-- Formulário de Alteração de Senha (Primeiro Acesso) -->
+            <form class="password-change-form" id="passwordChangeForm" style="display: none;">
+                <div class="first-login-header">
+                    <i class="fas fa-key" style="font-size: 2em; color: #ff9800; margin-bottom: 10px;"></i>
+                    <h3 style="color: #333; margin-bottom: 5px;">Primeiro Acesso</h3>
+                    <p style="color: #666; font-size: 0.9em; margin-bottom: 20px;">Você precisa alterar sua senha temporária</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="novaSenha">Nova Senha</label>
+                    <div class="input-group">
+                        <input type="password" id="novaSenha" name="novaSenha" placeholder="Digite sua nova senha" required>
+                        <i class="input-icon fas fa-lock"></i>
+                    </div>
+                    <div class="password-strength" id="passwordStrength" style="margin-top: 5px; font-size: 0.8em;"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmarSenha">Confirmar Nova Senha</label>
+                    <div class="input-group">
+                        <input type="password" id="confirmarSenha" name="confirmarSenha" placeholder="Confirme sua nova senha" required>
+                        <i class="input-icon fas fa-lock"></i>
+                    </div>
+                </div>
+                
+                <div class="password-requirements" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 5px; padding: 10px; margin-bottom: 15px; font-size: 0.85em; max-height: none;">
+                    <strong>Requisitos da senha:</strong>
+                    <ul style="margin: 5px 0 0 15px; padding: 0;">
+                        <li>Mínimo 8 caracteres</li>
+                        <li>Pelo menos 1 letra maiúscula</li>
+                        <li>Pelo menos 1 letra minúscula</li>
+                        <li>Pelo menos 1 número</li>
+                        <li>Pelo menos 1 caractere especial (!@#$%&*)</li>
+                    </ul>
+                </div>
+                
+                <button type="submit" class="btn-entrar">
+                    <span class="btn-text">Alterar Senha</span>
+                    <i class="fas fa-check btn-icon"></i>
+                    <i class="fas fa-spinner loading-spinner"></i>
+                </button>
+            </form>
+        </div>
+        <div class="login-message">
+            <div class="logo-container">
+                <img src="assets/images/logo2.png" alt="BlueDev Logo" class="login-logo">
+            </div>
+            <h2>Faça o Login em nossa<br>Plataforma</h2>
+        </div>
+        <div class="developer-credit">
+            Desenvolvido por <span>Magno Michel</span>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        document.querySelector('.toggle-password').addEventListener('click', function() {
+            const senhaInput = document.getElementById('senha');
+            const type = senhaInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            senhaInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // Variáveis globais para controle de estado
+        let currentUserEmail = '';
+        let isFirstLogin = false;
+
+        // Função para validar força da senha
+        function validatePasswordStrength(password) {
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%&*]/.test(password)
+            };
+            
+            const strength = Object.values(requirements).filter(Boolean).length;
+            return { requirements, strength };
+        }
+
+        // Função para atualizar indicador de força da senha
+        function updatePasswordStrength(password) {
+            const { requirements, strength } = validatePasswordStrength(password);
+            const strengthElement = document.getElementById('passwordStrength');
+            
+            if (!strengthElement) return;
+            
+            const strengthText = ['Muito fraca', 'Fraca', 'Regular', 'Boa', 'Muito boa'][strength - 1] || 'Muito fraca';
+            const strengthColor = ['#dc3545', '#fd7e14', '#ffc107', '#20c997', '#28a745'][strength - 1] || '#dc3545';
+            
+            strengthElement.innerHTML = `
+                <span style="color: ${strengthColor}; font-weight: bold;">Força: ${strengthText}</span>
+                <div style="margin-top: 3px;">
+                    ${requirements.length ? '✅' : '❌'} 8+ caracteres
+                    ${requirements.uppercase ? '✅' : '❌'} Maiúscula
+                    ${requirements.lowercase ? '✅' : '❌'} Minúscula
+                    ${requirements.number ? '✅' : '❌'} Número
+                    ${requirements.special ? '✅' : '❌'} Especial
+                </div>
+            `;
+        }
+
+        // Função para alternar entre formulários
+        function switchToPasswordChange(email) {
+            currentUserEmail = email;
+            isFirstLogin = true;
+            
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('passwordChangeForm').style.display = 'block';
+            
+            // Atualizar header
+            const header = document.querySelector('.login-header h2');
+            const subheader = document.querySelector('.login-header p');
+            header.innerHTML = 'Alterar <span class="highlight">Senha</span>';
+            subheader.textContent = `Olá! Você precisa alterar sua senha temporária para continuar.`;
+        }
+
+        function switchToLogin() {
+            isFirstLogin = false;
+            currentUserEmail = '';
+            
+            document.getElementById('passwordChangeForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            
+            // Resetar header
+            const header = document.querySelector('.login-header h2');
+            const subheader = document.querySelector('.login-header p');
+            header.innerHTML = 'Bem vindo ao <span class="highlight">Gestor de Comissões</span>';
+            subheader.textContent = 'Preencha os dados do login para acessar';
+        }
+
+        // Verificar se já está logado ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Limpar dados de autenticação para forçar login
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            sessionStorage.clear();
+            
+            console.log('🔐 Dados de autenticação limpos, usuário deve fazer login');
+
+            // Event listener para validação de senha em tempo real
+            const novaSenhaInput = document.getElementById('novaSenha');
+            if (novaSenhaInput) {
+                novaSenhaInput.addEventListener('input', function() {
+                    updatePasswordStrength(this.value);
+                });
+            }
+        });
+
+        // Mapeamento de permissões para páginas
+        function getFirstAllowedPage(permissoes) {
+            if (!permissoes || typeof permissoes !== 'object') return 'index.html';
+            const order = [
+                { url: 'index.html', flag: 'dashboard_ver' },
+                { url: 'colaboradores.html', flag: 'cadastros_colaboradores_ver' },
+                { url: 'pastorais.html', flag: 'cadastros_clientes_ver' },
+                { url: 'pilares.html', flag: 'cadastros_produtos_ver' },
+                { url: 'locais.html', flag: 'cadastros_servicos_ver' },
+                { url: 'acoes.html', flag: 'cadastros_acoes_ver' },
+                { url: 'pessoas.html', flag: 'cadastros_pessoas_ver' },
+                { url: 'usuarios.html', flag: 'cadastros_usuarios_ver' },
+                { url: 'perfil.html', flag: 'cadastros_perfis_ver' },
+                { url: 'recebimento.html', flag: 'relatorios_recebimento_ver' },
+                { url: 'conferencia.html', flag: 'relatorios_conferencia_ver' },
+                { url: 'dinamico.html', flag: 'relatorios_dinamico_ver' },
+                { url: 'manutencao-bd.html', flag: 'configuracoes_manutencao_ver' },
+                { url: 'sincronizar.html', flag: 'configuracoes_sincronizar_ver' }
+            ];
+            for (const item of order) {
+                if (permissoes[item.flag]) return item.url;
+            }
+            return 'index.html';
+        }
+
+        // Form submission - Login Normal
+        document.querySelector('.login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('usuario').value;
+            const senha = document.getElementById('senha').value;
+            const btnEntrar = document.querySelector('.btn-entrar');
+            const btnText = document.querySelector('.btn-text');
+            const btnIcon = document.querySelector('.btn-icon');
+            const loadingSpinner = document.querySelector('.loading-spinner');
+            const errorMessage = document.querySelector('.error-message');
+            const successMessage = document.querySelector('.success-message');
+            
+            // Reset messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // Disable button and show loading state
+            btnEntrar.disabled = true;
+            btnIcon.style.display = 'none';
+            loadingSpinner.style.display = 'inline-block';
+            btnText.textContent = 'Entrando...';
+            
+            try {
+                console.log('Tentando fazer login...', { email });
+                const response = await fetch('https://e-gerente-backend-cadastros-api.vercel.app/api/cadastros/colaboradores/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, senha })
+                });
+
+                console.log('Status da resposta:', response.status);
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Verificar se é primeiro acesso (senha temporária)
+                    if (data.requiresPasswordChange) {
+                        switchToPasswordChange(email);
+                        return;
+                    }
+                    
+                    // Login normal (sessão apenas)
+                    sessionStorage.setItem('token', data.token);
+                    sessionStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Redirecionar para primeira página permitida
+                    const target = getFirstAllowedPage(data.user && data.user.permissoes);
+                    setTimeout(() => { window.location.href = target; }, 250);
+                } else {
+                    const errorData = await response.json();
+                    
+                    // Tratamento específico para colaborador inativo
+                    if (response.status === 403 && errorData.error && errorData.error.includes('inativo')) {
+                        errorMessage.innerHTML = `
+                            <i class="fas fa-user-slash"></i>
+                            <strong>Acesso Negado</strong><br>
+                            ${errorData.error}<br>
+                            <small>${errorData.details || 'Entre em contato com o administrador'}</small>
+                        `;
+                        errorMessage.style.background = '#f8d7da';
+                        errorMessage.style.borderColor = '#f5c6cb';
+                        errorMessage.style.color = '#721c24';
+                    } else {
+                        errorMessage.textContent = errorData.message || errorData.error || 'Credenciais inválidas';
+                    }
+                    
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erro ao fazer login:', error);
+                errorMessage.textContent = 'Erro ao conectar ao servidor';
+                errorMessage.style.display = 'block';
+            } finally {
+                // Reset button state
+                btnEntrar.disabled = false;
+                btnIcon.style.display = 'inline-block';
+                loadingSpinner.style.display = 'none';
+                btnText.textContent = 'Entrar';
+            }
+        });
+
+        // Form submission - Alteração de Senha
+        document.querySelector('.password-change-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const novaSenha = document.getElementById('novaSenha').value;
+            const confirmarSenha = document.getElementById('confirmarSenha').value;
+            const btnEntrar = document.querySelector('.password-change-form .btn-entrar');
+            const btnText = document.querySelector('.password-change-form .btn-text');
+            const btnIcon = document.querySelector('.password-change-form .btn-icon');
+            const loadingSpinner = document.querySelector('.password-change-form .loading-spinner');
+            const errorMessage = document.querySelector('.error-message');
+            const successMessage = document.querySelector('.success-message');
+            
+            // Reset messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // Validações
+            if (novaSenha !== confirmarSenha) {
+                errorMessage.textContent = 'As senhas não coincidem';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            const { requirements, strength } = validatePasswordStrength(novaSenha);
+            if (strength < 4) {
+                errorMessage.textContent = 'A senha não atende aos requisitos mínimos de segurança';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Disable button and show loading state
+            btnEntrar.disabled = true;
+            btnIcon.style.display = 'none';
+            loadingSpinner.style.display = 'inline-block';
+            btnText.textContent = 'Alterando...';
+            
+            try {
+                console.log('Alterando senha...', { email: currentUserEmail });
+                const response = await fetch('https://e-gerente-backend-cadastros-api.vercel.app/api/cadastros/colaboradores/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        email: currentUserEmail, 
+                        novaSenha: novaSenha 
+                    })
+                });
+
+                console.log('Status da resposta:', response.status);
+                if (response.ok) {
+                    successMessage.textContent = 'Senha alterada com sucesso! Redirecionando...';
+                    successMessage.style.display = 'block';
+                    
+                    // Fazer login automático após alterar senha
+                    setTimeout(async () => {
+                        try {
+                            const loginResponse = await fetch('https://e-gerente-backend-cadastros-api.vercel.app/api/cadastros/colaboradores/login', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ email: currentUserEmail, senha: novaSenha })
+                            });
+                            
+                            if (loginResponse.ok) {
+                                const data = await loginResponse.json();
+                                sessionStorage.setItem('token', data.token);
+                                sessionStorage.setItem('user', JSON.stringify(data.user));
+                                
+                                // Redirecionar para primeira página permitida
+                                const target = getFirstAllowedPage(data.user && data.user.permissoes);
+                                setTimeout(() => { window.location.href = target; }, 250);
+                            } else {
+                                // Se falhar o login automático, voltar para tela de login
+                                switchToLogin();
+                            }
+                        } catch (error) {
+                            console.error('Erro no login automático:', error);
+                            switchToLogin();
+                        }
+                    }, 2000);
+                } else {
+                    const errorData = await response.json();
+                    errorMessage.textContent = errorData.message || 'Erro ao alterar senha';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erro ao alterar senha:', error);
+                errorMessage.textContent = 'Erro ao conectar ao servidor';
+                errorMessage.style.display = 'block';
+            } finally {
+                // Reset button state
+                btnEntrar.disabled = false;
+                btnIcon.style.display = 'inline-block';
+                loadingSpinner.style.display = 'none';
+                btnText.textContent = 'Alterar Senha';
+            }
+        });
+    </script>
+    <script src="scripts/navigation.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</body>
+</html> 

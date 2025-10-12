@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/src/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/frontend/src/index.html" },
+    { "src": "/usuarios", "dest": "/frontend/src/usuarios.html" },
+    { "src": "/colaboradores", "dest": "/frontend/src/colaboradores.html" },
+    { "src": "/produtos", "dest": "/frontend/src/produtos.html" },
+    { "src": "/locais", "dest": "/frontend/src/locais.html" },
+    { "src": "/acoes", "dest": "/frontend/src/acoes.html" },
+    { "src": "/pessoas", "dest": "/frontend/src/pessoas.html" },
+    { "src": "/usuarios", "dest": "/frontend/src/usuarios.html" },
+    { "src": "/perfil", "dest": "/frontend/src/perfil.html" },
+    { "src": "/clientes", "dest": "/frontend/src/clientes.html" },
+    { "src": "/conferencia", "dest": "/frontend/src/conferencia.html" },
+    { "src": "/dinamico", "dest": "/frontend/src/dinamico.html" },
+    { "src": "/manutencao-bd", "dest": "/frontend/src/manutencao-bd.html" },
+    { "src": "/recebimento", "dest": "/frontend/src/recebimento.html" },
+    { "src": "/comissoes", "dest": "/frontend/src/comissoes.html" },
+    { "src": "/sincronizar", "dest": "/frontend/src/sincronizar.html" },
+    { "src": "/login", "dest": "/frontend/src/login.html" },
+    { "src": "/assets/(.*)", "dest": "/frontend/src/assets/$1" },
+    { "src": "/styles/(.*)", "dest": "/frontend/src/styles/$1" },
+    { "src": "/(.*)", "dest": "/frontend/src/$1" }
+  ]
+} 

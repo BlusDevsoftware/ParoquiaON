@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParoquiaON - Comissões</title>
+    <link rel="icon" type="image/png" href="../Imagens/logo2.png">
+    <link rel="stylesheet" href="../Paginas_CSS/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Menu Lateral -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>ParoquiaON</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="home.html"><i class="fas fa-home"></i> Minha Comunidade</a>
+                </li>
+                <li>
+                    <a href="agenda.html"><i class="fas fa-calendar-alt"></i> Agenda</a>
+                </li>
+                <li>
+                    <a href="colaboradores.html"><i class="fas fa-users"></i> Comunidades</a>
+                </li>
+                <li class="active">
+                    <a href="comissoes.html"><i class="fas fa-calculator"></i> Comissões</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fas fa-chart-bar"></i> Relatórios</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fas fa-cog"></i> Configurações</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <!-- Cabeçalho -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1>Comissões</h1>
+                </div>
+                <div class="header-right">
+                    <button class="btn-primary" onclick="abrirModalComissao()">
+                        <i class="fas fa-plus"></i> Nova Comissão
+                    </button>
+                    <div class="user-info">
+                        <span>Bem-vindo, Usuário</span>
+                        <img src="https://via.placeholder.com/40" alt="Avatar" class="avatar">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Filtros -->
+            <div class="filters-container">
+                <div class="search-box">
+                    <input type="text" placeholder="Buscar comissão...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="filter-options">
+                    <select>
+                        <option value="">Todos os Colaboradores</option>
+                        <option value="joao">João Silva</option>
+                        <option value="maria">Maria Santos</option>
+                    </select>
+                    <select>
+                        <option value="">Status</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="pago">Pago</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                    <select>
+                        <option value="">Período</option>
+                        <option value="mes_atual">Mês Atual</option>
+                        <option value="mes_anterior">Mês Anterior</option>
+                        <option value="personalizado">Personalizado</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Resumo de Comissões -->
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Total de Comissões</h3>
+                        <p>R$ 45.000,00</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Pendentes</h3>
+                        <p>R$ 15.000,00</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Pagas</h3>
+                        <p>R$ 30.000,00</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="card-info">
+                        <h3>Colaboradores</h3>
+                        <p>12</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Comissões -->
+            <div class="content-area">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Colaborador</th>
+                                <th>Venda</th>
+                                <th>Valor Venda</th>
+                                <th>Percentual</th>
+                                <th>Valor Comissão</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>João Silva</td>
+                                <td>Venda #1234</td>
+                                <td>R$ 5.000,00</td>
+                                <td>5%</td>
+                                <td>R$ 250,00</td>
+                                <td>15/03/2024</td>
+                                <td><span class="status pending">Pendente</span></td>
+                                <td>
+                                    <button class="btn-action" title="Editar"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-action" title="Pagar"><i class="fas fa-money-bill-wave"></i></button>
+                                    <button class="btn-action" title="Cancelar"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Maria Santos</td>
+                                <td>Venda #1235</td>
+                                <td>R$ 3.500,00</td>
+                                <td>5%</td>
+                                <td>R$ 175,00</td>
+                                <td>14/03/2024</td>
+                                <td><span class="status paid">Pago</span></td>
+                                <td>
+                                    <button class="btn-action" title="Visualizar"><i class="fas fa-eye"></i></button>
+                                    <button class="btn-action" title="Recibo"><i class="fas fa-file-invoice"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Comissão -->
+    <div id="modalComissao" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nova Comissão</h2>
+                <button class="close-modal" onclick="fecharModalComissao()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formComissao">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="colaborador">Colaborador</label>
+                            <select id="colaborador" name="colaborador" required>
+                                <option value="">Selecione...</option>
+                                <option value="joao">João Silva</option>
+                                <option value="maria">Maria Santos</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="venda">Venda</label>
+                            <select id="venda" name="venda" required>
+                                <option value="">Selecione...</option>
+                                <option value="1234">Venda #1234</option>
+                                <option value="1235">Venda #1235</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="valorVenda">Valor da Venda</label>
+                            <input type="number" id="valorVenda" name="valorVenda" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="percentual">Percentual de Comissão (%)</label>
+                            <input type="number" id="percentual" name="percentual" step="0.1" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dataVenda">Data da Venda</label>
+                            <input type="date" id="dataVenda" name="dataVenda" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataPagamento">Data de Pagamento</label>
+                            <input type="date" id="dataPagamento" name="dataPagamento">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" name="status" required>
+                                <option value="pendente">Pendente</option>
+                                <option value="pago">Pago</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="observacao">Observação</label>
+                            <textarea id="observacao" name="observacao" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="fecharModalComissao()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/navigation.js"></script>
+    <script src="scripts/hamburger-menu.js"></script>
+</body>
+</html> 

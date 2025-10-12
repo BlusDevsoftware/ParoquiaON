@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParoquiaON - Manutenção do Banco de Dados</title>
+    <link rel="icon" type="image/png" href="assets/images/logo2.png">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/login.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="/js/auth-guard.js"></script>
+    <script src="/js/apply-auth-protection.js"></script>
+    
+    <style>
+        /* Estilos para modais */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #1976D2, #42A5F5);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .modal-header h2 i {
+            margin-right: 10px;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 24px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+
+
+        /* Estilos para logs */
+        .logs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .log-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .log-item.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .log-item.warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+
+        .log-item.info {
+            background: #d1ecf1;
+            border-left-color: #17a2b8;
+        }
+
+        .log-time {
+            font-size: 0.85rem;
+            color: #6c757d;
+            min-width: 120px;
+        }
+
+        .log-message {
+            flex: 1;
+            margin: 0 16px;
+            font-weight: 500;
+        }
+
+        .log-level {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .log-item.error .log-level {
+            background: #dc3545;
+            color: white;
+        }
+
+        .log-item.warning .log-level {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .log-item.info .log-level {
+            background: #17a2b8;
+            color: white;
+        }
+
+        /* Estilos para toast notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 16px 20px;
+            z-index: 10000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            border-left: 4px solid;
+            min-width: 300px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-success {
+            border-left-color: #28a745;
+        }
+
+        .toast-error {
+            border-left-color: #dc3545;
+        }
+
+        .toast-info {
+            border-left-color: #17a2b8;
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast-content i {
+            font-size: 1.2rem;
+        }
+
+        .toast-success .toast-content i {
+            color: #28a745;
+        }
+
+        .toast-error .toast-content i {
+            color: #dc3545;
+        }
+
+        .toast-info .toast-content i {
+            color: #17a2b8;
+        }
+
+        .toast-content span {
+            font-weight: 500;
+            color: #2b2f36;
+        }
+
+        /* Estilos para botões com loading */
+        .btn-primary:disabled,
+        .btn-secondary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .fa-spin {
+            animation: fa-spin 1s infinite linear;
+        }
+
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
+            <img src="assets/images/logo2.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
+            <h1><span class="white">Paroquia</span><span class="highlight">ON</span></h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html"><i class="fas fa-home"></i><span>Minha Comunidade</span></a></li>
+            <li><a href="agenda.html"><i class="fas fa-calendar-alt"></i><span>Agenda</span></a></li>
+            <li><a href="comunidades.html"><i class="fas fa-users"></i><span>Comunidades</span></a></li>
+            <li><a href="pastorais.html"><i class="fas fa-church"></i><span>Pastorais</span></a></li>
+            <li><a href="pilares.html"><i class="fas fa-columns"></i><span>Pilares</span></a></li>
+            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i><span>Locais</span></a></li>
+            <li><a href="acoes.html"><i class="fas fa-tasks"></i><span>Ações</span></a></li>
+            <li><a href="pessoas.html"><i class="fas fa-user"></i><span>Pessoas</span></a></li>
+            <li><a href="usuarios.html"><i class="fas fa-user-cog"></i><span>Usuários</span></a></li>
+            <li><a href="perfil.html"><i class="fas fa-user-shield"></i><span>Perfil</span></a></li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="lancar-comissao.html"><i class="fas fa-plus-circle"></i><span>Lançar (Comercial)</span></a></li>
+                    <li><a href="lancar-multcomissao.html"><i class="fas fa-layer-group"></i><span>Lançar (Múltiplos)</span></a></li>
+                    <li><a href="movimento-comissao.html"><i class="fas fa-exchange-alt"></i><span>Movimento</span></a></li>
+                    <li><a href="consulta-comissao.html"><i class="fas fa-search"></i><span>Consulta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-chart-bar"></i><span>Relatórios</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="recebimento.html"><i class="fas fa-money-bill-wave"></i><span>Recebimento</span></a></li>
+                    <li><a href="conferencia.html"><i class="fas fa-check-circle"></i><span>Conferência</span></a></li>
+                    <li><a href="dinamico.html"><i class="fas fa-chart-line"></i><span>Dinâmico</span><span class="beta-tag">beta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-cog"></i><span>Configurações</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="manutencao-bd.html" class="active"><i class="fas fa-database"></i><span>Manutenção BD</span></a></li>
+                    <li><a href="sincronizar.html"><i class="fas fa-sync"></i><span>Sincronizar</span></a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="logout-button">
+            <a href="index.html" data-logout><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="welcome-text">
+                <h1>Manutenção do Banco de Dados</h1>
+                <p>Gerencie e mantenha a integridade dos dados</p>
+            </div>
+            <div class="user-info">
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
+        </div>
+
+        <!-- Database Status -->
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Performance</h3>
+                    <p>98%</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Integridade</h3>
+                    <p>100%</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Status do BD</h3>
+                    <p>Online</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Última Verificação</h3>
+                    <p>Hoje, 08:30</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Options -->
+        <div class="maintenance-container">
+
+            <div class="maintenance-section">
+                <h2>Otimização</h2>
+                <div class="maintenance-options">
+                    <div class="option-card">
+                        <i class="fas fa-broom"></i>
+                        <h3>Limpeza de Cache</h3>
+                        <p>Remove dados temporários e cache</p>
+                        <button class="btn-primary">
+                            <i class="fas fa-play"></i>
+                            Limpar Cache
+                        </button>
+                    </div>
+                    <div class="option-card">
+                        <i class="fas fa-tools"></i>
+                        <h3>Otimização de Tabelas</h3>
+                        <p>Melhora a performance do banco de dados</p>
+                        <button class="btn-primary">
+                            <i class="fas fa-play"></i>
+                            Otimizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="maintenance-section">
+                <h2>Diagnóstico</h2>
+                <div class="maintenance-options">
+                    <div class="option-card">
+                        <i class="fas fa-search"></i>
+                        <h3>Verificação de Integridade</h3>
+                        <p>Verifica a integridade dos dados</p>
+                        <button class="btn-primary">
+                            <i class="fas fa-play"></i>
+                            Verificar
+                        </button>
+                    </div>
+                    <div class="option-card">
+                        <i class="fas fa-file-alt"></i>
+                        <h3>Log de Erros</h3>
+                        <p>Visualiza registros de erros do sistema</p>
+                        <button class="btn-secondary">
+                            <i class="fas fa-list"></i>
+                            Ver Logs
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle submenu
+        document.querySelectorAll('.submenu-trigger').forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.parentElement.classList.toggle('active');
+            });
+        });
+    </script>
+    <script src="scripts/navigation.js"></script>
+    <script src="scripts/config/api.js"></script>
+    <script>
+    window.addEventListener('DOMContentLoaded', function() {
+        if (typeof initializeMenu === 'function') {
+            initializeMenu();
+        }
+        document.querySelectorAll('.nav-menu a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                var modais = ['paymentModal', 'viewModal', 'baixaModal', 'logsModal'];
+                modais.forEach(function(id) {
+                    var modal = document.getElementById(id);
+                    if (modal) modal.style.display = 'none';
+                });
+            });
+        });
+
+        // Inicializar funcionalidades de manutenção
+        inicializarManutencao();
+    });
+
+    // Funções de manutenção do banco de dados
+    function inicializarManutencao() {
+        // Limpeza de Cache
+        document.querySelector('.maintenance-section:nth-child(1) .option-card:nth-child(1) .btn-primary').addEventListener('click', limparCache);
+        
+        // Otimização de Tabelas
+        document.querySelector('.maintenance-section:nth-child(1) .option-card:nth-child(2) .btn-primary').addEventListener('click', otimizarTabelas);
+        
+        // Verificação de Integridade
+        document.querySelector('.maintenance-section:nth-child(2) .option-card:nth-child(1) .btn-primary').addEventListener('click', verificarIntegridade);
+        
+        // Log de Erros
+        document.querySelector('.maintenance-section:nth-child(2) .option-card:nth-child(2) .btn-secondary').addEventListener('click', mostrarLogs);
+    }
+
+    // Função para mostrar toast de notificação
+    function mostrarToast(mensagem, tipo = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${tipo}`;
+        toast.innerHTML = `
+            <div class="toast-content">
+                <i class="fas fa-${tipo === 'success' ? 'check-circle' : tipo === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${mensagem}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+
+
+
+    // Função para limpar cache
+    async function limparCache() {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        
+        try {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Limpando...';
+            btn.disabled = true;
+            
+            // Simular limpeza de cache
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            mostrarToast('Cache limpo com sucesso!', 'success');
+            
+        } catch (error) {
+            mostrarToast('Erro ao limpar cache: ' + error.message, 'error');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // Função para otimizar tabelas
+    async function otimizarTabelas() {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        
+        try {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Otimizando...';
+            btn.disabled = true;
+            
+            // Simular otimização
+            await new Promise(resolve => setTimeout(resolve, 4000));
+            
+            mostrarToast('Tabelas otimizadas com sucesso!', 'success');
+            
+            // Atualizar card de performance
+            const cardPerformance = document.querySelector('.card:nth-child(3) .card-info p');
+            cardPerformance.textContent = '99%';
+            
+        } catch (error) {
+            mostrarToast('Erro ao otimizar tabelas: ' + error.message, 'error');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // Função para verificar integridade
+    async function verificarIntegridade() {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        
+        try {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+            btn.disabled = true;
+            
+            // Simular verificação
+            await new Promise(resolve => setTimeout(resolve, 2500));
+            
+            mostrarToast('Verificação de integridade concluída!', 'success');
+            
+            // Atualizar card de integridade
+            const cardIntegridade = document.querySelector('.card:nth-child(4) .card-info p');
+            cardIntegridade.textContent = '100%';
+            
+        } catch (error) {
+            mostrarToast('Erro na verificação: ' + error.message, 'error');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // Função para mostrar logs
+    function mostrarLogs() {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.id = 'logsModal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-file-alt"></i> Log de Erros</h2>
+                    <span class="close" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="logs-container">
+                        <div class="log-item error">
+                            <div class="log-time">15/12/2024 14:30</div>
+                            <div class="log-message">Erro de conexão com banco de dados</div>
+                            <div class="log-level">ERROR</div>
+                        </div>
+                        <div class="log-item warning">
+                            <div class="log-time">15/12/2024 12:15</div>
+                            <div class="log-message">Timeout na consulta de comissões</div>
+                            <div class="log-level">WARNING</div>
+                        </div>
+                        <div class="log-item info">
+                            <div class="log-time">15/12/2024 10:00</div>
+                            <div class="log-message">Backup automático realizado</div>
+                            <div class="log-level">INFO</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        modal.style.display = 'flex';
+    }
+    </script>
+    <script src="scripts/hamburger-menu.js"></script>
+</body>
+</html> 

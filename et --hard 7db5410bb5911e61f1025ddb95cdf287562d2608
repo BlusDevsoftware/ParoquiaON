@@ -1,0 +1,10 @@
+[33m504aaf4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: separa scripts específicos das páginas de comissões
+[33mba578e4[m fix: corrige navegação entre páginas do menu
+[33m7db5410[m fix: corrige estrutura do menu na página de relatórios
+[33ma3b17bd[m fix: adiciona script de navegação em todas as páginas do sistema
+[33ma844543[m fix: adiciona script de navegação na página de colaboradores
+[33m4d3bb8b[m fix: corrige comportamento do menu e submenus
+[33m6009400[m fix: melhora navegação do menu e comportamento dos submenus
+[33m7c23f72[m fix: remover scripts duplicados de navegação e padronizar uso do navigation.js em todas as páginas
+[33mcb61f5e[m refactor: separar lógica de navegação em arquivo dedicado
+[33m4371112[m fix: corrigir navegação entre páginas sem depender do Dashboard

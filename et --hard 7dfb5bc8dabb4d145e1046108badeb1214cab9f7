@@ -1,0 +1,20 @@
+[33m9d91278[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Aba múltiplos lançamentos agora igual à aba comercial, mas para lançamento individual
+[33m7dfb5bc[m Campo de quantidade de parcelas ao lado do botão Parcelado, igual à aba comercial
+[33m857aef8[m Simulação e parcelamento em múltiplos lançamentos aparecem abaixo da linha, igual à aba comercial
+[33mbe8fd31[m Remover campos de Data de Emissão e Vencimento da tela principal de múltiplos lançamentos, deixando apenas na simulação/parcelado
+[33m204151b[m Adicionar botões Parcelar e Simular com funcionalidade igual à aba comercial em múltiplos lançamentos
+[33m3431da1[m Adicionar campo Descrição ao lado de Produto/Serviço na aba de múltiplos lançamentos
+[33m396d0dd[m Adicionar campo Data de Vencimento e renomear Data para Data de Emissão na aba de múltiplos lançamentos
+[33ma00f5bd[m Padronizar campos de múltiplos lançamentos com o layout da aba Lançamento Comercial
+[33md072637[m Melhorar card de Valor da Venda: destaque visual leve e alinhamento com campo Produto
+[33mde22dbb[m Padronizar layout dos campos iniciais conforme o restante do sistema (tamanho, fonte, espaçamento)
+[33m30ea2ca[m Melhorias visuais no layout dos campos iniciais: mais espaçamento, destaque, modernização e responsividade
+[33mb74d6c8[m Restaurar visual original do campo Valor da Venda e botões Parcelar/Simular
+[33m688defc[m Corrigir campo Valor da Venda: permitir edição manual removendo restrições de CSS e pointer-events
+[33mc813fd6[m Valor da Venda: calcula automático ao selecionar itens, mas permite edição manual sem sobrescrever valor do usuário
+[33me8b6293[m Permitir edição manual do campo Valor da Venda no lançamento de comissão
+[33m4c1fc9a[m Corrige carregamento e visual do campo Produto/Serviço na aba Múltiplos Lançamentos, aplicando Choices.js e lógica igual ao campo de colaborador
+[33m1462ae0[m feat: botões toggle Produto/Serviço na aba múltiplos lançamentos seguindo padrão do lançamento comercial
+[33me25f054[m chore: commit vazio para forçar deploy na Vercel
+[33m23bdf74[m fix: corrigido carregamento dinâmico do select de colaborador (Choices.js) para evitar erro de múltipla inicialização e garantir exibição dos colaboradores
+[33m91043e9[m style: botões duplicar azul e deletar vermelho na aba múltiplos lançamentos

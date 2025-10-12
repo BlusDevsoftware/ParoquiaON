@@ -1,0 +1,2951 @@
+<!-- ========================================
+     MODAIS DE EXCLUSÃO E CANCELAMENTO DE BAIXA
+     Sistema de Movimento de Comissões
+     ======================================== -->
+
+<!-- Modal de Confirmação de Exclusão -->
+<div id="modalConfirmExclusao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center; overflow-y: auto; padding: 20px;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 98%; min-height: auto; max-height: 90vh; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; margin: auto; overflow: hidden; display: flex; flex-direction: column;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #e53935; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
+      <button class="close-modal" onclick="fecharModalConfirmExclusao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center; flex: 1; overflow-y: auto; min-height: 0;">
+      <i class="fas fa-exclamation-triangle" style="font-size: 2.5em; color: #e53935; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.15em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja excluir este título?</div>
+      <div style="font-size: 1em; color: #888; margin-bottom: 18px;">Esta ação não pode ser desfeita.</div>
+      
+      <!-- Opções de exclusão para parcelamentos -->
+      <div id="opcoesExclusaoParcelamento" style="display: none; background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 18px; text-align: left;">
+        <div style="font-weight: 500; margin-bottom: 12px; color: #333;">Opções de exclusão:</div>
+        <label style="display: flex; align-items: center; margin-bottom: 8px; cursor: pointer;">
+          <input type="radio" name="exclusaoParcelamento" value="unico" checked style="margin-right: 8px;">
+          <span>Excluir apenas este título</span>
+        </label>
+        <label style="display: flex; align-items: center; cursor: pointer;">
+          <input type="radio" name="exclusaoParcelamento" value="todos" style="margin-right: 8px;">
+          <span>Excluir todos os títulos do parcelamento</span>
+        </label>
+      </div>
+      
+      <!-- Lista de títulos parciais -->
+      <div id="listaTitulosParciais" style="display: none; background: #f8f9fa; border-radius: 8px; padding: 12px; margin-bottom: 18px; text-align: left;">
+        <div style="font-weight: 500; margin-bottom: 8px; color: #333;">Títulos relacionados:</div>
+        <div id="titulosParciaisLista" style="max-height: 100px; overflow-y: auto; font-size: 0.9em;"></div>
+      </div>
+      
+      <!-- Seção de animação de exclusão -->
+      <div id="animacaoExclusaoDiv" style="display: none; margin: 20px 0; text-align: center; background: #f8f9fa; border-radius: 12px; padding: 20px; border: 1px solid #e9ecef;">
+        <div style="font-weight: 600; color: #1976D2; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <i class="fas fa-spinner fa-spin" style="font-size: 1.2em;"></i>
+          <span id="textoProgressoExclusao">Iniciando exclusão...</span>
+        </div>
+        <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+          <div id="barraProgressoExclusao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);"></div>
+        </div>
+        <div style="font-size: 0.9em; color: #666; font-style: italic;">
+          Processando exclusão...
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" id="footerExclusaoBtns" style="display: flex; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee; flex-shrink: 0;">
+      <button id="btnCancelarExclusao" class="btn-secondary" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+      <button id="btnConfirmarExclusao" class="btn-danger" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #e53935; color: white; border: none;"><i class="fas fa-trash"></i> Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Sucesso de Exclusão -->
+<div id="modalSucessoExclusao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 5000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 370px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.2em; color: #43a047; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Título excluído com sucesso!</h2>
+      <button class="close-modal" onclick="fecharModalSucessoExclusao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
+      <i class="fas fa-check-circle" style="font-size: 2.5em; color: #43a047; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 8px;">O título foi removido do sistema.</div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+      <button id="btnOkSucessoExclusao" class="btn-success" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #43a047; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmação de Cancelar Baixa -->
+<div id="modalConfirmCancelarBaixa" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 98%; box-shadow: 0 8px 32px rgba(255,152,0,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> Confirmar Cancelamento de Baixa</h2>
+      <button class="close-modal" onclick="fecharModalConfirmCancelarBaixa()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+      <i class="fas fa-undo" style="font-size: 2.5em; color: #ff9800; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.15em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja cancelar a baixa deste título?</div>
+      <div style="font-size: 1em; color: #888; margin-bottom: 18px;">Esta ação irá:</div>
+      <div style="text-align: left; background: #fff3e0; border: 1px solid #ffcc02; border-radius: 8px; padding: 16px; margin-bottom: 18px;">
+        <ul style="margin: 0; padding-left: 20px; color: #e65100;">
+          <li>Alterar o status para "PENDENTE"</li>
+          <li>Zerar o valor pago</li>
+          <li>Limpar a data de pagamento</li>
+          <li>Remover o comprovante (se existir)</li>
+        </ul>
+      </div>
+      <div style="font-size: 0.95em; color: #666; font-style: italic;">Esta ação pode ser desfeita editando o título novamente.</div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
+      <button id="btnCancelarConfirmacao" class="btn-secondary" onclick="fecharModalConfirmCancelarBaixa()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+      <button id="btnConfirmarCancelarBaixa" class="btn-warning" onclick="executarCancelarBaixa()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none;"><i class="fas fa-undo"></i> Confirmar Cancelamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Sucesso de Cancelamento de Baixa -->
+<div id="modalSucessoCancelarBaixa" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 400px; width: 96%; box-shadow: 0 8px 32px rgba(255,152,0,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.2em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Baixa cancelada com sucesso!</h2>
+      <button class="close-modal" onclick="fecharModalSucessoCancelarBaixa()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
+      <i class="fas fa-undo" style="font-size: 2.5em; color: #ff9800; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 8px;">A baixa do título foi cancelada.</div>
+      <div style="font-size: 0.95em; color: #666; margin-bottom: 8px;">O título agora está com status "PENDENTE".</div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+      <button id="btnOkSucessoCancelarBaixa" class="btn-warning" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Sucesso de Baixa Múltipla -->
+<div id="modalSucessoBaixaMultipla" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(76,175,80,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Baixa Múltipla Realizada!</h2>
+      <button class="close-modal" onclick="fecharModalSucessoBaixaMultipla()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+      <div style="background: #e8f5e8; border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+        <i class="fas fa-check-double" style="font-size: 2.5em; color: #4CAF50;"></i>
+      </div>
+      
+      <div style="font-size: 1.2em; font-weight: 600; margin-bottom: 8px; color: #333;">Baixa múltipla concluída com sucesso!</div>
+      <div style="font-size: 1em; color: #666; margin-bottom: 24px;">
+        Todos os títulos selecionados foram processados e atualizados no sistema.
+      </div>
+      
+      <!-- Resumo da operação -->
+      <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: left;">
+        <div style="font-weight: 600; color: #333; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-info-circle" style="color: #1976D2;"></i>
+          Resumo da Operação
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.95em;">
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Títulos Processados</div>
+            <div id="quantidadeTitulosSucesso" style="color: #333; font-weight: 600;"></div>
+          </div>
+          
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Data de Pagamento</div>
+            <div id="dataPagamentoSucesso" style="color: #333; font-weight: 600;"></div>
+          </div>
+          
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Status Aplicado</div>
+            <div id="statusAplicadoSucesso" style="color: #333; font-weight: 600;"></div>
+          </div>
+          
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Comprovante</div>
+            <div id="comprovanteSucesso" style="color: #333; font-weight: 600;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+      <button id="btnOkSucessoBaixaMultipla" class="btn-success" onclick="fecharModalSucessoBaixaMultipla()" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #4CAF50; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Título Pago Não Pode Excluir -->
+<div id="modalTituloPagoNaoPodeExcluir" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(255,152,0,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Título Já Pago</h2>
+      <button class="close-modal" onclick="fecharModalTituloPagoNaoPodeExcluir()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+      <div style="background: #e8f5e8; border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+        <i class="fas fa-check-circle" style="font-size: 2.5em; color: #4CAF50;"></i>
+      </div>
+      
+      <div style="font-size: 1.2em; font-weight: 600; margin-bottom: 8px; color: #333;">Este título já foi pago!</div>
+      <div style="font-size: 1em; color: #666; margin-bottom: 24px;">
+        O título <strong id="numeroTituloPago" style="color: #1976D2;"></strong> já possui status <strong style="color: #4CAF50;">PAGO</strong> e não pode ser excluído.
+      </div>
+      
+      <!-- Informações detalhadas do título -->
+      <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: left;">
+        <div style="font-weight: 600; color: #333; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-info-circle" style="color: #1976D2;"></i>
+          Detalhes do Pagamento
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.95em;">
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Data do Pagamento</div>
+            <div id="dataPagamentoTitulo" style="color: #333; font-weight: 600;"></div>
+          </div>
+          
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Valor Pago</div>
+            <div id="valorPagoTitulo" style="color: #333; font-weight: 600;"></div>
+          </div>
+          
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Colaborador</div>
+            <div id="colaboradorTituloPago" style="color: #333; font-weight: 600;"></div>
+          </div>
+          
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Status</div>
+            <div style="color: #4CAF50; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+              <i class="fas fa-check-circle"></i>
+              PAGO
+            </div>
+          </div>
+        </div>
+        
+        <div id="observacoesTitulo" style="display: none; margin-top: 12px;">
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Observações</div>
+            <div id="textoObservacoesTitulo" style="color: #333; font-style: italic;"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Aviso sobre como proceder -->
+      <div style="background: #fff3e0; border: 1px solid #ffcc02; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <i class="fas fa-lightbulb" style="color: #ff9800; font-size: 1.2em; margin-top: 2px;"></i>
+          <div style="text-align: left;">
+            <div style="font-weight: 600; color: #e65100; margin-bottom: 6px;">Como proceder?</div>
+            <div style="font-size: 0.95em; color: #e65100;">
+              Para excluir este título, você deve primeiro <strong>cancelar a baixa</strong> através da opção "Cancelar Baixa" no menu de ações do título.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: center; gap: 12px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
+      <button class="btn-secondary" onclick="fecharModalTituloPagoNaoPodeExcluir()" style="padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;">
+        <i class="fas fa-times"></i>
+        Entendi
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     MODAIS DE CANCELAMENTO DE AGLUTINAÇÃO
+     ======================================== -->
+
+<!-- Modal de Confirmação de Cancelar Aglutinação -->
+<div id="modalConfirmCancelarAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 98%; box-shadow: 0 8px 32px rgba(156,39,176,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #9c27b0; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> Confirmar Cancelamento de Aglutinação</h2>
+      <button class="close-modal" onclick="fecharModalConfirmCancelarAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+      <i class="fas fa-undo" style="font-size: 2.5em; color: #9c27b0; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.15em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja cancelar a aglutinação deste título?</div>
+      <div style="font-size: 1em; color: #888; margin-bottom: 18px;">Esta ação irá:</div>
+      <div style="text-align: left; background: #f3e5f5; border: 1px solid #9c27b0; border-radius: 8px; padding: 16px; margin-bottom: 18px;">
+        <ul style="margin: 0; padding-left: 20px; color: #6a1b9a;">
+          <li>Excluir o título aglutinado</li>
+          <li>Restaurar os títulos originais com status "PENDENTE"</li>
+          <li>Manter os valores e datas originais</li>
+          <li>Remover a referência de aglutinação</li>
+        </ul>
+      </div>
+      
+      <!-- Informações do título aglutinado -->
+      <div id="infoTituloAglutinado" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px; margin-bottom: 18px; text-align: left; display: none;">
+        <div style="font-weight: 600; color: #333; margin-bottom: 12px;">Título Aglutinado:</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.9em;">
+          <div><strong>Número:</strong> <span id="numeroTituloAglutinado"></span></div>
+          <div><strong>Valor:</strong> <span id="valorTituloAglutinado"></span></div>
+          <div><strong>Colaborador:</strong> <span id="colaboradorTituloAglutinado"></span></div>
+          <div><strong>Vencimento:</strong> <span id="vencimentoTituloAglutinado"></span></div>
+        </div>
+      </div>
+      
+      <!-- Lista de títulos originais -->
+      <div id="listaTitulosOriginais" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px; margin-bottom: 18px; text-align: left; display: none;">
+        <div style="font-weight: 600; color: #333; margin-bottom: 12px;">Títulos Originais a Restaurar:</div>
+        <div id="titulosOriginaisLista" style="max-height: 120px; overflow-y: auto; font-size: 0.9em;"></div>
+      </div>
+      
+      <div style="font-size: 0.95em; color: #666; font-style: italic;">Esta ação pode ser desfeita criando uma nova aglutinação.</div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
+      <button id="btnCancelarConfirmacaoAglutinacao" class="btn-secondary" onclick="fecharModalConfirmCancelarAglutinacao()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+      <button id="btnConfirmarCancelarAglutinacao" class="btn-warning" onclick="executarCancelarAglutinacao()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #9c27b0; color: white; border: none;"><i class="fas fa-undo"></i> Confirmar Cancelamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Sucesso de Cancelamento de Aglutinação -->
+<div id="modalSucessoCancelarAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 400px; width: 96%; box-shadow: 0 8px 32px rgba(156,39,176,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.2em; color: #9c27b0; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Aglutinação cancelada com sucesso!</h2>
+      <button class="close-modal" onclick="fecharModalSucessoCancelarAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
+      <i class="fas fa-undo" style="font-size: 2.5em; color: #9c27b0; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 8px;">A aglutinação foi cancelada.</div>
+      <div style="font-size: 0.95em; color: #666; margin-bottom: 8px;">Os títulos originais foram restaurados com status "PENDENTE".</div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+      <button id="btnOkSucessoCancelarAglutinacao" class="btn-warning" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #9c27b0; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Progresso de Cancelamento de Aglutinação -->
+<div id="modalProgressoCancelarAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 98%; box-shadow: 0 8px 32px rgba(156,39,176,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #9c27b0; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-spinner fa-spin"></i> Cancelando Aglutinação</h2>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+      <div style="background: #f3e5f5; border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+        <i class="fas fa-undo" style="font-size: 2.5em; color: #9c27b0;"></i>
+      </div>
+      
+      <div style="font-size: 1.2em; font-weight: 600; margin-bottom: 8px; color: #333;">Processando cancelamento...</div>
+      <div style="font-size: 1em; color: #666; margin-bottom: 24px;">
+        <span id="textoProgressoCancelarAglutinacao">Iniciando cancelamento da aglutinação...</span>
+      </div>
+      
+      <!-- Barra de progresso -->
+      <div style="width: 100%; background-color: #f3e5f5; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+        <div id="barraProgressoCancelarAglutinacao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #9c27b0, #ba68c8); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(156,39,176,0.3);"></div>
+      </div>
+      
+      <div style="font-size: 0.9em; color: #666; font-style: italic;">
+        Por favor, aguarde...
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOVO: Modal de Aglutinação de Títulos -->
+<div id="modalAglutinacaoTitulos" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4500; align-items: center; justify-content: center; overflow-y: auto; padding: 20px;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 680px; width: 98%; min-height: auto; max-height: 90vh; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; margin: auto; overflow: hidden; display: flex; flex-direction: column;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-object-group"></i> Aglutinar Títulos</h2>
+      <button class="close-modal" onclick="fecharModalAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 24px 40px 0 40px; text-align: left; flex: 1; overflow-y: auto; min-height: 0;">
+      <div style="font-size: 1.05em; color: #555; margin-bottom: 12px;">Foram selecionados <strong id="quantidadeTitulosAglutinar" style="color:#ff9800;">0</strong> título(s) para aglutinação.</div>
+
+      <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+        <div style="font-weight: 600; color: #333; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-list" style="color:#1976D2;"></i>
+          Títulos Selecionados
+        </div>
+        <div id="listaTitulosAglutinacao" style="max-height: 260px; overflow-y: auto; font-size: 0.95em;">
+          <!-- preenchido dinamicamente -->
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div style="background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:12px;">
+          <div style="font-weight:500; color:#1976D2; margin-bottom:4px;">Total dos Valores</div>
+          <div id="valorTotalAglutinar" style="color:#333; font-weight:700;">R$ 0,00</div>
+        </div>
+        <div style="background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:12px;">
+          <div style="font-weight:500; color:#1976D2; margin-bottom:4px;">Colaborador</div>
+          <div id="colaboradorAglutinacao" style="color:#333; font-weight:700;">-</div>
+        </div>
+      </div>
+
+      <!-- NOVO: Simulação do novo título aglutinado -->
+      <div id="simulacaoAglutinacao" style="margin-top:12px; background:#e3f2fd; border:2px solid #1976D2; border-radius:12px; padding:16px;">
+        <!-- preenchido dinamicamente em abrirModalAglutinacao -->
+      </div>
+
+      <!-- NOVO: Campo de Motivo da Aglutinação -->
+      <div style="margin-top:12px; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:12px;">
+        <div style="font-weight:500; color:#1976D2; margin-bottom:6px;">Motivo da Aglutinação</div>
+        <textarea id="motivoAglutinacaoInput" placeholder="Descreva o motivo da aglutinação..." maxlength="500" style="width:100%; min-height:96px; border:1px solid #e0e0e0; border-radius:8px; padding:10px; font-size:0.95em; resize:vertical;"></textarea>
+        <div id="motivoAglutinacaoCount" style="text-align:right; color:#888; font-size:0.85em; margin-top:6px;">0/500</div>
+      </div>
+
+      <div style="margin-top:16px; background:#fff3e0; border:1px solid #ffcc02; border-radius:8px; padding:12px; color:#e65100;">
+        <i class="fas fa-info-circle"></i>
+        <span style="margin-left:8px;">Nesta etapa apenas revisamos os dados. A confirmação da aglutinação será implementada em seguida.</span>
+      </div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 20px 40px 28px 40px; border-top: 1px solid #eee; flex-shrink: 0;">
+      <button class="btn-secondary" onclick="fecharModalAglutinacao()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+      <button class="btn-warning" onclick="confirmarAglutinacao()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none;"><i class="fas fa-object-group"></i> Confirmar Aglutinação</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOVO: Modal de Bloqueio de Aglutinação (Títulos Pagos) -->
+<!-- NOVO: Animação inline de Aglutinação (padrão igual baixa) -->
+<template id="templateAnimacaoAglutinacao">
+  <div id="animacaoAglutinacaoDiv" style="margin: 20px 0; text-align: center; background: #f8f9fa; border-radius: 12px; padding: 20px; border: 1px solid #e9ecef;">
+    <div style="font-weight: 600; color: #1976D2; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 1.2em;"></i>
+      <span id="textoProgressoAglutinacao">Iniciando aglutinação...</span>
+    </div>
+    <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+      <div id="barraProgressoAglutinacao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);"></div>
+    </div>
+    <div style="font-size: 0.9em; color: #666; font-style: italic;">Processando aglutinação...</div>
+  </div>
+  
+  <style>
+    /* Nenhum estilo global adicional para evitar conflitos */
+  </style>
+</template>
+
+<!-- NOVO: Modal de Sucesso de Aglutinação -->
+<div id="modalSucessoAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 5600; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 420px; width: 96%; padding: 24px; box-shadow: 0 8px 32px rgba(76,175,80,0.18);">
+    <div class="modal-header" style="padding: 0 0 8px 0; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.2em; color: #43a047; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Sucesso!</h2>
+      <button class="close-modal" onclick="fecharModalSucessoAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding-top: 8px; text-align: center;">
+      <div style="font-size: 1.05em; color: #555; margin-bottom: 12px;">Aglutinação realizada com sucesso!</div>
+      <button id="btnOkSucessoAglutinacao" class="btn-success" onclick="fecharModalSucessoAglutinacao()" style="background-color: #43a047; color: white; border: none; padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;"><i class="fas fa-check"></i> OK</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalBloqueioAglutinacaoPago" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.22); z-index: 5500; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 560px; width: 96%; box-shadow: 0 8px 32px rgba(229,57,53,0.18); padding: 0;">
+    <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.28em; color: #e53935; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-ban"></i> Aglutinação não permitida</h2>
+      <button class="close-modal" onclick="fecharModalBloqueioAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px 32px 0 32px;">
+      <div style="background:#ffebee; border:1px solid #ffcdd2; color:#c62828; border-radius:8px; padding:12px; margin-bottom:14px; display:flex; align-items:flex-start; gap:10px;">
+        <i class="fas fa-exclamation-triangle" style="margin-top:2px;"></i>
+        <div>
+          <div style="font-weight:600;">Não é possível aglutinar títulos com status PAGO.</div>
+          <div id="qtdeTitulosPagosAglutinacao" style="font-size:0.95em; margin-top:4px;">Há títulos pagos na seleção.</div>
+        </div>
+      </div>
+      <div style="font-weight:600; color:#333; margin-bottom:8px; display:flex; align-items:center; gap:8px;"><i class="fas fa-list"></i> Títulos pagos selecionados</div>
+      <div id="listaTitulosPagosAglutinacao" style="max-height:220px; overflow:auto; border:1px solid #e9ecef; border-radius:8px; padding:8px; background:#fff;"></div>
+      <div style="margin-top:12px; font-size:0.92em; color:#666;">Remova os títulos pagos da seleção e tente novamente.</div>
+    </div>
+    <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; padding: 20px 32px 28px 32px; border-top: 1px solid #eee;">
+      <button class="btn-secondary" onclick="fecharModalBloqueioAglutinacao()" style="padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; display:flex; align-items:center; gap:8px;"><i class="fas fa-check"></i> Entendi</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOVO: Modal de Bloqueio de Aglutinação por Colaborador Diferente -->
+<div id="modalBloqueioAglutinacaoColab" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.22); z-index: 5500; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 560px; width: 96%; box-shadow: 0 8px 32px rgba(255,152,0,0.18); padding: 0;">
+    <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.28em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-user-slash"></i> Aglutinação não permitida</h2>
+      <button class="close-modal" onclick="fecharModalBloqueioAglutinacaoColab()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px 32px 0 32px;">
+      <div style="background:#fff3e0; border:1px solid #ffe0b2; color:#e65100; border-radius:8px; padding:12px; margin-bottom:14px; display:flex; align-items:flex-start; gap:10px;">
+        <i class="fas fa-exclamation-triangle" style="margin-top:2px;"></i>
+        <div>
+          <div style="font-weight:600;">Não é possível aglutinar títulos de colaboradores diferentes.</div>
+          <div id="qtdeColabsAglutinacao" style="font-size:0.95em; margin-top:4px;">Há mais de um colaborador na seleção.</div>
+        </div>
+      </div>
+      <div style="font-weight:600; color:#333; margin-bottom:8px; display:flex; align-items:center; gap:8px;"><i class="fas fa-list"></i> Títulos selecionados (colaborador)</div>
+      <div id="listaTitulosColabAglutinacao" style="max-height:220px; overflow:auto; border:1px solid #e9ecef; border-radius:8px; padding:8px; background:#fff;"></div>
+      <div style="margin-top:12px; font-size:0.92em; color:#666;">Selecione apenas títulos do mesmo colaborador e tente novamente.</div>
+    </div>
+    <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; padding: 20px 32px 28px 32px; border-top: 1px solid #eee;">
+      <button class="btn-secondary" onclick="fecharModalBloqueioAglutinacaoColab()" style="padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; display:flex; align-items:center; gap:8px;"><i class="fas fa-check"></i> Entendi</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOVO: Modal de Bloqueio por Mínimo de Títulos -->
+<div id="modalBloqueioMinimoAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.22); z-index: 5500; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 96%; box-shadow: 0 8px 32px rgba(25,118,210,0.18); padding: 0;">
+    <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.22em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-info-circle"></i> Aglutinação requer no mínimo 2 títulos</h2>
+      <button class="close-modal" onclick="fecharModalBloqueioMinimoAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px 32px 0 32px;">
+      <div style="background:#e3f2fd; border:1px solid #bbdefb; color:#0d47a1; border-radius:8px; padding:12px; margin-bottom:14px; display:flex; align-items:flex-start; gap:10px;">
+        <i class="fas fa-exclamation-circle" style="margin-top:2px;"></i>
+        <div>
+          <div style="font-weight:600;">Para realizar a aglutinação é necessário manter pelo menos <strong>2 títulos</strong> selecionados.</div>
+          <div style="font-size:0.95em; margin-top:4px;">Adicione mais títulos à seleção ou conclua/cancele esta operação.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; padding: 20px 32px 28px 32px; border-top: 1px solid #eee;">
+      <button class="btn-secondary" onclick="fecharModalBloqueioMinimoAglutinacao()" style="padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; display:flex; align-items:center; gap:8px;"><i class="fas fa-check"></i> Entendi</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOVO: Modal de Bloqueio de Aglutinação por Título já Aglutinado -->
+<div id="modalBloqueioAglutinacaoJaAglutinado" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.22); z-index: 5500; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 560px; width: 96%; box-shadow: 0 8px 32px rgba(156,39,176,0.18); padding: 0;">
+    <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.28em; color: #9c27b0; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-layer-group"></i> Aglutinação não permitida</h2>
+      <button class="close-modal" onclick="fecharModalBloqueioAglutinacaoJaAglutinado()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px 32px 0 32px;">
+      <div style="background:#f3e5f5; border:1px solid #e1bee7; color:#7b1fa2; border-radius:8px; padding:12px; margin-bottom:14px; display:flex; align-items:flex-start; gap:10px;">
+        <i class="fas fa-exclamation-triangle" style="margin-top:2px;"></i>
+        <div>
+          <div style="font-weight:600;">Não é possível aglutinar títulos que já foram aglutinados anteriormente.</div>
+          <div id="qtdeTitulosJaAglutinados" style="font-size:0.95em; margin-top:4px;">Há títulos com status AGLUTINADO na seleção.</div>
+        </div>
+      </div>
+      <div style="font-weight:600; color:#333; margin-bottom:8px; display:flex; align-items:center; gap:8px;"><i class="fas fa-list"></i> Títulos já aglutinados selecionados</div>
+      <div id="listaTitulosJaAglutinados" style="max-height:220px; overflow:auto; border:1px solid #e9ecef; border-radius:8px; padding:8px; background:#fff;"></div>
+      <div style="margin-top:12px; font-size:0.92em; color:#666;">Remova os títulos já aglutinados da seleção e tente novamente.</div>
+    </div>
+    <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; padding: 20px 32px 28px 32px; border-top: 1px solid #eee;">
+      <button class="btn-secondary" onclick="fecharModalBloqueioAglutinacaoJaAglutinado()" style="padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; display:flex; align-items:center; gap:8px;"><i class="fas fa-check"></i> Entendi</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOVO: Modal de Bloqueio de Baixa por Título Aglutinado -->
+<div id="modalBloqueioBaixaTituloAglutinado" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.22); z-index: 5500; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 560px; width: 96%; box-shadow: 0 8px 32px rgba(156,39,176,0.18); padding: 0;">
+    <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.28em; color: #9c27b0; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-ban"></i> Baixa não permitida</h2>
+      <button class="close-modal" onclick="fecharModalBloqueioBaixaTituloAglutinado()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px 32px 0 32px;">
+      <div style="background:#f3e5f5; border:1px solid #e1bee7; color:#7b1fa2; border-radius:8px; padding:12px; margin-bottom:14px; display:flex; align-items:flex-start; gap:10px;">
+        <i class="fas fa-exclamation-triangle" style="margin-top:2px;"></i>
+        <div>
+          <div style="font-weight:600;">Não é possível baixar títulos que foram aglutinados.</div>
+          <div style="font-size:0.95em; margin-top:4px;">Títulos aglutinados não podem ser baixados diretamente.</div>
+        </div>
+      </div>
+      <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <div style="font-weight:600; color:#333; margin-bottom:8px; display:flex; align-items:center; gap:8px;"><i class="fas fa-info-circle"></i> Informações do Título</div>
+        <div id="infoTituloAglutinadoBaixa" style="font-size:0.95em; color:#666;"></div>
+      </div>
+      <div style="font-size:0.92em; color:#666; line-height:1.5;">
+        <strong>Por que não é possível baixar?</strong><br>
+        Títulos aglutinados são criados a partir da combinação de outros títulos. Para fazer a baixa, você deve:
+        <ul style="margin: 8px 0 0 20px; padding: 0;">
+          <li>Cancelar a aglutinação primeiro</li>
+          <li>Fazer a baixa dos títulos originais individualmente</li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; padding: 20px 32px 28px 32px; border-top: 1px solid #eee;">
+      <button class="btn-secondary" onclick="fecharModalBloqueioBaixaTituloAglutinado()" style="padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; display:flex; align-items:center; gap:8px;"><i class="fas fa-check"></i> Entendi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     JAVASCRIPT DOS MODAIS
+     ======================================== -->
+
+<script>
+// Animação de Aglutinação
+function atualizarProgressoAglutinacao(percentual, texto) {
+  const barra = document.getElementById('barraProgressoAglutinacao');
+  const textoEl = document.getElementById('textoProgressoAglutinacao');
+  if (barra) barra.style.width = `${percentual}%`;
+  if (textoEl && typeof texto === 'string') textoEl.textContent = texto;
+}
+
+function mostrarAnimacaoAglutinacao() {
+  const modal = document.getElementById('modalAglutinacaoTitulos');
+  const modalBody = modal ? modal.querySelector('.modal-body') : null;
+  const footerBtns = modal ? modal.querySelector('.modal-footer') : null;
+  if (!modalBody) return;
+  // remover anterior
+  const anterior = document.getElementById('animacaoAglutinacaoDiv');
+  if (anterior) anterior.remove();
+  // esconder botoes
+  if (footerBtns) footerBtns.style.display = 'none';
+  // clonar template
+  const tpl = document.getElementById('templateAnimacaoAglutinacao');
+  if (tpl && tpl.content) {
+    const node = tpl.content.cloneNode(true);
+    // inserir antes do footer
+    try {
+      modalBody.appendChild(node);
+    } catch (_) {
+      modal.appendChild(node);
+    }
+  } else {
+    // fallback: construir dinamicamente (padrão igual baixa)
+    const animacaoDiv = document.createElement('div');
+    animacaoDiv.id = 'animacaoAglutinacaoDiv';
+    animacaoDiv.style.cssText = 'margin: 20px 0; text-align: center; background: #f8f9fa; border-radius: 12px; padding: 20px; border: 1px solid #e9ecef;';
+    animacaoDiv.innerHTML = `
+      <div style="font-weight: 600; color: #1976D2; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 1.2em;"></i>
+        <span id="textoProgressoAglutinacao">Iniciando aglutinação...</span>
+      </div>
+      <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+        <div id="barraProgressoAglutinacao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25,118,210,0.3);"></div>
+      </div>
+      <div style="font-size: 0.9em; color: #666; font-style: italic;">Processando aglutinação...</div>
+    `;
+    try {
+      modalBody.appendChild(animacaoDiv);
+    } catch (_) {
+      modal.appendChild(animacaoDiv);
+    }
+  }
+}
+
+function finalizarAnimacaoAglutinacao() {
+  const anim = document.getElementById('animacaoAglutinacaoDiv');
+  if (anim && anim.parentElement) anim.parentElement.removeChild(anim);
+  const modal = document.getElementById('modalAglutinacaoTitulos');
+  const footerBtns = modal ? modal.querySelector('.modal-footer') : null;
+  if (footerBtns) footerBtns.style.display = 'flex';
+}
+
+function fecharModalSucessoAglutinacao() {
+  const modal = document.getElementById('modalSucessoAglutinacao');
+  if (modal) modal.style.display = 'none';
+}
+
+// Variáveis globais para os modais
+let tituloParaExcluir = null;
+let tituloParaCancelarBaixa = null;
+let modoExclusaoParcelamento = 'unico';
+let titulosParaExcluirAnimacao = [];
+// NOVO: títulos selecionados para aglutinação
+let titulosParaAglutinar = [];
+// NOVO: observação digitada no modal de aglutinação
+let motivoAglutinacaoTexto = '';
+// NOVO: data de vencimento escolhida pelo usuário no modal de aglutinação
+let dataVencimentoAglutinacao = '';
+
+// NOVO: helper para normalizar valores numéricos em pt-BR
+function parseValorBr(valor) {
+  if (valor == null) return 0;
+  if (typeof valor === 'number') return isNaN(valor) ? 0 : valor;
+  if (typeof valor === 'string') {
+    const limpo = valor.replace(/\./g, '').replace(',', '.').trim();
+    const num = parseFloat(limpo);
+    return isNaN(num) ? 0 : num;
+  }
+  const n = Number(valor);
+  return isNaN(n) ? 0 : n;
+}
+
+// ========================================
+// FUNÇÕES DE EXCLUSÃO
+// ========================================
+
+// Função para confirmar exclusão de título
+async function confirmarExclusao(modo) {
+  if (!tituloParaExcluir || !tituloParaExcluir.titulo) {
+    console.error('Nenhum título para excluir');
+    return;
+  }
+  
+  const titulo = tituloParaExcluir.titulo;
+  console.log('Executando exclusão do título:', titulo.numero_titulo, 'modo:', modo);
+  
+  // Verificar se há títulos pagos antes de excluir múltiplos
+  if (modo === 'todos') {
+    const prefixo = (titulo.numero_titulo || '').split('-')[0];
+    const titulosDoGrupo = todosTitulos.filter(t => (t.numero_titulo || '').startsWith(prefixo + '-'));
+    
+    // Verificar se algum título está pago
+    const titulosPagos = titulosDoGrupo.filter(t => t.status && t.status.toUpperCase() === 'PAGO');
+    
+    if (titulosPagos.length > 0) {
+      console.log('Encontrados títulos pagos no grupo:', titulosPagos);
+      
+      // Fechar modal de confirmação
+      fecharModalConfirmExclusao();
+      
+      // Mostrar modal de aviso para o primeiro título pago encontrado
+      const primeiroTituloPago = titulosPagos[0];
+      mostrarModalTituloPagoNaoPodeExcluir(primeiroTituloPago);
+      
+      // Adicionar informação sobre quantos títulos estão pagos
+      const avisoDiv = document.querySelector('#modalTituloPagoNaoPodeExcluir .modal-body div[style*="background: #fff3e0"]');
+      if (avisoDiv) {
+        avisoDiv.innerHTML = `
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <i class="fas fa-exclamation-triangle" style="color: #e53935; font-size: 1.2em; margin-top: 2px;"></i>
+            <div style="text-align: left;">
+              <div style="font-weight: 600; color: #e53935; margin-bottom: 6px;">Atenção: Grupo de Títulos com Pagamentos!</div>
+              <div style="font-size: 0.95em; color: #e53935;">
+                Este grupo possui <strong>${titulosPagos.length} título(s) já pago(s)</strong> que não podem ser excluídos.
+                <br><br>
+                Para excluir o grupo completo, você deve primeiro <strong>cancelar a baixa</strong> de todos os títulos pagos através da opção "Cancelar Baixa" no menu de ações de cada título.
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      return; // Parar a execução
+    }
+  }
+  
+  // Mostrar animação de exclusão
+  const animacaoDiv = document.getElementById('animacaoExclusaoDiv');
+  const footerBtns = document.getElementById('footerExclusaoBtns');
+  const barraProgresso = document.getElementById('barraProgressoExclusao');
+  const textoProgresso = document.getElementById('textoProgressoExclusao');
+  
+  if (animacaoDiv) animacaoDiv.style.display = 'block';
+  if (footerBtns) footerBtns.style.display = 'none';
+  if (barraProgresso) barraProgresso.style.width = '0%';
+  if (textoProgresso) textoProgresso.textContent = 'Iniciando exclusão...';
+  
+  try {
+    if (modo === 'unico') {
+      // Excluir apenas o título atual
+      console.log('Excluindo título único:', titulo.id);
+      
+      // Atualizar progresso
+      if (barraProgresso) barraProgresso.style.width = '50%';
+      if (textoProgresso) textoProgresso.textContent = 'Excluindo título...';
+      
+      await window.api.delete(`/movimento_comissoes/${titulo.id}`);
+      
+      // Atualizar progresso
+      if (barraProgresso) barraProgresso.style.width = '100%';
+      if (textoProgresso) textoProgresso.textContent = 'Título excluído com sucesso!';
+      
+      // Aguardar um pouco para mostrar o progresso completo
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Atualizar arrays locais
+      todosTitulos = todosTitulos.filter(t => t.id !== titulo.id);
+      titulosFiltrados = titulosFiltrados.filter(t => t.id !== titulo.id);
+      
+      // Atualizar interface
+      atualizarTabelaComFiltros();
+      atualizarCardsTotalizadores();
+      
+      fecharModalConfirmExclusao();
+      abrirModalSucessoExclusao();
+      
+    } else if (modo === 'todos') {
+      // Excluir todos os títulos do parcelamento
+      const prefixo = (titulo.numero_titulo || '').split('-')[0];
+      const titulosDoGrupo = todosTitulos.filter(t => (t.numero_titulo || '').startsWith(prefixo + '-'));
+      
+      console.log('Excluindo parcelamento completo:', titulosDoGrupo.length, 'títulos');
+      
+      // Calcular progresso por título
+      const progressoPorTitulo = 100 / titulosDoGrupo.length;
+      
+      for (let i = 0; i < titulosDoGrupo.length; i++) {
+        const t = titulosDoGrupo[i];
+        
+        // Atualizar progresso
+        const progressoAtual = (i + 1) * progressoPorTitulo;
+        if (barraProgresso) barraProgresso.style.width = progressoAtual + '%';
+        if (textoProgresso) textoProgresso.textContent = `Excluindo título ${i + 1} de ${titulosDoGrupo.length}...`;
+        
+        await window.api.delete(`/movimento_comissoes/${t.id}`);
+        
+        // Pequeno delay para mostrar o progresso
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      
+      if (textoProgresso) textoProgresso.textContent = 'Todos os títulos excluídos com sucesso!';
+      
+      // Aguardar um pouco para mostrar o progresso completo
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      todosTitulos = todosTitulos.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
+      titulosFiltrados = titulosFiltrados.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
+      
+      atualizarTabelaComFiltros();
+      atualizarCardsTotalizadores();
+      
+      fecharModalConfirmExclusao();
+      abrirModalSucessoExclusao();
+    }
+    
+  } catch (error) {
+    console.error('Erro ao excluir título:', error);
+    
+    // Mostrar erro no progresso
+    if (textoProgresso) textoProgresso.textContent = 'Erro ao excluir título!';
+    if (barraProgresso) barraProgresso.style.backgroundColor = '#e53935';
+    
+    // Aguardar um pouco e mostrar alerta
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Melhorar mensagem de erro
+    let mensagemErro = 'Erro desconhecido ao excluir título';
+    if (error && error.message) {
+      mensagemErro = error.message;
+    } else if (error && typeof error === 'string') {
+      mensagemErro = error;
+    }
+    
+    alert(`Erro ao excluir título: ${mensagemErro}`);
+    
+    // Restaurar botões
+    if (footerBtns) footerBtns.style.display = 'flex';
+    if (animacaoDiv) animacaoDiv.style.display = 'none';
+  }
+}
+
+function abrirModalConfirmExclusao(titulo, onConfirm) {
+  console.log('abrirModalConfirmExclusao chamada com:', titulo);
+  
+  // Verificar se o título está com status PAGO
+  if (titulo.status && titulo.status.toUpperCase() === 'PAGO') {
+    console.log('Título está pago, mostrando modal de aviso...');
+    mostrarModalTituloPagoNaoPodeExcluir(titulo);
+    return;
+  }
+  
+  // Verificar se as funções necessárias estão disponíveis
+  if (typeof todosTitulos === 'undefined' || !Array.isArray(todosTitulos)) {
+    console.error('Lista de títulos não está disponível ou não é um array');
+    alert('Erro: Lista de títulos não está disponível. Por favor, atualize a página.');
+    return;
+  }
+  
+  // Verificar se o título ainda existe na lista atualizada
+  const tituloAtualizado = todosTitulos.find(t => t.id === titulo.id);
+  if (!tituloAtualizado) {
+    console.error('Título não encontrado na lista atualizada');
+    alert('Erro: Título não encontrado. Por favor, atualize a página.');
+    return;
+  }
+  
+  // Usar o título atualizado da lista
+  const tituloParaUsar = tituloAtualizado;
+  console.log('Usando título atualizado da lista:', tituloParaUsar);
+  
+  // Resetar estado anterior do modal para evitar conflitos
+  tituloParaExcluir = null;
+  modoExclusaoParcelamento = 'unico';
+  
+  // Definir novo título para exclusão
+  tituloParaExcluir = { titulo: tituloParaUsar, onConfirm };
+  console.log('tituloParaExcluir definido como:', tituloParaExcluir);
+  
+  // Resetar e configurar elementos do modal
+  const animacaoDiv = document.getElementById('animacaoExclusaoDiv');
+  const footerBtns = document.getElementById('footerExclusaoBtns');
+  const opcoesDiv = document.getElementById('opcoesExclusaoParcelamento');
+  const listaTitulosParciais = document.getElementById('listaTitulosParciais');
+  
+  // Resetar animação
+  if (animacaoDiv) {
+    animacaoDiv.style.display = 'none';
+  }
+  
+  // Mostrar botões
+  if (footerBtns) {
+    footerBtns.style.display = 'flex';
+  }
+  
+  // Resetar opções de parcelamento
+  if (opcoesDiv) {
+    opcoesDiv.style.display = 'none';
+  }
+  
+  // Resetar lista de títulos parciais
+  if (listaTitulosParciais) {
+    listaTitulosParciais.style.display = 'none';
+  }
+  
+  // Preencher informações do título no modal com verificações de segurança
+  const numeroElement = document.getElementById('numeroTituloExclusao');
+  const colaboradorElement = document.getElementById('colaboradorTituloExclusao');
+  const valorElement = document.getElementById('valorTituloExclusao');
+  const statusElement = document.getElementById('statusTituloExclusao');
+  
+  if (numeroElement) {
+    numeroElement.textContent = tituloParaUsar.numero_titulo || '';
+  } else {
+    console.warn('Elemento numeroTituloExclusao não encontrado');
+  }
+  
+  if (colaboradorElement) {
+    // Verificar se mapaColaboradores existe antes de usar
+    if (typeof mapaColaboradores !== 'undefined' && mapaColaboradores) {
+      colaboradorElement.textContent = mapaColaboradores[tituloParaUsar.colaborador_id] || tituloParaUsar.colaborador_id || '';
+    } else {
+      colaboradorElement.textContent = tituloParaUsar.colaborador_id || '';
+    }
+  } else {
+    console.warn('Elemento colaboradorTituloExclusao não encontrado');
+  }
+  
+  if (valorElement) {
+    // Verificar se formatarValorLocal existe antes de usar
+    if (typeof formatarValorLocal === 'function') {
+      valorElement.textContent = formatarValorLocal(tituloParaUsar.valor);
+    } else {
+      // Fallback se a função não estiver disponível
+      valorElement.textContent = tituloParaUsar.valor ? `R$ ${parseFloat(tituloParaUsar.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '';
+    }
+  } else {
+    console.warn('Elemento valorTituloExclusao não encontrado');
+  }
+  
+  if (statusElement) {
+    statusElement.textContent = tituloParaUsar.status || '';
+  } else {
+    console.warn('Elemento statusTituloExclusao não encontrado');
+  }
+  
+  // Detecta se é parcelado pelo padrão do número do título
+  const match = (tituloParaUsar.numero_titulo || '').match(/^(\d+)-\d+\/\d+$/);
+  if (match && opcoesDiv) {
+    console.log('Título é parcelado, mostrando opções...');
+    opcoesDiv.style.display = 'block';
+    const radioUnico = document.querySelector('input[name="exclusaoParcelamento"][value="unico"]');
+    if (radioUnico) radioUnico.checked = true;
+    modoExclusaoParcelamento = 'unico';
+  } else if (opcoesDiv) {
+    console.log('Título não é parcelado, ocultando opções...');
+    opcoesDiv.style.display = 'none';
+    modoExclusaoParcelamento = 'unico';
+  }
+  
+  // Configurar event listeners para as opções de parcelamento
+  document.getElementsByName('exclusaoParcelamento').forEach(radio => {
+    radio.onchange = function() {
+      modoExclusaoParcelamento = this.value;
+      console.log('Modo de exclusão alterado para:', modoExclusaoParcelamento);
+    };
+  });
+  
+  // Abrir modal
+  const modal = document.getElementById('modalConfirmExclusao');
+  if (modal) {
+    console.log('Abrindo modal de confirmação de exclusão...');
+    modal.style.display = 'flex';
+  } else {
+    console.error('Modal modalConfirmExclusao não encontrado!');
+  }
+}
+
+function fecharModalConfirmExclusao() {
+  console.log('Executando fecharModalConfirmExclusao...');
+  const modal = document.getElementById('modalConfirmExclusao');
+  console.log('Modal encontrado:', modal);
+  if (modal) {
+    console.log('Display antes de fechar:', modal.style.display);
+    modal.style.display = 'none';
+    console.log('Display após fechar:', modal.style.display);
+    console.log('Modal de confirmação fechado com sucesso');
+  } else {
+    console.log('Modal de confirmação não encontrado');
+  }
+  
+  // Resetar campos com segurança
+  const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
+  if (confirmacaoDiv) confirmacaoDiv.style.display = 'none';
+  const inputConfirmo = document.getElementById('inputConfirmoExclusao');
+  if (inputConfirmo) inputConfirmo.value = '';
+  const erroConfirmo = document.getElementById('erroConfirmoExclusao');
+  if (erroConfirmo) erroConfirmo.style.display = 'none';
+}
+
+function abrirModalSucessoExclusao() {
+  const modal = document.getElementById('modalSucessoExclusao');
+  if (modal) modal.style.display = 'flex';
+}
+
+function fecharModalSucessoExclusao() {
+  const modal = document.getElementById('modalSucessoExclusao');
+  if (modal) modal.style.display = 'none';
+}
+
+// ========================================
+// FUNÇÕES DE CANCELAMENTO DE BAIXA
+// ========================================
+
+function abrirModalConfirmCancelarBaixa(titulo) {
+  tituloParaCancelarBaixa = titulo;
+  
+  // Verificar se há títulos parciais relacionados
+  const titulosParciais = todosTitulos.filter(t => t.id_titulo_origem === tituloParaCancelarBaixa.id);
+  const isBaixaParcial = titulosParciais.length > 0;
+  
+  // Atualizar o modal de confirmação com informações específicas
+  const modalBody = document.querySelector('#modalConfirmCancelarBaixa .modal-body');
+  const listaAcoes = modalBody.querySelector('ul');
+  
+  if (isBaixaParcial) {
+    // Adicionar item sobre exclusão de títulos parciais
+    const itemParciais = document.createElement('li');
+    itemParciais.textContent = `Excluir ${titulosParciais.length} título(s) parcial(is) gerado(s)`;
+    itemParciais.style.color = '#e65100';
+    itemParciais.style.fontWeight = 'bold';
+    listaAcoes.appendChild(itemParciais);
+    
+    // Atualizar mensagem de aviso
+    const avisoDiv = modalBody.querySelector('div[style*="font-style: italic"]');
+    if (avisoDiv) {
+      avisoDiv.innerHTML = '<strong>Atenção:</strong> Esta ação irá excluir permanentemente os títulos parciais. Esta ação não pode ser desfeita.';
+      avisoDiv.style.color = '#e53935';
+      avisoDiv.style.fontWeight = 'bold';
+    }
+  }
+  
+  // Abrir modal de confirmação
+  document.getElementById('modalConfirmCancelarBaixa').style.display = 'flex';
+}
+
+function fecharModalConfirmCancelarBaixa() {
+  document.getElementById('modalConfirmCancelarBaixa').style.display = 'none';
+  // Não resetar tituloParaCancelarBaixa aqui, pois pode ser necessário para executarCancelarBaixa
+  // A variável será resetada apenas após o cancelamento ser executado com sucesso
+}
+
+function fecharModalSucessoCancelarBaixa() {
+  const modal = document.getElementById('modalSucessoCancelarBaixa');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  // Fechar também o modal de visualização/edição, se estiver aberto
+  const modalTitulo = document.getElementById('modalTitulo');
+  if (modalTitulo) {
+    modalTitulo.style.display = 'none';
+  }
+  const viewModal = document.getElementById('viewModal');
+  if (viewModal) {
+    modal.style.display = 'none';
+  }
+}
+
+// ========================================
+// FUNÇÕES DE CANCELAMENTO DE AGLUTINAÇÃO
+// ========================================
+
+// Variável global para armazenar o título aglutinado a ser cancelado
+let tituloParaCancelarAglutinacao = null;
+
+function abrirModalConfirmCancelarAglutinacao(titulo) {
+  console.log('[CANCELAR AGLUTINAÇÃO] Abrindo modal para título:', titulo);
+  tituloParaCancelarAglutinacao = titulo;
+  
+  // Verificar se é um título aglutinado
+  if (!titulo.ids_aglutinados && !titulo.numero_titulo?.includes('AGL-')) {
+    console.warn('[CANCELAR AGLUTINAÇÃO] Título não é aglutinado:', titulo);
+    alert('Este título não é uma aglutinação e não pode ser cancelado.');
+    return;
+  }
+  
+  // Buscar títulos originais se houver ids_aglutinados
+  let titulosOriginais = [];
+  if (titulo.ids_aglutinados) {
+    const ids = titulo.ids_aglutinados.split(',').map(id => parseInt(id.trim()));
+    titulosOriginais = todosTitulos.filter(t => ids.includes(t.id));
+  }
+  
+  // Preencher informações do título aglutinado
+  const infoTitulo = document.getElementById('infoTituloAglutinado');
+  const numeroEl = document.getElementById('numeroTituloAglutinado');
+  const valorEl = document.getElementById('valorTituloAglutinado');
+  const colabEl = document.getElementById('colaboradorAglutinado');
+  const vencEl = document.getElementById('vencimentoTituloAglutinado');
+  
+  if (infoTitulo && numeroEl && valorEl && colabEl && vencEl) {
+    numeroEl.textContent = titulo.numero_titulo || 'N/A';
+    valorEl.textContent = typeof formatarValorLocal === 'function' 
+      ? formatarValorLocal(titulo.valor) 
+      : `R$ ${(titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    
+    const colaboradorNome = mapaColaboradores && mapaColaboradores[titulo.colaborador_id] 
+      ? mapaColaboradores[titulo.colaborador_id] 
+      : titulo.colaborador_id || 'N/A';
+    colabEl.textContent = colaboradorNome;
+    
+    vencEl.textContent = titulo.data_vencimento 
+      ? (typeof formatarData === 'function' ? formatarData(titulo.data_vencimento) : titulo.data_vencimento)
+      : 'N/A';
+    
+    infoTitulo.style.display = 'block';
+  }
+  
+  // Preencher lista de títulos originais
+  const listaTitulos = document.getElementById('listaTitulosOriginais');
+  const titulosOriginaisLista = document.getElementById('titulosOriginaisLista');
+  
+  if (listaTitulos && titulosOriginaisLista) {
+    if (titulosOriginais.length > 0) {
+      titulosOriginaisLista.innerHTML = '';
+      titulosOriginais.forEach((t, idx) => {
+        const numero = t.numero_titulo || 'N/A';
+        const valor = typeof formatarValorLocal === 'function' 
+          ? formatarValorLocal(t.valor) 
+          : `R$ ${(t.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        const venc = t.data_vencimento 
+          ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento)
+          : 'N/A';
+        
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e9ecef; border-radius:6px; padding:8px 10px; margin-bottom:6px;';
+        item.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="background:#f3e5f5; color:#9c27b0; padding:2px 6px; border-radius:10px; font-weight:600; font-size:0.8em;">${idx+1}</span>
+            <div style="display:flex; flex-direction:column;">
+              <span style="font-weight:600; color:#333; font-size:0.9em;">${numero}</span>
+              <span style="color:#666; font-size:0.8em;">Vencimento: ${venc}</span>
+            </div>
+          </div>
+          <div style="font-weight:700; color:#333; font-size:0.9em;">${valor}</div>
+        `;
+        titulosOriginaisLista.appendChild(item);
+      });
+      
+      listaTitulos.style.display = 'block';
+    } else {
+      listaTitulos.style.display = 'none';
+    }
+  }
+  
+  // Abrir modal de confirmação
+  document.getElementById('modalConfirmCancelarAglutinacao').style.display = 'flex';
+}
+
+function fecharModalConfirmCancelarAglutinacao() {
+  document.getElementById('modalConfirmCancelarAglutinacao').style.display = 'none';
+  // Não resetar tituloParaCancelarAglutinacao aqui, pois pode ser necessário para executarCancelarAglutinacao
+}
+
+function fecharModalSucessoCancelarAglutinacao() {
+  const modal = document.getElementById('modalSucessoCancelarAglutinacao');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  // Fechar também o modal de visualização/edição, se estiver aberto
+  const modalTitulo = document.getElementById('modalTitulo');
+  if (modalTitulo) {
+    modalTitulo.style.display = 'none';
+  }
+  const viewModal = document.getElementById('viewModal');
+  if (viewModal) {
+    viewModal.style.display = 'none';
+  }
+}
+
+// Função para atualizar progresso do cancelamento de aglutinação
+function atualizarProgressoCancelarAglutinacao(percentual, texto) {
+  const barra = document.getElementById('barraProgressoCancelarAglutinacao');
+  const textoEl = document.getElementById('textoProgressoCancelarAglutinacao');
+  
+  if (barra) {
+    barra.style.width = `${percentual}%`;
+  }
+  
+  if (textoEl) {
+    textoEl.textContent = texto;
+  }
+}
+
+// Função para mostrar modal de progresso
+function mostrarModalProgressoCancelarAglutinacao() {
+  const modal = document.getElementById('modalProgressoCancelarAglutinacao');
+  if (modal) {
+    modal.style.display = 'flex';
+    // Resetar progresso
+    atualizarProgressoCancelarAglutinacao(0, 'Iniciando cancelamento da aglutinação...');
+  }
+}
+
+// Função para fechar modal de progresso
+function fecharModalProgressoCancelarAglutinacao() {
+  const modal = document.getElementById('modalProgressoCancelarAglutinacao');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// ========================================
+// FUNÇÕES AUXILIARES
+// ========================================
+
+function mostrarModalTituloPagoNaoPodeExcluir(titulo) {
+  const modal = document.getElementById('modalTituloPagoNaoPodeExcluir');
+  if (modal) {
+    // Preencher informações do título com verificações de segurança
+    const numeroElement = document.getElementById('numeroTituloPago');
+    const dataPagamentoElement = document.getElementById('dataPagamentoTitulo');
+    const valorPagoElement = document.getElementById('valorPagoTitulo');
+    const colaboradorElement = document.getElementById('colaboradorTituloPago');
+    
+    if (numeroElement) {
+      numeroElement.textContent = titulo.numero_titulo || '';
+    }
+    
+    if (dataPagamentoElement) {
+      // Verificar se formatarDataLocal existe antes de usar
+      if (typeof formatarDataLocal === 'function') {
+        dataPagamentoElement.textContent = formatarDataLocal(titulo.data_pagamento) || 'Não informada';
+      } else {
+        dataPagamentoElement.textContent = titulo.data_pagamento || 'Não informada';
+      }
+    }
+    
+    if (valorPagoElement) {
+      // Verificar se formatarValorLocal existe antes de usar
+      if (typeof formatarValorLocal === 'function') {
+        valorPagoElement.textContent = formatarValorLocal(titulo.valor_pago) || 'Não informado';
+      } else {
+        // Fallback se a função não estiver disponível
+        valorPagoElement.textContent = titulo.valor_pago ? `R$ ${parseFloat(titulo.valor_pago).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Não informado';
+      }
+    }
+    
+    if (colaboradorElement) {
+      // Verificar se mapaColaboradores existe antes de usar
+      if (typeof mapaColaboradores !== 'undefined' && mapaColaboradores) {
+        colaboradorElement.textContent = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
+      } else {
+        colaboradorElement.textContent = titulo.colaborador_id || '';
+      }
+    }
+    
+    // Mostrar observações se existirem
+    const observacoesDiv = document.getElementById('observacoesTitulo');
+    const observacoesTexto = document.getElementById('textoObservacoesTitulo');
+    if (titulo.observacoes && titulo.observacoes.trim()) {
+      observacoesTexto.textContent = titulo.observacoes;
+      observacoesDiv.style.display = 'block';
+    } else {
+      observacoesDiv.style.display = 'none';
+    }
+    
+    modal.style.display = 'flex';
+  }
+}
+
+function fecharModalTituloPagoNaoPodeExcluir() {
+  const modal = document.getElementById('modalTituloPagoNaoPodeExcluir');
+  if (modal) modal.style.display = 'none';
+}
+
+// NOVO: FUNÇÕES DE AGLUTINAÇÃO (abrir/fechar)
+function abrirModalAglutinacao(titulos) {
+  console.log('[MODAL] Abrindo modal de aglutinação...');
+  console.log('[MODAL] window.api disponível:', !!window.api);
+  console.log('[MODAL] window.api.post disponível:', !!window.api?.post);
+  
+  titulosParaAglutinar = Array.isArray(titulos) ? titulos : [];
+  motivoAglutinacaoTexto = '';
+
+  // VALIDAÇÕES ANTES DE ABRIR O MODAL
+  console.log('[MODAL] Executando validações antes de abrir modal...');
+  
+  // Verificar se há títulos selecionados
+  if (!Array.isArray(titulosParaAglutinar) || titulosParaAglutinar.length < 2) {
+    console.warn('[MODAL] Validação falhou: menos de 2 títulos');
+    mostrarModalBloqueioMinimoAglutinacao();
+    return;
+  }
+
+  // Verificar se há títulos pagos
+  const titulosPagos = titulosParaAglutinar.filter(t => (t.status || '').toUpperCase() === 'PAGO');
+  if (titulosPagos.length > 0) {
+    console.warn('[MODAL] Validação falhou: há títulos pagos');
+    mostrarModalBloqueioAglutinacaoPago(titulosPagos);
+    return;
+  }
+
+  // Verificar se há títulos já aglutinados
+  const titulosJaAglutinados = titulosParaAglutinar.filter(t => (t.status || '').toUpperCase() === 'AGLUTINADO');
+  if (titulosJaAglutinados.length > 0) {
+    console.warn('[MODAL] Validação falhou: há títulos já aglutinados');
+    mostrarModalBloqueioAglutinacaoJaAglutinado(titulosJaAglutinados);
+    return;
+  }
+
+  // Verificar se há títulos de colaboradores diferentes
+  const colaboradores = Array.from(new Set(titulosParaAglutinar.map(t => t.colaborador_id)));
+  if (colaboradores.length > 1) {
+    console.warn('[MODAL] Validação falhou: há colaboradores diferentes');
+    mostrarModalBloqueioAglutinacaoColab(titulosParaAglutinar);
+    return;
+  }
+
+  console.log('[MODAL] Todas as validações passaram, abrindo modal...');
+  
+  const modal = document.getElementById('modalAglutinacaoTitulos');
+  const qtdEl = document.getElementById('quantidadeTitulosAglutinar');
+  const listaEl = document.getElementById('listaTitulosAglutinacao');
+  const totalEl = document.getElementById('valorTotalAglutinar');
+  const colabEl = document.getElementById('colaboradorAglutinacao');
+  const motivoInput = document.getElementById('motivoAglutinacaoInput');
+  const motivoCount = document.getElementById('motivoAglutinacaoCount');
+  const simulacaoEl = document.getElementById('simulacaoAglutinacao');
+
+  if (qtdEl) qtdEl.textContent = titulosParaAglutinar.length;
+
+  if (listaEl) {
+    listaEl.innerHTML = '';
+    titulosParaAglutinar.forEach((t, idx) => {
+      const numero = (t.numero_titulo || '').toString();
+      const valorNum = parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0);
+      const valorFmt = (typeof formatarValorLocal === 'function')
+        ? formatarValorLocal(valorNum)
+        : `R$ ${valorNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      const dtVenc = t.data_vencimento ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento) : '-';
+      const linha = document.createElement('div');
+      linha.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:10px 12px; margin-bottom:8px; gap:10px;';
+      linha.innerHTML = `
+        <div style=\"display:flex; align-items:center; gap:8px;\">
+          <span style=\"background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;\">${idx+1}</span>
+          <div style=\"display:flex; flex-direction:column;\">
+            <span style=\"font-weight:600; color:#333;\">${numero}</span>
+            <span style=\"color:#666; font-size:0.85em;\">Vencimento: ${dtVenc}</span>
+          </div>
+        </div>
+        <div style=\"display:flex; align-items:center; gap:8px;\">
+          <div style=\"font-weight:700; color:#333;\">${valorFmt}</div>
+          <button type=\"button\" class=\"btn-visualizar-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #1976D2; background:#e3f2fd; color:#1976D2; cursor:pointer; font-weight:600;\"><i class=\"fas fa-eye\"></i> Visualizar</button>
+          <button type=\"button\" class=\"btn-remover-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #e53935; background:#ffebee; color:#e53935; cursor:pointer; font-weight:600;\"><i class=\"fas fa-times\"></i> Remover</button>
+        </div>
+      `;
+      listaEl.appendChild(linha);
+    });
+
+    // Bind dos botões Visualizar
+    const botoes = listaEl.querySelectorAll('button.btn-visualizar-titulo');
+    botoes.forEach(btn => {
+      btn.onclick = function() {
+        const id = this.getAttribute('data-id');
+        const titulo = titulosParaAglutinar.find(x => String(x.id) === String(id));
+        if (!titulo) return;
+        if (typeof abrirModalTitulo === 'function') {
+          abrirModalTitulo(titulo, 'visualizar');
+        } else if (typeof openViewModal === 'function') {
+          openViewModal(titulo);
+        } else {
+          alert('Função de visualização não disponível.');
+          return;
+        }
+        // Garantir que o modal de visualização fique acima do modal de aglutinação
+        setTimeout(() => {
+          const viewModalEl = document.getElementById('viewModal');
+          const modalTituloEl = document.getElementById('modalTitulo');
+          if (viewModalEl) viewModalEl.style.zIndex = '6000';
+          if (modalTituloEl) modalTituloEl.style.zIndex = '6000';
+        }, 0);
+      };
+    });
+
+    // NOVO: Bind dos botões Remover
+    const botoesRemover = listaEl.querySelectorAll('button.btn-remover-titulo');
+    botoesRemover.forEach(btn => {
+      btn.onclick = function() {
+        const id = this.getAttribute('data-id');
+        // Remover do array local
+        titulosParaAglutinar = titulosParaAglutinar.filter(x => String(x.id) !== String(id));
+        
+        // Desmarcar seleção na grid principal, se existir
+        try {
+          if (typeof linhasSelecionadas !== 'undefined' && Array.isArray(linhasSelecionadas)) {
+            const idx = linhasSelecionadas.indexOf(String(id));
+            if (idx !== -1) linhasSelecionadas.splice(idx, 1);
+            const tr = document.querySelector(`#movimentoComissoesTableBody tr[data-id="${id}"]`);
+            if (tr) tr.classList.remove('tr-selected');
+          }
+        } catch (e) { /* noop */ }
+        
+        // Recalcular quantidade, totals, colaborador e simulação
+        const qtdEl = document.getElementById('quantidadeTitulosAglutinar');
+        const totalEl = document.getElementById('valorTotalAglutinar');
+        const colabEl = document.getElementById('colaboradorAglutinacao');
+        const simulacaoEl = document.getElementById('simulacaoAglutinacao');
+        if (qtdEl) qtdEl.textContent = titulosParaAglutinar.length;
+        
+        // Re-renderizar lista
+        listaEl.innerHTML = '';
+        titulosParaAglutinar.forEach((t, idx2) => {
+          const numero = (t.numero_titulo || '').toString();
+          const valorNum = parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0);
+          const valorFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(valorNum) : `R$ ${valorNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+          const dtVenc = t.data_vencimento ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento) : '-';
+          const linha2 = document.createElement('div');
+          linha2.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:10px 12px; margin-bottom:8px; gap:10px;';
+          linha2.innerHTML = `
+            <div style=\"display:flex; align-items:center; gap:8px;\">
+              <span style=\"background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;\">${idx2+1}</span>
+              <div style=\"display:flex; flex-direction:column;\">
+                <span style=\"font-weight:600; color:#333;\">${numero}</span>
+                <span style=\"color:#666; font-size:0.85em;\">Vencimento: ${dtVenc}</span>
+              </div>
+            </div>
+            <div style=\"display:flex; align-items:center; gap:8px;\">
+              <div style=\"font-weight:700; color:#333;\">${valorFmt}</div>
+              <button type=\"button\" class=\"btn-visualizar-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #1976D2; background:#e3f2fd; color:#1976D2; cursor:pointer; font-weight:600;\"><i class=\"fas fa-eye\"></i> Visualizar</button>
+              <button type=\"button\" class=\"btn-remover-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #e53935; background:#ffebee; color:#e53935; cursor:pointer; font-weight:600;\"><i class=\"fas fa-times\"></i> Remover</button>
+            </div>
+          `;
+          listaEl.appendChild(linha2);
+        });
+        
+        // Rebind dos botões após re-renderização
+        const reBotoesVer = listaEl.querySelectorAll('button.btn-visualizar-titulo');
+        reBotoesVer.forEach(b => b.onclick = (ev2) => {
+          const id2 = ev2.currentTarget.getAttribute('data-id');
+          const titulo2 = titulosParaAglutinar.find(x => String(x.id) === String(id2));
+          if (!titulo2) return;
+          if (typeof abrirModalTitulo === 'function') abrirModalTitulo(titulo2, 'visualizar');
+          else if (typeof openViewModal === 'function') openViewModal(titulo2);
+          setTimeout(() => {
+            const viewModalEl = document.getElementById('viewModal');
+            const modalTituloEl = document.getElementById('modalTitulo');
+            if (viewModalEl) viewModalEl.style.zIndex = '6000';
+            if (modalTituloEl) modalTituloEl.style.zIndex = '6000';
+          }, 0);
+        });
+        const reBotoesRem = listaEl.querySelectorAll('button.btn-remover-titulo');
+        reBotoesRem.forEach(b => b.onclick = handleRemoverTituloClick);
+        
+        // Totais e colaborador
+        const total = titulosParaAglutinar.reduce((acc, t) => acc + (parseFloat(t.valor || t.valor_total || 0) || 0), 0);
+        const totalNum = titulosParaAglutinar.reduce((acc, t) => acc + parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0), 0);
+        const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(totalNum) : `R$ ${totalNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        if (totalEl) totalEl.textContent = totalFmt;
+        if (colabEl) {
+          const primeiro = titulosParaAglutinar[0];
+          const colabId = primeiro ? primeiro.colaborador_id : '';
+          colabEl.textContent = (typeof mapaColaboradores !== 'undefined' && mapaColaboradores && colabId) ? (mapaColaboradores[colabId] || colabId) : (colabId || '-');
+        }
+        
+        // Atualizar simulação
+        if (simulacaoEl) {
+          if (titulosParaAglutinar.length === 0) {
+            simulacaoEl.innerHTML = '';
+          } else {
+            // PRESERVAR a data escolhida pelo usuário em vez de sempre usar a data atual
+            let dataVencimento = '';
+            const campoVencimentoExistente = document.getElementById('vencimentoTituloAglutinado');
+            if (campoVencimentoExistente && campoVencimentoExistente.value) {
+              dataVencimento = campoVencimentoExistente.value;
+            } else {
+              // Fallback: usar data atual apenas se não houver data escolhida
+              const hoje = new Date();
+              const ano = hoje.getFullYear();
+              const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+              const dia = String(hoje.getDate()).padStart(2, '0');
+              dataVencimento = `${ano}-${mes}-${dia}`;
+            }
+            
+            const exemplos = titulosParaAglutinar.slice(0, 3).map(t => (t.numero_titulo || '')).filter(Boolean);
+            const origemResumo = titulosParaAglutinar.length > 3
+              ? `${titulosParaAglutinar.length} títulos (ex.: ${exemplos.join(', ')}...)`
+              : (exemplos.join(', ') || `${titulosParaAglutinar.length} título(s)`);
+            simulacaoEl.innerHTML = `
+              <div style=\"display: flex; align-items: center; gap: 10px; margin-bottom: 12px;\">
+                <i class=\"fas fa-receipt\" style=\"font-size: 1.3em; color: #1976D2;\"></i>
+                <h3 style=\"margin: 0; font-size: 1.1em; color: #1976D2; font-weight: 700;\">Novo Título Aglutinado (Simulação)</h3>
+              </div>
+              <div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;\">
+                <div style=\"background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;\">
+                  <div style=\"font-weight: 600; color: #1976D2; margin-bottom: 4px;\">Nº Título</div>
+                  <div style=\"color: #333;\">Simulado-AGL-1/1</div>
+                </div>
+                <div style=\"background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;\">
+                  <div style=\"font-weight: 600; color: #1976D2; margin-bottom: 4px;\">Origem</div>
+                  <div style=\"color: #333;\">${origemResumo}</div>
+                </div>
+                <div style=\"background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;\">
+                  <div style=\"font-weight: 600; color: #1976D2; margin-bottom: 4px;\">Colaborador</div>
+                  <div style=\"color: #333;\">${colabEl ? colabEl.textContent : '-'}\n                  </div>
+                </div>
+                <div style=\"background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;\">
+                  <div style=\"font-weight: 600; color: #1976D2; margin-bottom: 4px;\">Valor</div>
+                  <div style=\"color: #333; font-weight: 700;\">${totalFmt}</div>
+                </div>
+                <div style=\"background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;\">
+                  <div style=\"font-weight: 600; color: #1976D2; margin-bottom: 4px;\">Status</div>
+                  <div style=\"color: #333;\">PENDENTE</div>
+                </div>
+                <div style=\"background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;\">
+                  <div style=\"font-weight: 600; color: #1976D2; margin-bottom: 4px;\">Vencimento</div>
+                  <input type=\"date\" id=\"vencimentoTituloAglutinado\" value=\"${dataVencimento}\" style=\"padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;\" onchange=\"console.log('[FRONTEND] DEBUG - Data alterada para:', this.value);\">
+                </div>
+              </div>
+              <div style=\"margin-top: 12px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;\">
+                <div style=\"font-weight: 600; color: #1976D2; margin-bottom: 4px;\">Descrição</div>
+                <div style=\"color: #333;\">Aglutinação de ${titulosParaAglutinar.length} título(s)</div>
+              </div>
+            `;
+          }
+        }
+      };
+    });
+  }
+
+  if (motivoInput && motivoCount) {
+    motivoInput.value = '';
+    motivoCount.textContent = '0/500';
+    motivoInput.oninput = function() {
+      const len = this.value.length;
+      if (len > 500) this.value = this.value.substring(0, 500);
+      const atual = Math.min(this.value.length, 500);
+      motivoCount.textContent = `${atual}/500`;
+    };
+  }
+
+  // Garantir que a simulação esteja renderizada ao abrir
+  try { atualizarSimulacaoAglutinacaoUI(); } catch(_) {}
+
+  if (modal) modal.style.display = 'flex';
+}
+
+function fecharModalAglutinacao() {
+  const modal = document.getElementById('modalAglutinacaoTitulos');
+  if (modal) modal.style.display = 'none';
+  const listaEl = document.getElementById('listaTitulosAglutinacao');
+  if (listaEl) listaEl.innerHTML = '';
+  const motivoInput = document.getElementById('motivoAglutinacaoInput');
+  const motivoCount = document.getElementById('motivoAglutinacaoCount');
+  const simulacaoEl = document.getElementById('simulacaoAglutinacao');
+  if (motivoInput) motivoInput.value = '';
+  if (motivoCount) motivoCount.textContent = '0/500';
+  if (simulacaoEl) simulacaoEl.innerHTML = '';
+  motivoAglutinacaoTexto = '';
+  titulosParaAglutinar = [];
+}
+
+// NOVO: (Re)renderiza quantidade, lista, totais, colaborador e simulação com base no estado atual
+function renderAglutinacaoUIFromState() {
+  const qtdEl = document.getElementById('quantidadeTitulosAglutinar');
+  const totalEl = document.getElementById('valorTotalAglutinar');
+  const colabEl = document.getElementById('colaboradorAglutinacao');
+  const listaEl = document.getElementById('listaTitulosAglutinacao');
+
+  if (qtdEl) qtdEl.textContent = Array.isArray(titulosParaAglutinar) ? titulosParaAglutinar.length : 0;
+
+  if (listaEl) {
+    listaEl.innerHTML = '';
+    (titulosParaAglutinar || []).forEach((t, idx) => {
+      const numero = (t.numero_titulo || '').toString();
+      const valorNum = parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0);
+      const valorFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(valorNum) : `R$ ${valorNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      const dtVenc = t.data_vencimento ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento) : '-';
+      const linha = document.createElement('div');
+      linha.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:10px 12px; margin-bottom:8px; gap:10px;';
+      linha.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;">${idx+1}</span>
+          <div style="display:flex; flex-direction:column;">
+            <span style="font-weight:600; color:#333;">${numero}</span>
+            <span style="color:#666; font-size:0.85em;">Vencimento: ${dtVenc}</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="font-weight:700; color:#333;">${valorFmt}</div>
+          <button type="button" class="btn-visualizar-titulo" data-id="${t.id}" style="padding:6px 10px; border-radius:6px; border:1px solid #1976D2; background:#e3f2fd; color:#1976D2; cursor:pointer; font-weight:600;"><i class="fas fa-eye"></i> Visualizar</button>
+          <button type="button" class="btn-remover-titulo" data-id="${t.id}" style="padding:6px 10px; border-radius:6px; border:1px solid #e53935; background:#ffebee; color:#e53935; cursor:pointer; font-weight:600;"><i class="fas fa-times"></i> Remover</button>
+        </div>
+      `;
+      listaEl.appendChild(linha);
+    });
+
+    // Binds
+    const verBtns = listaEl.querySelectorAll('button.btn-visualizar-titulo');
+    verBtns.forEach(b => b.onclick = function(ev) {
+      const id = ev.currentTarget.getAttribute('data-id');
+      const titulo = (titulosParaAglutinar || []).find(x => String(x.id) === String(id));
+      if (!titulo) return;
+      if (typeof abrirModalTitulo === 'function') abrirModalTitulo(titulo, 'visualizar');
+      else if (typeof openViewModal === 'function') openViewModal(titulo);
+      setTimeout(() => {
+        const viewModalEl = document.getElementById('viewModal');
+        const modalTituloEl = document.getElementById('modalTitulo');
+        if (viewModalEl) viewModalEl.style.zIndex = '6000';
+        if (modalTituloEl) modalTituloEl.style.zIndex = '6000';
+      }, 0);
+    });
+    const remBtns = listaEl.querySelectorAll('button.btn-remover-titulo');
+    remBtns.forEach(b => b.onclick = handleRemoverTituloClick);
+  }
+
+  // Totais e colaborador
+  const totalNum = (titulosParaAglutinar || []).reduce((acc, t) => acc + parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0), 0);
+  const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(totalNum) : `R$ ${totalNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+  if (totalEl) totalEl.textContent = totalFmt;
+  if (colabEl) {
+    const primeiro = (titulosParaAglutinar || [])[0];
+    const colabId = primeiro ? primeiro.colaborador_id : '';
+    colabEl.textContent = (typeof mapaColaboradores !== 'undefined' && mapaColaboradores && colabId) ? (mapaColaboradores[colabId] || colabId) : (colabId || '-');
+  }
+
+  // Simulação
+  atualizarSimulacaoAglutinacaoUI();
+}
+
+// NOVO: Handler reutilizável para remover título da lista do modal
+function handleRemoverTituloClick(ev) {
+  const btn = ev.currentTarget;
+  const id = btn.getAttribute('data-id');
+  // Bloquear se o mínimo for alcançado
+  if (Array.isArray(titulosParaAglutinar) && titulosParaAglutinar.length <= 2) {
+    abrirModalBloqueioMinimoAglutinacao();
+    return;
+  }
+  // Remover do array local
+  titulosParaAglutinar = titulosParaAglutinar.filter(x => String(x.id) !== String(id));
+
+  // Desmarcar seleção na grid principal, se existir
+  try {
+    if (typeof linhasSelecionadas !== 'undefined' && Array.isArray(linhasSelecionadas)) {
+      const idx = linhasSelecionadas.indexOf(String(id));
+      if (idx !== -1) linhasSelecionadas.splice(idx, 1);
+      const tr = document.querySelector(`#movimentoComissoesTableBody tr[data-id="${id}"]`);
+      if (tr) tr.classList.remove('tr-selected');
+    }
+  } catch (_) {}
+
+  // Atualizar cabeçalho (quantidade, total, colaborador) e UI
+  const qtdEl = document.getElementById('quantidadeTitulosAglutinar');
+  const totalEl = document.getElementById('valorTotalAglutinar');
+  const colabEl = document.getElementById('colaboradorAglutinacao');
+  const listaEl = document.getElementById('listaTitulosAglutinacao');
+  if (qtdEl) qtdEl.textContent = titulosParaAglutinar.length;
+
+  // Re-renderizar lista
+  if (listaEl) {
+    listaEl.innerHTML = '';
+    titulosParaAglutinar.forEach((t, idx2) => {
+      const numero = (t.numero_titulo || '').toString();
+      const valorNum = parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0);
+      const valorFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(valorNum) : `R$ ${valorNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      const dtVenc = t.data_vencimento ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento) : '-';
+      const linha2 = document.createElement('div');
+      linha2.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:10px 12px; margin-bottom:8px; gap:10px;';
+      linha2.innerHTML = `
+        <div style=\"display:flex; align-items:center; gap:8px;\">\n          <span style=\"background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;\">${idx2+1}</span>\n          <div style=\"display:flex; flex-direction:column;\">\n            <span style=\"font-weight:600; color:#333;\">${numero}</span>\n            <span style=\"color:#666; font-size:0.85em;\">Vencimento: ${dtVenc}</span>\n          </div>\n        </div>\n        <div style=\"display:flex; align-items:center; gap:8px;\">\n          <div style=\"font-weight:700; color:#333;\">${valorFmt}</div>\n          <button type=\"button\" class=\"btn-visualizar-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #1976D2; background:#e3f2fd; color:#1976D2; cursor:pointer; font-weight:600;\"><i class=\"fas fa-eye\"></i> Visualizar</button>\n          <button type=\"button\" class=\"btn-remover-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #e53935; background:#ffebee; color:#e53935; cursor:pointer; font-weight:600;\"><i class=\"fas fa-times\"></i> Remover</button>\n        </div>\n      `;
+      listaEl.appendChild(linha2);
+    });
+
+    // Rebind dos botões
+    const reBotoesVer = listaEl.querySelectorAll('button.btn-visualizar-titulo');
+    reBotoesVer.forEach(b => b.onclick = function(ev2) {
+      const id2 = ev2.currentTarget.getAttribute('data-id');
+      const titulo2 = titulosParaAglutinar.find(x => String(x.id) === String(id2));
+      if (!titulo2) return;
+      if (typeof abrirModalTitulo === 'function') abrirModalTitulo(titulo2, 'visualizar');
+      else if (typeof openViewModal === 'function') openViewModal(titulo2);
+      setTimeout(() => {
+        const viewModalEl = document.getElementById('viewModal');
+        const modalTituloEl = document.getElementById('modalTitulo');
+        if (viewModalEl) viewModalEl.style.zIndex = '6000';
+        if (modalTituloEl) modalTituloEl.style.zIndex = '6000';
+      }, 0);
+    });
+    const reBotoesRem = listaEl.querySelectorAll('button.btn-remover-titulo');
+    reBotoesRem.forEach(b => b.onclick = handleRemoverTituloClick);
+  }
+
+  // Totais e colaborador
+  const total = titulosParaAglutinar.reduce((acc, t) => acc + (parseFloat(t.valor || t.valor_total || 0) || 0), 0);
+  const totalNum = titulosParaAglutinar.reduce((acc, t) => acc + parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0), 0);
+  const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(totalNum) : `R$ ${totalNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+  if (totalEl) totalEl.textContent = totalFmt;
+  if (colabEl) {
+    const primeiro = titulosParaAglutinar[0];
+    const colabId = primeiro ? primeiro.colaborador_id : '';
+    colabEl.textContent = (typeof mapaColaboradores !== 'undefined' && mapaColaboradores && colabId) ? (mapaColaboradores[colabId] || colabId) : (colabId || '-');
+  }
+
+  // Atualizar simulação
+  atualizarSimulacaoAglutinacaoUI();
+}
+
+// NOVO: utilitário para (re)construir a simulação do novo título
+function atualizarSimulacaoAglutinacaoUI() {
+  try {
+    const simulacaoEl = document.getElementById('simulacaoAglutinacao');
+    const colabEl = document.getElementById('colaboradorAglutinacao');
+    if (!simulacaoEl) return;
+    if (!Array.isArray(titulosParaAglutinar)) return;
+    if (titulosParaAglutinar.length === 0) {
+      simulacaoEl.innerHTML = '';
+      return;
+    }
+
+    const total = titulosParaAglutinar.reduce((acc, t) => acc + (parseFloat(t.valor || t.valor_total || 0) || 0), 0);
+    const totalNum = titulosParaAglutinar.reduce((acc, t) => acc + parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0), 0);
+    const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(totalNum) : `R$ ${totalNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    
+    // PRESERVAR a data escolhida pelo usuário em vez de sempre usar a data atual
+    let dataVencimento = '';
+    const campoVencimentoExistente = document.getElementById('vencimentoTituloAglutinado');
+    if (campoVencimentoExistente && campoVencimentoExistente.value) {
+      dataVencimento = campoVencimentoExistente.value;
+    } else {
+      // Fallback: usar data atual apenas se não houver data escolhida
+      const hoje = new Date();
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoje.getDate()).padStart(2, '0');
+      dataVencimento = `${ano}-${mes}-${dia}`;
+    }
+    
+    const exemplos = titulosParaAglutinar.slice(0, 3).map(t => (t.numero_titulo || '')).filter(Boolean);
+    const origemResumo = titulosParaAglutinar.length > 3
+      ? `${titulosParaAglutinar.length} títulos (ex.: ${exemplos.join(', ')}...)`
+      : (exemplos.join(', ') || `${titulosParaAglutinar.length} título(s)`);
+
+    // CRIAR HTML SEM O CAMPO DE DATA (será criado programaticamente)
+    simulacaoEl.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+        <i class="fas fa-receipt" style="font-size: 1.3em; color: #1976D2;"></i>
+        <h3 style="margin: 0; font-size: 1.1em; color: #1976D2; font-weight: 700;">Novo Título Aglutinado (Simulação)</h3>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Nº Título</div>
+          <div style="color: #333;">Simulado-AGL-1/1</div>
+        </div>
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Origem</div>
+          <div style="color: #333;">${origemResumo}</div>
+        </div>
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Colaborador</div>
+          <div style="color: #333;">${colabEl ? colabEl.textContent : '-'}</div>
+        </div>
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Valor</div>
+          <div style="color: #333; font-weight: 700;">${totalFmt}</div>
+        </div>
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Status</div>
+          <div style="color: #333;">PENDENTE</div>
+        </div>
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Vencimento</div>
+          <div id="containerVencimentoAglutinado"></div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+        <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Descrição</div>
+        <div style="color: #333;">Aglutinação de ${titulosParaAglutinar.length} título(s)</div>
+      </div>
+    `;
+
+    // CRIAR O CAMPO DE DATA PROGRAMATICAMENTE (garante inicialização correta)
+    const containerVencimento = document.getElementById('containerVencimentoAglutinado');
+    if (containerVencimento) {
+      const inputData = document.createElement('input');
+      inputData.type = 'date';
+      inputData.id = 'vencimentoTituloAglutinado';
+      inputData.value = dataVencimento;
+      inputData.style.cssText = 'padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;';
+      inputData.addEventListener('change', function() {
+        console.log('[FRONTEND] DEBUG - Data alterada para:', this.value);
+        // ARMAZENAR a data escolhida pelo usuário na variável global
+        dataVencimentoAglutinacao = this.value;
+        console.log('[FRONTEND] DEBUG - Variável global atualizada para:', dataVencimentoAglutinacao);
+      });
+      
+      containerVencimento.appendChild(inputData);
+      
+      console.log('[FRONTEND] DEBUG - Campo de data criado programaticamente com valor:', dataVencimento);
+      console.log('[FRONTEND] DEBUG - Campo criado:', inputData);
+      console.log('[FRONTEND] DEBUG - Campo value:', inputData.value);
+      console.log('[FRONTEND] DEBUG - Campo type:', inputData.type);
+    }
+
+  } catch (e) {
+    console.warn('Falha ao atualizar simulação de aglutinação:', e);
+  }
+}
+
+// NOVO: Confirmar aglutinação (agora com integração backend)
+async function confirmarAglutinacao() {
+  try {
+    console.log('[FRONTEND] Iniciando confirmarAglutinacao...');
+    const motivoInput = document.getElementById('motivoAglutinacaoInput');
+    let dtInput = document.getElementById('vencimentoTituloAglutinado');
+    
+    console.log('[FRONTEND] DEBUG - Campo observação encontrado:', !!motivoInput);
+    console.log('[FRONTEND] DEBUG - Campo vencimento encontrado:', !!dtInput);
+    
+    if (dtInput) {
+      console.log('[FRONTEND] DEBUG - Campo vencimento value:', dtInput.value);
+      console.log('[FRONTEND] DEBUG - Campo vencimento getAttribute value:', dtInput.getAttribute('value'));
+      console.log('[FRONTEND] DEBUG - Campo vencimento type:', dtInput.type);
+      console.log('[FRONTEND] DEBUG - Campo vencimento id:', dtInput.id);
+    }
+    
+    motivoAglutinacaoTexto = motivoInput ? motivoInput.value.trim() : '';
+    
+    // CAPTURAR DATA DE VENCIMENTO USANDO VARIÁVEL GLOBAL
+    let dataVencimento = new Date().toISOString().split('T')[0]; // Fallback para data atual
+    
+    console.log('[FRONTEND] === INVESTIGAÇÃO DA DATA DE VENCIMENTO ===');
+    console.log('[FRONTEND] Variável global dataVencimentoAglutinacao:', dataVencimentoAglutinacao);
+    
+    // PRIORIDADE 1: Usar a variável global (data escolhida pelo usuário)
+    if (dataVencimentoAglutinacao) {
+      console.log('[FRONTEND] Usando data da variável global:', dataVencimentoAglutinacao);
+      
+      // Função para tratar data como local (igual à baixa parcial)
+      function tratarDataComoLocal(dataString) {
+        const partes = dataString.split('-');
+        const ano = parseInt(partes[0]);
+        const mes = parseInt(partes[1]) - 1; // Mês começa em 0
+        const dia = parseInt(partes[2]);
+        
+        // Criar data como local (não UTC)
+        const dataLocal = new Date(ano, mes, dia);
+        console.log('[FRONTEND] Data criada como local:', dataLocal);
+        
+        // Retornar no formato YYYY-MM-DD
+        const anoLocal = dataLocal.getFullYear();
+        const mesLocal = String(dataLocal.getMonth() + 1).padStart(2, '0');
+        const diaLocal = String(dataLocal.getDate()).padStart(2, '0');
+        const dataFormatada = `${anoLocal}-${mesLocal}-${diaLocal}`;
+        
+        console.log('[FRONTEND] Data formatada:', dataFormatada);
+        return dataFormatada;
+      }
+      
+      // Usar a função para tratar a data
+      dataVencimento = tratarDataComoLocal(dataVencimentoAglutinacao);
+      console.log('[FRONTEND] Data final que será usada:', dataVencimento);
+    } else {
+      console.log('[FRONTEND] Variável global vazia, usando fallback');
+    }
+    
+    console.log('[FRONTEND] === FIM INVESTIGAÇÃO ===');
+
+    console.log('[FRONTEND] Dados coletados:', {
+      observacao: motivoAglutinacaoTexto,
+      dataVencimento: dataVencimento,
+      titulosParaAglutinar: titulosParaAglutinar
+    });
+
+    // Validações no frontend antes de enviar para o backend
+    if (!Array.isArray(titulosParaAglutinar) || titulosParaAglutinar.length < 2) {
+      console.warn('[FRONTEND] Validação falhou: menos de 2 títulos');
+      mostrarModalBloqueioMinimoAglutinacao();
+      return;
+    }
+
+    // Verificar se há títulos pagos
+    const titulosPagos = titulosParaAglutinar.filter(t => (t.status || '').toUpperCase() === 'PAGO');
+    if (titulosPagos.length > 0) {
+      console.warn('[FRONTEND] Validação falhou: há títulos pagos');
+      mostrarModalBloqueioAglutinacaoPago(titulosPagos);
+      return;
+    }
+
+    // Verificar se há títulos já aglutinados
+    const titulosJaAglutinados = titulosParaAglutinar.filter(t => (t.status || '').toUpperCase() === 'AGLUTINADO');
+    if (titulosJaAglutinados.length > 0) {
+      console.warn('[FRONTEND] Validação falhou: há títulos já aglutinados');
+      mostrarModalBloqueioAglutinacaoJaAglutinado(titulosJaAglutinados);
+      return;
+    }
+
+    // Verificar se há títulos de colaboradores diferentes
+    const colaboradores = Array.from(new Set(titulosParaAglutinar.map(t => t.colaborador_id)));
+    if (colaboradores.length > 1) {
+      console.warn('[FRONTEND] Validação falhou: há colaboradores diferentes');
+      mostrarModalBloqueioAglutinacaoColab(titulosParaAglutinar);
+      return;
+    }
+
+    // Montar payload
+    const ids = titulosParaAglutinar.map(t => t.id);
+    const payload = {
+      ids,
+      observacao: motivoAglutinacaoTexto,
+      data_vencimento: dataVencimento
+    };
+
+    console.log('[FRONTEND] Payload preparado:', payload);
+    console.log('[FRONTEND] window.api disponível:', !!window.api);
+    console.log('[FRONTEND] window.api.post disponível:', !!window.api?.post);
+
+    // Iniciar animação inline (padrão do sistema)
+    const btns = document.querySelectorAll('#modalAglutinacaoTitulos .modal-footer button');
+    btns.forEach(b => b.disabled = true);
+    mostrarAnimacaoAglutinacao();
+    atualizarProgressoAglutinacao(10, 'Preparando dados para aglutinação...');
+
+    console.log('[FRONTEND] Fazendo requisição POST para /movimento_comissoes/aglutinar...');
+    atualizarProgressoAglutinacao(35, 'Enviando dados ao servidor...');
+    const resp = await window.api.post('/movimento_comissoes/aglutinar', payload);
+    console.log('[FRONTEND] Resposta recebida:', resp);
+    atualizarProgressoAglutinacao(65, 'Processando resposta...');
+
+    // Atualizar UI local
+    if (resp && resp.novo) {
+      console.log('[FRONTEND] Novo título criado:', resp.novo);
+      
+      // ATUALIZAR TÍTULOS ORIGINAIS USANDO A API (igual ao cancelamento)
+      if (resp.ids_para_atualizar && Array.isArray(resp.ids_para_atualizar)) {
+        atualizarProgressoAglutinacao(70, 'Atualizando status dos títulos originais...');
+        
+        let sucessos = 0;
+        let erros = 0;
+        
+        for (let i = 0; i < resp.ids_para_atualizar.length; i++) {
+          const id = resp.ids_para_atualizar[i];
+          try {
+            console.log(`[FRONTEND] Atualizando título ID ${id} (${i + 1}/${resp.ids_para_atualizar.length})...`);
+
+            // Tentar primeiro com id_titulo_aglutinado
+            try {
+              const dadosAtualizacao = {
+                status: 'AGLUTINADO',
+                id_titulo_aglutinado: resp.novo.id
+              };
+
+              console.log(`[FRONTEND] Dados de atualização para título ${id}:`, dadosAtualizacao);
+
+              // Usar window.api.put() igual ao cancelamento
+              const resultado = await window.api.put(`/movimento_comissoes/${id}`, dadosAtualizacao);
+              console.log(`[FRONTEND] Título ${id} atualizado com sucesso (com id_titulo_aglutinado):`, resultado);
+              sucessos++;
+
+            } catch (errUpd) {
+              console.warn(`[FRONTEND] Falha ao atualizar título ${id} com id_titulo_aglutinado. Tentando fallback:`, errUpd);
+
+              // Fallback: apenas com status
+              const dadosAtualizacaoFallback = {
+                status: 'AGLUTINADO'
+              };
+
+              console.log(`[FRONTEND] Tentando fallback para título ${id}:`, dadosAtualizacaoFallback);
+              const resultadoFallback = await window.api.put(`/movimento_comissoes/${id}`, dadosAtualizacaoFallback);
+              console.log(`[FRONTEND] Título ${id} atualizado com sucesso (fallback):`, resultadoFallback);
+              sucessos++;
+            }
+
+          } catch (error) {
+            console.error(`[FRONTEND] Erro ao atualizar título ${id}:`, error);
+            erros++;
+          }
+        }
+        
+        console.log(`[FRONTEND] Resumo da atualização: ${sucessos} sucessos, ${erros} erros`);
+        
+        if (erros > 0) {
+          console.warn(`[FRONTEND] Atenção: ${erros} título(s) não foram atualizados com sucesso`);
+        }
+
+        // VERIFICAR SE OS TÍTULOS FORAM REALMENTE ATUALIZADOS NO BANCO
+        console.log('[FRONTEND] Verificando se os títulos foram realmente atualizados no banco...');
+        for (let i = 0; i < resp.ids_para_atualizar.length; i++) {
+          const id = resp.ids_para_atualizar[i];
+          try {
+            const tituloAtualizado = await window.api.get(`/movimento_comissoes/${id}`);
+            console.log(`[FRONTEND] Título ${id} após atualização:`, tituloAtualizado);
+            console.log(`[FRONTEND] Status do título ${id}: ${tituloAtualizado.status}`);
+            console.log(`[FRONTEND] id_titulo_aglutinado do título ${id}: ${tituloAtualizado.id_titulo_aglutinado}`);
+          } catch (error) {
+            console.error(`[FRONTEND] Erro ao verificar título ${id} após atualização:`, error);
+          }
+        }
+      }
+      
+      // Recarregar dados da API para obter status atualizados
+      atualizarProgressoAglutinacao(80, 'Atualizando listagem...');
+      
+      try {
+        if (typeof carregarComissoes === 'function') {
+          console.log('[FRONTEND] Recarregando dados da API...');
+          await carregarComissoes();
+        } else {
+          // Fallback: atualizar UI local se carregarComissoes não estiver disponível
+          if (Array.isArray(todosTitulos)) {
+            const idSet = new Set(ids.map(String));
+            todosTitulos = todosTitulos.filter(t => !idSet.has(String(t.id)));
+            todosTitulos.push(resp.novo);
+            if (Array.isArray(titulosFiltrados)) {
+              titulosFiltrados = titulosFiltrados.filter(t => !idSet.has(String(t.id)));
+              titulosFiltrados.push(resp.novo);
+            }
+            if (typeof atualizarTabelaComFiltros === 'function') atualizarTabelaComFiltros();
+            if (typeof atualizarCardsTotalizadores === 'function') atualizarCardsTotalizadores();
+          }
+        }
+      } catch (error) {
+        console.error('[FRONTEND] Erro ao atualizar UI:', error);
+        // Fallback em caso de erro
+        if (Array.isArray(todosTitulos)) {
+          const idSet = new Set(ids.map(String));
+          todosTitulos = todosTitulos.filter(t => !idSet.has(String(t.id)));
+          todosTitulos.push(resp.novo);
+          if (Array.isArray(titulosFiltrados)) {
+            titulosFiltrados = titulosFiltrados.filter(t => !idSet.has(String(t.id)));
+            titulosFiltrados.push(resp.novo);
+          }
+          if (typeof atualizarTabelaComFiltros === 'function') atualizarTabelaComFiltros();
+          if (typeof atualizarCardsTotalizadores === 'function') atualizarCardsTotalizadores();
+        }
+      }
+
+      // Finalizar animação e mostrar sucesso
+      atualizarProgressoAglutinacao(100, 'Aglutinação concluída com sucesso!');
+      await new Promise(r => setTimeout(r, 500));
+      finalizarAnimacaoAglutinacao();
+      fecharModalAglutinacao();
+      const modalSucesso = document.getElementById('modalSucessoAglutinacao');
+      if (modalSucesso) modalSucesso.style.display = 'flex';
+    } else {
+      console.warn('[FRONTEND] Resposta sem novo título:', resp);
+      finalizarAnimacaoAglutinacao();
+      alert('Aglutinação finalizada, mas sem retorno de novo título.');
+    }
+  } catch (error) {
+    console.error('[FRONTEND] Erro ao confirmar aglutinação:', error);
+    console.error('[FRONTEND] Detalhes do erro:', {
+      message: error?.message,
+      status: error?.status,
+      data: error?.data
+    });
+    finalizarAnimacaoAglutinacao();
+    const msg = error?.data?.error || error?.message || 'Erro ao aglutinar títulos';
+    alert(msg);
+  } finally {
+    const btns = document.querySelectorAll('#modalAglutinacaoTitulos .modal-footer button');
+    btns.forEach(b => b.disabled = false);
+  }
+}
+
+// Função para fechar todos os modais relacionados ao cancelamento de baixa
+function fecharTodosModaisCancelamento() {
+  console.log('Fechando todos os modais de cancelamento...');
+  
+  // Lista de todos os modais que podem estar abertos
+  const modaisParaFechar = [
+    'modalConfirmCancelarBaixa',
+    'modalConfirmExclusao',
+    'modalSucessoExclusao',
+    'modalSucessoCancelarBaixa',
+    'modalSucessoBaixaMultipla',
+    'modalTituloPagoNaoPodeExcluir',
+    'modalTitulo',
+    'viewModal',
+    'modalConfirmCancelarAglutinacao',
+    'modalSucessoCancelarAglutinacao',
+    'modalProgressoCancelarAglutinacao'
+  ];
+  
+  modaisParaFechar.forEach(modalId => {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  });
+  
+  // Resetar variáveis globais
+  tituloParaCancelarBaixa = null;
+  tituloParaCancelarAglutinacao = null;
+  
+  // ATUALIZAR LISTA DE TÍTULOS APÓS CANCELAMENTO DE BAIXA
+  // Isso garante que a exclusão múltipla funcione com o status atualizado
+  if (typeof atualizarTabelaComFiltros === 'function') {
+    console.log('Atualizando tabela e lista de títulos após cancelamento...');
+    try {
+      // Atualizar a tabela para refletir as mudanças
+      atualizarTabelaComFiltros();
+      
+      // Atualizar os cards totalizadores
+      if (typeof atualizarCardsTotalizadores === 'function') {
+        atualizarCardsTotalizadores();
+      }
+      
+      console.log('Tabela e títulos atualizados com sucesso após cancelamento');
+    } catch (error) {
+      console.warn('Erro ao atualizar tabela após cancelamento:', error);
+    }
+  } else {
+    console.warn('Função atualizarTabelaComFiltros não está disponível');
+  }
+  
+  console.log('Todos os modais de cancelamento foram fechados, variáveis resetadas e títulos atualizados');
+}
+
+// ========================================
+// EVENT LISTENERS
+// ========================================
+
+// Event listeners serão configurados no arquivo principal após carregamento dos modais
+// Removidos para evitar duplicação e conflitos
+
+  // Configurar botão OK do modal de sucesso de cancelamento de baixa
+  const btnOkSucessoCancelarBaixa = document.getElementById('btnOkSucessoCancelarBaixa');
+  if (btnOkSucessoCancelarBaixa) {
+    btnOkSucessoCancelarBaixa.addEventListener('click', fecharModalSucessoCancelarBaixa);
+  }
+  
+  // Configurar botão OK do modal de sucesso de baixa múltipla
+  const btnOkSucessoBaixaMultipla = document.getElementById('btnOkSucessoBaixaMultipla');
+  if (btnOkSucessoBaixaMultipla) {
+    btnOkSucessoBaixaMultipla.addEventListener('click', fecharModalSucessoBaixaMultipla);
+  }
+  
+  // Configurar botão OK do modal de sucesso de cancelamento de aglutinação
+  const btnOkSucessoCancelarAglutinacao = document.getElementById('btnOkSucessoCancelarAglutinacao');
+  if (btnOkSucessoCancelarAglutinacao) {
+    btnOkSucessoCancelarAglutinacao.addEventListener('click', fecharModalSucessoCancelarAglutinacao);
+  }
+
+// Garantir renderização inicial da simulação após montar o modal
+setTimeout(() => {
+  try { renderAglutinacaoUIFromState(); } catch(_) {}
+}, 0);
+
+// NOVO: Handler reutilizável para remover título da lista do modal
+function handleRemoverTituloClick(ev) {
+  const btn = ev.currentTarget;
+  const id = btn.getAttribute('data-id');
+  // Bloquear se o mínimo for alcançado
+  if (Array.isArray(titulosParaAglutinar) && titulosParaAglutinar.length <= 2) {
+    abrirModalBloqueioMinimoAglutinacao();
+    return;
+  }
+  // Remover do array local
+  titulosParaAglutinar = titulosParaAglutinar.filter(x => String(x.id) !== String(id));
+
+  // Desmarcar seleção na grid principal, se existir
+  try {
+    if (typeof linhasSelecionadas !== 'undefined' && Array.isArray(linhasSelecionadas)) {
+      const idx = linhasSelecionadas.indexOf(String(id));
+      if (idx !== -1) linhasSelecionadas.splice(idx, 1);
+      const tr = document.querySelector(`#movimentoComissoesTableBody tr[data-id="${id}"]`);
+      if (tr) tr.classList.remove('tr-selected');
+    }
+  } catch (_) {}
+
+  // Atualizar cabeçalho (quantidade, total, colaborador) e UI
+  const qtdEl = document.getElementById('quantidadeTitulosAglutinar');
+  const totalEl = document.getElementById('valorTotalAglutinar');
+  const colabEl = document.getElementById('colaboradorAglutinacao');
+  const listaEl = document.getElementById('listaTitulosAglutinacao');
+  if (qtdEl) qtdEl.textContent = titulosParaAglutinar.length;
+
+  // Re-renderizar lista
+  if (listaEl) {
+    listaEl.innerHTML = '';
+    titulosParaAglutinar.forEach((t, idx2) => {
+      const numero = (t.numero_titulo || '').toString();
+      const valorNum = parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0);
+      const valorFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(valorNum) : `R$ ${valorNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      const dtVenc = t.data_vencimento ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento) : '-';
+      const linha2 = document.createElement('div');
+      linha2.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:10px 12px; margin-bottom:8px; gap:10px;';
+      linha2.innerHTML = `
+        <div style=\"display:flex; align-items:center; gap:8px;\">\n          <span style=\"background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;\">${idx2+1}</span>\n          <div style=\"display:flex; flex-direction:column;\">\n            <span style=\"font-weight:600; color:#333;\">${numero}</span>\n            <span style=\"color:#666; font-size:0.85em;\">Vencimento: ${dtVenc}</span>\n          </div>\n        </div>\n        <div style=\"display:flex; align-items:center; gap:8px;\">\n          <div style=\"font-weight:700; color:#333;\">${valorFmt}</div>\n          <button type=\"button\" class=\"btn-visualizar-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #1976D2; background:#e3f2fd; color:#1976D2; cursor:pointer; font-weight:600;\"><i class=\"fas fa-eye\"></i> Visualizar</button>\n          <button type=\"button\" class=\"btn-remover-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #e53935; background:#ffebee; color:#e53935; cursor:pointer; font-weight:600;\"><i class=\"fas fa-times\"></i> Remover</button>\n        </div>\n      `;
+      listaEl.appendChild(linha2);
+    });
+
+    // Rebind dos botões
+    const reBotoesVer = listaEl.querySelectorAll('button.btn-visualizar-titulo');
+    reBotoesVer.forEach(b => b.onclick = function(ev2) {
+      const id2 = ev2.currentTarget.getAttribute('data-id');
+      const titulo2 = titulosParaAglutinar.find(x => String(x.id) === String(id2));
+      if (!titulo2) return;
+      if (typeof abrirModalTitulo === 'function') abrirModalTitulo(titulo2, 'visualizar');
+      else if (typeof openViewModal === 'function') openViewModal(titulo2);
+      setTimeout(() => {
+        const viewModalEl = document.getElementById('viewModal');
+        const modalTituloEl = document.getElementById('modalTitulo');
+        if (viewModalEl) viewModalEl.style.zIndex = '6000';
+        if (modalTituloEl) modalTituloEl.style.zIndex = '6000';
+      }, 0);
+    });
+    const reBotoesRem = listaEl.querySelectorAll('button.btn-remover-titulo');
+    reBotoesRem.forEach(b => b.onclick = handleRemoverTituloClick);
+  }
+
+  // Totais e colaborador
+  const total = titulosParaAglutinar.reduce((acc, t) => acc + (parseFloat(t.valor || t.valor_total || 0) || 0), 0);
+  const totalNum = titulosParaAglutinar.reduce((acc, t) => acc + parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0), 0);
+  const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(totalNum) : `R$ ${totalNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+  if (totalEl) totalEl.textContent = totalFmt;
+  if (colabEl) {
+    const primeiro = titulosParaAglutinar[0];
+    const colabId = primeiro ? primeiro.colaborador_id : '';
+    colabEl.textContent = (typeof mapaColaboradores !== 'undefined' && mapaColaboradores && colabId) ? (mapaColaboradores[colabId] || colabId) : (colabId || '-');
+  }
+
+  // Atualizar simulação
+  atualizarSimulacaoAglutinacaoUI();
+}
+
+// NOVO: Funções do modal de bloqueio de aglutinação
+function abrirModalBloqueioAglutinacao(titulosPagos) {
+  try {
+    const modal = document.getElementById('modalBloqueioAglutinacaoPago');
+    const lista = document.getElementById('listaTitulosPagosAglutinacao');
+    const qtde = document.getElementById('qtdeTitulosPagosAglutinacao');
+
+    if (qtde) qtde.textContent = `Você selecionou ${titulosPagos.length} título(s) com status PAGO.`;
+
+    if (lista) {
+      lista.innerHTML = '';
+      titulosPagos.forEach((t, i) => {
+        const num = t.numero_titulo || t.id || '-';
+        const colab = (typeof mapaColaboradores !== 'undefined' && mapaColaboradores && t.colaborador_id) ? (mapaColaboradores[t.colaborador_id] || t.colaborador_id) : (t.colaborador_id || '-');
+        const venc = t.data_vencimento ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento) : '-';
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px; border:1px solid #e9ecef; border-radius:8px; margin-bottom:8px; background:#fff;';
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="background:#ffcdd2; color:#c62828; padding:2px 8px; border-radius:12px; font-weight:700;">${i+1}</span>
+            <div style="display:flex; flex-direction:column;">
+              <span style="font-weight:600; color:#333;">${num}</span>
+              <span style="color:#666; font-size:0.85em;">Vencimento: ${venc}</span>
+              <span style="color:#666; font-size:0.85em;">Colaborador: ${colab}</span>
+            </div>
+          </div>
+          <div style="color:#c62828; font-weight:700;">PAGO</div>
+        `;
+        lista.appendChild(row);
+      });
+    }
+
+    if (modal) modal.style.display = 'flex';
+  } catch (e) {
+    console.warn('Erro ao abrir modal de bloqueio de aglutinação:', e);
+    alert('Não é possível aglutinar títulos pagos.');
+  }
+}
+
+function fecharModalBloqueioAglutinacao() {
+  const modal = document.getElementById('modalBloqueioAglutinacaoPago');
+  if (modal) modal.style.display = 'none';
+}
+
+// NOVO: Funções do modal de bloqueio (colaboradores diferentes)
+function abrirModalBloqueioAglutinacaoColab(titulos) {
+  try {
+    const modal = document.getElementById('modalBloqueioAglutinacaoColab');
+    const lista = document.getElementById('listaTitulosColabAglutinacao');
+    const qtde = document.getElementById('qtdeColabsAglutinacao');
+
+    // Calcular colaboradores distintos
+    const setColabs = new Set((titulos || []).map(t => t.colaborador_id));
+    if (qtde) qtde.textContent = `Foram detectados ${setColabs.size} colaboradores na seleção.`;
+
+    if (lista) {
+      lista.innerHTML = '';
+      (titulos || []).forEach((t, i) => {
+        const num = t.numero_titulo || t.id || '-';
+        const colab = (typeof mapaColaboradores !== 'undefined' && mapaColaboradores && t.colaborador_id) ? (mapaColaboradores[t.colaborador_id] || t.colaborador_id) : (t.colaborador_id || '-');
+        const venc = t.data_vencimento ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento) : '-';
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px; border:1px solid #e9ecef; border-radius:8px; margin-bottom:8px; background:#fff;';
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="background:#ffe0b2; color:#e65100; padding:2px 8px; border-radius:12px; font-weight:700;">${i+1}</span>
+            <div style="display:flex; flex-direction:column;">
+              <span style="font-weight:600; color:#333;">${num}</span>
+              <span style="color:#666; font-size:0.85em;">Vencimento: ${venc}</span>
+              <span style="color:#666; font-size:0.85em;">Colaborador: ${colab}</span>
+            </div>
+          </div>
+          <div style="color:#e65100; font-weight:700;">${colab}</div>
+        `;
+        lista.appendChild(row);
+      });
+    }
+
+    if (modal) modal.style.display = 'flex';
+  } catch (e) {
+    console.warn('Erro ao abrir modal de bloqueio por colaborador:', e);
+    alert('Não é possível aglutinar títulos de colaboradores diferentes.');
+  }
+}
+
+function fecharModalBloqueioAglutinacaoColab() {
+  const modal = document.getElementById('modalBloqueioAglutinacaoColab');
+  if (modal) modal.style.display = 'none';
+}
+
+// NOVO: Funções do modal de bloqueio mínimo
+function abrirModalBloqueioMinimoAglutinacao() {
+  const modal = document.getElementById('modalBloqueioMinimoAglutinacao');
+  if (modal) modal.style.display = 'flex';
+}
+function fecharModalBloqueioMinimoAglutinacao() {
+  const modal = document.getElementById('modalBloqueioMinimoAglutinacao');
+  if (modal) modal.style.display = 'none';
+}
+
+function fecharModalBloqueioAglutinacaoJaAglutinado() {
+  const modal = document.getElementById('modalBloqueioAglutinacaoJaAglutinado');
+  if (modal) modal.style.display = 'none';
+}
+
+// NOVO: Funções do modal de bloqueio de baixa para títulos aglutinados
+function mostrarModalBloqueioBaixaTituloAglutinado(titulo) {
+  console.log('[BLOQUEIO BAIXA] Mostrando modal para título aglutinado:', titulo);
+  
+  try {
+    const infoEl = document.getElementById('infoTituloAglutinadoBaixa');
+    
+    if (infoEl) {
+      // Formatar informações do título
+      const valorFormatado = titulo.valor ? `R$ ${parseFloat(titulo.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Não informado';
+      const vencimentoFormatado = titulo.data_vencimento ? new Date(titulo.data_vencimento).toLocaleDateString('pt-BR') : 'Não informado';
+      const colaborador = mapaColaboradores && mapaColaboradores[titulo.colaborador_id] ? mapaColaboradores[titulo.colaborador_id] : titulo.colaborador_id || 'Não informado';
+      
+      infoEl.innerHTML = `
+        <div style="margin-bottom: 8px;"><strong>Número:</strong> ${titulo.numero_titulo || 'Não informado'}</div>
+        <div style="margin-bottom: 8px;"><strong>Valor:</strong> ${valorFormatado}</div>
+        <div style="margin-bottom: 8px;"><strong>Vencimento:</strong> ${vencimentoFormatado}</div>
+        <div style="margin-bottom: 8px;"><strong>Colaborador:</strong> ${colaborador}</div>
+        <div><strong>Status:</strong> <span style="background:#9c27b0; color:white; padding:2px 8px; border-radius:12px; font-size:0.85em; font-weight:600;">AGLUTINADO</span></div>
+      `;
+    }
+    
+    const modal = document.getElementById('modalBloqueioBaixaTituloAglutinado');
+    if (modal) modal.style.display = 'flex';
+  } catch (e) {
+    console.warn('Erro ao abrir modal de bloqueio de baixa para título aglutinado:', e);
+    alert('Não é possível baixar títulos aglutinados.');
+  }
+}
+
+function fecharModalBloqueioBaixaTituloAglutinado() {
+  const modal = document.getElementById('modalBloqueioBaixaTituloAglutinado');
+  if (modal) modal.style.display = 'none';
+}
+
+// Função para fechar modal de progresso
+function fecharModalProgressoCancelarAglutinacao() {
+  const modal = document.getElementById('modalProgressoCancelarAglutinacao');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Função principal para executar o cancelamento de aglutinação
+async function executarCancelarAglutinacao() {
+  console.log('[CANCELAR AGLUTINAÇÃO] Iniciando execução para título:', tituloParaCancelarAglutinacao);
+  
+  if (!tituloParaCancelarAglutinacao) {
+    console.error('[CANCELAR AGLUTINAÇÃO] Título não encontrado');
+    alert('Erro: Título não encontrado!');
+    return;
+  }
+  
+  try {
+    // Fechar modal de confirmação e mostrar progresso
+    fecharModalConfirmCancelarAglutinacao();
+    mostrarModalProgressoCancelarAglutinacao();
+    
+    // Atualizar progresso inicial
+    atualizarProgressoCancelarAglutinacao(10, 'Preparando cancelamento...');
+    
+    // Buscar títulos originais
+    let titulosOriginais = [];
+    if (tituloParaCancelarAglutinacao.ids_aglutinados) {
+      const ids = tituloParaCancelarAglutinacao.ids_aglutinados.split(',').map(id => parseInt(id.trim()));
+      titulosOriginais = todosTitulos.filter(t => ids.includes(t.id));
+    }
+    
+    console.log('[CANCELAR AGLUTINAÇÃO] Títulos originais encontrados:', titulosOriginais);
+    
+    // Atualizar progresso
+    atualizarProgressoCancelarAglutinacao(20, 'Restaurando títulos originais...');
+    
+    // Restaurar títulos originais se existirem
+    if (titulosOriginais.length > 0) {
+      for (let i = 0; i < titulosOriginais.length; i++) {
+        const tituloOriginal = titulosOriginais[i];
+        const progresso = 20 + ((i + 1) / titulosOriginais.length) * 40;
+        
+        atualizarProgressoCancelarAglutinacao(progresso, `Restaurando título ${tituloOriginal.numero_titulo}...`);
+        
+        try {
+          // Restaurar status para PENDENTE e remover referência de aglutinação
+          const dadosRestauracao = {
+            status: 'PENDENTE',
+            id_titulo_aglutinado: null
+          };
+          
+          // Atualizar na API
+          await window.api.put(`/movimento_comissoes/${tituloOriginal.id}`, dadosRestauracao);
+          
+          // Atualizar localmente
+          const indexLocal = todosTitulos.findIndex(t => t.id === tituloOriginal.id);
+          if (indexLocal !== -1) {
+            todosTitulos[indexLocal] = { ...todosTitulos[indexLocal], ...dadosRestauracao };
+          }
+          
+          console.log('[CANCELAR AGLUTINAÇÃO] Título original restaurado:', tituloOriginal.numero_titulo);
+          
+        } catch (error) {
+          console.error('[CANCELAR AGLUTINAÇÃO] Erro ao restaurar título original:', tituloOriginal.numero_titulo, error);
+          throw new Error(`Erro ao restaurar título original ${tituloOriginal.numero_titulo}: ${error.message}`);
+        }
+      }
+    }
+    
+    // Atualizar progresso
+    atualizarProgressoCancelarAglutinacao(70, 'Excluindo título aglutinado...');
+    
+    // Excluir título aglutinado da API
+    await window.api.delete(`/movimento_comissoes/${tituloParaCancelarAglutinacao.id}`);
+    
+    // Remover da lista local
+    const indexAglutinado = todosTitulos.findIndex(t => t.id === tituloParaCancelarAglutinacao.id);
+    if (indexAglutinado !== -1) {
+      todosTitulos.splice(indexAglutinado, 1);
+    }
+    
+    // Atualizar progresso final
+    atualizarProgressoCancelarAglutinacao(90, 'Finalizando cancelamento...');
+    
+    // Aguardar um pouco para mostrar o progresso final
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Atualizar progresso final
+    atualizarProgressoCancelarAglutinacao(100, 'Cancelamento concluído com sucesso!');
+    
+    // Aguardar um pouco para mostrar o progresso final
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Fechar modal de progresso
+    fecharModalProgressoCancelarAglutinacao();
+    
+    // ATUALIZAR INTERFACE APÓS CANCELAMENTO
+    console.log('[CANCELAR AGLUTINAÇÃO] Atualizando interface...');
+    
+    // Recarregar dados da API para obter status atualizados
+    try {
+      if (typeof carregarComissoes === 'function') {
+        console.log('[CANCELAR AGLUTINAÇÃO] Recarregando dados da API...');
+        await carregarComissoes();
+      } else {
+        // Fallback: atualizar UI local
+        if (typeof atualizarTabelaComFiltros === 'function') {
+          atualizarTabelaComFiltros();
+        }
+        if (typeof atualizarCardsTotalizadores === 'function') {
+          atualizarCardsTotalizadores();
+        }
+      }
+    } catch (error) {
+      console.error('[CANCELAR AGLUTINAÇÃO] Erro ao atualizar interface:', error);
+      // Fallback em caso de erro
+      if (typeof atualizarTabelaComFiltros === 'function') {
+        atualizarTabelaComFiltros();
+      }
+      if (typeof atualizarCardsTotalizadores === 'function') {
+        atualizarCardsTotalizadores();
+      }
+    }
+    
+    // Mostrar modal de sucesso
+    const modalSucesso = document.getElementById('modalSucessoCancelarAglutinacao');
+    if (modalSucesso) {
+      modalSucesso.style.display = 'flex';
+    }
+    
+    // Resetar variáveis
+    tituloParaCancelarAglutinacao = null;
+    
+    console.log('[CANCELAR AGLUTINAÇÃO] Cancelamento concluído com sucesso!');
+    
+  } catch (error) {
+    console.error('[CANCELAR AGLUTINAÇÃO] Erro durante execução:', error);
+    
+    // Fechar modal de progresso
+    fecharModalProgressoCancelarAglutinacao();
+    
+    // Mostrar erro
+    const msg = error?.data?.error || error?.message || 'Erro ao cancelar aglutinação';
+    alert(`Erro ao cancelar aglutinação: ${msg}`);
+    
+    // Resetar variáveis
+    tituloParaCancelarAglutinacao = null;
+  }
+}
+
+// Função para fechar modal de sucesso de baixa múltipla
+function fecharModalSucessoBaixaMultipla() {
+  const modal = document.getElementById('modalSucessoBaixaMultipla');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Função para mostrar modal de sucesso de baixa múltipla
+function mostrarModalSucessoBaixaMultipla(dados) {
+  // Preencher informações no modal
+  document.getElementById('quantidadeTitulosSucesso').textContent = dados.quantidade;
+  document.getElementById('dataPagamentoSucesso').textContent = dados.dataPagamento;
+  document.getElementById('statusAplicadoSucesso').textContent = dados.status;
+  document.getElementById('comprovanteSucesso').textContent = dados.comprovante ? 'Sim' : 'Não';
+  
+  // Mostrar o modal
+  const modal = document.getElementById('modalSucessoBaixaMultipla');
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+// ========================================
+// FUNÇÕES PARA MOSTRAR MODAIS DE BLOQUEIO
+// ========================================
+
+function mostrarModalBloqueioMinimoAglutinacao() {
+  const modal = document.getElementById('modalBloqueioMinimoAglutinacao');
+  if (modal) modal.style.display = 'flex';
+}
+
+function mostrarModalBloqueioAglutinacaoPago(titulosPagos) {
+  // Preencher informações no modal
+  const qtdeEl = document.getElementById('qtdeTitulosPagosAglutinacao');
+  const listaEl = document.getElementById('listaTitulosPagosAglutinacao');
+  
+  if (qtdeEl) {
+    qtdeEl.textContent = `Há ${titulosPagos.length} título(s) pago(s) na seleção.`;
+  }
+  
+  if (listaEl) {
+    listaEl.innerHTML = '';
+    titulosPagos.forEach(t => {
+      const linha = document.createElement('div');
+      linha.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ffcdd2; border-radius:6px; padding:8px 10px; margin-bottom:6px;';
+      linha.innerHTML = `
+        <span style="font-weight:500; color:#333;">${t.numero_titulo}</span>
+        <span style="background:#e53935; color:white; padding:2px 8px; border-radius:12px; font-size:0.85em; font-weight:600;">PAGO</span>
+      `;
+      listaEl.appendChild(linha);
+    });
+  }
+  
+  const modal = document.getElementById('modalBloqueioAglutinacaoPago');
+  if (modal) modal.style.display = 'flex';
+}
+
+function mostrarModalBloqueioAglutinacaoJaAglutinado(titulosJaAglutinados) {
+  // Preencher informações no modal
+  const qtdeEl = document.getElementById('qtdeTitulosJaAglutinados');
+  const listaEl = document.getElementById('listaTitulosJaAglutinados');
+  
+  if (qtdeEl) {
+    qtdeEl.textContent = `Há ${titulosJaAglutinados.length} título(s) com status AGLUTINADO na seleção.`;
+  }
+  
+  if (listaEl) {
+    listaEl.innerHTML = '';
+    titulosJaAglutinados.forEach(t => {
+      const linha = document.createElement('div');
+      linha.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e1bee7; border-radius:6px; padding:8px 10px; margin-bottom:6px;';
+      linha.innerHTML = `
+        <span style="font-weight:500; color:#333;">${t.numero_titulo}</span>
+        <span style="background:#9c27b0; color:white; padding:2px 8px; border-radius:12px; font-size:0.85em; font-weight:600;">AGLUTINADO</span>
+      `;
+      listaEl.appendChild(linha);
+    });
+  }
+  
+  const modal = document.getElementById('modalBloqueioAglutinacaoJaAglutinado');
+  if (modal) modal.style.display = 'flex';
+}
+
+function mostrarModalBloqueioAglutinacaoColab(titulos) {
+  // Preencher informações no modal
+  const qtdeEl = document.getElementById('qtdeColabsAglutinacao');
+  const listaEl = document.getElementById('listaTitulosColabAglutinacao');
+  
+  if (qtdeEl) {
+    const colaboradores = Array.from(new Set(titulos.map(t => t.colaborador_id)));
+    qtdeEl.textContent = `Há ${colaboradores.length} colaborador(es) diferente(s) na seleção.`;
+  }
+  
+  if (listaEl) {
+    listaEl.innerHTML = '';
+    titulos.forEach(t => {
+      const colaboradorNome = mapaColaboradores[t.colaborador_id] || t.colaborador_id || '';
+      const linha = document.createElement('div');
+      linha.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ffe0b2; border-radius:6px; padding:8px 10px; margin-bottom:6px;';
+      linha.innerHTML = `
+        <span style="font-weight:500; color:#333;">${t.numero_titulo}</span>
+        <span style="background:#ff9800; color:white; padding:2px 8px; border-radius:12px; font-size:0.85em; font-weight:600;">${colaboradorNome}</span>
+      `;
+      listaEl.appendChild(linha);
+    });
+  }
+  
+  const modal = document.getElementById('modalBloqueioAglutinacaoColab');
+  if (modal) modal.style.display = 'flex';
+}
+
+// NOVO: Modal de Linha do Tempo do Título
+function abrirModalTimeline(titulo) {
+  console.log('[TIMELINE] Abrindo modal para título:', titulo);
+  
+  // Debug: mostrar informações de data do título
+      console.log('[TIMELINE] Debug - Datas do título:', {
+      created_at: titulo.created_at,
+      updated_at: titulo.updated_at,
+      data_geracao: titulo.data_geracao,
+      data_pagamento: titulo.data_pagamento,
+      data_vencimento: titulo.data_vencimento,
+      status: titulo.status
+    });
+    
+    // Verificar se o problema está no banco - comparar com horário atual
+    console.log('[TIMELINE] Debug - Horário atual do navegador:', new Date().toISOString());
+    console.log('[TIMELINE] Debug - Diferença de horas:', {
+      created_at_hora: titulo.created_at ? new Date(titulo.created_at).getHours() : 'N/A',
+      hora_atual: new Date().getHours(),
+      diferenca: titulo.created_at ? Math.abs(new Date(titulo.created_at).getHours() - new Date().getHours()) : 'N/A'
+    });
+  
+  try {
+    const modal = document.getElementById('modalTimeline');
+    const ul = document.getElementById('timelineEventos');
+    const tituloInfo = document.getElementById('timelineTituloInfo');
+    
+    if (!modal || !ul || !tituloInfo) {
+      console.error('[TIMELINE] Elementos do modal não encontrados');
+      return;
+    }
+    
+    // Limpar conteúdo anterior
+    ul.innerHTML = '';
+    
+    // Exibir informações do título no cabeçalho
+    const colaboradorNome = mapaColaboradores && mapaColaboradores[titulo.colaborador_id] 
+      ? mapaColaboradores[titulo.colaborador_id] 
+      : titulo.colaborador_id || 'N/A';
+    
+    tituloInfo.innerHTML = `
+      <div style="background: #fff3e0; border: 1px solid #ffb74d; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+        <div style="font-weight: 600; color: #e65100; margin-bottom: 4px;">Título ${titulo.numero_titulo}</div>
+        <div style="font-size: 0.9em; color: #666;">
+          <span><strong>Colaborador:</strong> ${colaboradorNome}</span> | 
+          <span><strong>Valor:</strong> ${formatarValorLocal ? formatarValorLocal(titulo.valor) : `R$ ${(titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}</span> | 
+          <span><strong>Status:</strong> <span style="background: #9c27b0; color: white; padding: 2px 6px; border-radius: 12px; font-size: 0.8em;">${titulo.status || 'N/A'}</span></span>
+        </div>
+      </div>
+    `;
+    
+    // Gerar eventos da linha do tempo
+    const eventos = gerarEventosTimeline(titulo);
+    
+    if (eventos && eventos.length > 0) {
+      eventos.forEach(ev => {
+        const li = document.createElement('li');
+        li.style.cssText = 'margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px; position: relative;';
+        
+        // Adicionar linha conectora (exceto para o último item)
+        if (ev !== eventos[eventos.length - 1]) {
+          li.style.cssText += 'padding-bottom: 8px;';
+          li.innerHTML = `
+            <div style="position: absolute; left: 15px; top: 40px; width: 2px; height: 18px; background: #e0e0e0;"></div>
+          `;
+        }
+        
+        li.innerHTML += `
+          <div style="width: 32px; height: 32px; background: ${ev.corFundo}; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid ${ev.corBorda}; margin-top: 2px; flex-shrink: 0;">
+            <i class="fas ${ev.icone}" style="color: ${ev.corIcone}; font-size: 1.1em;"></i>
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-weight: 600; color: #333; font-size: 1.05em; margin-bottom: 2px;">${ev.titulo}</div>
+            <div style="color: #888; font-size: 0.95em; margin-bottom: 4px;">${ev.data}</div>
+            ${ev.descricao ? `<div style="color: #555; font-size: 0.95em; line-height: 1.4; background: #f8f9fa; padding: 8px; border-radius: 6px; border-left: 3px solid ${ev.corBorda};">${ev.descricao}</div>` : ''}
+          </div>
+        `;
+        
+        ul.appendChild(li);
+      });
+    } else {
+      ul.innerHTML = '<li style="color:#888; text-align:center; margin: 32px 0; font-style: italic;">Nenhum evento encontrado para este título.</li>';
+    }
+    
+    modal.style.display = 'flex';
+    
+  } catch (e) {
+    console.error('[TIMELINE] Erro ao abrir modal:', e);
+    alert('Erro ao carregar linha do tempo do título.');
+  }
+}
+
+function fecharModalTimeline() {
+  const modal = document.getElementById('modalTimeline');
+  if (modal) modal.style.display = 'none';
+}
+
+function gerarEventosTimeline(titulo) {
+  const eventos = [];
+  
+  console.log('[TIMELINE] Gerando eventos para título:', titulo.numero_titulo);
+  
+  try {
+    // 1. Criação do título (usar created_at para mostrar data e hora, senão data_geracao)
+    const dataCriacao = titulo.created_at || titulo.data_geracao;
+    
+    if (dataCriacao) {
+      eventos.push({
+        titulo: 'Título Criado',
+        data: formatarDataCompleta(dataCriacao),
+        descricao: `Título ${titulo.numero_titulo} criado com valor de ${formatarValorLocal ? formatarValorLocal(titulo.valor) : `R$ ${(titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}`,
+        icone: 'fa-plus-circle',
+        corFundo: '#e8f5e8',
+        corBorda: '#4caf50',
+        corIcone: '#4caf50'
+      });
+    }
+    
+    // 2. Edição do título (se houver updated_at diferente de created_at)
+    if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
+      console.log('[TIMELINE] Debug - Evento de edição:', {
+        created_at: titulo.created_at,
+        updated_at: titulo.updated_at,
+        sao_diferentes: titulo.updated_at !== titulo.created_at,
+        updated_at_parseado: new Date(titulo.updated_at).toISOString(),
+        created_at_parseado: new Date(titulo.created_at).toISOString()
+      });
+      
+      // Debug adicional para entender o problema de timezone
+      const updatedAtDate = new Date(titulo.updated_at);
+      console.log('[TIMELINE] Debug - Análise detalhada do updated_at:', {
+        original: titulo.updated_at,
+        tipo: typeof titulo.updated_at,
+        parseado_iso: updatedAtDate.toISOString(),
+        parseado_local: updatedAtDate.toString(),
+        parseado_utc: updatedAtDate.toUTCString(),
+        horas_utc: updatedAtDate.getUTCHours(),
+        horas_local: updatedAtDate.getHours(),
+        timezone_offset: updatedAtDate.getTimezoneOffset()
+      });
+      
+      eventos.push({
+        titulo: 'Título Editado',
+        data: formatarDataCompleta(titulo.updated_at),
+        descricao: 'Informações do título foram modificadas',
+        icone: 'fa-edit',
+        corFundo: '#fff3e0',
+        corBorda: '#ff9800',
+        corIcone: '#ff9800'
+      });
+    }
+    
+    // 3. Aglutinação (se for título aglutinado)
+    if (titulo.tipo_aglutinacao === 'AGL-PS' && titulo.ids_aglutinados) {
+      const ids = titulo.ids_aglutinados.split(',').map(id => id.trim());
+      const dataAglutinacao = titulo.data_geracao;
+      eventos.push({
+        titulo: 'Títulos Aglutinados',
+        data: formatarDataCompleta(dataAglutinacao),
+        descricao: `Aglutinação criada a partir de ${ids.length} título(s) original(is).${titulo.motivo_aglutinacao ? ` Motivo: ${titulo.motivo_aglutinacao}` : ''}`,
+        icone: 'fa-link',
+        corFundo: '#e3f2fd',
+        corBorda: '#2196f3',
+        corIcone: '#2196f3'
+      });
+    }
+    
+    // 4. Baixa parcial (se for título parcial)
+    if (titulo.id_titulo_origem) {
+      const tituloOrigem = todosTitulos.find(t => t.id === titulo.id_titulo_origem);
+      if (tituloOrigem) {
+        const dataBaixaParcial = titulo.data_geracao;
+        eventos.push({
+          titulo: 'Baixa Parcial Realizada',
+          data: formatarDataCompleta(dataBaixaParcial),
+          descricao: `Baixa parcial de ${formatarValorLocal ? formatarValorLocal(titulo.valor) : `R$ ${(titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} do título original ${tituloOrigem.numero_titulo}`,
+          icone: 'fa-money-bill-wave',
+          corFundo: '#f3e5f5',
+        corBorda: '#9c27b0',
+        corIcone: '#9c27b0'
+        });
+      }
+    }
+    
+    // 5. Pagamento (baixa) - usar data_pagamento ou updated_at se disponível
+    if (titulo.status === 'PAGO' && titulo.data_pagamento) {
+      // Usar updated_at se disponível e diferente de created_at, senão usar data_pagamento
+      let dataPagamento;
+      if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
+        dataPagamento = titulo.updated_at;
+      } else {
+        // Usar apenas a data de pagamento sem simular horário
+        dataPagamento = titulo.data_pagamento;
+      }
+      
+      eventos.push({
+        titulo: 'Título Pago',
+        data: formatarDataCompleta(dataPagamento),
+        descricao: `Pagamento realizado no valor de ${formatarValorLocal ? formatarValorLocal(titulo.valor_pago || titulo.valor) : `R$ ${(titulo.valor_pago || titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}${titulo.observacoes ? `. Observação: ${titulo.observacoes}` : ''}`,
+        icone: 'fa-check-circle',
+        corFundo: '#e8f5e8',
+        corBorda: '#4caf50',
+        corIcone: '#4caf50'
+      });
+    }
+    
+    // 6. Cancelamento de baixa (se houver histórico)
+    if (titulo.status === 'PENDENTE' && titulo.data_pagamento) {
+      // Usar updated_at se disponível e diferente de created_at
+      let dataCancelamento;
+      if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
+        dataCancelamento = titulo.updated_at;
+      } else {
+        // Se não há timestamp de cancelamento, não mostrar o evento
+        // pois pode ser um título que nunca foi pago
+        return eventos;
+      }
+      
+      eventos.push({
+        titulo: 'Baixa Cancelada',
+        data: formatarDataCompleta(dataCancelamento),
+        descricao: 'Pagamento do título foi cancelado',
+        icone: 'fa-undo',
+        corFundo: '#ffebee',
+        corBorda: '#f44336',
+        corIcone: '#f44336'
+      });
+    }
+    
+    // 7. Cancelamento de aglutinação (se aplicável)
+    if (titulo.status === 'PENDENTE' && titulo.id_titulo_aglutinado) {
+      // Usar updated_at se disponível e diferente de created_at
+      let dataCancelamentoAglutinacao;
+      if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
+        dataCancelamentoAglutinacao = titulo.updated_at;
+      } else {
+        // Se não há timestamp de cancelamento, não mostrar o evento
+        // pois pode ser um título que nunca foi aglutinado
+        return eventos;
+      }
+      
+      eventos.push({
+        titulo: 'Aglutinação Cancelada',
+        data: formatarDataCompleta(dataCancelamentoAglutinacao),
+        descricao: 'Aglutinação foi cancelada, título voltou ao status original',
+        icone: 'fa-unlink',
+        corFundo: '#fff3e0',
+        corBorda: '#ff9800',
+        corIcone: '#ff9800'
+      });
+    }
+    
+    // 8. Vencimento (se aplicável)
+    if (titulo.status === 'VENCIDO' && titulo.data_vencimento) {
+      eventos.push({
+        titulo: 'Título Vencido',
+        data: formatarDataCompleta(titulo.data_vencimento),
+        descricao: 'Título atingiu a data de vencimento sem pagamento',
+        icone: 'fa-exclamation-triangle',
+        corFundo: '#ffebee',
+        corBorda: '#f44336',
+        corIcone: '#f44336'
+      });
+    }
+    
+    // Ordenar eventos por data (mais recente primeiro)
+    eventos.sort((a, b) => new Date(b.data) - new Date(a.data));
+    
+    console.log('[TIMELINE] Eventos gerados:', eventos);
+    
+  } catch (e) {
+    console.error('[TIMELINE] Erro ao gerar eventos:', e);
+  }
+  
+  return eventos;
+}
+
+function formatarDataCompleta(data) {
+  if (!data) return 'Data não informada';
+  
+  try {
+    console.log('[TIMELINE] Formatando data original:', data);
+    
+    // Verificar se a string original contém informações de hora (timestamp)
+    const temHoraNaString = typeof data === 'string' && (
+      data.includes('T') || 
+      data.includes(':') || 
+      data.includes('Z') ||
+      data.length > 10
+    );
+    
+    if (temHoraNaString) {
+      // Para datas com timestamp, exibir exatamente como está no banco
+      // Extrair apenas a parte da data e hora, removendo timezone
+      const match = data.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})/);
+      if (match) {
+        const [, dataPart, horaPart] = match;
+        const [ano, mes, dia] = dataPart.split('-');
+        const [hora, minuto] = horaPart.split(':');
+        const resultado = `${dia}/${mes}/${ano}, ${hora}:${minuto}`;
+        console.log('[TIMELINE] Resultado exato do banco:', resultado);
+      return resultado;
+      }
+      
+      // Fallback: se não conseguir extrair, retornar como está
+      return data;
+    } else {
+      // Para datas sem timestamp, converter apenas o formato
+      const d = new Date(data);
+      if (isNaN(d)) return data;
+      
+      // Converter apenas o formato da data (DD/MM/AAAA)
+      const [ano, mes, dia] = data.split('-');
+      return `${dia}/${mes}/${ano}`;
+    }
+  } catch (e) {
+    console.error('[TIMELINE] Erro ao formatar data:', data, e);
+    return data;
+  }
+}
+</script>
+
+<!-- NOVO: Modal de Linha do Tempo do Título -->
+<div id="modalTimeline" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.22); z-index: 5500; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 700px; width: 96%; box-shadow: 0 8px 32px rgba(255,152,0,0.18); padding: 0;">
+    <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.28em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-clock"></i> Linha do Tempo do Título</h2>
+      <button class="close-modal" onclick="fecharModalTimeline()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px 32px 0 32px; min-height: 200px; max-height: 500px; overflow-y: auto;">
+      <!-- Informações do título -->
+      <div id="timelineTituloInfo"></div>
+      
+      <!-- Lista de eventos da linha do tempo -->
+      <ul id="timelineEventos" style="list-style: none; padding: 0; margin: 0;">
+        <!-- Eventos dinâmicos aqui -->
+      </ul>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 20px 32px 28px 32px; border-top: 1px solid #eee;">
+      <button class="btn-secondary" onclick="fecharModalTimeline()" style="padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; display: flex; align-items: center; gap: 8px;"><i class="fas fa-times"></i> Fechar</button>
+    </div>
+  </div>
+</div> 

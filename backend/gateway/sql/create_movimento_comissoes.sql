@@ -1,0 +1,21 @@
+CREATE TABLE movimento_comissoes (
+    id SERIAL PRIMARY KEY,
+    numero_titulo VARCHAR(30) NOT NULL,
+    data_geracao DATE NOT NULL,
+    data_vencimento DATE NOT NULL,
+    colaborador_id VARCHAR(30) NOT NULL REFERENCES colaboradores(codigo),
+    tipo VARCHAR(20) NOT NULL,
+    descricao VARCHAR(255),
+    valor DECIMAL(12,2) NOT NULL,
+    valor_venda DECIMAL(12,2) NOT NULL,
+    percentual_comissao DECIMAL(5,2),
+    status VARCHAR(20) NOT NULL,
+    valor_pago DECIMAL(12,2),
+    data_pagamento DATE,
+    observacoes TEXT,
+    usuario_lancamento VARCHAR(100) NOT NULL,
+    cliente_id INT,
+    item_id INT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+); 

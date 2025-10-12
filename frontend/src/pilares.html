@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParoquiaON - Pilares</title>
+    <link rel="icon" type="image/png" href="assets/images/logo2.png">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/login.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="scripts/auth-guard.js"></script>
+    <script src="scripts/apply-auth-protection.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="scripts/config/api.js"></script>
+    <script src="scripts/bloqueio_exclusao.js"></script>
+    <script src="scripts/navigation.js"></script>
+    <style>
+        /* Estilos do modal e botões padronizados */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.show {
+            opacity: 1;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: auto;
+        }
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-header h2 i {
+            color: #2196F3;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            flex: 1;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-group label i {
+            margin-right: 5px;
+            color: #2196F3;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #2196F3;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+        }
+        .form-group input[readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+        .form-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .btn-primary,
+        .btn-secondary {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #1976D2;
+        }
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        .actions {
+            white-space: nowrap !important;
+            min-width: 110px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            margin: 0 1px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .view-btn {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .edit-btn {
+            background-color: #198754;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+        .action-btn i {
+            font-size: 14px;
+        }
+        .modal-content.delete-confirmation {
+            max-width: 400px;
+            width: 90%;
+            margin: auto;
+            padding: 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .modal-header.delete-header {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 24px 24px 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header.delete-header h2 {
+            color: #dc3545;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        .modal-header.delete-header i {
+            color: #dc3545;
+            font-size: 1.3em;
+        }
+        .delete-icon {
+            text-align: center;
+            font-size: 48px;
+            color: #dc3545;
+            margin: 24px 0 10px 0;
+        }
+        .delete-message {
+            text-align: center;
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .delete-warning {
+            text-align: center;
+            font-size: 15px;
+            color: #888;
+            margin-bottom: 24px;
+        }
+        .form-actions.delete-actions {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding: 0 0 24px 0;
+            border-top: 1px solid #eee;
+            background: #fff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn-danger:hover {
+            background-color: #b71c1c;
+        }
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 12px 28px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        /* Estilos para a coluna de Status - Mesmo padrão da aba de clientes */
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .status.ativo {
+            background-color: #e8f5e9;
+            color: #4CAF50;
+        }
+        
+        .status.inativo {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+
+        /* Estilos para a tabela de produtos - Mesmo padrão da tabela de colaboradores */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 20px;
+            /* Ocupar máximo da tela com pequeno espaçamento */
+            height: calc(100vh - 200px);
+            position: relative;
+        }
+
+        /* Spinner de carregamento - IDÊNTICO AO DA ABA DE COLABORADORES */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Loader específico para a tabela de produtos */
+        .loader-overlay-produtos {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border-radius: 8px;
+        }
+
+        .spinner-main {
+            border: 8px solid #e3f2fd;
+            border-top: 8px solid #1976D2;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: #1976D2;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Scroll personalizado para a tabela completa */
+        .table-scroll {
+            /* Ocupar máximo da tela com pequeno espaçamento */
+            height: calc(100vh - 300px);
+            overflow-y: auto;
+            overflow-x: auto;
+            position: relative;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+            background: #fff;
+            margin-bottom: 16px;
+            padding-bottom: 24px;
+            flex: 1 1 auto;
+        }
+
+        .table-scroll table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            table-layout: auto;
+            min-width: 700px;
+        }
+
+        .table-scroll thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table-scroll thead th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            white-space: nowrap;
+            background: #f8f9fa;
+        }
+
+        /* Larguras específicas para cada coluna */
+        .table-scroll th:nth-child(1), /* Código */
+        .table-scroll td:nth-child(1) {
+            width: 80px;
+            min-width: 80px;
+        }
+
+        .table-scroll th:nth-child(2), /* Nome */
+        .table-scroll td:nth-child(2) {
+            width: 300px;
+            min-width: 300px;
+        }
+
+        .table-scroll th:nth-child(3), /* Preço */
+        .table-scroll td:nth-child(3) {
+            width: 120px;
+            min-width: 120px;
+        }
+
+        .table-scroll th:nth-child(4), /* Status */
+        .table-scroll td:nth-child(4) {
+            width: 100px;
+            min-width: 100px;
+        }
+
+        .table-scroll th:nth-child(5), /* Ações */
+        .table-scroll td:nth-child(5) {
+            width: 120px;
+            min-width: 120px;
+        }
+
+        .table-scroll tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+
+        .table-scroll tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .table-scroll tbody td {
+            padding: 12px;
+            vertical-align: middle;
+            color: #495057;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .table-scroll::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Responsividade para tabelas pequenas */
+        @media (max-width: 768px) {
+            .table-container {
+                height: calc(100vh - 150px);
+            }
+            
+            .table-scroll {
+                height: calc(100vh - 250px);
+            }
+        }
+        /* Padronizar ações como Clientes/Colaboradores */
+        .actions {
+            white-space: nowrap !important;
+            min-width: 110px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .table-scroll tbody tr { height: 72px; }
+        /* Remover linha sob Ações para visual mais limpo (opcional) */
+        .table-scroll td:nth-child(5) { border-bottom: none !important; }
+        
+        /* Estilos para o toggle switch no cabeçalho do modal - Mesmo padrão das outras abas */
+        .modal-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .status-toggle-modal {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .switch-modal {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        
+        .switch-modal input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider-modal {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        
+        .slider-modal:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        .switch-modal input:checked + .slider-modal {
+            background-color: #2196F3;
+        }
+        
+        .switch-modal input:checked + .slider-modal:before {
+            transform: translateX(20px);
+        }
+        
+        .switch-modal:hover .slider-modal {
+            box-shadow: 0 0 5px rgba(33, 150, 243, 0.3);
+        }
+        
+        .status-label-modal {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            white-space: nowrap;
+        }
+    </style>
+    <script>
+        // Funções de Modal - Escopo Global
+        window.openModal = function() {
+            const modal = document.getElementById('produtoModal');
+            modal.style.display = 'flex';
+        }
+
+        window.closeModal = function() {
+            const modal = document.getElementById('produtoModal');
+            modal.style.display = 'none';
+        }
+
+        window.closeViewModal = function() {
+            const modal = document.getElementById('viewModal');
+            modal.style.display = 'none';
+        }
+
+        window.closeDeleteModal = function() {
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
+            <img src="assets/images/logo2.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
+            <h1><span class="white">Paroquia</span><span class="highlight">ON</span></h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html"><i class="fas fa-home"></i><span>Minha Comunidade</span></a></li>
+            <li><a href="agenda.html"><i class="fas fa-calendar-alt"></i><span>Agenda</span></a></li>
+            <li><a href="comunidades.html"><i class="fas fa-users"></i><span>Comunidades</span></a></li>
+            <li><a href="pastorais.html"><i class="fas fa-church"></i><span>Pastorais</span></a></li>
+            <li><a href="pilares.html" class="active"><i class="fas fa-columns"></i><span>Pilares</span></a></li>
+            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i><span>Locais</span></a></li>
+            <li><a href="acoes.html"><i class="fas fa-tasks"></i><span>Ações</span></a></li>
+            <li><a href="pessoas.html"><i class="fas fa-user"></i><span>Pessoas</span></a></li>
+            <li><a href="usuarios.html"><i class="fas fa-user-cog"></i><span>Usuários</span></a></li>
+            <li><a href="perfil.html"><i class="fas fa-user-shield"></i><span>Perfil</span></a></li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-chart-bar"></i><span>Relatórios</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="recebimento.html"><i class="fas fa-money-bill-wave"></i><span>Recebimento</span></a></li>
+                    <li><a href="conferencia.html"><i class="fas fa-check-circle"></i><span>Conferência</span></a></li>
+                    <li><a href="dinamico.html"><i class="fas fa-chart-line"></i><span>Dinâmico</span><span class="beta-tag">beta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-cog"></i><span>Configurações</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="manutencao-bd.html"><i class="fas fa-database"></i><span>Manutenção BD</span></a></li>
+                    <li><a href="sincronizar.html"><i class="fas fa-sync"></i><span>Sincronizar</span></a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="logout-button">
+            <a href="index.html" data-logout><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="welcome-text">
+                <h1>Pilares</h1>
+                <p>Gerencie os pilares da paróquia</p>
+            </div>
+            <div class="user-info">
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar pilar...">
+            </div>
+            <div class="filter-options">
+                <select>
+                    <option value="">Tipo de Pilar</option>
+                    <option value="liturgico">Litúrgico</option>
+                    <option value="social">Social</option>
+                    <option value="educativo">Educativo</option>
+                    <option value="pastoral">Pastoral</option>
+                    <option value="administrativo">Administrativo</option>
+                </select>
+                <select>
+                    <option value="">Status</option>
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="novoPilar()">
+                <i class="fas fa-plus"></i>
+                Novo Pilar
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <!-- Spinner de Carregamento - DENTRO DA TABELA -->
+            <div id="loader-produtos" class="loader-overlay-produtos">
+                <div class="spinner-main"></div>
+                <div class="loading-text">Carregando produtos...</div>
+            </div>
+            
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nome do Pilar</th>
+                            <th>Tipo</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- A tabela será preenchida dinamicamente pelo JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="produtoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"><i class="fas fa-columns"></i> Novo Pilar</h2>
+                <div class="modal-header-actions">
+                    <div class="status-toggle-modal">
+                        <label class="switch-modal">
+                            <input type="checkbox" id="statusToggleModal" checked>
+                            <span class="slider-modal round"></span>
+                        </label>
+                        <span class="status-label-modal">Ativo</span>
+                    </div>
+                    <button class="close-modal" onclick="closeModal()">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="produtoForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nome"><i class="fas fa-columns"></i> Nome do Pilar</label>
+                            <input type="text" id="nome" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo"><i class="fas fa-tag"></i> Tipo de Pilar</label>
+                            <select id="tipo" name="tipo" required>
+                                <option value="">Selecione...</option>
+                                <option value="liturgico">Litúrgico</option>
+                                <option value="social">Social</option>
+                                <option value="educativo">Educativo</option>
+                                <option value="pastoral">Pastoral</option>
+                                <option value="administrativo">Administrativo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <input type="hidden" id="status" name="status" value="ativo">
+                    <div class="form-group">
+                        <label for="descricao"><i class="fas fa-align-left"></i> Descrição</label>
+                        <textarea rows="3" id="descricao" name="descricao"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal()"><i class="fas fa-times"></i> Cancelar</button>
+                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content delete-confirmation">
+            <div class="modal-header delete-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
+                <button class="close-modal" onclick="closeDeleteModal()" style="font-size: 1.5em;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 0 24px; background: #fff;">
+                <div class="delete-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="delete-message">
+                    Tem certeza que deseja excluir este produto?
+                </div>
+                <div class="delete-warning">
+                    Esta ação não pode ser desfeita.
+                </div>
+            </div>
+            <div class="form-actions delete-actions">
+                <button class="btn-secondary" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button id="confirmDeleteBtn" class="btn-danger">
+                    <i class="fas fa-trash"></i>
+                    Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso - Cadastro -->
+    <div id="successModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; font-size: 1.3em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Cadastro Realizado!</h2>
+                <button class="close-modal" onclick="closeSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
+                <i class="fas fa-check-circle" style="font-size: 3em; color: #4CAF50; margin-bottom: 16px;"></i>
+                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Pilar cadastrado com sucesso!</div>
+                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
+                    O pilar foi adicionado ao sistema e já está disponível para uso.
+                </div>
+                <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
+                    <div style="margin-bottom: 8px;"><strong>Status:</strong> Ativo</div>
+                    <div style="margin-bottom: 8px;"><strong>Data de Cadastro:</strong> <span id="dataCadastro"></span></div>
+                    <div><strong>Sistema:</strong> ParoquiaON</div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="btn-secondary" onclick="closeSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso - Atualização -->
+    <div id="updateSuccessModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; font-size: 1.3em; color: #2196F3; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-sync-alt"></i> Dados Atualizados!</h2>
+                <button class="close-modal" onclick="closeUpdateSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
+                <i class="fas fa-sync-alt" style="font-size: 3em; color: #2196F3; margin-bottom: 16px;"></i>
+                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Dados atualizados com sucesso!</div>
+                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
+                    As informações do produto foram atualizadas no sistema.
+                </div>
+                <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
+                    <div style="margin-bottom: 8px;"><strong>Status:</strong> <span id="statusAtualizado"></span></div>
+                    <div style="margin-bottom: 8px;"><strong>Data de Atualização:</strong> <span id="dataAtualizacao"></span></div>
+                    <div><strong>Sistema:</strong> ParoquiaON</div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="btn-secondary" onclick="closeUpdateSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso - Exclusão -->
+    <div id="deleteSuccessModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; font-size: 1.3em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Pilar Excluído!</h2>
+                <button class="close-modal" onclick="closeDeleteSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
+                <i class="fas fa-check-circle" style="font-size: 3em; color: #4CAF50; margin-bottom: 16px;"></i>
+                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Pilar excluído com sucesso!</div>
+                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
+                    O registro foi removido do sistema.
+                </div>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="btn-secondary" onclick="closeDeleteSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        function formatarCodigo(codigo) {
+            return String(codigo).padStart(5, '0');
+        }
+
+        // Função para carregar produtos
+        async function carregarPilars() {
+            try {
+                // Mostrar spinner ao iniciar carregamento
+                mostrarSpinner();
+                
+                const produtos = await api.get('/produtos');
+                const tbody = document.querySelector('.table-container table tbody');
+                tbody.innerHTML = '';
+
+                produtos.forEach(produto => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${formatarCodigo(produto.codigo)}</td>
+                        <td>${produto.nome}</td>
+                        <td>R$ ${parseFloat(produto.preco).toFixed(2)}</td>
+                        <td>
+                            <span class="status ${produto.status === 'ativo' ? 'ativo' : 'inativo'}">
+                                ${produto.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </td>
+                        <td class="actions">
+                            <button class="action-btn view-btn" title="Visualizar" onclick="visualizarPilar('${produto.codigo}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn edit-btn" title="Editar" onclick="editarPilar('${produto.codigo}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn" title="Excluir" onclick="excluirPilar('${produto.codigo}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                // Ocultar spinner após carregar com sucesso
+                ocultarSpinner();
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+                alert('Erro ao carregar produtos');
+                // Ocultar spinner mesmo em caso de erro
+                ocultarSpinner();
+            }
+        }
+
+        // Função para abrir modal de novo produto
+        function novoPilar() {
+            const form = document.getElementById('produtoForm');
+            form.reset();
+            delete form.dataset.codigo;
+            
+            // Inicializar toggle de status
+            const statusToggle = document.getElementById('statusToggleModal');
+            const statusInput = document.getElementById('status');
+            const statusLabel = document.querySelector('.status-label-modal');
+            if (statusToggle) statusToggle.checked = true;
+            if (statusInput) statusInput.value = 'ativo';
+            if (statusLabel) statusLabel.textContent = 'Ativo';
+            
+            const modal = document.getElementById('produtoModal');
+            const modalTitle = document.getElementById('modalTitle');
+            modalTitle.innerHTML = '<i class="fas fa-columns"></i> Novo Pilar';
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Função para fechar o modal
+        function closeModal() {
+            const modal = document.getElementById('produtoModal');
+            const form = document.getElementById('produtoForm');
+            // Reabilitar campos
+            Array.from(form.elements).forEach(element => {
+                element.disabled = false;
+            });
+            // Mostrar botões de ação
+            const formActions = form.querySelector('.form-actions');
+            if (formActions) formActions.style.display = '';
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Função para salvar produto
+        async function salvarPilar(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const produto = {
+                nome: formData.get('nome'),
+                preco: parseFloat(formData.get('preco')),
+                status: formData.get('status'),
+                descricao: formData.get('descricao')
+            };
+            try {
+                if (form.dataset.codigo) {
+                    await api.put(`/produtos/${form.dataset.codigo}`, produto);
+                    // Mostrar modal de sucesso de atualização
+                    window.showUpdateSuccessModal(produto.status === 'ativo' ? 'Ativo' : 'Inativo');
+                } else {
+                    await api.post('/produtos', produto);
+                    // Mostrar modal de sucesso de cadastro
+                    window.showSuccessModal();
+                }
+                closeModal();
+                carregarPilars();
+            } catch (error) {
+                console.error('Erro ao salvar produto:', error);
+                alert('Erro ao salvar produto');
+            }
+        }
+
+        // Função para editar produto
+        async function editarPilar(codigo) {
+            try {
+                const produto = await api.get(`/produtos/${codigo}`);
+                const form = document.getElementById('produtoForm');
+                form.dataset.codigo = produto.codigo;
+                form.nome.value = produto.nome;
+                form.preco.value = produto.preco;
+                form.descricao.value = produto.descricao || '';
+                
+                // Atualizar toggle de status
+                const statusToggle = document.getElementById('statusToggleModal');
+                const statusInput = document.getElementById('status');
+                const statusLabel = document.querySelector('.status-label-modal');
+                const status = produto.status || 'ativo';
+                if (statusToggle) statusToggle.checked = status === 'ativo';
+                if (statusInput) statusInput.value = status;
+                if (statusLabel) statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
+                
+                const modal = document.getElementById('produtoModal');
+                const modalTitle = document.getElementById('modalTitle');
+                modalTitle.innerHTML = '<i class="fas fa-box"></i> Editar Pilar';
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            } catch (error) {
+                console.error('Erro ao carregar produto:', error);
+                alert('Erro ao carregar produto');
+            }
+        }
+
+        // Função para visualizar produto
+        async function visualizarPilar(codigo) {
+            try {
+                const produto = await api.get(`/produtos/${codigo}`);
+                const form = document.getElementById('produtoForm');
+                form.nome.value = produto.nome;
+                form.preco.value = produto.preco;
+                form.descricao.value = produto.descricao || '';
+                
+                // Atualizar toggle de status
+                const statusToggle = document.getElementById('statusToggleModal');
+                const statusInput = document.getElementById('status');
+                const statusLabel = document.querySelector('.status-label-modal');
+                const status = produto.status || 'ativo';
+                if (statusToggle) statusToggle.checked = status === 'ativo';
+                if (statusInput) statusInput.value = status;
+                if (statusLabel) statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
+                
+                // Desabilitar todos os campos
+                Array.from(form.elements).forEach(element => {
+                    element.disabled = true;
+                });
+                
+                // Ajustar título
+                const modal = document.getElementById('produtoModal');
+                const modalTitle = document.getElementById('modalTitle');
+                modalTitle.innerHTML = '<i class="fas fa-eye"></i> Visualizar Pilar';
+                
+                // Esconder botões de ação
+                const formActions = form.querySelector('.form-actions');
+                if (formActions) formActions.style.display = 'none';
+                
+                // Abrir modal
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+                
+                // Ao fechar, reabilitar campos e mostrar botões
+                form.onsubmit = (e) => {
+                    e.preventDefault();
+                    closeModal();
+                };
+            } catch (error) {
+                console.error('Erro ao visualizar produto:', error);
+                alert('Erro ao visualizar produto');
+            }
+        }
+
+        // Função para exclusão com modal
+        let codigoParaExcluir = null;
+        function excluirPilar(codigo) {
+            codigoParaExcluir = codigo;
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Função para controlar o toggle de status
+        function toggleStatus() {
+            const toggle = document.getElementById('statusToggleModal');
+            const statusInput = document.getElementById('status');
+            const statusLabel = document.querySelector('.status-label-modal');
+            
+            if (toggle && statusInput && statusLabel) {
+                const isAtivo = toggle.checked;
+                statusInput.value = isAtivo ? 'ativo' : 'inativo';
+                statusLabel.textContent = isAtivo ? 'Ativo' : 'Inativo';
+            }
+        }
+        
+        // Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA DE COLABORADORES
+        function mostrarSpinner() {
+            document.getElementById('loader-produtos').style.display = 'flex';
+        }
+        
+        function ocultarSpinner() {
+            document.getElementById('loader-produtos').style.display = 'none';
+        }
+
+        // Função para mostrar modal de sucesso
+        window.showSuccessModal = function() {
+            // Preencher data de cadastro
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('dataCadastro').textContent = dataAtual;
+            
+            // Mostrar modal
+            const modal = document.getElementById('successModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Função para fechar modal de sucesso
+        window.closeSuccessModal = function() {
+            const modal = document.getElementById('successModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Função para mostrar modal de sucesso de atualização
+        window.showUpdateSuccessModal = function(status) {
+            // Preencher dados de atualização
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('dataAtualizacao').textContent = dataAtual;
+            document.getElementById('statusAtualizado').textContent = status || 'Ativo';
+            
+            // Mostrar modal
+            const modal = document.getElementById('updateSuccessModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Função para fechar modal de sucesso de atualização
+        window.closeUpdateSuccessModal = function() {
+            const modal = document.getElementById('updateSuccessModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Função para mostrar modal de sucesso de exclusão
+        window.showDeleteSuccessModal = function() {
+            const modal = document.getElementById('deleteSuccessModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Função para fechar modal de sucesso de exclusão
+        window.closeDeleteSuccessModal = function() {
+            const modal = document.getElementById('deleteSuccessModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Mostrar spinner centralizado ao iniciar
+                mostrarSpinner();
+                
+                // Carregar dados
+                await carregarPilars();
+                
+                // Ocultar spinner centralizado quando tudo carregar
+                ocultarSpinner();
+            } catch (error) {
+                console.error('Erro ao inicializar página:', error);
+                // Ocultar spinner mesmo em caso de erro
+                ocultarSpinner();
+            }
+            
+            // Adicionar event listener para o toggle de status
+            const statusToggle = document.getElementById('statusToggleModal');
+            if (statusToggle) {
+                statusToggle.addEventListener('change', toggleStatus);
+            }
+            
+            document.getElementById('produtoForm').addEventListener('submit', salvarPilar);
+            document.getElementById('confirmDeleteBtn').onclick = async function() {
+                if (!codigoParaExcluir) return;
+                try {
+                    const result = await window.bloqueioExclusao.deleteWithCheck(
+                        'produtos',
+                        codigoParaExcluir,
+                        () => { closeDeleteModal(); carregarPilars(); window.showDeleteSuccessModal(); }
+                    );
+                    if (!result || result.blocked) return;
+                } catch (error) {
+                    console.error('Erro ao excluir produto:', error);
+                } finally {
+                    codigoParaExcluir = null;
+                }
+            };
+        });
+        // Fechar modal de sucesso quando clicar fora dele
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('successModal');
+            if (event.target === modal) {
+                closeSuccessModal();
+            }
+            
+            const updateModal = document.getElementById('updateSuccessModal');
+            if (event.target === updateModal) {
+                closeUpdateSuccessModal();
+            }
+            const deleteModalSuccess = document.getElementById('deleteSuccessModal');
+            if (event.target === deleteModalSuccess) {
+                closeDeleteSuccessModal();
+            }
+        });
+
+        window.novoPilar = novoPilar;
+        window.editarPilar = editarPilar;
+        window.excluirPilar = excluirPilar;
+        window.visualizarPilar = visualizarPilar;
+        window.closeModal = closeModal;
+        window.closeDeleteModal = closeDeleteModal;
+        window.toggleStatus = toggleStatus;
+        window.showSuccessModal = showSuccessModal;
+        window.closeSuccessModal = closeSuccessModal;
+        window.showUpdateSuccessModal = showUpdateSuccessModal;
+        window.closeUpdateSuccessModal = closeUpdateSuccessModal;
+        window.showDeleteSuccessModal = showDeleteSuccessModal;
+        window.closeDeleteSuccessModal = closeDeleteSuccessModal;
+    </script>
+    <script src="scripts/hamburger-menu.js"></script>
+</body>
+</html> 
+
+
