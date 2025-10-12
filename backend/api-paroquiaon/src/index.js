@@ -61,22 +61,19 @@ app.get('/', (req, res) => {
 // Rotas públicas (sem autenticação)
 app.use('/api/auth', authRoutes);
 
-// Middleware de autenticação para rotas protegidas
-app.use('/api', authMiddleware);
-
-// Rotas protegidas do ParóquiaON
-app.use('/api/cadastros', cadastroRoutes);
-app.use('/api/perfis', perfilRoutes);
-app.use('/api/movimento_comissoes', movimentoComissaoRoutes);
-app.use('/api/usuarios', usuarioRoutes);
-app.use('/api/pessoas', pessoaRoutes);
-app.use('/api/comunidades', comunidadeRoutes);
-app.use('/api/pastorais', pastoralRoutes);
-app.use('/api/pilares', pilarRoutes);
-app.use('/api/locais', localRoutes);
-app.use('/api/acoes', acaoRoutes);
-app.use('/api/agenda', agendaRoutes);
-app.use('/api/relatorios', relatorioRoutes);
+// Rotas protegidas do ParóquiaON (com autenticação)
+app.use('/api/cadastros', authMiddleware, cadastroRoutes);
+app.use('/api/perfis', authMiddleware, perfilRoutes);
+app.use('/api/movimento_comissoes', authMiddleware, movimentoComissaoRoutes);
+app.use('/api/usuarios', authMiddleware, usuarioRoutes);
+app.use('/api/pessoas', authMiddleware, pessoaRoutes);
+app.use('/api/comunidades', authMiddleware, comunidadeRoutes);
+app.use('/api/pastorais', authMiddleware, pastoralRoutes);
+app.use('/api/pilares', authMiddleware, pilarRoutes);
+app.use('/api/locais', authMiddleware, localRoutes);
+app.use('/api/acoes', authMiddleware, acaoRoutes);
+app.use('/api/agenda', authMiddleware, agendaRoutes);
+app.use('/api/relatorios', authMiddleware, relatorioRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
