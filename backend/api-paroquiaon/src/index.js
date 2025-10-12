@@ -6,8 +6,10 @@ const authMiddleware = require('./middleware/auth');
 
 // Importar rotas do ParóquiaON
 const authRoutes = require('./routes/authRoutes');
-const usuarioRoutes = require('./routes/usuarioRoutes');
+const cadastroRoutes = require('./routes/cadastroRoutes');
 const perfilRoutes = require('./routes/perfilRoutes');
+const movimentoComissaoRoutes = require('./routes/movimentoComissaoRoutes');
+const usuarioRoutes = require('./routes/usuarioRoutes');
 const pessoaRoutes = require('./routes/pessoaRoutes');
 const comunidadeRoutes = require('./routes/comunidadeRoutes');
 const pastoralRoutes = require('./routes/pastoralRoutes');
@@ -49,16 +51,9 @@ app.get('/', (req, res) => {
         description: 'API para gerenciar comunidades, pastorais, eventos e relatórios',
         endpoints: {
             auth: '/api/auth',
-            usuarios: '/api/usuarios',
+            cadastros: '/api/cadastros/:tabela',
             perfis: '/api/perfis',
-            pessoas: '/api/pessoas',
-            comunidades: '/api/comunidades',
-            pastorais: '/api/pastorais',
-            pilares: '/api/pilares',
-            locais: '/api/locais',
-            acoes: '/api/acoes',
-            agenda: '/api/agenda',
-            relatorios: '/api/relatorios'
+            movimento_comissoes: '/api/movimento_comissoes'
         }
     });
 });
@@ -70,8 +65,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api', authMiddleware);
 
 // Rotas protegidas do ParóquiaON
-app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/cadastros', cadastroRoutes);
 app.use('/api/perfis', perfilRoutes);
+app.use('/api/movimento_comissoes', movimentoComissaoRoutes);
+app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/pessoas', pessoaRoutes);
 app.use('/api/comunidades', comunidadeRoutes);
 app.use('/api/pastorais', pastoralRoutes);
@@ -99,29 +96,15 @@ app.get('/api/info', (req, res) => {
         description: 'API para sistema de gestão paroquial',
         modules: {
             auth: 'Autenticação e autorização',
-            usuarios: 'Gestão de usuários do sistema',
+            cadastros: 'CRUD genérico para todas as tabelas',
             perfis: 'Perfis de acesso e permissões',
-            pessoas: 'Cadastro de pessoas da paróquia',
-            comunidades: 'Gestão de comunidades paroquiais',
-            pastorais: 'Gestão de pastorais',
-            pilares: 'Pilares da paróquia',
-            locais: 'Locais e espaços físicos',
-            acoes: 'Ações e atividades',
-            agenda: 'Agenda de eventos',
-            relatorios: 'Relatórios e estatísticas'
+            movimento_comissoes: 'Gestão de movimentos de comissões'
         },
         endpoints: {
             auth: '/api/auth',
-            usuarios: '/api/usuarios',
+            cadastros: '/api/cadastros/:tabela',
             perfis: '/api/perfis',
-            pessoas: '/api/pessoas',
-            comunidades: '/api/comunidades',
-            pastorais: '/api/pastorais',
-            pilares: '/api/pilares',
-            locais: '/api/locais',
-            acoes: '/api/acoes',
-            agenda: '/api/agenda',
-            relatorios: '/api/relatorios'
+            movimento_comissoes: '/api/movimento_comissoes'
         }
     });
 });
