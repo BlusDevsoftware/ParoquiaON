@@ -17,7 +17,7 @@ Esta migração adiciona uma nova coluna `motivo_aglutinacao` na tabela `movimen
 ## 📁 Arquivos Modificados
 
 ### Backend
-- `backend/cadastros-api/src/controllers/movimentoComissaoController.js` - Atualizado para usar nova coluna
+- `backend/api-paroquiaon/src/controllers/movimentoComissaoController.js` - Atualizado para usar nova coluna
 
 ### Frontend
 - `frontend/src/movimento-comissao.html` - Modal de visualização atualizado

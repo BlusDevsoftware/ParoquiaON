@@ -2,30 +2,52 @@
   "version": 2,
   "builds": [
     {
-      "src": "frontend/src/**/*",
+      "src": "frontend/src/*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "frontend/src/assets/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "frontend/src/styles/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "frontend/src/scripts/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     { "src": "/", "dest": "/frontend/src/index.html" },
-    { "src": "/usuarios", "dest": "/frontend/src/usuarios.html" },
-    { "src": "/colaboradores", "dest": "/frontend/src/colaboradores.html" },
-    { "src": "/produtos", "dest": "/frontend/src/produtos.html" },
+    { "src": "/comunidades", "dest": "/frontend/src/comunidades.html" },
+    { "src": "/pastorais", "dest": "/frontend/src/pastorais.html" },
+    { "src": "/pilares", "dest": "/frontend/src/pilares.html" },
     { "src": "/locais", "dest": "/frontend/src/locais.html" },
     { "src": "/acoes", "dest": "/frontend/src/acoes.html" },
     { "src": "/pessoas", "dest": "/frontend/src/pessoas.html" },
     { "src": "/usuarios", "dest": "/frontend/src/usuarios.html" },
     { "src": "/perfil", "dest": "/frontend/src/perfil.html" },
-    { "src": "/clientes", "dest": "/frontend/src/clientes.html" },
+    { "src": "/agenda", "dest": "/frontend/src/agenda.html" },
+    { "src": "/recebimento", "dest": "/frontend/src/recebimento.html" },
     { "src": "/conferencia", "dest": "/frontend/src/conferencia.html" },
     { "src": "/dinamico", "dest": "/frontend/src/dinamico.html" },
     { "src": "/manutencao-bd", "dest": "/frontend/src/manutencao-bd.html" },
-    { "src": "/recebimento", "dest": "/frontend/src/recebimento.html" },
-    { "src": "/comissoes", "dest": "/frontend/src/comissoes.html" },
     { "src": "/sincronizar", "dest": "/frontend/src/sincronizar.html" },
     { "src": "/login", "dest": "/frontend/src/login.html" },
     { "src": "/assets/(.*)", "dest": "/frontend/src/assets/$1" },
     { "src": "/styles/(.*)", "dest": "/frontend/src/styles/$1" },
-    { "src": "/(.*)", "dest": "/frontend/src/$1" }
+    { "src": "/scripts/(.*)", "dest": "/frontend/src/scripts/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
   ]
-} 
+}

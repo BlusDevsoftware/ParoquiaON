@@ -41,6 +41,28 @@ app.use((req, res, next) => {
     next();
 });
 
+// Rota raiz
+app.get('/', (req, res) => {
+    res.json({
+        message: 'API ParóquiaON - Sistema de Gestão Paroquial',
+        version: '1.0.0',
+        description: 'API para gerenciar comunidades, pastorais, eventos e relatórios',
+        endpoints: {
+            auth: '/api/auth',
+            usuarios: '/api/usuarios',
+            perfis: '/api/perfis',
+            pessoas: '/api/pessoas',
+            comunidades: '/api/comunidades',
+            pastorais: '/api/pastorais',
+            pilares: '/api/pilares',
+            locais: '/api/locais',
+            acoes: '/api/acoes',
+            agenda: '/api/agenda',
+            relatorios: '/api/relatorios'
+        }
+    });
+});
+
 // Rotas públicas (sem autenticação)
 app.use('/api/auth', authRoutes);
 
@@ -75,6 +97,19 @@ app.get('/api/info', (req, res) => {
         name: 'ParóquiaON API',
         version: '1.0.0',
         description: 'API para sistema de gestão paroquial',
+        modules: {
+            auth: 'Autenticação e autorização',
+            usuarios: 'Gestão de usuários do sistema',
+            perfis: 'Perfis de acesso e permissões',
+            pessoas: 'Cadastro de pessoas da paróquia',
+            comunidades: 'Gestão de comunidades paroquiais',
+            pastorais: 'Gestão de pastorais',
+            pilares: 'Pilares da paróquia',
+            locais: 'Locais e espaços físicos',
+            acoes: 'Ações e atividades',
+            agenda: 'Agenda de eventos',
+            relatorios: 'Relatórios e estatísticas'
+        },
         endpoints: {
             auth: '/api/auth',
             usuarios: '/api/usuarios',
@@ -96,7 +131,8 @@ app.use((err, req, res, next) => {
     console.error('Erro na API:', err);
     res.status(500).json({
         error: 'Erro interno do servidor',
-        message: process.env.NODE_ENV === 'development' ? err.message : 'Algo deu errado'
+        message: process.env.NODE_ENV === 'development' ? err.message : 'Algo deu errado',
+        timestamp: new Date().toISOString()
     });
 });
 
@@ -105,7 +141,8 @@ app.use('*', (req, res) => {
     res.status(404).json({
         error: 'Rota não encontrada',
         path: req.originalUrl,
-        method: req.method
+        method: req.method,
+        timestamp: new Date().toISOString()
     });
 });
 
@@ -115,6 +152,7 @@ app.listen(PORT, () => {
     console.log(`🚀 ParóquiaON API rodando na porta ${PORT}`);
     console.log(`📊 Health check: http://localhost:${PORT}/health`);
     console.log(`📋 API Info: http://localhost:${PORT}/api/info`);
+    console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth`);
 });
 
 module.exports = app;

@@ -1,7 +1,7 @@
 {
-  "name": "paroquiaon-api",
+  "name": "api-paroquiaon",
   "version": "1.0.0",
-  "description": "API para o sistema ParóquiaON - Gestão Paroquial",
+  "description": "API Principal do sistema ParóquiaON - Gestão Paroquial",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -11,10 +11,11 @@
   "keywords": [
     "paroquia",
     "api",
-    "gestao",
+    "cadastros",
     "comunidades",
     "pastorais",
-    "agenda"
+    "pessoas",
+    "usuarios"
   ],
   "author": "BlueDev",
   "license": "MIT",

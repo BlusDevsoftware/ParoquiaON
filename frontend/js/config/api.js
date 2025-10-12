@@ -1,5 +1,5 @@
 // Configuração da API
-const API_URL = 'https://e-gerente-backend-cadastros-api.vercel.app/api/cadastros';
+const API_URL = 'https://api-paroquiaon-xxx.vercel.app/api';
 
 const api = {
     async get(endpoint) {

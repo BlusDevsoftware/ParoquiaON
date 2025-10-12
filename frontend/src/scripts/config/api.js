@@ -1,119 +1,186 @@
-// Evita sobrescrever se já houver um cliente global (ex.: gateway axios)
-if (window.api) {
-    // Já existe um cliente definido; não sobrescrever
-} else {
 // Configuração da API
-const API_URL = 'https://e-gerente-backend-cadastros-api.vercel.app/api/cadastros';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api-paroquiaon.vercel.app'
 
-// Função para fazer requisições GET
-async function get(endpoint) {
-    try {
-        const response = await fetch(`${API_URL}${endpoint}`);
-        const responseData = await response.json();
-        if (!response.ok) {
-            throw { status: response.status, data: responseData };
-        }
-        return responseData;
-    } catch (error) {
-        throw error;
+// Configurações da API
+export const apiConfig = {
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+}
+
+// Função para fazer requisições HTTP
+export async function apiRequest(endpoint, options = {}) {
+  const url = `${API_BASE_URL}${endpoint}`
+  
+  const defaultOptions = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...apiConfig.headers,
+      ...options.headers
     }
-}
+  }
 
-// Função para fazer requisições POST
-async function post(endpoint, data) {
-    try {
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+  const config = {
+    ...defaultOptions,
+    ...options
+  }
 
-        const responseData = await response.json();
-
-        if (!response.ok) {
-            throw { status: response.status, data: responseData };
-        }
-
-        return responseData;
-    } catch (error) {
-        throw error;
+  try {
+    const response = await fetch(url, config)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
+    
+    const data = await response.json()
+    return { data, error: null }
+  } catch (error) {
+    console.error('API Request Error:', error)
+    return { data: null, error }
+  }
 }
 
-// Função para fazer requisições PUT
-async function put(endpoint, data) {
-    try {
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+// Métodos HTTP
+export const api = {
+  // GET
+  async get(endpoint, options = {}) {
+    return apiRequest(endpoint, {
+      method: 'GET',
+      ...options
+    })
+  },
 
-        const responseData = await response.json();
+  // POST
+  async post(endpoint, data, options = {}) {
+    return apiRequest(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      ...options
+    })
+  },
 
-        if (!response.ok) {
-            throw { status: response.status, data: responseData };
-        }
+  // PUT
+  async put(endpoint, data, options = {}) {
+    return apiRequest(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      ...options
+    })
+  },
 
-        return responseData;
-    } catch (error) {
-        throw error;
-    }
+  // PATCH
+  async patch(endpoint, data, options = {}) {
+    return apiRequest(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      ...options
+    })
+  },
+
+  // DELETE
+  async delete(endpoint, options = {}) {
+    return apiRequest(endpoint, {
+      method: 'DELETE',
+      ...options
+    })
+  }
 }
 
-// Função para fazer requisições DELETE
-async function del(endpoint) {
-    try {
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            method: 'DELETE'
-        });
-        let responseData = null;
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-            responseData = await response.json();
-        }
-        if (!response.ok) {
-            throw { status: response.status, data: responseData };
-        }
-        return responseData;
-    } catch (error) {
-        throw error;
-    }
+// Endpoints específicos
+export const endpoints = {
+  // Autenticação
+  auth: {
+    login: '/auth/login',
+    logout: '/auth/logout',
+    register: '/auth/register',
+    refresh: '/auth/refresh'
+  },
+
+  // Comunidades
+  comunidades: {
+    list: '/comunidades',
+    create: '/comunidades',
+    get: (id) => `/comunidades/${id}`,
+    update: (id) => `/comunidades/${id}`,
+    delete: (id) => `/comunidades/${id}`
+  },
+
+  // Pastorais
+  pastorais: {
+    list: '/pastorais',
+    create: '/pastorais',
+    get: (id) => `/pastorais/${id}`,
+    update: (id) => `/pastorais/${id}`,
+    delete: (id) => `/pastorais/${id}`
+  },
+
+  // Pilares
+  pilares: {
+    list: '/pilares',
+    create: '/pilares',
+    get: (id) => `/pilares/${id}`,
+    update: (id) => `/pilares/${id}`,
+    delete: (id) => `/pilares/${id}`
+  },
+
+  // Locais
+  locais: {
+    list: '/locais',
+    create: '/locais',
+    get: (id) => `/locais/${id}`,
+    update: (id) => `/locais/${id}`,
+    delete: (id) => `/locais/${id}`
+  },
+
+  // Ações
+  acoes: {
+    list: '/acoes',
+    create: '/acoes',
+    get: (id) => `/acoes/${id}`,
+    update: (id) => `/acoes/${id}`,
+    delete: (id) => `/acoes/${id}`
+  },
+
+  // Pessoas
+  pessoas: {
+    list: '/pessoas',
+    create: '/pessoas',
+    get: (id) => `/pessoas/${id}`,
+    update: (id) => `/pessoas/${id}`,
+    delete: (id) => `/pessoas/${id}`
+  },
+
+  // Usuários
+  usuarios: {
+    list: '/usuarios',
+    create: '/usuarios',
+    get: (id) => `/usuarios/${id}`,
+    update: (id) => `/usuarios/${id}`,
+    delete: (id) => `/usuarios/${id}`
+  },
+
+  // Perfis
+  perfis: {
+    list: '/perfis',
+    create: '/perfis',
+    get: (id) => `/perfis/${id}`,
+    update: (id) => `/perfis/${id}`,
+    delete: (id) => `/perfis/${id}`
+  },
+
+  // Agenda
+  agenda: {
+    list: '/agenda',
+    create: '/agenda',
+    get: (id) => `/agenda/${id}`,
+    update: (id) => `/agenda/${id}`,
+    delete: (id) => `/agenda/${id}`,
+    byDate: (date) => `/agenda/date/${date}`,
+    byMonth: (month, year) => `/agenda/month/${year}/${month}`
+  }
 }
 
-// Função para fazer requisições PUT com FormData (upload de arquivos)
-async function putFormData(endpoint, formData) {
-    try {
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            method: 'PUT',
-            body: formData // Não definir Content-Type, deixar o browser definir automaticamente
-        });
-
-        const responseData = await response.json();
-
-        if (!response.ok) {
-            throw { status: response.status, data: responseData };
-        }
-
-        return responseData;
-    } catch (error) {
-        throw error;
-    }
-}
-
-// Exporta as funções da API
-const api = {
-    get,
-    post,
-    put,
-    putFormData,
-    delete: del
-};
-
-// Torna a API disponível globalmente
-window.api = api;
-}
+export default api

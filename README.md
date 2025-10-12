@@ -1,96 +1,172 @@
-# eGerente
+# ParóquiaON
 
-Sistema de gerenciamento para empresas de serviços, desenvolvido com Node.js, Express e Supabase.
+Sistema de gestão paroquial desenvolvido para gerenciar comunidades, pastorais, eventos e relatórios.
 
-## Estrutura do projeto
+## 🚀 Tecnologias
 
-```
-.
-├── backend/
-│   └── gateway/         # API Gateway
-├── frontend/           # Interface do usuário
-└── README.md
-```
+### Frontend
+- HTML5, CSS3, JavaScript
+- Vite (build tool)
+- Font Awesome (ícones)
+- Supabase (autenticação)
 
-## Requisitos
-
-- Node.js 18 ou superior
-- Conta no Supabase
+### Backend
+- Node.js/Express.js
 - PostgreSQL
-- Navegador moderno
+- Supabase
 
-## Instalação
+### Infraestrutura
+- Vercel (deploy frontend)
+- GitHub (controle de versão)
+
+## 📋 Funcionalidades
+
+- ✅ Gestão de Comunidades
+- ✅ Gestão de Pastorais
+- ✅ Gestão de Pilares
+- ✅ Gestão de Locais
+- ✅ Gestão de Ações
+- ✅ Gestão de Pessoas
+- ✅ Gestão de Usuários
+- ✅ Gestão de Perfis
+- ✅ Agenda de Eventos (Dia, Semana, Mês, Ano)
+- ✅ Relatórios Dinâmicos
+- ✅ Sistema de Autenticação
+- ✅ Interface Responsiva
+
+## 🛠️ Instalação
+
+### Pré-requisitos
+- Node.js 18+
+- Python 3.9+
+- PostgreSQL 14+
+- Git
+
+### Desenvolvimento Local
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/egerente.git
-cd egerente
+git clone https://github.com/BlusDevsoftware/ParoquiaON.git
+cd ParoquiaON
 ```
 
-2. Configure o backend:
+2. Configure o ambiente:
 ```bash
-cd backend/gateway
-npm install
 cp .env.example .env
-# Edite o arquivo .env com suas credenciais do Supabase
+# Edite o arquivo .env com suas configurações
 ```
 
-3. Configure o frontend:
+3. Instale dependências do frontend:
 ```bash
-cd ../../frontend
-# Abra o arquivo js/config/api.js e configure a URL da API
+cd frontend
+npm install
 ```
 
-## Executando o projeto
-
-1. Inicie o backend:
+4. Execute o projeto:
 ```bash
-cd backend/gateway
 npm run dev
 ```
 
-2. Abra o frontend:
-- Abra o arquivo `frontend/index.html` em um servidor local
-- Ou use uma extensão como Live Server no VS Code
+## 🚀 Deploy
 
-## Funcionalidades
+### Deploy Automático na Vercel
 
-- Gerenciamento de usuários
-- Gerenciamento de colaboradores
-- Gerenciamento de clientes
-- Gerenciamento de produtos
-- Gerenciamento de serviços
+O projeto está configurado para deploy automático na Vercel:
 
-## Tecnologias utilizadas
+1. **Conecte o repositório à Vercel**:
+   - Acesse https://vercel.com
+   - Conecte sua conta GitHub
+   - Importe o repositório `BlusDevsoftware/ParoquiaON`
 
-### Backend
-- Node.js
-- Express
-- Supabase
-- PostgreSQL
+2. **Configure as variáveis de ambiente**:
+   - `VITE_SUPABASE_URL`: URL do seu projeto Supabase
+   - `VITE_SUPABASE_ANON_KEY`: Chave anônima do Supabase
+   - `VITE_API_URL`: URL da sua API
 
-### Frontend
-- HTML5
-- CSS3
-- JavaScript
-- Bootstrap 5
-- Font Awesome
+3. **Deploy**:
+   - O deploy acontece automaticamente a cada push
+   - Acesse a URL fornecida pela Vercel
 
-## Segurança
+### Deploy Manual
 
-- CORS habilitado
-- Rate limiting
-- Helmet para headers de segurança
-- Autenticação via Supabase
+```bash
+# Instalar Vercel CLI
+npm install -g vercel
 
-## Contribuição
+# Fazer login
+vercel login
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
+# Deploy
+vercel --prod
+```
+
+## 📁 Estrutura do Projeto
+
+```
+ParoquiaON/
+├── frontend/              # Interface do usuário
+│   ├── src/
+│   │   ├── *.html         # Páginas do sistema
+│   │   ├── styles/        # Arquivos CSS
+│   │   ├── scripts/       # Arquivos JavaScript
+│   │   └── assets/        # Imagens e recursos
+│   ├── package.json
+│   └── vite.config.js
+├── backend/               # APIs do sistema
+│   ├── api-paroquiaon/   # API principal
+│   └── gateway/          # Gateway (legado)
+├── database/              # Scripts de banco de dados
+├── docs/                  # Documentação
+├── vercel.json            # Configuração da Vercel
+├── package.json           # Configuração do projeto
+└── README.md              # Este arquivo
+```
+
+## 🔧 Configuração
+
+### Variáveis de Ambiente
+
+Crie um arquivo `.env` baseado no `.env.example`:
+
+```env
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anonima
+VITE_API_URL=url_da_sua_api
+```
+
+### Banco de Dados
+
+Execute os scripts SQL na pasta `database/` para criar as tabelas necessárias.
+
+## 🤝 Contribuição
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
-## Licença
+## 📄 Licença
 
-Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes. 
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 👥 Equipe
+
+- **Desenvolvimento**: BlueDev
+- **Cliente**: Paróquia
+
+## 📞 Suporte
+
+Para suporte, entre em contato através de:
+- Email: suporte@bluedev.com.br
+- GitHub Issues: [Criar uma issue](https://github.com/BlusDevsoftware/ParoquiaON/issues)
+
+## 🔗 Links Úteis
+
+- [Vercel Dashboard](https://vercel.com/dashboard)
+- [Supabase Dashboard](https://supabase.com/dashboard)
+- [GitHub Repository](https://github.com/BlusDevsoftware/ParoquiaON)
+
+---
+
+**ParóquiaON** - Sistema de gestão paroquial moderno e eficiente.

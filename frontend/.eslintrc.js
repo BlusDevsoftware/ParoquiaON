@@ -8,7 +8,7 @@ module.exports = {
     'eslint:recommended'
   ],
   parserOptions: {
-    ecmaVersion: 12,
+    ecmaVersion: 'latest',
     sourceType: 'module'
   },
   rules: {
@@ -18,8 +18,12 @@ module.exports = {
     'semi': ['error', 'always'],
     'quotes': ['error', 'single'],
     'indent': ['error', 2],
-    'no-multiple-empty-lines': ['error', { 'max': 1 }],
-    'no-trailing-spaces': 'error',
-    'eol-last': 'error'
+    'comma-dangle': ['error', 'never'],
+    'eol-last': ['error', 'always'],
+    'no-trailing-spaces': 'error'
+  },
+  globals: {
+    'import': 'readonly',
+    'export': 'readonly'
   }
-}; 
+}
