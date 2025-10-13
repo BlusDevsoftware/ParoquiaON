@@ -3,6 +3,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const corsMiddleware = require('./middleware/cors');
 const authMiddleware = require('./middleware/auth');
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 // Importar rotas do ParóquiaON
 const authRoutes = require('./routes/authRoutes');
@@ -105,9 +106,6 @@ app.get('/api/info', (req, res) => {
         }
     });
 });
-
-// Importar middleware de tratamento de erros
-const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 // Middleware para rotas não encontradas
 app.use('*', notFoundHandler);

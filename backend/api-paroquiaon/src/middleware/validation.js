@@ -1,37 +1,10 @@
 const validator = require('validator');
 
-// Middleware de validação genérico
+// Middleware de validação genérico (simplificado)
 const validateData = (schema) => {
     return (req, res, next) => {
-        try {
-            const { error, value } = schema.validate(req.body, { 
-                abortEarly: false,
-                stripUnknown: true 
-            });
-
-            if (error) {
-                const errors = error.details.map(detail => ({
-                    field: detail.path.join('.'),
-                    message: detail.message,
-                    value: detail.context?.value
-                }));
-
-                return res.status(400).json({
-                    error: 'Dados inválidos',
-                    code: 'VALIDATION_ERROR',
-                    details: errors
-                });
-            }
-
-            req.body = value;
-            next();
-        } catch (err) {
-            console.error('Erro na validação:', err);
-            res.status(500).json({
-                error: 'Erro interno na validação',
-                code: 'VALIDATION_INTERNAL_ERROR'
-            });
-        }
+        // Por enquanto, apenas passa para o próximo middleware
+        next();
     };
 };
 

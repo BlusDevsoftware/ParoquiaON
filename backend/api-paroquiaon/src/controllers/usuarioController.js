@@ -1,51 +1,18 @@
 const { supabase } = require('../config/supabase');
-const { validateRequired, validatePassword, sanitizeData } = require('../middleware/validation');
 
 // Listar todos os usuários
 async function listarUsuarios(req, res) {
     try {
-        const { page = 1, limit = 10, search } = req.query;
-        const offset = (page - 1) * limit;
-
-        let query = supabase
+        const { data, error } = await supabase
             .from('usuarios')
-            .select(`
-                id,
-                email,
-                login,
-                ativo,
-                created_at,
-                ultimo_login,
-                perfis (nome),
-                pessoas (nome, telefone)
-            `, { count: 'exact' });
-
-        // Aplicar busca se especificada
-        if (search) {
-            query = query.or(`email.ilike.%${search}%,login.ilike.%${search}%`);
-        }
-
-        const { data, error, count } = await query
-            .range(offset, offset + limit - 1)
-            .order('created_at', { ascending: false });
+            .select('*')
+            .order('id', { ascending: true });
 
         if (error) throw error;
-
-        res.json({
-            data,
-            pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
-                total: count,
-                totalPages: Math.ceil(count / limit)
-            }
-        });
+        res.json(data);
     } catch (error) {
         console.error('Erro ao listar usuários:', error);
-        res.status(500).json({ 
-            error: 'Erro ao listar usuários',
-            code: 'LIST_USERS_ERROR'
-        });
+        res.status(500).json({ error: 'Erro ao listar usuários' });
     }
 }
 
@@ -74,61 +41,17 @@ async function buscarUsuario(req, res) {
 async function criarUsuario(req, res) {
     try {
         const dados = req.body;
-
-        // Validações básicas
-        if (!dados.email || !dados.login || !dados.senha) {
-            return res.status(400).json({
-                error: 'Email, login e senha são obrigatórios',
-                code: 'MISSING_REQUIRED_FIELDS'
-            });
-        }
-
-        // Verificar se email já existe
-        const { data: existingUser } = await supabase
-            .from('usuarios')
-            .select('id')
-            .eq('email', dados.email)
-            .single();
-
-        if (existingUser) {
-            return res.status(409).json({
-                error: 'Email já está em uso',
-                code: 'EMAIL_ALREADY_EXISTS'
-            });
-        }
-
-        // Hash da senha
-        const bcrypt = require('bcryptjs');
-        const saltRounds = 12;
-        dados.senha = await bcrypt.hash(dados.senha, saltRounds);
-        dados.ativo = true;
-
         const { data, error } = await supabase
             .from('usuarios')
             .insert([dados])
-            .select(`
-                id,
-                email,
-                login,
-                ativo,
-                created_at,
-                perfis (nome),
-                pessoas (nome, telefone)
-            `)
+            .select()
             .single();
 
         if (error) throw error;
-        
-        res.status(201).json({
-            message: 'Usuário criado com sucesso',
-            data
-        });
+        res.status(201).json(data);
     } catch (error) {
         console.error('Erro ao criar usuário:', error);
-        res.status(500).json({ 
-            error: 'Erro ao criar usuário',
-            code: 'CREATE_USER_ERROR'
-        });
+        res.status(500).json({ error: 'Erro ao criar usuário' });
     }
 }
 
