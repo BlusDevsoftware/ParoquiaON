@@ -52,8 +52,7 @@ app.get('/', (req, res) => {
         endpoints: {
             auth: '/api/auth',
             cadastros: '/api/cadastros/:tabela',
-            perfis: '/api/perfis',
-            movimento_comissoes: '/api/movimento_comissoes'
+            perfis: '/api/perfis'
         }
     });
 });
@@ -94,13 +93,12 @@ app.get('/api/info', (req, res) => {
             auth: 'Autenticação e autorização',
             cadastros: 'CRUD genérico para todas as tabelas',
             perfis: 'Perfis de acesso e permissões',
-            movimento_comissoes: 'Gestão de movimentos de comissões'
+            // movimento_comissoes removido
         },
         endpoints: {
             auth: '/api/auth',
             cadastros: '/api/cadastros/:tabela',
-            perfis: '/api/perfis',
-            movimento_comissoes: '/api/movimento_comissoes'
+            perfis: '/api/perfis'
         }
     });
 });
