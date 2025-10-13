@@ -1,0 +1,13 @@
+# Ignorar arquivos desnecessários
+node_modules/
+.git/
+.gitignore
+*.log
+.DS_Store
+Thumbs.db
+
+# Manter apenas o necessário para o build
+!frontend/src/
+!frontend/package.json
+!frontend/build-simple.js
+!backend/api-paroquiaon/
