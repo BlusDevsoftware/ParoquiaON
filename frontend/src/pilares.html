@@ -559,6 +559,200 @@
             color: #333;
             white-space: nowrap;
         }
+
+        /* Barra superior ocupando toda a largura */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: #1e3a8a;
+            color: white;
+            padding: 0 30px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 12px 0;
+            position: relative;
+            transition: opacity 0.2s ease;
+            font-size: 16px;
+        }
+
+        .nav-link:hover {
+            opacity: 0.8;
+        }
+
+        .nav-link.active {
+            opacity: 1;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #4caf50;
+            border-radius: 2px;
+        }
+
+        /* Dropdown styles */
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dropdown-trigger i {
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-dropdown:hover .dropdown-trigger i {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1000;
+            border: 1px solid #e0e0e0;
+        }
+
+        .nav-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+            color: #1976d2;
+        }
+
+        .beta-tag {
+            background: #ff9800;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            position: relative;
+            font-size: 16px;
+        }
+
+        .header-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #f44336;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            background: #4caf50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Ajustar main-content para compensar header fixo */
+        .main-content {
+            margin-top: 80px;
+        }
     </style>
     <script>
         // Funções de Modal - Escopo Global
@@ -584,61 +778,44 @@
     </script>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
-            <img src="assets/images/logo2.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
-            <h1><span class="white">Paroquia</span><span class="highlight">ON</span></h1>
+    <!-- Header Superior -->
+    <div class="top-header">
+        <div class="header-left">
+            <div class="logo-section">
+                <span style="font-size: 20px; font-weight: 600;">ParoquiaON</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Minha Comunidade</a>
+                <a href="agenda.html" class="nav-link">Agenda</a>
+                <a href="comunidades.html" class="nav-link">Comunidades</a>
+                <a href="pastorais.html" class="nav-link">Pastorais</a>
+                <a href="pilares.html" class="nav-link active">Pilares</a>
+                <a href="locais.html" class="nav-link">Locais</a>
+                <a href="acoes.html" class="nav-link">Ações</a>
+                <a href="pessoas.html" class="nav-link">Pessoas</a>
+                <a href="usuarios.html" class="nav-link">Usuários</a>
+                <a href="perfil.html" class="nav-link">Perfil</a>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-trigger">Relatórios <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="recebimento.html" class="dropdown-item">Recebimento</a>
+                        <a href="conferencia.html" class="dropdown-item">Conferência</a>
+                        <a href="dinamico.html" class="dropdown-item">Dinâmico <span class="beta-tag">beta</span></a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <ul class="nav-menu">
-            <li><a href="index.html"><i class="fas fa-home"></i><span>Minha Comunidade</span></a></li>
-            <li><a href="agenda.html"><i class="fas fa-calendar-alt"></i><span>Agenda</span></a></li>
-            <li><a href="comunidades.html"><i class="fas fa-users"></i><span>Comunidades</span></a></li>
-            <li><a href="pastorais.html"><i class="fas fa-church"></i><span>Pastorais</span></a></li>
-            <li><a href="pilares.html" class="active"><i class="fas fa-columns"></i><span>Pilares</span></a></li>
-            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i><span>Locais</span></a></li>
-            <li><a href="acoes.html"><i class="fas fa-tasks"></i><span>Ações</span></a></li>
-            <li><a href="pessoas.html"><i class="fas fa-user"></i><span>Pessoas</span></a></li>
-            <li><a href="usuarios.html"><i class="fas fa-user-cog"></i><span>Usuários</span></a></li>
-            <li><a href="perfil.html"><i class="fas fa-user-shield"></i><span>Perfil</span></a></li>
-            <li class="has-submenu">
-                <a href="#" class="submenu-trigger"><i class="fas fa-chart-bar"></i><span>Relatórios</span><i class="fas fa-chevron-down submenu-icon"></i></a>
-                <ul class="submenu">
-                    <li><a href="recebimento.html"><i class="fas fa-money-bill-wave"></i><span>Recebimento</span></a></li>
-                    <li><a href="conferencia.html"><i class="fas fa-check-circle"></i><span>Conferência</span></a></li>
-                    <li><a href="dinamico.html"><i class="fas fa-chart-line"></i><span>Dinâmico</span><span class="beta-tag">beta</span></a></li>
-                </ul>
-            </li>
-            <li class="has-submenu">
-                <a href="#" class="submenu-trigger"><i class="fas fa-cog"></i><span>Configurações</span><i class="fas fa-chevron-down submenu-icon"></i></a>
-                <ul class="submenu">
-                    <li><a href="manutencao-bd.html"><i class="fas fa-database"></i><span>Manutenção BD</span></a></li>
-                    <li><a href="sincronizar.html"><i class="fas fa-sync"></i><span>Sincronizar</span></a></li>
-                </ul>
-            </li>
-        </ul>
-        <div class="logout-button">
-            <a href="index.html" data-logout><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
+        <div class="header-right">
+            <div class="header-icon">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="user-avatar">A</div>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Header -->
-        <div class="header">
-            <div class="welcome-text">
-                <h1>Pilares</h1>
-                <p>Gerencie os pilares da paróquia</p>
-            </div>
-            <div class="user-info">
-                <div class="notifications">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge">3</span>
-                </div>
-                <div class="user-avatar">A</div>
-            </div>
-        </div>
-
         <!-- Filters -->
         <div class="filters-container">
             <div class="search-box">

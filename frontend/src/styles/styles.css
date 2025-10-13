@@ -119,111 +119,7 @@ body {
     background-color: #f8f9fa;
 }
 
-/* Sidebar */
-.sidebar {
-    width: 280px;
-    background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
-    color: white;
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
-    transition: all 0.3s ease;
-    z-index: 1000;
-    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.sidebar.collapsed {
-    width: 80px;
-}
-
-.sidebar.collapsed .nav-menu {
-    display: block;
-    padding: 10px 0;
-}
-
-.sidebar.collapsed .nav-menu li {
-    margin: 5px 0;
-    padding: 0 5px;
-}
-
-.sidebar.collapsed .nav-menu a {
-    justify-content: center;
-    padding: 12px 8px;
-    border-radius: 8px;
-}
-
-.sidebar.collapsed .nav-menu a span {
-    display: none;
-}
-
-.sidebar.collapsed .nav-menu i {
-    margin-right: 0;
-    font-size: 18px;
-}
-
-.sidebar.collapsed .submenu-icon {
-    display: none;
-}
-
-/* Submenus normais quando sidebar expandido */
-.sidebar .submenu {
-    display: none;
-}
-
-.sidebar .has-submenu.active .submenu {
-    display: block;
-}
-
-/* Estilos de submenu removidos - sidebar expande automaticamente */
-
-.sidebar .has-submenu {
-    position: relative;
-}
-
-
-.sidebar.collapsed .logo {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 15px 5px;
-    height: auto;
-}
-
-.sidebar.collapsed .logo h1 {
-    display: none;
-}
-
-.sidebar.collapsed .logo img {
-    margin-right: 0;
-    margin-bottom: 15px;
-    height: 2em;
-    display: block;
-}
-
-.sidebar.collapsed .hamburger-btn {
-    margin-left: 0;
-    margin-top: 0;
-    align-self: center;
-}
-
-.sidebar.collapsed .logout-button span {
-    display: none;
-}
-
-.sidebar.collapsed .logout-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-}
-
-.sidebar.collapsed .logout-button a {
-    justify-content: center;
-    padding: 10px;
-}
+/* Sidebar CSS removido - agora usando menu superior */
 
 .logo {
     padding: 25px 20px;
@@ -232,10 +128,7 @@ body {
     background: rgba(255, 255, 255, 0.05);
 }
 
-.sidebar .logo {
-    border-bottom: none;
-    background: transparent; /* usa o degradê do próprio .sidebar */
-}
+/* Referência à sidebar removida */
 
 .logo h1 {
     color: white;
@@ -391,12 +284,8 @@ body {
     background-color: #f8f9fa;
     transition: margin-left 0.3s ease;
     position: relative;
-    width: calc(100% - 280px);
-}
-
-.sidebar.collapsed + .main-content {
-    margin-left: 80px;
-    width: calc(100% - 80px);
+    width: 100%;
+    margin-left: 0;
 }
 
 .main-content::before {
@@ -1144,10 +1033,7 @@ textarea {
         min-width: 800px;
     }
 
-    .sidebar {
-        width: 70px;
-        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
-    }
+    /* Referência à sidebar removida */
 
     .main-content {
         margin-left: 70px;
