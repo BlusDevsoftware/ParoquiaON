@@ -1,8 +1,8 @@
 // Configuração da API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api-paroquiaon.vercel.app'
+const API_BASE_URL = 'https://api-paroquiaon.vercel.app'
 
 // Configurações da API
-export const apiConfig = {
+const apiConfig = {
   baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
@@ -12,7 +12,7 @@ export const apiConfig = {
 }
 
 // Função para fazer requisições HTTP
-export async function apiRequest(endpoint, options = {}) {
+async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`
   
   const defaultOptions = {
@@ -44,7 +44,7 @@ export async function apiRequest(endpoint, options = {}) {
 }
 
 // Métodos HTTP
-export const api = {
+const api = {
   // GET
   async get(endpoint, options = {}) {
     return apiRequest(endpoint, {
@@ -90,7 +90,7 @@ export const api = {
 }
 
 // Endpoints específicos
-export const endpoints = {
+const endpoints = {
   // Autenticação
   auth: {
     login: '/auth/login',
@@ -183,4 +183,7 @@ export const endpoints = {
   }
 }
 
-export default api
+// Tornar disponível globalmente
+window.api = api;
+window.apiConfig = apiConfig;
+window.endpoints = endpoints;
