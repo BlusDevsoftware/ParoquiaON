@@ -73,10 +73,14 @@ SUPABASE_KEY=your-supabase-anon-key
 # API
 PORT=3000
 NODE_ENV=development
-JWT_SECRET=your-secret-key
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 
-# CORS
-CORS_ORIGIN=http://localhost:3000,https://paroquiaon.vercel.app
+# CORS (separadas por vírgula)
+CORS_ORIGINS=https://paroquiaon.vercel.app,http://localhost:3000,http://localhost:5173
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=1000
 ```
 
 ### Banco de Dados
@@ -181,11 +185,14 @@ curl http://localhost:3000/api/info
 ## 🛡️ Segurança
 
 - Rate limiting (1000 req/15min)
-- CORS configurado
+- CORS configurado para domínios ParoquiaON
 - Helmet para headers de segurança
-- Validação de senhas
-- Hash de senhas com bcrypt
-- JWT com expiração
+- Validação de senhas com requisitos de força
+- Hash de senhas com bcrypt (12 rounds)
+- JWT com expiração (24h)
+- Middleware de validação de dados
+- Sanitização automática de dados
+- Tratamento de erros padronizado
 
 ## 📝 Logs
 

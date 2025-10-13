@@ -106,25 +106,14 @@ app.get('/api/info', (req, res) => {
     });
 });
 
-// Middleware de tratamento de erros
-app.use((err, req, res, next) => {
-    console.error('Erro na API:', err);
-    res.status(500).json({
-        error: 'Erro interno do servidor',
-        message: process.env.NODE_ENV === 'development' ? err.message : 'Algo deu errado',
-        timestamp: new Date().toISOString()
-    });
-});
+// Importar middleware de tratamento de erros
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 // Middleware para rotas não encontradas
-app.use('*', (req, res) => {
-    res.status(404).json({
-        error: 'Rota não encontrada',
-        path: req.originalUrl,
-        method: req.method,
-        timestamp: new Date().toISOString()
-    });
-});
+app.use('*', notFoundHandler);
+
+// Middleware de tratamento de erros (deve ser o último)
+app.use(errorHandler);
 
 // Inicialização do servidor
 const PORT = process.env.PORT || 3000;
