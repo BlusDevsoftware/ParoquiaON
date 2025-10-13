@@ -1,4 +1,4 @@
-const supabase = require('../config/supabase');
+const { supabase } = require('../config/supabase');
 
 // Gerar próximo código de perfil
 async function gerarProximoCodigo() {
