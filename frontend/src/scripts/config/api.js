@@ -1,5 +1,5 @@
 // Configuração da API
-const API_BASE_URL = 'https://api-paroquiaon.vercel.app'
+const API_BASE_URL = 'http://localhost:8000' // Usar localhost para desenvolvimento
 
 // Configurações da API
 const apiConfig = {

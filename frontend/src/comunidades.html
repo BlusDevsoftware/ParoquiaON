@@ -205,8 +205,8 @@
                 const dadosComunidade = {
                     nome: nome,
                     telefone: form.telefone.value.trim(),
-                    membros_conselho: form.membros_conselho.value.trim(),
-                    secretario: form.secretario.value.trim(),
+                    membros_conselho: getConselhoMembers(),
+                    secretario: getSecretario(),
                     endereco: form.endereco.value.trim(),
                     data_fundacao: form.data_fundacao.value,
                     status: form.status.value || 'Ativo'
@@ -254,11 +254,19 @@
                 const form = document.getElementById('colaboradorForm');
                 form.nome.value = comunidade.nome || '';
                 form.telefone.value = comunidade.telefone || '';
-                form.membros_conselho.value = comunidade.membros_conselho || '';
-                form.secretario.value = comunidade.secretario || '';
                 form.endereco.value = comunidade.endereco || '';
                 form.data_fundacao.value = comunidade.data_fundacao || '';
                 form.status.value = comunidade.status || 'Ativo';
+                
+                // Preencher membros do conselho se existirem
+                if (comunidade.membros_conselho) {
+                    setConselhoMembers(comunidade.membros_conselho);
+                }
+                
+                // Preencher secretário se existir
+                if (comunidade.secretario) {
+                    setSecretario(comunidade.secretario);
+                }
                 
                 // Alterar título do modal
                 const modalTitle = document.querySelector('#colaboradorModal .modal-header h2');
@@ -298,8 +306,8 @@
                 const dadosAtualizacao = {
                     nome: nome,
                     telefone: form.telefone.value.trim(),
-                    membros_conselho: form.membros_conselho.value.trim(),
-                    secretario: form.secretario.value.trim(),
+                    membros_conselho: getConselhoMembers(),
+                    secretario: getSecretario(),
                     endereco: form.endereco.value.trim(),
                     data_fundacao: form.data_fundacao.value,
                     status: form.status.value || 'Ativo'
@@ -468,6 +476,133 @@
             }
         }
         
+        // Funções auxiliares para trabalhar com membros do conselho e secretário
+        
+        // Função para obter membros do conselho
+        function getConselhoMembers() {
+            const membersContainer = document.getElementById('conselho-members');
+            if (!membersContainer) return '';
+            
+            const members = [];
+            const memberElements = membersContainer.querySelectorAll('.member-item');
+            
+            memberElements.forEach(element => {
+                const nameInput = element.querySelector('input[name="nome"]');
+                const roleInput = element.querySelector('input[name="funcao"]');
+                if (nameInput && nameInput.value.trim()) {
+                    members.push({
+                        nome: nameInput.value.trim(),
+                        funcao: roleInput ? roleInput.value.trim() : ''
+                    });
+                }
+            });
+            
+            return members.length > 0 ? JSON.stringify(members) : '';
+        }
+        
+        // Função para obter secretário
+        function getSecretario() {
+            const responsavelContainer = document.getElementById('responsavel-members');
+            if (!responsavelContainer) return '';
+            
+            const secretarioElement = responsavelContainer.querySelector('.member-item');
+            if (secretarioElement) {
+                const nameInput = secretarioElement.querySelector('input[name="nome"]');
+                const roleInput = secretarioElement.querySelector('input[name="funcao"]');
+                if (nameInput && nameInput.value.trim()) {
+                    return `${nameInput.value.trim()}${roleInput && roleInput.value.trim() ? ' - ' + roleInput.value.trim() : ''}`;
+                }
+            }
+            
+            return '';
+        }
+        
+        // Função para definir membros do conselho
+        function setConselhoMembers(membersData) {
+            try {
+                const members = typeof membersData === 'string' ? JSON.parse(membersData) : membersData;
+                const container = document.getElementById('conselho-members');
+                
+                if (container && Array.isArray(members)) {
+                    container.innerHTML = '';
+                    members.forEach(member => {
+                        addConselhoMember(member.nome, member.funcao);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao definir membros do conselho:', error);
+            }
+        }
+        
+        // Função para definir secretário
+        function setSecretario(secretarioData) {
+            try {
+                const container = document.getElementById('responsavel-members');
+                if (container && secretarioData) {
+                    container.innerHTML = '';
+                    const parts = secretarioData.split(' - ');
+                    const nome = parts[0];
+                    const funcao = parts[1] || '';
+                    addResponsavelMember(nome, funcao);
+                }
+            } catch (error) {
+                console.error('Erro ao definir secretário:', error);
+            }
+        }
+        
+        // Função para limpar membros do conselho
+        function clearConselhoMembers() {
+            const container = document.getElementById('conselho-members');
+            if (container) {
+                container.innerHTML = '';
+            }
+        }
+        
+        // Função para limpar secretário
+        function clearSecretario() {
+            const container = document.getElementById('responsavel-members');
+            if (container) {
+                container.innerHTML = '';
+            }
+        }
+        
+        // Funções para adicionar membros (se não existirem)
+        function addConselhoMember(nome = '', funcao = '') {
+            const container = document.getElementById('conselho-members');
+            if (!container) return;
+            
+            const memberDiv = document.createElement('div');
+            memberDiv.className = 'member-item';
+            memberDiv.innerHTML = `
+                <input type="text" name="nome" placeholder="Nome do membro" value="${nome}">
+                <input type="text" name="funcao" placeholder="Função" value="${funcao}">
+                <button type="button" onclick="removeMember(this)" class="btn-remove-member">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(memberDiv);
+        }
+        
+        function addResponsavelMember(nome = '', funcao = '') {
+            const container = document.getElementById('responsavel-members');
+            if (!container) return;
+            
+            const memberDiv = document.createElement('div');
+            memberDiv.className = 'member-item';
+            memberDiv.innerHTML = `
+                <input type="text" name="nome" placeholder="Nome do responsável" value="${nome}">
+                <input type="text" name="funcao" placeholder="Função" value="${funcao}">
+                <button type="button" onclick="removeMember(this)" class="btn-remove-member">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(memberDiv);
+        }
+        
+        function removeMember(button) {
+            button.parentElement.remove();
+        }
+        
         // Inicializar quando a página carregar
         document.addEventListener('DOMContentLoaded', inicializarPagina);
     </script>
@@ -488,11 +623,13 @@
             if (form.codigo) form.codigo.value = '';
             form.nome.value = '';
             form.telefone.value = '';
-            form.membros_conselho.value = '';
-            form.secretario.value = '';
             form.endereco.value = '';
             form.data_fundacao.value = '';
             form.status.value = 'Ativo';
+            
+            // Limpar membros do conselho e secretário
+            clearConselhoMembers();
+            clearSecretario();
             
             // Reabilitar todos os campos
             Array.from(form.elements).forEach(el => {
@@ -2384,35 +2521,35 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Filters -->
-        <div class="filters-container">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Buscar comunidade...">
+            <!-- Filters -->
+            <div class="filters-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar comunidade...">
+                </div>
+                <div class="filter-options">
+                    <select>
+                        <option value="">Status</option>
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="openModal()">
+                    <i class="fas fa-plus"></i>
+                    Nova Comunidade
+                </button>
             </div>
-            <div class="filter-options">
-                <select>
-                    <option value="">Status</option>
-                    <option value="ativo">Ativo</option>
-                    <option value="inativo">Inativo</option>
-                </select>
-            </div>
-            <button class="btn-primary" onclick="openModal()">
-                <i class="fas fa-plus"></i>
-                Nova Comunidade
-            </button>
-        </div>
 
         <!-- Cards Container -->
         <div class="cards-container">
             <!-- Spinner de Carregamento - DENTRO DO CONTAINER -->
-            <div id="loader-colaboradores" class="loader-overlay-colaboradores">
-                <div class="spinner-main"></div>
-                <div class="loading-text">Carregando comunidades...</div>
-            </div>
-            
-            <div id="communities-grid" class="communities-grid">
-                <!-- Cards das comunidades serão carregados dinamicamente via JavaScript -->
+                <div id="loader-colaboradores" class="loader-overlay-colaboradores">
+                    <div class="spinner-main"></div>
+                    <div class="loading-text">Carregando comunidades...</div>
+                </div>
+                
+                    <div id="communities-grid" class="communities-grid">
+                        <!-- Cards das comunidades serão carregados dinamicamente via JavaScript -->
             </div>
         </div>
     </div>
