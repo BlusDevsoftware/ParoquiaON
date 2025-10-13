@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ParoquiaON - Dashboard</title>
+    <title>ParoquiaON - Minha Comunidade</title>
     
     <link rel="icon" type="image/png" href="assets/images/logo2.png">
     <link rel="stylesheet" href="styles/styles.css">
@@ -121,8 +121,8 @@
         <!-- Header -->
         <div class="header">
             <div class="welcome-text">
-                <h1>Bem-vindo, Admin</h1>
-                <p>Visualize suas informações e estatísticas</p>
+                <h1>Minha Comunidade</h1>
+                <p>Visão geral da sua paróquia e estatísticas</p>
             </div>
             <div class="user-info">
                 <div class="notifications">
@@ -144,59 +144,59 @@
         <div class="dashboard-cards" id="dashboard-cards">
             <div class="card" draggable="true">
                 <div class="card-header">
-                    <h3>Total de Colaboradores</h3>
+                    <h3>Total de Comunidades</h3>
                     <i class="fas fa-users"></i>
                 </div>
-                <div class="card-value" id="total-colaboradores">-</div>
-                <div class="card-change" id="crescimento-colaboradores">Carregando...</div>
+                <div class="card-value" id="total-comunidades">-</div>
+                <div class="card-change" id="crescimento-comunidades">Carregando...</div>
             </div>
             <div class="card" draggable="true">
                 <div class="card-header">
-                    <h3>Comissões do Mês</h3>
-                    <i class="fas fa-hand-holding-usd"></i>
+                    <h3>Pastorais Ativas</h3>
+                    <i class="fas fa-church"></i>
                 </div>
-                <div class="card-value" id="comissoes-mes">-</div>
-                <div class="card-change" id="crescimento-comissoes">Carregando...</div>
+                <div class="card-value" id="pastorais-ativas">-</div>
+                <div class="card-change" id="crescimento-pastorais">Carregando...</div>
             </div>
             <div class="card" draggable="true">
                 <div class="card-header">
-                    <h3>Vendas do Mês</h3>
-                    <i class="fas fa-chart-line"></i>
+                    <h3>Pessoas Cadastradas</h3>
+                    <i class="fas fa-user"></i>
                 </div>
-                <div class="card-value" id="vendas-mes">-</div>
-                <div class="card-change" id="crescimento-vendas">Carregando...</div>
+                <div class="card-value" id="pessoas-cadastradas">-</div>
+                <div class="card-change" id="crescimento-pessoas">Carregando...</div>
             </div>
             <div class="card" draggable="true">
                 <div class="card-header">
-                    <h3>Pagamentos Pendentes</h3>
-                    <i class="fas fa-clock"></i>
+                    <h3>Eventos do Mês</h3>
+                    <i class="fas fa-calendar-alt"></i>
                 </div>
-                <div class="card-value" id="pagamentos-pendentes">-</div>
-                <div class="card-change" id="qtd-pendentes">Carregando...</div>
+                <div class="card-value" id="eventos-mes">-</div>
+                <div class="card-change" id="qtd-eventos">Carregando...</div>
             </div>
         </div>
 
         <!-- Charts Section -->
         <div class="charts-section">
             <div class="chart-container">
-                <h2>Evolução das Comissões</h2>
-                <canvas id="comissoesChart"></canvas>
+                <h2>Evolução de Pessoas Cadastradas</h2>
+                <canvas id="pessoasChart"></canvas>
             </div>
             <div class="chart-container">
-                <h2>Status das Comissões</h2>
-                <canvas id="statusChart"></canvas>
+                <h2>Distribuição por Pastorais</h2>
+                <canvas id="pastoraisChart"></canvas>
             </div>
         </div>
 
         <!-- Insights Adicionais -->
         <div class="charts-section">
             <div class="chart-container">
-                <h2>Vendas por Produto</h2>
-                <canvas id="vendasProdutoChart"></canvas>
+                <h2>Eventos por Mês</h2>
+                <canvas id="eventosChart"></canvas>
             </div>
             <div class="chart-container">
-                <h2>Top 5 Colaboradores</h2>
-                <canvas id="topColaboradoresChart"></canvas>
+                <h2>Top 5 Comunidades</h2>
+                <canvas id="comunidadesChart"></canvas>
             </div>
         </div>
     </div>
@@ -205,7 +205,7 @@
     <script src="scripts/config/api.js"></script>
     <script>
         // Variáveis globais
-        let comissoesChart, statusChart, vendasProdutoChart, topColaboradoresChart;
+        let pessoasChart, pastoraisChart, eventosChart, comunidadesChart;
         let dashboardData = {};
 
         // Inicializar dashboard
@@ -229,13 +229,13 @@
         // Função para debug dos gráficos
         function debugGraficos() {
             console.log('=== DEBUG DOS GRÁFICOS ===');
-            console.log('comissoesChart:', comissoesChart);
-            console.log('statusChart:', statusChart);
-            console.log('vendasProdutoChart:', vendasProdutoChart);
-            console.log('topColaboradoresChart:', topColaboradoresChart);
+            console.log('pessoasChart:', pessoasChart);
+            console.log('pastoraisChart:', pastoraisChart);
+            console.log('eventosChart:', eventosChart);
+            console.log('comunidadesChart:', comunidadesChart);
             
             // Verificar se os elementos canvas existem
-            const canvasIds = ['comissoesChart', 'statusChart', 'vendasProdutoChart', 'topColaboradoresChart'];
+            const canvasIds = ['pessoasChart', 'pastoraisChart', 'eventosChart', 'comunidadesChart'];
             canvasIds.forEach(id => {
                 const canvas = document.getElementById(id);
                 console.log(`Canvas ${id}:`, canvas);
@@ -248,21 +248,21 @@
         // Função para destruir gráficos existentes
         function destruirGraficos() {
             try {
-                if (comissoesChart && typeof comissoesChart.destroy === 'function') {
-                    comissoesChart.destroy();
-                    comissoesChart = null;
+                if (pessoasChart && typeof pessoasChart.destroy === 'function') {
+                    pessoasChart.destroy();
+                    pessoasChart = null;
                 }
-                if (statusChart && typeof statusChart.destroy === 'function') {
-                    statusChart.destroy();
-                    statusChart = null;
+                if (pastoraisChart && typeof pastoraisChart.destroy === 'function') {
+                    pastoraisChart.destroy();
+                    pastoraisChart = null;
                 }
-                if (vendasProdutoChart && typeof vendasProdutoChart.destroy === 'function') {
-                    vendasProdutoChart.destroy();
-                    vendasProdutoChart = null;
+                if (eventosChart && typeof eventosChart.destroy === 'function') {
+                    eventosChart.destroy();
+                    eventosChart = null;
                 }
-                if (topColaboradoresChart && typeof topColaboradoresChart.destroy === 'function') {
-                    topColaboradoresChart.destroy();
-                    topColaboradoresChart = null;
+                if (comunidadesChart && typeof comunidadesChart.destroy === 'function') {
+                    comunidadesChart.destroy();
+                    comunidadesChart = null;
                 }
                 console.log('Gráficos destruídos com sucesso');
             } catch (error) {
@@ -304,26 +304,24 @@
         // Função para carregar dados dos cards
         async function carregarDadosCards() {
             try {
-                // Buscar dados reais das APIs
+                // Buscar dados reais das APIs do ParoquiaON
                 const dados = await buscarDadosReais();
                 
                 // Atualizar cards
-                document.getElementById('total-colaboradores').textContent = dados.colaboradores.total;
-                document.getElementById('crescimento-colaboradores').textContent = dados.colaboradores.crescimento;
+                document.getElementById('total-comunidades').textContent = dados.comunidades.total;
+                document.getElementById('crescimento-comunidades').textContent = dados.comunidades.crescimento;
                 
-                document.getElementById('comissoes-mes').textContent = formatarMoeda(dados.comissoes.valor);
-                document.getElementById('crescimento-comissoes').textContent = dados.comissoes.crescimento;
+                document.getElementById('pastorais-ativas').textContent = dados.pastorais.total;
+                document.getElementById('crescimento-pastorais').textContent = dados.pastorais.crescimento;
                 
-                document.getElementById('vendas-mes').textContent = formatarMoeda(dados.vendas.valor);
-                document.getElementById('crescimento-vendas').textContent = dados.vendas.crescimento;
+                document.getElementById('pessoas-cadastradas').textContent = dados.pessoas.total;
+                document.getElementById('crescimento-pessoas').textContent = dados.pessoas.crescimento;
                 
-                document.getElementById('pagamentos-pendentes').textContent = formatarMoeda(dados.pendentes.valor);
-                document.getElementById('qtd-pendentes').textContent = dados.pendentes.quantidade;
+                document.getElementById('eventos-mes').textContent = dados.eventos.total;
+                document.getElementById('qtd-eventos').textContent = dados.eventos.detalhes;
 
                 // Aplicar classes de cor baseadas no crescimento
                 aplicarClassesCrescimento();
-                
-                // Dados dos cards carregados com sucesso
                 
             } catch (error) {
                 console.error('Erro ao carregar dados dos cards:', error);
@@ -331,57 +329,54 @@
             }
         }
 
-        // Função para buscar dados reais das APIs
+        // Função para buscar dados reais das APIs do ParoquiaON
         async function buscarDadosReais() {
             try {
-                // Buscar colaboradores usando a mesma API da aba movimento de comissões
-                const colaboradores = await window.api.get('/colaboradores');
+                // Buscar dados das APIs do sistema ParoquiaON
+                const [comunidades, pastorais, pessoas, agenda] = await Promise.all([
+                    window.api.get('/comunidades'),
+                    window.api.get('/pastorais'),
+                    window.api.get('/pessoas'),
+                    window.api.get('/agenda')
+                ]);
 
-                // Buscar movimentos de comissões usando a mesma API da aba movimento de comissões
-                const comissoes = await window.api.get('/movimento_comissoes/todos');
+                // Calcular dados das comunidades
+                const totalComunidades = comunidades.length;
+                const crescimentoComunidades = calcularCrescimento(comunidades, 'data_cadastro');
 
-                // Calcular dados dos colaboradores
-                const totalColaboradores = colaboradores.length;
-                const campoDataColab = colaboradores.some(c => c && c.data_admissao) ? 'data_admissao' : 'data_cadastro';
-                const crescimentoColaboradores = calcularCrescimento(colaboradores, campoDataColab);
+                // Calcular dados das pastorais
+                const pastoraisAtivas = pastorais.filter(p => p.status === 'ativo' || p.ativo === true);
+                const totalPastorais = pastoraisAtivas.length;
+                const crescimentoPastorais = calcularCrescimento(pastorais, 'data_cadastro');
 
-                // Calcular dados das comissões do mês atual
+                // Calcular dados das pessoas
+                const totalPessoas = pessoas.length;
+                const crescimentoPessoas = calcularCrescimento(pessoas, 'data_cadastro');
+
+                // Calcular eventos do mês atual
                 const mesAtual = new Date().getMonth();
                 const anoAtual = new Date().getFullYear();
-                const comissoesMes = comissoes.filter(c => {
-                    const dataComissao = new Date(c.data_geracao);
-                    return dataComissao.getMonth() === mesAtual && dataComissao.getFullYear() === anoAtual;
+                const eventosMes = agenda.filter(evento => {
+                    const dataEvento = new Date(evento.data_evento || evento.data);
+                    return dataEvento.getMonth() === mesAtual && dataEvento.getFullYear() === anoAtual;
                 });
 
-                const valorComissoesMes = comissoesMes.reduce((total, c) => total + parseValorBr(c.valor), 0);
-                const crescimentoComissoes = calcularCrescimento(comissoesMes, 'data_geracao');
-
-                // Calcular vendas (soma dos valores de venda das comissões)
-                const vendasMes = comissoesMes.reduce((total, c) => total + parseValorBr(c.valor_venda), 0);
-                const crescimentoVendas = calcularCrescimento(comissoesMes, 'data_geracao');
-
-                // Calcular pagamentos pendentes
-                const comissoesPendentes = comissoes.filter(c => 
-                    c.status && c.status.toLowerCase().includes('pendente')
-                );
-                const valorPendentes = comissoesPendentes.reduce((total, c) => total + parseValorBr(c.valor), 0);
-
                 return {
-                    colaboradores: {
-                        total: totalColaboradores,
-                        crescimento: crescimentoColaboradores
+                    comunidades: {
+                        total: totalComunidades,
+                        crescimento: crescimentoComunidades
                     },
-                    comissoes: {
-                        valor: valorComissoesMes,
-                        crescimento: crescimentoComissoes
+                    pastorais: {
+                        total: totalPastorais,
+                        crescimento: crescimentoPastorais
                     },
-                    vendas: {
-                        valor: vendasMes,
-                        crescimento: crescimentoVendas
+                    pessoas: {
+                        total: totalPessoas,
+                        crescimento: crescimentoPessoas
                     },
-                    pendentes: {
-                        valor: valorPendentes,
-                        quantidade: `${comissoesPendentes.length} pendentes`
+                    eventos: {
+                        total: eventosMes.length,
+                        detalhes: `${eventosMes.length} eventos este mês`
                     }
                 };
 
@@ -389,10 +384,10 @@
                 console.error('Erro ao buscar dados reais:', error);
                 // Retornar dados padrão em caso de erro
                 return {
-                    colaboradores: { total: 0, crescimento: 'Erro ao carregar' },
-                    comissoes: { valor: 0, crescimento: 'Erro ao carregar' },
-                    vendas: { valor: 0, crescimento: 'Erro ao carregar' },
-                    pendentes: { valor: 0, quantidade: 'Erro ao carregar' }
+                    comunidades: { total: 0, crescimento: 'Erro ao carregar' },
+                    pastorais: { total: 0, crescimento: 'Erro ao carregar' },
+                    pessoas: { total: 0, crescimento: 'Erro ao carregar' },
+                    eventos: { total: 0, detalhes: 'Erro ao carregar' }
                 };
             }
         }
@@ -431,161 +426,42 @@
         // Função para aplicar classes de cor baseadas no crescimento
         function aplicarClassesCrescimento() {
             const elementos = [
-                { id: 'crescimento-colaboradores', texto: '+12% este mês' },
-                { id: 'crescimento-comissoes', texto: '+8% este mês' },
-                { id: 'crescimento-vendas', texto: '-3% este mês' }
+                { id: 'crescimento-comunidades', texto: '+12% este mês' },
+                { id: 'crescimento-pastorais', texto: '+8% este mês' },
+                { id: 'crescimento-pessoas', texto: '-3% este mês' }
             ];
 
             elementos.forEach(item => {
                 const elemento = document.getElementById(item.id);
-                if (item.texto.includes('-')) {
+                if (elemento && elemento.textContent.includes('-')) {
                     elemento.classList.add('negative');
-                } else {
+                } else if (elemento) {
                     elemento.classList.remove('negative');
                 }
             });
         }
 
-        // Função para carregar comissões
-        async function carregarComissoes() {
-            try {
-                const tbody = document.getElementById('comissoes-tbody');
-                if (!tbody) {
-                    // Tabela removida do layout; sair silenciosamente
-                    return;
-                }
-                tbody.innerHTML = '<tr><td colspan="5" class="loading">Carregando comissões...</td></tr>';
-
-                // Buscar dados reais das comissões
-                const comissoes = await buscarComissoesReais();
-                
-                if (comissoes.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="no-data">Nenhuma comissão encontrada</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = comissoes.map(comissao => `
-                    <tr>
-                        <td>${comissao.colaborador}</td>
-                        <td>${formatarMoeda(comissao.valor)}</td>
-                        <td>${formatarData(comissao.data)}</td>
-                        <td><span class="status ${comissao.status}">${comissao.statusText}</span></td>
-                        <td>
-                            <button class="action-btn view-btn" onclick="verComissao(${comissao.id})" title="Ver">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="action-btn edit-btn" onclick="editarComissao(${comissao.id})" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete-btn" onclick="excluirComissao(${comissao.id})" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-
-                // Comissões carregadas com sucesso
-
-            } catch (error) {
-                console.error('Erro ao carregar comissões:', error);
-                document.getElementById('comissoes-tbody').innerHTML = 
-                    '<tr><td colspan="5" class="error">Erro ao carregar comissões</td></tr>';
-            }
-        }
-
-        // Função para buscar comissões reais da API
-        async function buscarComissoesReais() {
-            try {
-                // Buscar movimentos de comissões usando a mesma API da aba movimento de comissões
-                const comissoes = await window.api.get('/movimento_comissoes/todos');
-
-                // Buscar colaboradores para mapear nomes usando a mesma API da aba movimento de comissões
-                const colaboradores = await window.api.get('/colaboradores');
-
-                // Criar mapa de colaboradores por ID e por CÓDIGO
-                const mapaColabPorId = {};
-                const mapaColabPorCodigo = {};
-                colaboradores.forEach(col => {
-                    if (!col) return;
-                    if (col.id !== undefined && col.id !== null) mapaColabPorId[String(col.id)] = col.nome || col.descricao || 'Colaborador';
-                    if (col.codigo !== undefined && col.codigo !== null) mapaColabPorCodigo[String(col.codigo)] = col.nome || col.descricao || 'Colaborador';
-                });
-
-                // Processar comissões e pegar apenas as 5 mais recentes
-                const comissoesProcessadas = comissoes
-                    .map(comissao => ({
-                        id: comissao.id,
-                        colaborador: mapaColabPorId[String(comissao.colaborador_id)] || mapaColabPorCodigo[String(comissao.colaborador_codigo)] || 'Colaborador',
-                        valor: parseValorBr(comissao.valor) || 0,
-                        data: comissao.data_geracao,
-                        status: mapearStatus(comissao.status),
-                        statusText: comissao.status || 'Pendente'
-                    }))
-                    .sort((a, b) => new Date(b.data) - new Date(a.data))
-                    .slice(0, 5);
-
-                return comissoesProcessadas;
-
-            } catch (error) {
-                console.error('Erro ao buscar comissões reais:', error);
-                return [];
-            }
-        }
-
-        // Função para mapear status para classes CSS
-        function mapearStatus(status) {
-            if (!status) return 'pending';
-            
-            const statusLower = status.toLowerCase();
-            if (statusLower.includes('pago') || statusLower.includes('paid')) return 'paid';
-            if (statusLower.includes('cancelado') || statusLower.includes('cancelled')) return 'cancelled';
-            if (statusLower.includes('pendente') || statusLower.includes('pending')) return 'pending';
-            if (statusLower.includes('vencido') || statusLower.includes('vencido')) return 'cancelled';
-            
-            return 'pending';
-        }
 
         // Função para inicializar gráficos
         async function inicializarGraficos() {
             try {
                 // Buscar dados reais para os gráficos
                 const dadosGraficos = await buscarDadosGraficos();
-                const insightsGraficos = await buscarDadosInsights();
                 
                 // Validar dados antes de criar gráficos
-                if (!dadosGraficos || !insightsGraficos) {
+                if (!dadosGraficos) {
                     throw new Error('Dados dos gráficos inválidos');
                 }
 
-                // Validar dados de evolução
-                if (!dadosGraficos.evolucao || !Array.isArray(dadosGraficos.evolucao.dados) || dadosGraficos.evolucao.dados.length === 0) {
-                    dadosGraficos.evolucao = { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] };
-                }
-
-                // Validar dados de status
-                if (!dadosGraficos.status || !Array.isArray(dadosGraficos.status.dados) || dadosGraficos.status.dados.length === 0) {
-                    dadosGraficos.status = { labels: ['Pago', 'Pendente', 'Aglutinado', 'Cancelado'], dados: [0, 0, 0, 0] };
-                }
-
-                // Validar dados de vendas por produto
-                if (!insightsGraficos.vendasProduto || !Array.isArray(insightsGraficos.vendasProduto.dados) || insightsGraficos.vendasProduto.dados.length === 0) {
-                    insightsGraficos.vendasProduto = { labels: ['Sem dados'], dados: [0] };
-                }
-
-                // Validar dados de top colaboradores
-                if (!insightsGraficos.topColaboradores || !Array.isArray(insightsGraficos.topColaboradores.dados) || insightsGraficos.topColaboradores.dados.length === 0) {
-                    insightsGraficos.topColaboradores = { labels: ['Sem dados'], dados: [0] };
-                }
-                
-                // Gráfico de evolução das comissões
-                const ctxComissoes = document.getElementById('comissoesChart').getContext('2d');
-                comissoesChart = new Chart(ctxComissoes, {
+                // Gráfico de evolução de pessoas
+                const ctxPessoas = document.getElementById('pessoasChart').getContext('2d');
+                pessoasChart = new Chart(ctxPessoas, {
                     type: 'line',
                     data: {
-                        labels: dadosGraficos.evolucao.labels,
+                        labels: dadosGraficos.pessoas.labels,
                         datasets: [{
-                            label: 'Comissões (R$)',
-                            data: dadosGraficos.evolucao.dados,
+                            label: 'Pessoas Cadastradas',
+                            data: dadosGraficos.pessoas.dados,
                             borderColor: '#007bff',
                             backgroundColor: 'rgba(0, 123, 255, 0.1)',
                             tension: 0.4,
@@ -605,7 +481,7 @@
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function(value) {
-                                        return 'R$ ' + value.toLocaleString('pt-BR');
+                                        return value.toLocaleString('pt-BR');
                                     }
                                 }
                             }
@@ -613,19 +489,19 @@
                     }
                 });
 
-                // Gráfico de status das comissões
-                const ctxStatus = document.getElementById('statusChart').getContext('2d');
-                statusChart = new Chart(ctxStatus, {
+                // Gráfico de distribuição por pastorais
+                const ctxPastorais = document.getElementById('pastoraisChart').getContext('2d');
+                pastoraisChart = new Chart(ctxPastorais, {
                     type: 'doughnut',
                     data: {
-                        labels: dadosGraficos.status.labels,
+                        labels: dadosGraficos.pastorais.labels,
                         datasets: [{
-                            data: dadosGraficos.status.dados,
+                            data: dadosGraficos.pastorais.dados,
                             backgroundColor: [
-                                '#28a745', // Pago
-                                '#ffc107', // Pendente
-                                '#17a2b8', // Aglutinado
-                                '#dc3545'  // Cancelado
+                                '#28a745', // Ativa
+                                '#ffc107', // Inativa
+                                '#17a2b8', // Em formação
+                                '#dc3545'  // Suspensa
                             ],
                             borderWidth: 0
                         }]
@@ -641,17 +517,15 @@
                     }
                 });
 
-                // Gráficos criados com sucesso
-
-                // Vendas por Produto (bar)
-                const ctxVendasProduto = document.getElementById('vendasProdutoChart').getContext('2d');
-                vendasProdutoChart = new Chart(ctxVendasProduto, {
+                // Gráfico de eventos por mês
+                const ctxEventos = document.getElementById('eventosChart').getContext('2d');
+                eventosChart = new Chart(ctxEventos, {
                     type: 'bar',
                     data: {
-                        labels: insightsGraficos.vendasProduto.labels,
+                        labels: dadosGraficos.eventos.labels,
                         datasets: [{
-                            label: 'Vendas (R$)',
-                            data: insightsGraficos.vendasProduto.dados,
+                            label: 'Eventos',
+                            data: dadosGraficos.eventos.dados,
                             backgroundColor: '#42a5f5'
                         }]
                     },
@@ -662,7 +536,7 @@
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    callback: function(value) { return 'R$ ' + value.toLocaleString('pt-BR'); }
+                                    stepSize: 1
                                 }
                             }
                         },
@@ -670,15 +544,15 @@
                     }
                 });
 
-                // Top 5 Colaboradores (horizontal bar)
-                const ctxTopColab = document.getElementById('topColaboradoresChart').getContext('2d');
-                topColaboradoresChart = new Chart(ctxTopColab, {
+                // Gráfico de top comunidades
+                const ctxComunidades = document.getElementById('comunidadesChart').getContext('2d');
+                comunidadesChart = new Chart(ctxComunidades, {
                     type: 'bar',
                     data: {
-                        labels: insightsGraficos.topColaboradores.labels,
+                        labels: dadosGraficos.comunidades.labels,
                         datasets: [{
-                            label: 'Comissões (R$)',
-                            data: insightsGraficos.topColaboradores.dados,
+                            label: 'Pessoas',
+                            data: dadosGraficos.comunidades.dados,
                             backgroundColor: '#66bb6a'
                         }]
                     },
@@ -689,30 +563,12 @@
                         scales: {
                             x: {
                                 beginAtZero: true,
-                                ticks: { callback: function(value){ return 'R$ ' + value.toLocaleString('pt-BR'); } }
+                                ticks: { stepSize: 1 }
                             }
                         },
                         plugins: { legend: { display: false } }
                     }
                 });
-
-                // Configurar tooltip personalizado de forma segura
-                if (topColaboradoresChart && topColaboradoresChart.options && topColaboradoresChart.options.plugins) {
-                    topColaboradoresChart.options.animation = false;
-                    
-                    // Configurar tooltip de forma segura
-                    if (!topColaboradoresChart.options.plugins.tooltip) {
-                        topColaboradoresChart.options.plugins.tooltip = {};
-                    }
-                    if (!topColaboradoresChart.options.plugins.tooltip.callbacks) {
-                        topColaboradoresChart.options.plugins.tooltip.callbacks = {};
-                    }
-                    
-                    topColaboradoresChart.options.plugins.tooltip.callbacks.label = function(context) {
-                        const val = context.raw || 0;
-                        return 'R$ ' + Number(val).toLocaleString('pt-BR');
-                    };
-                }
 
             } catch (error) {
                 console.error('Erro ao inicializar gráficos:', error);
@@ -721,125 +577,49 @@
             }
         }
 
-        // Função para buscar dados dos gráficos
+        // Função para buscar dados dos gráficos do ParoquiaON
         async function buscarDadosGraficos() {
             try {
-                // Buscar movimentos de comissões usando a mesma API da aba movimento de comissões
-                const comissoes = await window.api.get('/movimento_comissoes/todos');
+                // Buscar dados das APIs do sistema ParoquiaON
+                const [pessoas, pastorais, agenda, comunidades] = await Promise.all([
+                    window.api.get('/pessoas'),
+                    window.api.get('/pastorais'),
+                    window.api.get('/agenda'),
+                    window.api.get('/comunidades')
+                ]);
 
-                // Calcular dados de evolução (últimos 6 meses)
-                const evolucao = calcularEvolucaoComissoes(comissoes);
+                // Calcular evolução de pessoas (últimos 6 meses)
+                const evolucaoPessoas = calcularEvolucaoPessoas(pessoas);
                 
-                // Calcular dados de status
-                const status = calcularStatusComissoes(comissoes);
+                // Calcular distribuição por pastorais
+                const distribuicaoPastorais = calcularDistribuicaoPastorais(pastorais);
 
-                return { evolucao, status };
+                // Calcular eventos por mês (últimos 6 meses)
+                const eventosPorMes = calcularEventosPorMes(agenda);
+
+                // Calcular top comunidades por número de pessoas
+                const topComunidades = calcularTopComunidades(comunidades, pessoas);
+
+                return { 
+                    pessoas: evolucaoPessoas, 
+                    pastorais: distribuicaoPastorais,
+                    eventos: eventosPorMes,
+                    comunidades: topComunidades
+                };
 
             } catch (error) {
                 console.error('Erro ao buscar dados dos gráficos:', error);
                 return {
-                    evolucao: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] },
-                    status: { labels: ['Pago', 'Pendente', 'Cancelado'], dados: [0, 0, 0] }
+                    pessoas: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] },
+                    pastorais: { labels: ['Ativa', 'Inativa'], dados: [0, 0] },
+                    eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] },
+                    comunidades: { labels: ['Sem dados'], dados: [0] }
                 };
             }
         }
 
-        // Função para buscar dados dos insights (vendas por produto e top colaboradores)
-        async function buscarDadosInsights() {
-            try {
-                const [comissoes, produtos, colaboradores] = await Promise.all([
-                    window.api.get('/movimento_comissoes'),
-                    window.api.get('/produtos'),
-                    window.api.get('/colaboradores')
-                ]);
-
-                // Vendas por produto: extrair de item_id ("id-descricao, id-descricao") quando existir
-                const mapaProdutoParaValor = {};
-                comissoes.forEach(c => {
-                    const valorTitulo = parseValorBr(c.valor_venda) || parseValorBr(c.valor);
-
-                    // Se houver lista de itens no título, dividir o valor igualmente entre os itens
-                    if (c.item_id && typeof c.item_id === 'string' && c.item_id.trim().length > 0) {
-                        const itens = c.item_id.split(',')
-                            .map(s => s.trim())
-                            .filter(Boolean)
-                            .map(s => {
-                                const [id, ...descParts] = s.split('-');
-                                const desc = descParts.join('-').trim();
-                                return { id: (id || '').trim(), desc: desc || (id || '').trim() };
-                            })
-                            .filter(it => it.id || it.desc);
-                        const partes = itens.length || 1;
-                        const valorPorItem = valorTitulo / partes;
-                        itens.forEach(it => {
-                            const chave = it.desc || it.id || 'Sem Produto';
-                            mapaProdutoParaValor[chave] = (mapaProdutoParaValor[chave] || 0) + valorPorItem;
-                        });
-                        return;
-                    }
-
-                    // Fallback: usar campos diretos de nome de produto, se existirem
-                    const nomeDireto = (c.nome_produto || c.produto_nome || 'Sem Produto');
-                    mapaProdutoParaValor[nomeDireto] = (mapaProdutoParaValor[nomeDireto] || 0) + valorTitulo;
-                });
-                const produtosOrdenados = Object.entries(mapaProdutoParaValor)
-                    .sort((a,b) => b[1]-a[1])
-                    .slice(0, 8);
-
-                const vendasProduto = {
-                    labels: produtosOrdenados.map(([nome]) => nome),
-                    dados: produtosOrdenados.map(([,valor]) => valor)
-                };
-
-                // Top 5 colaboradores por soma de valor_receber
-                const somaPorColaborador = {};
-                const mapaCodigoParaNome = {};
-                colaboradores.forEach(colab => {
-                    if (!colab) return;
-                    const nome = colab.nome || colab.descricao || colab.nome_colaborador || 'Colaborador';
-                    if (colab.codigo !== undefined && colab.codigo !== null) {
-                        mapaCodigoParaNome[String(colab.codigo)] = nome;
-                    }
-                });
-                comissoes.forEach(t => {
-                    // Mesma estratégia da aba Recebimento: prioriza código do colaborador
-                    const possivelCodigo = t.colaborador_codigo || t.colaborador_codigo_id || t.colaborador_id || t.colaborador || t.codigo_colaborador;
-                    let nomeColab = undefined;
-                    if (possivelCodigo !== undefined && mapaCodigoParaNome[String(possivelCodigo)]) {
-                        nomeColab = mapaCodigoParaNome[String(possivelCodigo)];
-                    }
-                    // Fallback: tenta campos de nome diretamente
-                    if (!nomeColab) {
-                        const nomeDireto = t.colaborador || t.colaborador_nome || t.nome_colaborador;
-                        if (nomeDireto && typeof nomeDireto === 'string' && nomeDireto.trim().length > 0) {
-                            nomeColab = nomeDireto.trim();
-                        }
-                    }
-                    const chave = nomeColab || 'Colaborador';
-                    const valor = parseValorBr(t.valor);
-                    somaPorColaborador[chave] = (somaPorColaborador[chave] || 0) + valor;
-                });
-                const topColabOrdenado = Object.entries(somaPorColaborador)
-                    .sort((a,b) => b[1]-a[1])
-                    .slice(0, 5);
-
-                const topColaboradores = {
-                    labels: topColabOrdenado.map(([nome]) => nome),
-                    dados: topColabOrdenado.map(([,valor]) => valor)
-                };
-
-                return { vendasProduto, topColaboradores };
-            } catch (e) {
-                console.error('Erro ao buscar dados de insights:', e);
-                return {
-                    vendasProduto: { labels: [], dados: [] },
-                    topColaboradores: { labels: [], dados: [] }
-                };
-            }
-        }
-
-        // Função para calcular evolução das comissões
-        function calcularEvolucaoComissoes(comissoes) {
+        // Função para calcular evolução de pessoas cadastradas
+        function calcularEvolucaoPessoas(pessoas) {
             const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
             const dados = new Array(6).fill(0);
             const labels = [];
@@ -850,52 +630,108 @@
                 const mes = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
                 labels.push(meses[mes.getMonth()]);
                 
-                // Filtrar comissões do mês
-                const comissoesMes = (comissoes || []).filter(c => {
-                    if (!c || !c.data_geracao) return false;
-                    const dataComissao = new Date(c.data_geracao);
-                    if (isNaN(dataComissao.getTime())) return false;
-                    return dataComissao.getMonth() === mes.getMonth() && 
-                           dataComissao.getFullYear() === mes.getFullYear();
+                // Filtrar pessoas do mês
+                const pessoasMes = (pessoas || []).filter(p => {
+                    if (!p || !p.data_cadastro) return false;
+                    const dataPessoa = new Date(p.data_cadastro);
+                    if (isNaN(dataPessoa.getTime())) return false;
+                    return dataPessoa.getMonth() === mes.getMonth() && 
+                           dataPessoa.getFullYear() === mes.getFullYear();
                 });
 
-                // Somar valores: prioriza valor_venda, fallback para valor
-                const totalMes = comissoesMes.reduce((total, c) => {
-                    const v = parseValorBr(c.valor_venda);
-                    const fallback = parseValorBr(c.valor);
-                    return total + (v || fallback || 0);
-                }, 0);
-                dados[5 - i] = totalMes;
+                dados[5 - i] = pessoasMes.length;
             }
 
             return { labels, dados };
         }
 
-        // Função para calcular status das comissões
-        function calcularStatusComissoes(comissoes) {
+        // Função para calcular distribuição por pastorais
+        function calcularDistribuicaoPastorais(pastorais) {
             const status = {
-                pago: 0,
-                pendente: 0,
-                aglutinado: 0,
-                cancelado: 0
+                ativa: 0,
+                inativa: 0,
+                formacao: 0,
+                suspensa: 0
             };
 
-            (comissoes || []).forEach(comissao => {
-                const raw = (comissao.status || '').toString().trim().toUpperCase();
-                if (raw === 'PAGO' || raw === 'PAID') {
-                    status.pago++;
-                } else if (raw === 'AGLUTINADO') {
-                    status.aglutinado++;
-                } else if (raw === 'CANCELADO' || raw === 'CANCELLED' || raw === 'VENCIDO') {
-                    status.cancelado++;
+            (pastorais || []).forEach(pastoral => {
+                const statusPastoral = (pastoral.status || pastoral.ativo || '').toString().trim().toLowerCase();
+                if (statusPastoral === 'ativo' || statusPastoral === 'true') {
+                    status.ativa++;
+                } else if (statusPastoral === 'em formação' || statusPastoral === 'formacao') {
+                    status.formacao++;
+                } else if (statusPastoral === 'suspensa' || statusPastoral === 'suspenso') {
+                    status.suspensa++;
                 } else {
-                    status.pendente++;
+                    status.inativa++;
                 }
             });
 
             return {
-                labels: ['Pago', 'Pendente', 'Aglutinado', 'Cancelado'],
-                dados: [status.pago, status.pendente, status.aglutinado, status.cancelado]
+                labels: ['Ativa', 'Inativa', 'Em Formação', 'Suspensa'],
+                dados: [status.ativa, status.inativa, status.formacao, status.suspensa]
+            };
+        }
+
+        // Função para calcular eventos por mês
+        function calcularEventosPorMes(agenda) {
+            const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const dados = new Array(6).fill(0);
+            const labels = [];
+
+            // Pegar os últimos 6 meses
+            const hoje = new Date();
+            for (let i = 5; i >= 0; i--) {
+                const mes = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+                labels.push(meses[mes.getMonth()]);
+                
+                // Filtrar eventos do mês
+                const eventosMes = (agenda || []).filter(evento => {
+                    if (!evento || !evento.data_evento && !evento.data) return false;
+                    const dataEvento = new Date(evento.data_evento || evento.data);
+                    if (isNaN(dataEvento.getTime())) return false;
+                    return dataEvento.getMonth() === mes.getMonth() && 
+                           dataEvento.getFullYear() === mes.getFullYear();
+                });
+
+                dados[5 - i] = eventosMes.length;
+            }
+
+            return { labels, dados };
+        }
+
+        // Função para calcular top comunidades
+        function calcularTopComunidades(comunidades, pessoas) {
+            // Criar mapa de pessoas por comunidade
+            const pessoasPorComunidade = {};
+            
+            pessoas.forEach(pessoa => {
+                if (pessoa.comunidade_id || pessoa.comunidade) {
+                    const comunidadeId = pessoa.comunidade_id || pessoa.comunidade;
+                    pessoasPorComunidade[comunidadeId] = (pessoasPorComunidade[comunidadeId] || 0) + 1;
+                }
+            });
+
+            // Criar mapa de nomes de comunidades
+            const nomesComunidades = {};
+            comunidades.forEach(comunidade => {
+                if (comunidade.id) {
+                    nomesComunidades[comunidade.id] = comunidade.nome || comunidade.descricao || 'Comunidade';
+                }
+            });
+
+            // Ordenar por número de pessoas
+            const topComunidades = Object.entries(pessoasPorComunidade)
+                .map(([id, count]) => ({
+                    nome: nomesComunidades[id] || `Comunidade ${id}`,
+                    count: count
+                }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5);
+
+            return {
+                labels: topComunidades.map(c => c.nome),
+                dados: topComunidades.map(c => c.count)
             };
         }
 
@@ -903,17 +739,18 @@
         function criarGraficosPadrao() {
             try {
                 // Destruir gráficos existentes apenas se já existirem
-                if (comissoesChart || statusChart || vendasProdutoChart || topColaboradoresChart) {
+                if (pessoasChart || pastoraisChart || eventosChart || comunidadesChart) {
                     destruirGraficos();
                 }
                 
-                const ctxComissoes = document.getElementById('comissoesChart').getContext('2d');
-                comissoesChart = new Chart(ctxComissoes, {
+                // Gráfico de evolução de pessoas
+                const ctxPessoas = document.getElementById('pessoasChart').getContext('2d');
+                pessoasChart = new Chart(ctxPessoas, {
                     type: 'line',
                     data: {
                         labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
                         datasets: [{
-                            label: 'Comissões (R$)',
+                            label: 'Pessoas Cadastradas',
                             data: [0, 0, 0, 0, 0, 0],
                             borderColor: '#007bff',
                             backgroundColor: 'rgba(0, 123, 255, 0.1)',
@@ -934,7 +771,7 @@
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function(value) {
-                                        return 'R$ ' + value.toLocaleString('pt-BR');
+                                        return value.toLocaleString('pt-BR');
                                     }
                                 }
                             }
@@ -942,17 +779,17 @@
                     }
                 });
 
-                const ctxStatus = document.getElementById('statusChart').getContext('2d');
-                statusChart = new Chart(ctxStatus, {
+                // Gráfico de distribuição por pastorais
+                const ctxPastorais = document.getElementById('pastoraisChart').getContext('2d');
+                pastoraisChart = new Chart(ctxPastorais, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Pago', 'Pendente', 'Cancelado'],
+                        labels: ['Ativa', 'Inativa'],
                         datasets: [{
-                            data: [0, 0, 0],
+                            data: [0, 0],
                             backgroundColor: [
                                 '#28a745',
-                                '#ffc107',
-                                '#dc3545'
+                                '#ffc107'
                             ],
                             borderWidth: 0
                         }]
@@ -968,15 +805,15 @@
                     }
                 });
 
-                // Criar gráficos vazios para os outros também
-                const ctxVendasProduto = document.getElementById('vendasProdutoChart').getContext('2d');
-                vendasProdutoChart = new Chart(ctxVendasProduto, {
+                // Gráfico de eventos por mês
+                const ctxEventos = document.getElementById('eventosChart').getContext('2d');
+                eventosChart = new Chart(ctxEventos, {
                     type: 'bar',
                     data: {
-                        labels: ['Sem dados'],
+                        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
                         datasets: [{
-                            label: 'Vendas (R$)',
-                            data: [0],
+                            label: 'Eventos',
+                            data: [0, 0, 0, 0, 0, 0],
                             backgroundColor: '#42a5f5'
                         }]
                     },
@@ -987,7 +824,7 @@
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    callback: function(value) { return 'R$ ' + value.toLocaleString('pt-BR'); }
+                                    stepSize: 1
                                 }
                             }
                         },
@@ -995,13 +832,14 @@
                     }
                 });
 
-                const ctxTopColab = document.getElementById('topColaboradoresChart').getContext('2d');
-                topColaboradoresChart = new Chart(ctxTopColab, {
+                // Gráfico de top comunidades
+                const ctxComunidades = document.getElementById('comunidadesChart').getContext('2d');
+                comunidadesChart = new Chart(ctxComunidades, {
                     type: 'bar',
                     data: {
                         labels: ['Sem dados'],
                         datasets: [{
-                            label: 'Comissões (R$)',
+                            label: 'Pessoas',
                             data: [0],
                             backgroundColor: '#66bb6a'
                         }]
@@ -1013,7 +851,7 @@
                         scales: {
                             x: {
                                 beginAtZero: true,
-                                ticks: { callback: function(value){ return 'R$ ' + value.toLocaleString('pt-BR'); } }
+                                ticks: { stepSize: 1 }
                             }
                         },
                         plugins: { legend: { display: false } }
@@ -1049,47 +887,13 @@
             localStorage.setItem('dashboardCardsOrder', JSON.stringify(ordem));
         }
 
-        // Funções de ação das comissões
-        function verComissao(id) {
-            mostrarToast(`Visualizando comissão #${id}`, 'info');
-            // Implementar modal de visualização
-        }
-
-        function editarComissao(id) {
-            mostrarToast(`Editando comissão #${id}`, 'info');
-            // Redirecionar para página de edição
-            window.location.href = `movimento-comissao.html?id=${id}`;
-        }
-
-        function excluirComissao(id) {
-            if (confirm('Tem certeza que deseja excluir esta comissão?')) {
-                mostrarToast(`Comissão #${id} excluída`, 'success');
-                carregarComissoes(); // Recarregar tabela
-            }
-        }
-
+        // Funções de ação das comissões (removidas - não aplicáveis ao sistema paroquial)
         // Funções utilitárias
         function formatarMoeda(valor) {
             return new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
                 currency: 'BRL'
             }).format(valor);
-        }
-
-        // Converte valores monetários em string (pt-BR) para número
-        function parseValorBr(valor) {
-            if (typeof valor === 'number' && isFinite(valor)) return valor;
-            if (valor == null) return 0;
-            const s = String(valor).trim();
-            if (s === '') return 0;
-            // Se contiver vírgula, tratar como pt-BR: remover pontos de milhar e trocar vírgula por ponto
-            if (s.includes(',')) {
-                const normalizado = s.replace(/\./g, '').replace(',', '.');
-                const n = Number(normalizado);
-                return isNaN(n) ? 0 : n;
-            }
-            const n = Number(s);
-            return isNaN(n) ? 0 : n;
         }
 
         function formatarData(data) {
