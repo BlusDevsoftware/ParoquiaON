@@ -16,6 +16,462 @@
     <script src="scripts/config/api.js"></script>
     <script src="scripts/bloqueio_exclusao.js"></script>
     <script src="scripts/colaboradores.js"></script>
+    
+    <!-- Configuração das Comunidades -->
+    <script>
+        // Variáveis globais
+        let comunidades = [];
+        let comunidadeEditando = null;
+        
+        // Função para carregar comunidades do banco de dados
+        async function carregarComunidades() {
+            try {
+                console.log('🔄 Carregando comunidades...');
+                
+                // Mostrar loader
+                const loader = document.getElementById('loader-colaboradores');
+                if (loader) {
+                    loader.style.display = 'flex';
+                }
+                
+                // Buscar comunidades via API do ParoquiaON
+                const { data, error } = await api.get('/comunidades');
+                
+                if (error) {
+                    throw error;
+                }
+                
+                comunidades = data || [];
+                console.log('✅ Comunidades carregadas:', comunidades.length);
+                
+                // Renderizar cards
+                renderizarComunidades(comunidades);
+                
+                // Esconder loader
+                if (loader) {
+                    loader.style.display = 'none';
+                }
+                
+                return comunidades;
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar comunidades:', error);
+                
+                // Esconder loader
+                const loader = document.getElementById('loader-colaboradores');
+                if (loader) {
+                    loader.style.display = 'none';
+                }
+                
+                // Mostrar erro
+                mostrarToast('Erro ao carregar comunidades: ' + error.message, 'error');
+                
+                return [];
+            }
+        }
+        
+        // Função para renderizar comunidades em cards
+        function renderizarComunidades(comunidades) {
+            const grid = document.getElementById('communities-grid');
+            if (!grid) return;
+            
+            if (comunidades.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                        <i class="fas fa-users" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <h3>Nenhuma comunidade encontrada</h3>
+                        <p>Clique em "Nova Comunidade" para cadastrar a primeira comunidade.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = comunidades.map(comunidade => `
+                <div class="community-card" data-id="${comunidade.id}">
+                    <div class="community-header">
+                        <h3>${comunidade.nome || 'Sem nome'}</h3>
+                        <span class="status-badge ${comunidade.status === 'Ativo' ? 'active' : 'inactive'}">
+                            ${comunidade.status || 'Ativo'}
+                        </span>
+                    </div>
+                    
+                    <div class="community-info">
+                        <p><i class="fas fa-phone"></i> ${comunidade.telefone || 'Não informado'}</p>
+                        <p><i class="fas fa-users"></i> ${comunidade.membros_conselho || 'Não informado'} membros</p>
+                        <p><i class="fas fa-user"></i> Secretário: ${comunidade.secretario || 'Não informado'}</p>
+                        <p><i class="fas fa-map-marker-alt"></i> ${comunidade.endereco || 'Não informado'}</p>
+                        <p><i class="fas fa-calendar"></i> Fundada em: ${formatarData(comunidade.data_fundacao)}</p>
+                    </div>
+                    
+                    <div class="community-actions">
+                        <button class="btn-secondary" onclick="visualizarComunidade(${comunidade.id})">
+                            <i class="fas fa-eye"></i> Visualizar
+                        </button>
+                        <button class="btn-primary" onclick="editarComunidade(${comunidade.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn-delete" onclick="excluirComunidade(${comunidade.id})">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Função para formatar data
+        function formatarData(data) {
+            if (!data) return 'Não informado';
+            
+            try {
+                const dataObj = new Date(data);
+                return dataObj.toLocaleDateString('pt-BR');
+            } catch (error) {
+                return 'Data inválida';
+            }
+        }
+        
+        // Função para mostrar toast
+        function mostrarToast(mensagem, tipo = 'success') {
+            // Criar elemento de toast
+            const toast = document.createElement('div');
+            toast.className = `toast ${tipo}`;
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    <span>${mensagem}</span>
+                </div>
+            `;
+            
+            // Adicionar ao body
+            document.body.appendChild(toast);
+            
+            // Mostrar toast
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            // Remover após 5 segundos
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 5000);
+        }
+        
+        // Função para salvar comunidade (cadastrar ou editar)
+        async function salvarComunidade() {
+            if (comunidadeEditando) {
+                await salvarEdicao();
+            } else {
+                await cadastrarComunidade();
+            }
+        }
+        
+        // Função para abrir modal de nova comunidade
+        function openModal() {
+            comunidadeEditando = null;
+            const modal = document.getElementById('colaboradorModal');
+            const form = document.getElementById('colaboradorForm');
+            
+            // Limpar formulário
+            form.reset();
+            
+            // Alterar título do modal
+            const modalTitle = document.querySelector('#colaboradorModal .modal-header h2');
+            if (modalTitle) {
+                modalTitle.textContent = 'Nova Comunidade';
+            }
+            
+            // Mostrar modal
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Função para cadastrar nova comunidade
+        async function cadastrarComunidade() {
+            try {
+                const form = document.getElementById('colaboradorForm');
+                const formData = new FormData(form);
+                
+                // Validar campos obrigatórios
+                const nome = form.nome.value.trim();
+                if (!nome) {
+                    mostrarToast('Nome da comunidade é obrigatório', 'error');
+                    return;
+                }
+                
+                // Preparar dados para inserção
+                const dadosComunidade = {
+                    nome: nome,
+                    telefone: form.telefone.value.trim(),
+                    membros_conselho: form.membros_conselho.value.trim(),
+                    secretario: form.secretario.value.trim(),
+                    endereco: form.endereco.value.trim(),
+                    data_fundacao: form.data_fundacao.value,
+                    status: form.status.value || 'Ativo'
+                };
+                
+                console.log('📝 Cadastrando comunidade:', dadosComunidade);
+                
+                // Inserir via API do ParoquiaON
+                const { data, error } = await api.post('/comunidades', dadosComunidade);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('✅ Comunidade cadastrada:', data);
+                
+                // Fechar modal
+                closeModal();
+                
+                // Mostrar sucesso
+                mostrarToast('Comunidade cadastrada com sucesso!', 'success');
+                
+                // Recarregar lista
+                await carregarComunidades();
+                
+            } catch (error) {
+                console.error('❌ Erro ao cadastrar comunidade:', error);
+                mostrarToast('Erro ao cadastrar comunidade: ' + error.message, 'error');
+            }
+        }
+        
+        // Função para editar comunidade
+        async function editarComunidade(id) {
+            try {
+                // Buscar comunidade no array local
+                const comunidade = comunidades.find(c => c.id === id);
+                if (!comunidade) {
+                    mostrarToast('Comunidade não encontrada', 'error');
+                    return;
+                }
+                
+                comunidadeEditando = comunidade;
+                
+                // Preencher formulário
+                const form = document.getElementById('colaboradorForm');
+                form.nome.value = comunidade.nome || '';
+                form.telefone.value = comunidade.telefone || '';
+                form.membros_conselho.value = comunidade.membros_conselho || '';
+                form.secretario.value = comunidade.secretario || '';
+                form.endereco.value = comunidade.endereco || '';
+                form.data_fundacao.value = comunidade.data_fundacao || '';
+                form.status.value = comunidade.status || 'Ativo';
+                
+                // Alterar título do modal
+                const modalTitle = document.querySelector('#colaboradorModal .modal-header h2');
+                if (modalTitle) {
+                    modalTitle.textContent = 'Editar Comunidade';
+                }
+                
+                // Mostrar modal
+                const modal = document.getElementById('colaboradorModal');
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                
+            } catch (error) {
+                console.error('❌ Erro ao editar comunidade:', error);
+                mostrarToast('Erro ao carregar dados da comunidade', 'error');
+            }
+        }
+        
+        // Função para salvar edição
+        async function salvarEdicao() {
+            try {
+                if (!comunidadeEditando) {
+                    mostrarToast('Nenhuma comunidade sendo editada', 'error');
+                    return;
+                }
+                
+                const form = document.getElementById('colaboradorForm');
+                
+                // Validar campos obrigatórios
+                const nome = form.nome.value.trim();
+                if (!nome) {
+                    mostrarToast('Nome da comunidade é obrigatório', 'error');
+                    return;
+                }
+                
+                // Preparar dados para atualização
+                const dadosAtualizacao = {
+                    nome: nome,
+                    telefone: form.telefone.value.trim(),
+                    membros_conselho: form.membros_conselho.value.trim(),
+                    secretario: form.secretario.value.trim(),
+                    endereco: form.endereco.value.trim(),
+                    data_fundacao: form.data_fundacao.value,
+                    status: form.status.value || 'Ativo'
+                };
+                
+                console.log('📝 Atualizando comunidade:', dadosAtualizacao);
+                
+                // Atualizar via API do ParoquiaON
+                const { data, error } = await api.put(`/comunidades/${comunidadeEditando.id}`, dadosAtualizacao);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('✅ Comunidade atualizada:', data);
+                
+                // Fechar modal
+                closeModal();
+                
+                // Mostrar sucesso
+                mostrarToast('Comunidade atualizada com sucesso!', 'success');
+                
+                // Recarregar lista
+                await carregarComunidades();
+                
+            } catch (error) {
+                console.error('❌ Erro ao atualizar comunidade:', error);
+                mostrarToast('Erro ao atualizar comunidade: ' + error.message, 'error');
+            }
+        }
+        
+        // Função para excluir comunidade
+        async function excluirComunidade(id) {
+            try {
+                // Buscar comunidade no array local
+                const comunidade = comunidades.find(c => c.id === id);
+                if (!comunidade) {
+                    mostrarToast('Comunidade não encontrada', 'error');
+                    return;
+                }
+                
+                // Confirmar exclusão
+                const confirmacao = confirm(`Tem certeza que deseja excluir a comunidade "${comunidade.nome}"?\n\nEsta ação não pode ser desfeita.`);
+                if (!confirmacao) {
+                    return;
+                }
+                
+                console.log('🗑️ Excluindo comunidade:', comunidade.nome);
+                
+                // Excluir via API do ParoquiaON
+                const { error } = await api.delete(`/comunidades/${id}`);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('✅ Comunidade excluída');
+                
+                // Mostrar sucesso
+                mostrarToast('Comunidade excluída com sucesso!', 'success');
+                
+                // Recarregar lista
+                await carregarComunidades();
+                
+            } catch (error) {
+                console.error('❌ Erro ao excluir comunidade:', error);
+                mostrarToast('Erro ao excluir comunidade: ' + error.message, 'error');
+            }
+        }
+        
+        // Função para visualizar comunidade
+        function visualizarComunidade(id) {
+            try {
+                // Buscar comunidade no array local
+                const comunidade = comunidades.find(c => c.id === id);
+                if (!comunidade) {
+                    mostrarToast('Comunidade não encontrada', 'error');
+                    return;
+                }
+                
+                // Preencher modal de visualização
+                const modal = document.getElementById('viewModal');
+                if (modal) {
+                    // Preencher campos de visualização
+                    const campos = {
+                        'view-nome': comunidade.nome || 'Não informado',
+                        'view-telefone': comunidade.telefone || 'Não informado',
+                        'view-membros': comunidade.membros_conselho || 'Não informado',
+                        'view-secretario': comunidade.secretario || 'Não informado',
+                        'view-endereco': comunidade.endereco || 'Não informado',
+                        'view-data': formatarData(comunidade.data_fundacao),
+                        'view-status': comunidade.status || 'Ativo'
+                    };
+                    
+                    // Atualizar campos no modal
+                    Object.entries(campos).forEach(([id, valor]) => {
+                        const elemento = document.getElementById(id);
+                        if (elemento) {
+                            elemento.textContent = valor;
+                        }
+                    });
+                    
+                    // Mostrar modal
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao visualizar comunidade:', error);
+                mostrarToast('Erro ao carregar dados da comunidade', 'error');
+            }
+        }
+        
+        // Função para buscar comunidades
+        function buscarComunidades() {
+            const termoBusca = document.querySelector('.search-box input').value.toLowerCase().trim();
+            const statusFiltro = document.querySelector('.filter-options select').value;
+            
+            let comunidadesFiltradas = [...comunidades];
+            
+            // Filtrar por termo de busca
+            if (termoBusca) {
+                comunidadesFiltradas = comunidadesFiltradas.filter(comunidade => 
+                    comunidade.nome.toLowerCase().includes(termoBusca) ||
+                    comunidade.secretario.toLowerCase().includes(termoBusca) ||
+                    comunidade.endereco.toLowerCase().includes(termoBusca)
+                );
+            }
+            
+            // Filtrar por status
+            if (statusFiltro) {
+                comunidadesFiltradas = comunidadesFiltradas.filter(comunidade => 
+                    comunidade.status === statusFiltro
+                );
+            }
+            
+            // Renderizar resultados filtrados
+            renderizarComunidades(comunidadesFiltradas);
+        }
+        
+        // Função para inicializar a página
+        async function inicializarPagina() {
+            try {
+                console.log('🚀 Inicializando página de comunidades...');
+                
+                // Configurar eventos
+                const searchInput = document.querySelector('.search-box input');
+                const statusSelect = document.querySelector('.filter-options select');
+                
+                if (searchInput) {
+                    searchInput.addEventListener('input', buscarComunidades);
+                }
+                
+                if (statusSelect) {
+                    statusSelect.addEventListener('change', buscarComunidades);
+                }
+                
+                // Carregar comunidades
+                await carregarComunidades();
+                
+                console.log('✅ Página inicializada com sucesso');
+                
+            } catch (error) {
+                console.error('❌ Erro ao inicializar página:', error);
+                mostrarToast('Erro ao inicializar página: ' + error.message, 'error');
+            }
+        }
+        
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', inicializarPagina);
+    </script>
+    
     <script>
         // Funções de Modal - Escopo Global
 
@@ -210,6 +666,7 @@
             display: flex;
             align-items: center;
             gap: 60px;
+            flex: 1;
         }
 
         .logo-section {
@@ -221,6 +678,8 @@
         .nav-links {
             display: flex;
             gap: 30px;
+            justify-content: center;
+            flex: 1;
         }
 
         .nav-link {
@@ -330,6 +789,7 @@
             display: flex;
             align-items: center;
             gap: 20px;
+            flex-shrink: 0;
         }
 
         .header-icon {
@@ -752,7 +1212,7 @@
             position: relative;
         }
 
-        /* Estilos para scroll da tabela */
+        /* Estilos para scroll da tabela - Ocupando toda a página */
         .table-container {
             background: white;
             border-radius: 8px;
@@ -915,16 +1375,74 @@
             background: #a8a8a8;
         }
 
-        /* Responsividade para tabelas pequenas */
-        @media (max-width: 768px) {
-            .table-container {
-                height: calc(100vh - 150px);
-            }
-            
-            .table-scroll {
-                height: calc(100vh - 250px);
-            }
+        /* Container de filtros - Seguindo padrão das outras abas */
+        .filters-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 10px 10px 40px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-options select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #1976D2;
+        }
+
+        /* Responsividade para tabelas pequenas - REMOVIDO (substituído por regras mais específicas) */
 
         /* Toggle de Status (estilo switch) - Mesmo padrão da aba de clientes */
         .switch {
@@ -1186,16 +1704,16 @@
             border: 1px dashed #ddd;
         }
 
-        /* Estilos para cards das comunidades */
+        /* Estilos para cards das comunidades - Seguindo padrão das outras abas */
         .cards-container {
-            position: relative;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            margin-top: 5px;
-            min-height: 700px;
-            max-height: calc(100vh - 150px);
+            margin-top: 20px;
+            /* Ocupar máximo da tela com pequeno espaçamento */
+            height: calc(100vh - 200px);
+            position: relative;
         }
 
         .communities-grid {
@@ -1204,9 +1722,15 @@
             gap: 8px;
             padding: 8px;
             overflow-y: auto;
-            max-height: 100%;
-            height: 100%;
-            flex: 1;
+            /* Ocupar máximo da tela com pequeno espaçamento */
+            height: calc(100vh - 300px);
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+            background: #fff;
+            margin-bottom: 16px;
+            padding-bottom: 24px;
+            flex: 1 1 auto;
         }
 
         .community-card {
@@ -1338,17 +1862,422 @@
             background: #da190b;
         }
 
-        /* Responsividade para cards */
-        @media (max-width: 768px) {
+        /* Estilos para cards das comunidades */
+        .community-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        .community-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .community-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .community-header h3 {
+            margin: 0;
+            color: #1976D2;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-badge.inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .community-info {
+            margin-bottom: 20px;
+        }
+
+        .community-info p {
+            margin: 8px 0;
+            color: #666;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .community-info i {
+            color: #1976D2;
+            width: 16px;
+        }
+
+        .community-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .community-actions button {
+            flex: 1;
+            min-width: 80px;
+            padding: 8px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .community-actions .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .community-actions .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .community-actions .btn-primary {
+            background: #1976D2;
+            color: white;
+        }
+
+        .community-actions .btn-primary:hover {
+            background: #1565c0;
+        }
+
+        .community-actions .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .community-actions .btn-delete:hover {
+            background: #d32f2f;
+        }
+
+        /* Estilos para Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            padding: 16px 20px;
+            z-index: 10000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            border-left: 4px solid #4CAF50;
+            min-width: 300px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            border-left-color: #f44336;
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast-content i {
+            font-size: 18px;
+        }
+
+        .toast.success .toast-content i {
+            color: #4CAF50;
+        }
+
+        .toast.error .toast-content i {
+            color: #f44336;
+        }
+
+        .toast-content span {
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* Responsividade para celular - Telas pequenas (até 480px) */
+        @media (max-width: 480px) {
+            /* Corrigir barra branca à esquerda */
+            body {
+                margin: 0;
+                padding: 0;
+                overflow-x: hidden;
+            }
+
+            .main-content {
+                margin-top: 60px;
+                padding: 0;
+                width: 100%;
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            /* Header responsivo */
+            .top-header {
+                padding: 10px 15px;
+                height: 60px;
+                width: 100%;
+                margin: 0;
+                left: 0;
+                right: 0;
+            }
+
+            .filters-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 12px 15px;
+                margin-bottom: 15px;
+                margin-left: 0;
+                margin-right: 0;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .search-box {
+                max-width: none;
+                width: 100%;
+                margin: 0;
+            }
+
+            .search-box input {
+                font-size: 16px; /* Evita zoom no iOS */
+                padding: 12px 12px 12px 40px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .filter-options {
+                width: 100%;
+                margin: 0;
+            }
+
+            .filter-options select {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+                box-sizing: border-box;
+            }
+
+            .btn-primary {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+                justify-content: center;
+                margin: 0;
+            }
+
+            .cards-container {
+                margin-top: 15px;
+                margin-left: 0;
+                margin-right: 0;
+                height: calc(100vh - 180px);
+                border-radius: 8px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
             .communities-grid {
                 grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 12px;
+                margin: 0;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            /* Ajustar cards para mobile */
+            .community-card {
                 padding: 15px;
+                margin: 0;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .community-card h3 {
+                font-size: 18px;
+                margin-bottom: 8px;
+            }
+
+            .community-info {
+                gap: 8px;
+            }
+
+            .community-info p {
+                font-size: 14px;
+                margin: 4px 0;
+            }
+
+            .community-actions {
+                flex-direction: column;
+                gap: 8px;
+                margin-top: 12px;
+            }
+
+            .community-actions button {
+                width: 100%;
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            /* Modal responsivo */
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+                max-height: 90vh;
+            }
+
+            .modal-header h2 {
+                font-size: 18px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group label {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .modal-footer button {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
             }
         }
 
-        @media (min-width: 769px) and (max-width: 1024px) {
+        /* Responsividade para tablets pequenos (481px - 768px) */
+        @media (min-width: 481px) and (max-width: 768px) {
+            /* Header responsivo para tablets */
+            .top-header {
+                padding: 12px 20px;
+                height: 70px;
+            }
+
+            .header-left {
+                gap: 30px;
+            }
+
+            .logo-section h1 {
+                font-size: 20px;
+            }
+
+            .nav-links {
+                gap: 20px;
+            }
+
+            .nav-link {
+                font-size: 15px;
+                padding: 10px 15px;
+            }
+
+            .header-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .main-content {
+                margin-top: 70px;
+                padding: 15px;
+            }
+
+            .filters-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 12px;
+                padding: 15px 20px;
+            }
+
+            .search-box {
+                flex: 1;
+                min-width: 200px;
+            }
+
+            .filter-options {
+                flex-shrink: 0;
+            }
+
+            .btn-primary {
+                flex-shrink: 0;
+                min-width: 140px;
+            }
+
+            .cards-container {
+                margin-top: 20px;
+                height: calc(100vh - 200px);
+            }
+
             .communities-grid {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .community-card {
+                padding: 18px;
+            }
+
+            .community-actions {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .community-actions button {
+                flex: 1;
+                padding: 10px;
+            }
+        }
+
+        /* Responsividade para tablets grandes (769px - 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .communities-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .cards-container {
+                height: calc(100vh - 220px);
             }
         }
 
@@ -1357,9 +2286,53 @@
             width: 8px;
         }
 
-        .communities-grid::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
+        /* Prevenir overflow horizontal em mobile */
+        @media (max-width: 768px) {
+            * {
+                box-sizing: border-box;
+            }
+
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .main-content {
+                overflow-x: hidden;
+            }
+        }
+
+        /* Melhorias de scroll para mobile */
+        @media (max-width: 768px) {
+            .communities-grid {
+                -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
+                scroll-behavior: smooth;
+            }
+
+            .cards-container {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Melhorar área de toque para botões */
+            .community-actions button,
+            .btn-primary,
+            .btn-secondary,
+            .btn-delete {
+                min-height: 44px; /* Tamanho mínimo recomendado para touch */
+                touch-action: manipulation; /* Evita zoom duplo toque */
+            }
+
+            /* Melhorar área de toque para inputs */
+            .search-box input,
+            .filter-options select,
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                min-height: 44px;
+                touch-action: manipulation;
+            }
         }
 
         .communities-grid::-webkit-scrollbar-thumb {
@@ -1411,43 +2384,35 @@
 
     <!-- Main Content -->
     <div class="main-content">
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar comunidade...">
             </div>
+            <div class="filter-options">
+                <select>
+                    <option value="">Status</option>
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="openModal()">
+                <i class="fas fa-plus"></i>
+                Nova Comunidade
+            </button>
         </div>
 
-        <!-- Conteúdo da página -->
-        <div class="content">
-            <!-- Filters -->
-            <div class="filters-container">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Buscar comunidade...">
-                </div>
-                <div class="filter-options">
-                    <select>
-                        <option value="">Status</option>
-                        <option value="ativo">Ativo</option>
-                        <option value="inativo">Inativo</option>
-                    </select>
-                </div>
-                <button class="btn-primary" onclick="openModal()">
-                    <i class="fas fa-plus"></i>
-                    Nova Comunidade
-                </button>
+        <!-- Cards Container -->
+        <div class="cards-container">
+            <!-- Spinner de Carregamento - DENTRO DO CONTAINER -->
+            <div id="loader-colaboradores" class="loader-overlay-colaboradores">
+                <div class="spinner-main"></div>
+                <div class="loading-text">Carregando comunidades...</div>
             </div>
-
-            <!-- Table -->
-            <div class="table-container">
-                <!-- Spinner de Carregamento - DENTRO DA TABELA -->
-                <div id="loader-colaboradores" class="loader-overlay-colaboradores">
-                    <div class="spinner-main"></div>
-                    <div class="loading-text">Carregando comunidades...</div>
-                </div>
-                
-                <div class="table-scroll">
-                    <div id="communities-grid" class="communities-grid">
-                        <!-- Cards das comunidades serão carregados dinamicamente via JavaScript -->
-                    </div>
-                </div>
+            
+            <div id="communities-grid" class="communities-grid">
+                <!-- Cards das comunidades serão carregados dinamicamente via JavaScript -->
             </div>
         </div>
     </div>
@@ -1545,7 +2510,7 @@
                         <button type="button" class="btn-secondary" onclick="closeModal()">
                             <i class="fas fa-times"></i> Cancelar
                         </button>
-                        <button type="submit" class="btn-primary">
+                        <button type="button" class="btn-primary" onclick="salvarComunidade()">
                             <i class="fas fa-save"></i> Salvar
                         </button>
                     </div>
