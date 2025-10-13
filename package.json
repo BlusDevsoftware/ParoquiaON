@@ -1,13 +1,13 @@
 {
-  "name": "paroquiaon",
+  "name": "paroquiaon-frontend",
   "version": "1.0.0",
-  "description": "Sistema de gestão paroquial desenvolvido para gerenciar comunidades, pastorais, eventos e relatórios",
-  "main": "index.js",
+  "description": "Frontend do sistema ParóquiaON - Gestão Paroquial",
+  "type": "module",
   "scripts": {
-    "build": "echo 'Build completed'",
-    "dev": "echo 'Development server'",
-    "start": "echo 'Starting ParóquiaON'",
-    "deploy": "vercel --prod"
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "vercel-build": "vite build"
   },
   "keywords": [
     "paroquia",
@@ -29,6 +29,8 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "vercel": "^32.0.0"
+    "vite": "^5.0.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32"
   }
 }

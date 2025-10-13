@@ -3,9 +3,13 @@ import { resolve } from 'path'
 
 export default defineConfig({
   root: 'src',
+  base: './',
   build: {
     outDir: '../dist',
     emptyOutDir: true,
+    esbuild: {
+      target: 'es2015'
+    },
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'src/index.html'),
@@ -26,6 +30,10 @@ export default defineConfig({
         login: resolve(__dirname, 'src/login.html')
       }
     }
+  },
+  assetsInclude: ['**/*.js'],
+  optimizeDeps: {
+    exclude: ['**/scripts/**']
   },
   server: {
     port: 3000,
