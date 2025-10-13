@@ -2,10 +2,6 @@
   "name": "paroquiaon-frontend",
   "version": "1.0.0",
   "description": "Frontend do sistema ParóquiaON",
-  "scripts": {
-    "build": "node build-simple.js",
-    "vercel-build": "node build-simple.js"
-  },
   "keywords": [
     "paroquia",
     "frontend",
