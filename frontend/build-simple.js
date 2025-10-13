@@ -1,14 +1,25 @@
 const fs = require('fs');
 const path = require('path');
 
+console.log('Iniciando build...');
+console.log('Diretório atual:', __dirname);
+
 // Criar diretório dist se não existir
 const distDir = path.join(__dirname, 'dist');
 if (!fs.existsSync(distDir)) {
   fs.mkdirSync(distDir, { recursive: true });
+  console.log('Diretório dist criado');
 }
 
 // Copiar arquivos HTML
 const srcDir = path.join(__dirname, 'src');
+console.log('Diretório src:', srcDir);
+
+if (!fs.existsSync(srcDir)) {
+  console.error('Diretório src não encontrado!');
+  process.exit(1);
+}
+
 const htmlFiles = fs.readdirSync(srcDir).filter(file => file.endsWith('.html'));
 
 htmlFiles.forEach(file => {
@@ -27,6 +38,8 @@ dirsToCopy.forEach(dir => {
   if (fs.existsSync(srcPath)) {
     copyDir(srcPath, destPath);
     console.log(`Copiado diretório: ${dir}`);
+  } else {
+    console.log(`Diretório não encontrado: ${dir}`);
   }
 });
 
@@ -49,3 +62,4 @@ function copyDir(src, dest) {
 }
 
 console.log('Build concluído!');
+console.log('Arquivos no dist:', fs.readdirSync(distDir));
