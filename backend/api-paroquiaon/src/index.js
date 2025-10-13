@@ -9,7 +9,6 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const authRoutes = require('./routes/authRoutes');
 const cadastroRoutes = require('./routes/cadastroRoutes');
 const perfilRoutes = require('./routes/perfilRoutes');
-const movimentoComissaoRoutes = require('./routes/movimentoComissaoRoutes');
 const usuarioRoutes = require('./routes/usuarioRoutes');
 const pessoaRoutes = require('./routes/pessoaRoutes');
 const comunidadeRoutes = require('./routes/comunidadeRoutes');
@@ -65,7 +64,6 @@ app.use('/api/auth', authRoutes);
 // Rotas protegidas do ParóquiaON (com autenticação)
 app.use('/api/cadastros', authMiddleware, cadastroRoutes);
 app.use('/api/perfis', authMiddleware, perfilRoutes);
-app.use('/api/movimento_comissoes', authMiddleware, movimentoComissaoRoutes);
 app.use('/api/usuarios', authMiddleware, usuarioRoutes);
 app.use('/api/pessoas', authMiddleware, pessoaRoutes);
 app.use('/api/comunidades', authMiddleware, comunidadeRoutes);
