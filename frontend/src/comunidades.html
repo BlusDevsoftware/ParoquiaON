@@ -407,15 +407,32 @@
                     return;
                 }
                 
-                // Preparar dados para atualização
+                // Preparar dados para atualização (alinhar com schema do BD)
+                const conselhoMembrosJson = (() => {
+                    try {
+                        const v = getConselhoMembers();
+                        if (!v) return null;
+                        return typeof v === 'string' ? JSON.parse(v) : v;
+                    } catch { return null; }
+                })();
+
+                const responsaveisJson = (() => {
+                    try {
+                        const s = getSecretario();
+                        if (!s) return null;
+                        const parts = s.split(' - ');
+                        return [{ nome: parts[0] || '', funcao: parts[1] || '' }];
+                    } catch { return null; }
+                })();
+
                 const dadosAtualizacao = {
                     nome: nome,
                     telefone: form.telefone.value.trim(),
-                    membros_conselho: getConselhoMembers(),
-                    secretario: getSecretario(),
                     endereco: form.endereco.value.trim(),
                     data_fundacao: form.data_fundacao.value,
-                    status: form.status.value || 'Ativo'
+                    status: form.status.value || 'Ativo',
+                    conselho_membros: conselhoMembrosJson,
+                    responsaveis: responsaveisJson
                 };
                 
                 console.log('📝 Atualizando comunidade:', dadosAtualizacao);
