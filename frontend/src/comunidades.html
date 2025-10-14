@@ -306,6 +306,42 @@
                 syncFromToggle();
             });
         }
+
+        // Inicializar handlers de foto (preview + hidden base64)
+        function inicializarFotoHandlers() {
+            const fileInput = document.getElementById('fotoInput');
+            const preview = document.getElementById('fotoPreview');
+            const hidden = document.querySelector('input[name="foto"]');
+            if (!fileInput || !preview || !hidden) return;
+
+            // Reset listeners antigos
+            const novoInput = fileInput.cloneNode(true);
+            fileInput.parentNode.replaceChild(novoInput, fileInput);
+            const inputRef = document.getElementById('fotoInput');
+
+            inputRef.addEventListener('change', () => {
+                const file = inputRef.files && inputRef.files[0];
+                if (!file) return;
+                if (file.size > 500 * 1024) {
+                    try { mostrarToast('A imagem deve ter no máximo 500KB.', 'error'); } catch(_) {}
+                    inputRef.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result;
+                    preview.src = base64;
+                    hidden.value = base64;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Clique na imagem abre seletor
+            preview.addEventListener('click', () => {
+                if (inputRef.disabled) return;
+                inputRef.click();
+            });
+        }
         
         // Função para editar comunidade
         async function editarComunidade(id) {
@@ -3101,56 +3137,7 @@
             alert('Funcionalidade de visualização será implementada');
         }
 
-        function editCommunity(id) {
-            console.log('Editar comunidade:', id);
-            // Implementar edição
-            alert('Funcionalidade de edição será implementada');
-        }
-
-        function deleteCommunity(id) {
-            console.log('Excluir comunidade:', id);
-            // Implementar exclusão
-            if (confirm('Tem certeza que deseja excluir esta comunidade?')) {
-                alert('Funcionalidade de exclusão será implementada');
-            }
-        }
-
-        // Simular carregamento de dados (substituir pela integração real)
-        function loadCommunities() {
-            mostrarSpinner();
-            
-            // Simular delay de carregamento
-            setTimeout(() => {
-                const mockCommunities = [
-                    {
-                        codigo: 1,
-                        nome: 'Comunidade São José',
-                        telefone: '(11) 99999-9999',
-                        endereco: 'Rua das Flores, 123 - Centro',
-                        data_fundacao: '2020-01-15',
-                        status: 'Ativo',
-                        foto: null
-                    },
-                    {
-                        codigo: 2,
-                        nome: 'Comunidade Nossa Senhora',
-                        telefone: '(11) 88888-8888',
-                        endereco: 'Av. Principal, 456 - Bairro Novo',
-                        data_fundacao: '2019-05-20',
-                        status: 'Ativo',
-                        foto: null
-                    }
-                ];
-                
-                renderCommunities(mockCommunities);
-                ocultarSpinner();
-            }, 1000);
-        }
-
-        // Carregar comunidades quando a página carregar
-        document.addEventListener('DOMContentLoaded', function() {
-            loadCommunities();
-        });
+        
     </script>
     <script src="scripts/navigation.js"></script>
 </body>
