@@ -82,19 +82,31 @@
                 return;
             }
             
-            grid.innerHTML = comunidades.map(comunidade => `
+            const FALLBACK_IMG = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjQwIiBjeT0iMjgiIHI9IjEyIiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0xNiA2NEMxNiA1Ni4yODcxIDIyLjI4NzEgNTAgMzAgNTBINDBDNDcuNzEyOSA1MCA1NCA1Ni4yODcxIDU0IDY0VjgwSDE2VjY0WiIgZmlsbD0iI0NDQ0NDQyIvPgo8L3N2Zz4=';
+            grid.innerHTML = comunidades.map(comunidade => {
+                const fotoUrl = comunidade.foto && typeof comunidade.foto === 'string' && comunidade.foto.trim() !== ''
+                    ? comunidade.foto
+                    : FALLBACK_IMG;
+                const membros = Array.isArray(comunidade.conselho_membros) ? comunidade.conselho_membros.length : (comunidade.membros_conselho || 'Não informado');
+                const secretario = Array.isArray(comunidade.responsaveis) && comunidade.responsaveis[0]
+                    ? `${comunidade.responsaveis[0].nome || ''}${comunidade.responsaveis[0].funcao ? ' - ' + comunidade.responsaveis[0].funcao : ''}`
+                    : (comunidade.secretario || 'Não informado');
+                return `
                 <div class="community-card" data-id="${comunidade.id}">
                     <div class="community-header">
-                        <h3>${comunidade.nome || 'Sem nome'}</h3>
-                        <span class="status-badge ${comunidade.status === 'Ativo' ? 'active' : 'inactive'}">
-                            ${comunidade.status || 'Ativo'}
-                        </span>
+                        <img src="${fotoUrl}" alt="Foto da Comunidade" class="community-photo" style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 12px;">
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            <h3>${comunidade.nome || 'Sem nome'}</h3>
+                            <span class="status-badge ${comunidade.status === 'Ativo' ? 'active' : 'inactive'}">
+                                ${comunidade.status || 'Ativo'}
+                            </span>
+                        </div>
                     </div>
                     
                     <div class="community-info">
                         <p><i class="fas fa-phone"></i> ${comunidade.telefone || 'Não informado'}</p>
-                        <p><i class="fas fa-users"></i> ${comunidade.membros_conselho || 'Não informado'} membros</p>
-                        <p><i class="fas fa-user"></i> Secretário: ${comunidade.secretario || 'Não informado'}</p>
+                        <p><i class="fas fa-users"></i> ${membros} membros</p>
+                        <p><i class="fas fa-user"></i> Secretário: ${secretario}</p>
                         <p><i class="fas fa-map-marker-alt"></i> ${comunidade.endereco || 'Não informado'}</p>
                         <p><i class="fas fa-calendar"></i> Fundada em: ${formatarData(comunidade.data_fundacao)}</p>
                     </div>
@@ -110,8 +122,8 @@
                             <i class="fas fa-trash"></i> Excluir
                         </button>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
         
         // Função para formatar data
