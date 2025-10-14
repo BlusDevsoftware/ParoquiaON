@@ -92,18 +92,17 @@
                     ? `${comunidade.responsaveis[0].nome || ''}${comunidade.responsaveis[0].funcao ? ' - ' + comunidade.responsaveis[0].funcao : ''}`
                     : (comunidade.secretario || 'Não informado');
                 return `
-                <div class="community-card" data-id="${comunidade.id}">
-                    <div class="community-header">
-                        <img src="${fotoUrl}" alt="Foto da Comunidade" class="community-photo" style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 12px;">
-                        <div style="display:flex; flex-direction:column; gap:6px;">
-                            <h3>${comunidade.nome || 'Sem nome'}</h3>
-                            <span class="status-badge ${comunidade.status === 'Ativo' ? 'active' : 'inactive'}">
-                                ${comunidade.status || 'Ativo'}
-                            </span>
-                        </div>
+                <div class="community-card" data-id="${comunidade.id}" style="overflow:hidden; border-radius:12px;">
+                    <div class="community-image" style="width:100%; height:180px; overflow:hidden;">
+                        <img src="${fotoUrl}" alt="Foto da Comunidade" style="width:100%; height:100%; object-fit:cover; display:block;">
                     </div>
-                    
-                    <div class="community-info">
+                    <div class="community-header" style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+                        <h3 style="margin:0;">${comunidade.nome || 'Sem nome'}</h3>
+                        <span class="status-badge ${comunidade.status === 'Ativo' ? 'active' : 'inactive'}">
+                            ${comunidade.status || 'Ativo'}
+                        </span>
+                    </div>
+                    <div class="community-info" style="margin-top:8px;">
                         <p><i class="fas fa-phone"></i> ${comunidade.telefone || 'Não informado'}</p>
                         <p><i class="fas fa-users"></i> ${membros} membros</p>
                         <p><i class="fas fa-user"></i> Secretário: ${secretario}</p>
