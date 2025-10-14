@@ -1668,17 +1668,6 @@
             background: #a8a8a8;
         }
 
-        /* Container de filtros - Seguindo padrão das outras abas */
-        .filters-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
 
         .search-box {
             position: relative;
@@ -2341,17 +2330,6 @@
                 right: 0;
             }
 
-            .filters-container {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-                padding: 12px 15px;
-                margin-bottom: 15px;
-                margin-left: 0;
-                margin-right: 0;
-                width: 100%;
-                box-sizing: border-box;
-            }
 
             .search-box {
                 max-width: none;
@@ -2515,12 +2493,6 @@
                 padding: 15px;
             }
 
-            .filters-container {
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 12px;
-                padding: 15px 20px;
-            }
 
             .search-box {
                 flex: 1;
@@ -2681,7 +2653,7 @@
     <!-- Main Content -->
     <div class="main-content">
             <!-- Filters -->
-            <div class="filters-container" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+            <div class="filters-container" style="display:flex; align-items:center; justify-content:space-between; gap:12px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); padding: 16px 20px; margin-bottom: 20px;">
                 <div class="filters-left" style="display:flex; flex-direction:column;">
                     <span style="font-size:18px; font-weight:600; color:#333;">Comunidade</span>
                     <span style="font-size:12px; color:#666; margin-top:2px;">Gerencie todas as suas comunidades cadastradas</span>

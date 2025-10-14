@@ -281,16 +281,165 @@
             color: #f44336;
         }
 
-        /* Estilos para o container da tabela - IDÊNTICO AO DA ABA DE COLABORADORES */
-        .table-container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+        /* Estilos para o grid de pessoas - Baseado no communities-grid */
+        .cards-container {
             margin-top: 20px;
             /* Ocupar exatamente o espaço restante da tela */
             height: calc(100vh - 200px);
             position: relative;
+        }
+
+        .pessoas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 8px;
+            padding: 8px;
+            overflow-y: auto;
+            /* Ocupar todo o espaço do container */
+            height: 100%;
+            position: relative;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .pessoa-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .pessoa-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .pessoa-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .pessoa-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .pessoa-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pessoa-actions button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #0056b3;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .pessoa-info {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .pessoa-info p {
+            margin: 4px 0;
+        }
+
+        .pessoa-info i {
+            margin-right: 8px;
+            width: 16px;
+            color: #007bff;
+        }
+
+        /* Responsividade para o grid de pessoas */
+        @media (max-width: 768px) {
+            .cards-container {
+                height: calc(100vh - 180px);
+            }
+            
+            .pessoas-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 12px;
+                margin: 0;
+                width: 100%;
+                height: 100%;
+                box-sizing: border-box;
+            }
+
+            .pessoa-card {
+                padding: 18px;
+            }
+        }
+
+        /* Responsividade para tablets (769px - 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .pessoas-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 15px;
+                padding: 15px;
+                height: 100%;
+            }
+
+            .pessoa-card {
+                padding: 18px;
+            }
+        }
+
+        /* Responsividade para tablets grandes (769px - 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .pessoas-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+                padding: 20px;
+                height: 100%;
+            }
+
+            .cards-container {
+                height: calc(100vh - 220px);
+            }
+        }
+
+        /* Scroll personalizado para o grid */
+        .pessoas-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .pessoas-grid::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .pessoas-grid::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
         }
 
         /* Spinner de carregamento - IDÊNTICO AO DA ABA DE COLABORADORES */
@@ -739,49 +888,47 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Filters -->
-        <div class="filters-container">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Buscar pessoa...">
+        <div class="filters-container" style="display:flex; align-items:center; justify-content:space-between; gap:12px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); padding: 16px 20px; margin-bottom: 20px;">
+            <div class="filters-left" style="display:flex; flex-direction:column;">
+                <span style="font-size:18px; font-weight:600; color:#333;">Pessoas</span>
+                <span style="font-size:12px; color:#666; margin-top:2px;">Gerencie todas as pessoas cadastradas</span>
             </div>
-            <div class="filter-options">
-                <select>
-                    <option value="">Status</option>
-                    <option value="ativo">Ativo</option>
-                    <option value="inativo">Inativo</option>
-                </select>
+            <div class="filters-right" style="display:flex; align-items:center; gap:8px;">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar pessoa...">
+                </div>
+                <div class="filter-options">
+                    <select style="min-width:120px;">
+                        <option value="">Status</option>
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="openPessoaModal()" style="background:#1e3a8a; border-color:#1e3a8a;">
+                    <i class="fas fa-plus"></i>
+                    Nova Pessoa
+                </button>
             </div>
-            <button class="btn-primary" onclick="openPessoaModal()">
-                <i class="fas fa-plus"></i>
-                Nova Pessoa
-            </button>
         </div>
 
-        <!-- Table -->
-        <div class="table-container">
-            <!-- Spinner de Carregamento - DENTRO DA TABELA -->
+        <!-- Cards Grid -->
+        <div class="cards-container">
+            <!-- Spinner de Carregamento -->
             <div id="loader-pessoas" class="loader-overlay-servicos">
                 <div class="spinner-main"></div>
                 <div class="loading-text">Carregando pessoas...</div>
             </div>
             
-            <div class="table-scroll">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Foto</th>
-                            <th>Nome</th>
-                            <th>Telefone</th>
-                            <th>Endereço</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pessoasTableBody">
-                        <!-- A tabela será preenchida dinamicamente pelo JavaScript -->
-                    </tbody>
-                </table>
+            <div id="pessoas-grid" class="pessoas-grid">
+                <!-- Cabeçalho do Grid -->
+                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
+                    <div>Nome</div>
+                    <div>Telefone</div>
+                    <div>Endereço</div>
+                    <div>Ações</div>
+                </div>
+                <!-- Cards das pessoas serão carregados dinamicamente via JavaScript -->
             </div>
         </div>
     </div>
