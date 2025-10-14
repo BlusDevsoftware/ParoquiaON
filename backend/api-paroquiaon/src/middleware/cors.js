@@ -1,6 +1,7 @@
 const cors = require('cors');
 
 const allowedOrigins = [
+    'https://paroquia-on.vercel.app',
     'https://paroquiaon.vercel.app',
     'https://paroquiaon-frontend.vercel.app',
     'https://paroquiaon-git-main-bluedevs-projects.vercel.app',
