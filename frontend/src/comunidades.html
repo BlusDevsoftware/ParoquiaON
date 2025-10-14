@@ -207,16 +207,18 @@
                 }
                 
                 // Preparar dados para inserção (alinhar com schema do BD)
-                const gerarCodigo = () => {
-                    const d = new Date();
-                    const pad = (n) => String(n).padStart(2, '0');
-                    const y = d.getFullYear();
-                    const m = pad(d.getMonth() + 1);
-                    const day = pad(d.getDate());
-                    const hh = pad(d.getHours());
-                    const mm = pad(d.getMinutes());
-                    const ss = pad(d.getSeconds());
-                    return `COM-${y}${m}${day}-${hh}${mm}${ss}`; // e.g., COM-20251014-153045
+                const calcularProximoCodigo = (lista) => {
+                    try {
+                        const somenteNumericos = (lista || [])
+                            .map(c => (c && c.codigo) ? String(c.codigo).trim() : '')
+                            .filter(cod => /^\d+$/.test(cod))
+                            .map(cod => parseInt(cod, 10));
+                        const maxAtual = somenteNumericos.length > 0 ? Math.max(...somenteNumericos) : 0;
+                        const proximo = maxAtual + 1;
+                        return String(proximo).padStart(5, '0'); // 00001, 00002, ...
+                    } catch {
+                        return '00001';
+                    }
                 };
 
                 const conselhoMembrosJson = (() => {
@@ -237,7 +239,7 @@
                 })();
 
                 const dadosComunidade = {
-                    codigo: gerarCodigo(),
+                    codigo: calcularProximoCodigo(comunidades),
                     nome: nome,
                     telefone: form.telefone.value.trim(),
                     endereco: form.endereco.value.trim(),
