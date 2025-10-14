@@ -93,21 +93,21 @@
                     : (comunidade.secretario || 'Não informado');
                 return `
                 <div class="community-card" data-id="${comunidade.id}" style="overflow:hidden; border-radius:12px;">
-                    <div class="community-image" style="width:100%; height:180px; overflow:hidden; background:#f7f7f7; display:flex; align-items:center; justify-content:center;">
+                    <div class="community-image" style="width:100%; height:120px; overflow:hidden; background:#f7f7f7; display:flex; align-items:center; justify-content:center;">
                         <img src="${fotoUrl}" alt="Foto da Comunidade" style="width:100%; height:100%; object-fit:contain; display:block;">
                     </div>
-                    <div class="community-header" style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
-                        <h3 style="margin:0;">${comunidade.nome || 'Sem nome'}</h3>
+                    <div class="community-header" style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                        <h3 style="margin:0; font-size:16px;">${comunidade.nome || 'Sem nome'}</h3>
                         <span class="status-badge ${comunidade.status === 'Ativo' ? 'active' : 'inactive'}">
                             ${comunidade.status || 'Ativo'}
                         </span>
                     </div>
-                    <div class="community-info" style="margin-top:8px;">
-                        <p><i class="fas fa-phone"></i> ${comunidade.telefone || 'Não informado'}</p>
-                        <p><i class="fas fa-users"></i> ${membros} membros</p>
-                        <p><i class="fas fa-user"></i> Secretário: ${secretario}</p>
-                        <p><i class="fas fa-map-marker-alt"></i> ${comunidade.endereco || 'Não informado'}</p>
-                        <p><i class="fas fa-calendar"></i> Fundada em: ${formatarData(comunidade.data_fundacao)}</p>
+                    <div class="community-info" style="margin-top:6px;">
+                        <p style="margin:2px 0;"><i class="fas fa-phone"></i> ${comunidade.telefone || 'Não informado'}</p>
+                        <p style="margin:2px 0;"><i class="fas fa-users"></i> ${membros} membros</p>
+                        <p style="margin:2px 0;"><i class="fas fa-user"></i> Secretário: ${secretario}</p>
+                        <p style="margin:2px 0;"><i class="fas fa-map-marker-alt"></i> ${comunidade.endereco || 'Não informado'}</p>
+                        <p style="margin:2px 0;"><i class="fas fa-calendar"></i> Fundada em: ${formatarData(comunidade.data_fundacao)}</p>
                     </div>
                     
                     <div class="community-actions">
