@@ -34,11 +34,10 @@
                 }
                 
                 // Buscar comunidades via API do ParoquiaON
-                const data = await api.get('/comunidades');
+                const { data, error } = await api.get('/comunidades');
+                if (error) throw error;
                 
-                // api.get já retorna o JSON; erros são lançados via exceção
-                
-                comunidades = data || [];
+                comunidades = Array.isArray(data) ? data : [];
                 console.log('✅ Comunidades carregadas:', comunidades.length);
                 
                 // Renderizar cards
@@ -212,7 +211,8 @@
                 console.log('📝 Cadastrando comunidade:', dadosComunidade);
                 
                 // Inserir via API do ParoquiaON
-                const created = await api.post('/comunidades', dadosComunidade);
+                const { data: created, error } = await api.post('/comunidades', dadosComunidade);
+                if (error) throw error;
                 
                 console.log('✅ Comunidade cadastrada:', created);
                 
