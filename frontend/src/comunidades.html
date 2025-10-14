@@ -1125,6 +1125,17 @@
             margin-top: 75px;
         }
 
+        /* Evitar scroll desnecessário no body */
+        body {
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+
+        /* Permitir scroll apenas no communities-grid */
+        .communities-grid {
+            overflow-y: auto;
+        }
+
         .toast {
             background: white;
             border-radius: 4px;
@@ -1992,9 +2003,10 @@
         .cards-container {
             background: white;
             border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             margin-top: 10px;
-            /* Ocupar máximo da tela com pequeno espaçamento */
+            /* Ocupar exatamente o espaço restante da tela */
             height: calc(100vh - 200px);
             position: relative;
         }
