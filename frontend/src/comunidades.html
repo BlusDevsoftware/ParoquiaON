@@ -3046,6 +3046,8 @@
 
         // Inicializar empty states quando o modal abrir
         window.openModal = function() {
+            // Garantir modo criação
+            comunidadeEditando = null;
             const modal = document.getElementById('comunidadeModal');
             const modalTitleEl = document.getElementById('modalTitle');
             if (modalTitleEl) modalTitleEl.textContent = 'Nova Comunidade';
