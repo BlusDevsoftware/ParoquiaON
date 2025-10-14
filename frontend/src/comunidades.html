@@ -3044,11 +3044,26 @@
             }
         }
 
+        // Cache do template inicial do modal para reset completo
+        let comunidadeModalTemplate = null;
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('comunidadeModal');
+            if (modal && comunidadeModalTemplate === null) {
+                comunidadeModalTemplate = modal.innerHTML;
+            }
+        });
+
         // Inicializar empty states quando o modal abrir
         window.openModal = function() {
             // Garantir modo criação
             comunidadeEditando = null;
             const modal = document.getElementById('comunidadeModal');
+
+            // Restaurar conteúdo original do modal para limpar listeners/estados
+            if (modal && comunidadeModalTemplate) {
+                modal.innerHTML = comunidadeModalTemplate;
+            }
+
             const modalTitleEl = document.getElementById('modalTitle');
             if (modalTitleEl) modalTitleEl.textContent = 'Nova Comunidade';
             modal.style.display = 'flex';
@@ -3094,10 +3109,11 @@
             const actions = form.querySelector('.form-actions');
             if (actions) actions.style.display = 'flex';
             
-            // Remover event listeners anteriores e adicionar apenas o de criação
+            // Garantir apenas o fluxo de criação (botão já chama salvarComunidade)
+            // Se ainda assim quiser via submit, reata o listener:
             const newForm = form.cloneNode(true);
             form.parentNode.replaceChild(newForm, form);
-            document.getElementById('comunidadeForm').addEventListener('submit', salvarComunidade);
+            document.getElementById('comunidadeForm').addEventListener('submit', (e) => { e.preventDefault(); salvarComunidade(); });
             
             // Limpar formulário e reinicializar handlers
             limparFormulario();
