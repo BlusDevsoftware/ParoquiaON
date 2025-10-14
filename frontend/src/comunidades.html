@@ -15,7 +15,6 @@
     <script src="scripts/apply-auth-protection.js"></script>
     <script src="scripts/config/api.js"></script>
     <script src="scripts/bloqueio_exclusao.js"></script>
-    <script src="scripts/colaboradores.js"></script>
     
     <!-- Configuração das Comunidades -->
     <script>
@@ -29,17 +28,15 @@
                 console.log('🔄 Carregando comunidades...');
                 
                 // Mostrar loader
-                const loader = document.getElementById('loader-colaboradores');
+                const loader = document.getElementById('loader-comunidades');
                 if (loader) {
                     loader.style.display = 'flex';
                 }
                 
                 // Buscar comunidades via API do ParoquiaON
-                const { data, error } = await api.get('/comunidades');
+                const data = await api.get('/comunidades');
                 
-                if (error) {
-                    throw error;
-                }
+                // api.get já retorna o JSON; erros são lançados via exceção
                 
                 comunidades = data || [];
                 console.log('✅ Comunidades carregadas:', comunidades.length);
@@ -58,7 +55,7 @@
                 console.error('❌ Erro ao carregar comunidades:', error);
                 
                 // Esconder loader
-                const loader = document.getElementById('loader-colaboradores');
+                const loader = document.getElementById('loader-comunidades');
                 if (loader) {
                     loader.style.display = 'none';
                 }
@@ -171,14 +168,14 @@
         // Função para abrir modal de nova comunidade
         function openModal() {
             comunidadeEditando = null;
-            const modal = document.getElementById('colaboradorModal');
-            const form = document.getElementById('colaboradorForm');
+            const modal = document.getElementById('comunidadeModal');
+            const form = document.getElementById('comunidadeForm');
             
             // Limpar formulário
             form.reset();
             
             // Alterar título do modal
-            const modalTitle = document.querySelector('#colaboradorModal .modal-header h2');
+            const modalTitle = document.querySelector('#comunidadeModal .modal-header h2');
             if (modalTitle) {
                 modalTitle.textContent = 'Nova Comunidade';
             }
@@ -191,7 +188,7 @@
         // Função para cadastrar nova comunidade
         async function cadastrarComunidade() {
             try {
-                const form = document.getElementById('colaboradorForm');
+                const form = document.getElementById('comunidadeForm');
                 const formData = new FormData(form);
                 
                 // Validar campos obrigatórios
@@ -215,13 +212,9 @@
                 console.log('📝 Cadastrando comunidade:', dadosComunidade);
                 
                 // Inserir via API do ParoquiaON
-                const { data, error } = await api.post('/comunidades', dadosComunidade);
+                const created = await api.post('/comunidades', dadosComunidade);
                 
-                if (error) {
-                    throw error;
-                }
-                
-                console.log('✅ Comunidade cadastrada:', data);
+                console.log('✅ Comunidade cadastrada:', created);
                 
                 // Fechar modal
                 closeModal();
@@ -251,7 +244,7 @@
                 comunidadeEditando = comunidade;
                 
                 // Preencher formulário
-                const form = document.getElementById('colaboradorForm');
+                const form = document.getElementById('comunidadeForm');
                 form.nome.value = comunidade.nome || '';
                 form.telefone.value = comunidade.telefone || '';
                 form.endereco.value = comunidade.endereco || '';
@@ -269,13 +262,13 @@
                 }
                 
                 // Alterar título do modal
-                const modalTitle = document.querySelector('#colaboradorModal .modal-header h2');
+            const modalTitle = document.querySelector('#comunidadeModal .modal-header h2');
                 if (modalTitle) {
                     modalTitle.textContent = 'Editar Comunidade';
                 }
                 
                 // Mostrar modal
-                const modal = document.getElementById('colaboradorModal');
+                const modal = document.getElementById('comunidadeModal');
                 modal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
                 
@@ -293,7 +286,7 @@
                     return;
                 }
                 
-                const form = document.getElementById('colaboradorForm');
+                const form = document.getElementById('comunidadeForm');
                 
                 // Validar campos obrigatórios
                 const nome = form.nome.value.trim();
@@ -611,12 +604,12 @@
         // Funções de Modal - Escopo Global
 
         window.closeModal = function() {
-            const modal = document.getElementById('colaboradorModal');
+            const modal = document.getElementById('comunidadeModal');
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
             
             // Limpar formulário completamente
-            const form = document.getElementById('colaboradorForm');
+                const form = document.getElementById('comunidadeForm');
             form.reset();
             
             // Limpar campos manualmente para garantir
@@ -644,18 +637,18 @@
         }
 
         // Função para mostrar modal de sucesso
-        window.showSuccessModal = function(senhaTemporaria, emailColaborador) {
+        window.showSuccessModal = function(senhaTemporaria, emailComunidade) {
             // Preencher data de cadastro
             const dataAtual = new Date().toLocaleDateString('pt-BR');
             document.getElementById('dataCadastro').textContent = dataAtual;
             
             // Exibir credenciais se fornecidas
             const senhaElement = document.getElementById('senhaTemporaria');
-            const loginElement = document.getElementById('loginColaborador');
+            const loginElement = document.getElementById('loginComunidade');
             
-            if (senhaTemporaria && senhaElement && emailColaborador && loginElement) {
+            if (senhaTemporaria && senhaElement && emailComunidade && loginElement) {
                 senhaElement.textContent = senhaTemporaria;
-                loginElement.textContent = emailColaborador;
+                loginElement.textContent = emailComunidade;
                 document.getElementById('credenciaisContainer').style.display = 'block';
             } else {
                 document.getElementById('credenciaisContainer').style.display = 'none';
@@ -705,11 +698,11 @@
 
         // Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA  DASHBOARD
         function mostrarSpinner() {
-            document.getElementById('loader-colaboradores').style.display = 'flex';
+            document.getElementById('loader-comunidades').style.display = 'flex';
         }
         
         function ocultarSpinner() {
-            document.getElementById('loader-colaboradores').style.display = 'none';
+            document.getElementById('loader-comunidades').style.display = 'none';
         }
     </script>
     <style>
@@ -742,7 +735,7 @@
             border-radius: 10px;
         }
 
-        /* Loader específico para a tabela de colaboradores */
+        /* Loader específico para a tabela de comunidades */
         .loader-overlay-colaboradores {
             display: none;
             position: absolute;
@@ -1661,7 +1654,7 @@
             white-space: nowrap;
         }
 
-        /* Foto do colaborador */
+        /* Foto da comunidade */
         .foto-container {
             display: flex;
             align-items: center;
@@ -2543,7 +2536,7 @@
         <!-- Cards Container -->
         <div class="cards-container">
             <!-- Spinner de Carregamento - DENTRO DO CONTAINER -->
-                <div id="loader-colaboradores" class="loader-overlay-colaboradores">
+                <div id="loader-comunidades" class="loader-overlay-colaboradores">
                     <div class="spinner-main"></div>
                     <div class="loading-text">Carregando comunidades...</div>
                 </div>
@@ -2555,7 +2548,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal" id="colaboradorModal">
+    <div class="modal" id="comunidadeModal">
         <div class="modal-content" style="max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
                 <h2><i class="fas fa-church"></i> <span id="modalTitle">Nova Comunidade</span></h2>
@@ -2573,7 +2566,7 @@
                 </div>
             </div>
             <div class="modal-body">
-                <form id="colaboradorForm">
+                <form id="comunidadeForm">
                     <!-- Seção: Dados Cadastrais da Comunidade -->
                     <div class="form-section">
                         <h3 class="section-title"><i class="fas fa-church"></i> Dados Cadastrais da Comunidade</h3>
@@ -2706,7 +2699,7 @@
                             <i class="fas fa-envelope" style="margin-right: 6px;"></i>Login (Email):
                         </div>
                         <div style="background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 10px; font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold; color: #333; text-align: center;">
-                            <span id="loginColaborador"></span>
+                            <span id="loginComunidade"></span>
                         </div>
                     </div>
                     
@@ -2722,7 +2715,7 @@
                     
                     <div style="margin-top: 8px; font-size: 12px; color: #856404;">
                         <i class="fas fa-exclamation-triangle" style="margin-right: 4px;"></i>
-                        Anote estas credenciais! Elas serão necessárias para o primeiro acesso do colaborador.
+                        Anote estas credenciais! Elas serão necessárias para o primeiro acesso da comunidade.
                     </div>
                 </div>
                 <div style="display: flex; justify-content: center; gap: 12px;">
@@ -2912,14 +2905,14 @@
 
         // Inicializar empty states quando o modal abrir
         window.openModal = function() {
-            const modal = document.getElementById('colaboradorModal');
+            const modal = document.getElementById('comunidadeModal');
             const modalTitle = modal.querySelector('#modalTitle');
             modalTitle.textContent = 'Nova Comunidade';
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
 
             // Limpar formulário completamente
-            const form = document.getElementById('colaboradorForm');
+            const form = document.getElementById('comunidadeForm');
             form.reset();
             
             // Limpar campos manualmente para garantir
@@ -2951,7 +2944,7 @@
             // Remover event listeners anteriores e adicionar apenas o de criação
             const newForm = form.cloneNode(true);
             form.parentNode.replaceChild(newForm, form);
-            document.getElementById('colaboradorForm').addEventListener('submit', criarColaborador);
+            document.getElementById('comunidadeForm').addEventListener('submit', salvarComunidade);
             
             // Limpar formulário e reinicializar handlers
             limparFormulario();
