@@ -171,7 +171,16 @@
             const form = document.getElementById('comunidadeForm');
             
             // Limpar formulário
-            form.reset();
+            if (typeof limparFormulario === 'function') {
+                limparFormulario();
+            } else {
+                form.reset();
+                // Garantir estado inicial
+                const statusInput = form.querySelector('input[name="status"]');
+                if (statusInput) statusInput.value = 'Ativo';
+                const preview = document.getElementById('fotoPreview');
+                if (preview) preview.src = preview.src; // mantém avatar default
+            }
             
             // Alterar título do modal
             const modalTitle = document.querySelector('#comunidadeModal .modal-header h2');
@@ -228,6 +237,19 @@
             } catch (error) {
                 console.error('❌ Erro ao cadastrar comunidade:', error);
                 mostrarToast('Erro ao cadastrar comunidade: ' + error.message, 'error');
+            }
+        }
+
+        // Função utilitária para limpar formulário de comunidade
+        function limparFormulario() {
+            const form = document.getElementById('comunidadeForm');
+            if (!form) return;
+            form.reset();
+            const statusInput = form.querySelector('input[name="status"]');
+            if (statusInput) statusInput.value = 'Ativo';
+            const preview = document.getElementById('fotoPreview');
+            if (preview) {
+                // mantém imagem atual, pois avatar default já está no src inicial
             }
         }
         

@@ -19,6 +19,7 @@ async function apiRequest(endpoint, options = {}) {
     headers: {
       'Content-Type': 'application/json',
       ...apiConfig.headers,
+      ...(window.authGuard ? window.authGuard.getAuthHeaders() : {}),
       ...options.headers
     }
   }
