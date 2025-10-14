@@ -369,10 +369,20 @@
                     setConselhoMembers(comunidade.membros_conselho);
                 }
                 
-                // Preencher secretário se existir
-                if (comunidade.secretario) {
-                    setSecretario(comunidade.secretario);
+                // Preencher secretário/responsáveis se existir
+                if (comunidade.responsaveis) {
+                    setSecretario(Array.isArray(comunidade.responsaveis) && comunidade.responsaveis[0]
+                        ? `${comunidade.responsaveis[0].nome || ''}${comunidade.responsaveis[0].funcao ? ' - ' + comunidade.responsaveis[0].funcao : ''}`
+                        : comunidade.responsaveis);
                 }
+
+                // Preencher foto
+                const fotoHidden = document.querySelector('input[name="foto"]');
+                const fotoPreview = document.getElementById('fotoPreview');
+                if (fotoHidden) fotoHidden.value = comunidade.foto || '';
+                if (fotoPreview) fotoPreview.src = comunidade.foto || fotoPreview.src;
+                // Re-inicializar handlers da foto
+                inicializarFotoHandlers();
                 
                 // Alterar título do modal
             const modalTitle = document.querySelector('#comunidadeModal .modal-header h2');
@@ -3054,6 +3064,16 @@
             form.data_fundacao.value = '';
             form.status.value = 'Ativo';
             
+            // Reset da imagem
+            const fotoHidden = form.querySelector('input[name="foto"]');
+            if (fotoHidden) fotoHidden.value = '';
+            const fotoPreview = document.getElementById('fotoPreview');
+            if (fotoPreview) {
+                // mantém o src default já presente no HTML
+            }
+            // Re-inicializar handlers da foto
+            inicializarFotoHandlers();
+
             // Limpar membros dinâmicos
             document.getElementById('conselho-members').innerHTML = '';
             document.getElementById('responsavel-members').innerHTML = '';
