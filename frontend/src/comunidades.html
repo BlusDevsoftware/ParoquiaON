@@ -3018,8 +3018,8 @@
         // Inicializar empty states quando o modal abrir
         window.openModal = function() {
             const modal = document.getElementById('comunidadeModal');
-            const modalTitle = modal.querySelector('#modalTitle');
-            modalTitle.textContent = 'Nova Comunidade';
+            const modalTitleEl = document.getElementById('modalTitle');
+            if (modalTitleEl) modalTitleEl.textContent = 'Nova Comunidade';
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
 
