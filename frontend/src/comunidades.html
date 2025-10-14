@@ -206,15 +206,45 @@
                     return;
                 }
                 
-                // Preparar dados para inserção
+                // Preparar dados para inserção (alinhar com schema do BD)
+                const gerarCodigo = () => {
+                    const d = new Date();
+                    const pad = (n) => String(n).padStart(2, '0');
+                    const y = d.getFullYear();
+                    const m = pad(d.getMonth() + 1);
+                    const day = pad(d.getDate());
+                    const hh = pad(d.getHours());
+                    const mm = pad(d.getMinutes());
+                    const ss = pad(d.getSeconds());
+                    return `COM-${y}${m}${day}-${hh}${mm}${ss}`; // e.g., COM-20251014-153045
+                };
+
+                const conselhoMembrosJson = (() => {
+                    try {
+                        const v = getConselhoMembers(); // pode ser string JSON ou ''
+                        if (!v) return null;
+                        return typeof v === 'string' ? JSON.parse(v) : v;
+                    } catch { return null; }
+                })();
+
+                const responsaveisJson = (() => {
+                    try {
+                        const s = getSecretario(); // string "Nome - Função" ou ''
+                        if (!s) return null;
+                        const parts = s.split(' - ');
+                        return [{ nome: parts[0] || '', funcao: parts[1] || '' }];
+                    } catch { return null; }
+                })();
+
                 const dadosComunidade = {
+                    codigo: gerarCodigo(),
                     nome: nome,
                     telefone: form.telefone.value.trim(),
-                    membros_conselho: getConselhoMembers(),
-                    secretario: getSecretario(),
                     endereco: form.endereco.value.trim(),
                     data_fundacao: form.data_fundacao.value,
-                    status: form.status.value || 'Ativo'
+                    status: form.status.value || 'Ativo',
+                    conselho_membros: conselhoMembrosJson,
+                    responsaveis: responsaveisJson
                 };
                 
                 console.log('📝 Cadastrando comunidade:', dadosComunidade);
@@ -251,6 +281,28 @@
             if (preview) {
                 // mantém imagem atual, pois avatar default já está no src inicial
             }
+        }
+
+        // Inicializar toggle de status (compatível com layout atual)
+        function inicializarStatusToggle() {
+            const toggle = document.querySelector('.status-toggle');
+            const input = document.querySelector('input[name="status"]');
+            const statusLabel = document.querySelector('.status-label-modal');
+            if (!toggle || !input) return;
+            const syncFromModel = () => {
+                const ativo = (input.value || '').toLowerCase() === 'ativo';
+                toggle.checked = ativo;
+                if (statusLabel) statusLabel.textContent = ativo ? 'Ativo' : 'Inativo';
+            };
+            const syncFromToggle = () => {
+                input.value = toggle.checked ? 'Ativo' : 'Inativo';
+                if (statusLabel) statusLabel.textContent = toggle.checked ? 'Ativo' : 'Inativo';
+            };
+            syncFromModel();
+            toggle.addEventListener('change', () => {
+                if (toggle.disabled) return;
+                syncFromToggle();
+            });
         }
         
         // Função para editar comunidade
