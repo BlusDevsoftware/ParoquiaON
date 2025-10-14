@@ -246,7 +246,8 @@
                     data_fundacao: form.data_fundacao.value,
                     status: form.status.value || 'Ativo',
                     conselho_membros: conselhoMembrosJson,
-                    responsaveis: responsaveisJson
+                    responsaveis: responsaveisJson,
+                    foto: (form.querySelector('input[name="foto"]').value || null)
                 };
                 
                 console.log('📝 Cadastrando comunidade:', dadosComunidade);
@@ -432,7 +433,8 @@
                     data_fundacao: form.data_fundacao.value,
                     status: form.status.value || 'Ativo',
                     conselho_membros: conselhoMembrosJson,
-                    responsaveis: responsaveisJson
+                    responsaveis: responsaveisJson,
+                    foto: (form.querySelector('input[name="foto"]').value || null)
                 };
                 
                 console.log('📝 Atualizando comunidade:', dadosAtualizacao);
