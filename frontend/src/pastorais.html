@@ -1460,7 +1460,7 @@ async function salvarPastoral(event) {
                     window.showSuccessModal();
                 }
                 closeModal();
-                carregarPastoraisGrid();
+                carregarPastorais();
             } catch (error) {
                 console.error('Erro ao salvar pastoral:', error);
                 alert('Erro ao salvar pastoral');
@@ -1552,9 +1552,7 @@ async function visualizarPastoral(id) {
                 mostrarSpinner();
                 
                 // Carregar dados
-                if (typeof carregarPastoraisGrid === 'function') {
-                    await carregarPastoraisGrid();
-                }
+                await carregarPastorais();
                 // Carregar pessoas para o select de responsável
                 try {
                     const { data: pessoas } = await api.get(endpoints.pessoas.list);
@@ -1580,7 +1578,7 @@ async function visualizarPastoral(id) {
                     await window.bloqueioExclusao.deleteWithCheck(
                         'pastorais',
                         codigoParaExcluir,
-                        () => { closeDeleteModal(); carregarPastoraisGrid(); window.showDeleteSuccessModal(); }
+                        () => { closeDeleteModal(); carregarPastorais(); window.showDeleteSuccessModal(); }
                     );
                 } catch (error) {
                     console.error('Erro ao excluir pastoral:', error);
