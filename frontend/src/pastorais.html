@@ -956,24 +956,15 @@
                     <span style="font-size:12px; color:#666; margin-top:2px;">Gerencie todas as suas pastorais cadastradas</span>
                 </div>
                 <div class="filters-right" style="display:flex; align-items:center; gap:8px;">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Buscar pastoral...">
-                    </div>
-                    <div class="filter-options">
-                        <select style="min-width:120px;">
-                            <option value="">Tipo de Pastoral</option>
-                            <option value="social">Pastoral Social</option>
-                            <option value="liturgica">Pastoral Litúrgica</option>
-                            <option value="catequese">Catequese</option>
-                            <option value="jovem">Pastoral da Juventude</option>
-                            <option value="familia">Pastoral da Família</option>
-                        </select>
-                    </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar pastoral...">
+                </div>
+                    
                     <button class="btn-primary" onclick="novoCliente()" style="background:#1e3a8a; border-color:#1e3a8a;">
-                        <i class="fas fa-plus"></i>
-                        Nova Pastoral
-                    </button>
+                    <i class="fas fa-plus"></i>
+                    Nova Pastoral
+                </button>
                 </div>
             </div>
 
@@ -995,12 +986,12 @@
                 </div>
                 <!-- Cards das pastorais serão carregados dinamicamente via JavaScript -->
             </div>
-            </div>
+        </div>
     </div>
 
     <!-- Modal -->
     <div class="modal" id="clienteModal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
                          <div class="modal-header">
                  <h2 id="modalTitle"><i class="fas fa-church"></i> Nova Pastoral</h2>
                  <div class="modal-header-actions">
@@ -1011,27 +1002,18 @@
                          </label>
                          <span class="status-label-modal">Ativo</span>
                      </div>
-                     <button class="close-modal" onclick="closeModal()">&times;</button>
+                    <button class="close-modal" onclick="closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
                  </div>
              </div>
             <div class="modal-body">
                 <form id="clienteForm">
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-church"></i> Dados da Pastoral</h3>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="foto"><i class="fas fa-image"></i> Foto da Pastoral</label>
-                            <input type="file" id="foto" name="foto" accept="image/*" onchange="previewImage(this)">
+                            <div class="form-group" style="flex: 1 1 100%; align-items: center;">
                             <div id="fotoPreview" style="margin-top: 10px; text-align: center;"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="tipo"><i class="fas fa-church"></i> Tipo de Pastoral</label>
-                            <select id="tipo" name="tipo" required autocomplete="off">
-                                <option value="">Selecione...</option>
-                                <option value="social">Pastoral Social</option>
-                                <option value="liturgica">Pastoral Litúrgica</option>
-                                <option value="catequese">Catequese</option>
-                                <option value="jovem">Pastoral da Juventude</option>
-                                <option value="familia">Pastoral da Família</option>
-                            </select>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1040,8 +1022,10 @@
                             <input type="text" id="nome" name="nome" required autocomplete="name" placeholder="Digite o nome da pastoral">
                         </div>
                         <div class="form-group">
-                            <label for="responsavel"><i class="fas fa-user-tie"></i> Responsável</label>
-                            <input type="text" id="responsavel" name="responsavel" required autocomplete="name" placeholder="Nome do responsável">
+                            <label for="responsavel_id"><i class="fas fa-user-tie"></i> Responsável</label>
+                            <select id="responsavel_id" name="responsavel_id">
+                                <option value="">Selecione...</option>
+                            </select>
                         </div>
                     </div>
                          <div class="form-group">
@@ -1063,10 +1047,10 @@
                      <input type="hidden" id="status" name="status" value="ativo">
 
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="closeModal()">
+                        <button type="button" class="btn-secondary" onclick="closeModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500;">
                             <i class="fas fa-times"></i> Cancelar
                         </button>
-                        <button type="submit" class="btn-primary">
+                        <button type="submit" class="btn-primary" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; background:#1e3a8a; border-color:#1e3a8a;">
                             <i class="fas fa-save"></i> Salvar
                         </button>
                     </div>
@@ -1458,6 +1442,7 @@
             const cliente = {
                 nome: formData.get('nome'),
                 descricao: formData.get('observacao') || '',
+                responsavel_id: formData.get('responsavel_id') || null,
                 status: formData.get('status')
             };
 
@@ -1573,6 +1558,14 @@
                 if (typeof carregarPastoraisGrid === 'function') {
                     await carregarPastoraisGrid();
                 }
+                // Carregar pessoas para o select de responsável
+                try {
+                    const { data: pessoas } = await api.get(endpoints.pessoas.list);
+                    const select = document.getElementById('responsavel_id');
+                    if (select && Array.isArray(pessoas)) {
+                        select.innerHTML = '<option value="">Selecione...</option>' + pessoas.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+                    }
+                } catch (_) {}
                 
                 // Ocultar spinner centralizado quando tudo carregar
                 ocultarSpinner();
@@ -1697,7 +1690,7 @@
 
         document.addEventListener('DOMContentLoaded', carregarPastoraisGrid);
     </script>
-    
+
     <script src="scripts/navigation.js"></script>
 </body>
 </html> 
