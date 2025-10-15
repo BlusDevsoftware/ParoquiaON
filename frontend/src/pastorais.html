@@ -347,7 +347,7 @@
             transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease;
             box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06);
         }
-        .btn-icon i { font-size: 15px; }
+        .btn-icon i { font-size: 15px; color: currentColor; }
         .btn-icon:hover {
             transform: translateY(-1px);
             background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
@@ -364,38 +364,42 @@
             outline-offset: 2px;
         }
 
-        /* Variações por ação */
-        .btn-icon.btn-edit {
-            color: #0e7490;
-            border-color: rgba(14, 116, 144, 0.18);
-        }
-        .btn-icon.btn-edit:hover {
-            background: linear-gradient(180deg, #ecfeff 0%, #cffafe 100%);
-            color: #155e75;
-            border-color: rgba(14, 116, 144, 0.35);
-            box-shadow: 0 2px 8px rgba(14, 116, 144, 0.20);
-        }
-
+        /* Variações por ação (azul menu: #1e3a8a) */
+        .btn-icon.btn-edit,
         .btn-icon.btn-duplicate {
-            color: #6d28d9;
-            border-color: rgba(109, 40, 217, 0.18);
+            background: #1e3a8a;
+            color: #ffffff;
+            border-color: #1e3a8a;
+            box-shadow: 0 1px 2px rgba(30, 58, 138, 0.25);
         }
+        .btn-icon.btn-edit:hover,
         .btn-icon.btn-duplicate:hover {
-            background: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 100%);
-            color: #4c1d95;
-            border-color: rgba(109, 40, 217, 0.35);
-            box-shadow: 0 2px 8px rgba(109, 40, 217, 0.20);
+            background: #2740a6;
+            color: #ffffff;
+            border-color: #2740a6;
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.35);
+        }
+        .btn-icon.btn-edit:active,
+        .btn-icon.btn-duplicate:active {
+            background: #1b3780;
+            border-color: #1b3780;
         }
 
         .btn-icon.btn-delete {
-            color: #b91c1c;
-            border-color: rgba(185, 28, 28, 0.18);
+            background: #b91c1c;
+            color: #ffffff;
+            border-color: #b91c1c;
+            box-shadow: 0 1px 2px rgba(185, 28, 28, 0.25);
         }
         .btn-icon.btn-delete:hover {
-            background: linear-gradient(180deg, #fff1f2 0%, #fee2e2 100%);
-            color: #991b1b;
-            border-color: rgba(185, 28, 28, 0.35);
-            box-shadow: 0 2px 8px rgba(185, 28, 28, 0.20);
+            background: #991b1b;
+            color: #ffffff;
+            border-color: #991b1b;
+            box-shadow: 0 2px 8px rgba(185, 28, 28, 0.35);
+        }
+        .btn-icon.btn-delete:active {
+            background: #7f1d1d;
+            border-color: #7f1d1d;
         }
 
         .pastoral-card {
