@@ -1097,7 +1097,7 @@
                     <div>Nome da Pastoral</div>
                     <div>Responsável</div>
                     <div>Tipo</div>
-                    <div>Ações</div>
+                    <div style="text-align: center;">Ações</div>
                 </div>
                 <!-- Cards das pastorais serão carregados dinamicamente via JavaScript -->
             </div>
@@ -1129,8 +1129,7 @@
                     <div class="form-row">
                             <div class="form-group" style="flex: 1 1 100%; align-items: center;">
                                 <div class="foto-container" style="justify-content: center; display:flex; align-items:center; gap:16px;">
-                                    <img id="fotoPreview" class="foto-preview" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0yMCA4MEMyMCA3MC4zNTg5IDI3LjM1ODkgNjMgMzcgNjNINjNDNzIuNjQxMSA2MyA4MCA3MC4zNTg5IDgwIDgwVjEwMEgyMFY4MFoiIGZpbGw9IiNDQ0NDQ0MiLz4KPC9zdmc+" alt="Pré-visualização" style="width:180px;height:180px;border-radius:12px;object-fit:cover;border:1px solid #ddd;background:#f5f5f5;">
-                                    <button type="button" class="btn-secondary" onclick="document.getElementById('fotoInput').click()"><i class="fas fa-upload"></i> Selecionar</button>
+                                    <img id="fotoPreview" class="foto-preview" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0yMCA4MEMyMCA3MC4zNTg5IDI3LjM1ODkgNjMgMzcgNjNINjNDNzIuNjQxMSA2MyA4MCA3MC4zNTg5IDgwIDgwVjEwMEgyMFY4MFoiIGZpbGw9IiNDQ0NDQ0MiLz4KPC9zdmc+" alt="Pré-visualização" style="width:180px;height:180px;border-radius:12px;object-fit:cover;border:1px solid #ddd;background:#f5f5f5;cursor:pointer;" onclick="document.getElementById('fotoInput').click()">
                                     <input type="file" id="fotoInput" accept="image/*" style="display:none">
                                 </div>
                                 <input type="hidden" name="foto" value="">
@@ -1149,9 +1148,15 @@
                             </select>
                         </div>
                     </div>
-                         <div class="form-group">
-                             <label for="contato"><i class="fas fa-phone"></i> Contato</label>
-                             <input type="text" id="contato" name="contato" autocomplete="off" placeholder="Telefone ou email">
+                         <div class="form-row">
+                             <div class="form-group">
+                                 <label for="contato"><i class="fas fa-phone"></i> Contato</label>
+                                 <input type="text" id="contato" name="contato" autocomplete="off" placeholder="Telefone ou email">
+                             </div>
+                             <div class="form-group">
+                                 <label for="tipo"><i class="fas fa-tag"></i> Tipo</label>
+                                 <input type="text" id="tipo" name="tipo" autocomplete="off" placeholder="Tipo da pastoral">
+                             </div>
                          </div>
                      </div>
                      <div class="form-row">
@@ -1566,6 +1571,7 @@ function novaPastoral() {
             const selectResp = document.getElementById('responsavel_id');
             if (selectResp) selectResp.value = '';
             form.contato.value = '';
+            form.tipo.value = '';
             form.observacao.value = '';
             // Resetar contador
             atualizarContador(form.observacao);
@@ -1596,6 +1602,34 @@ function novaPastoral() {
         function closeModal() {
     const modal = document.getElementById('pastoralModal');
     const form = document.getElementById('pastoralForm');
+            
+            // Limpar formulário completamente
+            form.reset();
+            
+            // Limpar campos manualmente para garantir
+            form.nome.value = '';
+            form.contato.value = '';
+            form.tipo.value = '';
+            form.observacao.value = '';
+            form.status.value = 'Ativo';
+            
+            // Reset da imagem
+            const fotoHidden = form.querySelector('input[name="foto"]');
+            if (fotoHidden) fotoHidden.value = '';
+            const fotoPreview = document.getElementById('fotoPreview');
+            if (fotoPreview) {
+                // mantém o src default já presente no HTML
+            }
+            
+            // Resetar contador
+            atualizarContador(form.observacao);
+            
+            // Resetar status para ativo
+            const statusToggle = document.getElementById('statusToggleModal');
+            const statusLabel = document.querySelector('.status-label-modal');
+            if (statusToggle) statusToggle.checked = true;
+            if (statusLabel) statusLabel.textContent = 'Ativo';
+            
             // Reabilitar campos
             Array.from(form.elements).forEach(element => {
                 element.disabled = false;
@@ -1621,6 +1655,7 @@ async function editarPastoral(id) {
                 const selectRespEdit = document.getElementById('responsavel_id');
                 if (selectRespEdit) selectRespEdit.value = pastoral.responsavel_id || '';
                 form.contato.value = pastoral.contato || '';
+                form.tipo.value = pastoral.tipo || '';
                 form.observacao.value = pastoral.observacao || '';
                 // Atualizar contador
                 atualizarContador(form.observacao);
@@ -1659,6 +1694,7 @@ async function salvarPastoral(event) {
             const statusStr = formData.get('status');
             const payload = {
                 nome: formData.get('nome'),
+                tipo: formData.get('tipo') || '',
                 descricao: formData.get('observacao') || '',
                 responsavel_id: formData.get('responsavel_id') ? Number(formData.get('responsavel_id')) : null,
                 foto: formData.get('foto') || null,
@@ -1727,6 +1763,7 @@ async function visualizarPastoral(id) {
                 const selectRespView = document.getElementById('responsavel_id');
                 if (selectRespView) selectRespView.value = pastoral.responsavel_id || '';
                 form.contato.value = pastoral.contato || '';
+                form.tipo.value = pastoral.tipo || '';
                 form.observacao.value = pastoral.descricao || '';
                 // Atualizar contador
                 atualizarContador(form.observacao);
@@ -1842,6 +1879,7 @@ async function visualizarPastoral(id) {
                 const selectResp = document.getElementById('responsavel_id');
                 if (selectResp) selectResp.value = pastoral.responsavel_id || '';
                 form.contato.value = pastoral.contato || '';
+                form.tipo.value = pastoral.tipo || '';
                 form.observacao.value = pastoral.descricao || '';
                 atualizarContador(form.observacao);
                 const hiddenFoto = form.querySelector('input[name="foto"]');
