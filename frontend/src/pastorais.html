@@ -1011,7 +1011,8 @@
                 
             <div id="pastorais-grid" class="pastorais-grid">
                 <!-- Cabeçalho do Grid -->
-                <div class="grid-header" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
+                <div class="grid-header" style="display: grid; grid-template-columns: 56px 1fr 1fr 1fr 1fr; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
+                    <div>Foto</div>
                     <div>Nome da Pastoral</div>
                     <div>Responsável</div>
                     <div>Tipo</div>
@@ -1053,6 +1054,10 @@
                         <div class="form-group">
                             <label for="nome"><i class="fas fa-church"></i> Nome da Pastoral</label>
                             <input type="text" id="nome" name="nome" required autocomplete="name" placeholder="Digite o nome da pastoral">
+                        </div>
+                        <div class="form-group">
+                            <label for="foto"><i class="fas fa-image"></i> Foto da Pastoral (URL)</label>
+                            <input type="url" id="foto" name="foto" placeholder="https://...">
                         </div>
                         <div class="form-group">
                             <label for="responsavel_id"><i class="fas fa-user-tie"></i> Responsável</label>
@@ -1344,10 +1349,14 @@
             const responsavelId = pastoral?.responsavel_id;
             const responsavelNome = (responsavelId && pessoasById[responsavelId]?.nome) ? pessoasById[responsavelId].nome : '-';
             const tipo = pastoral?.tipo || '-';
+            const foto = pastoral?.foto || '';
             const id = pastoral?.id ?? '';
             const row = document.createElement('div');
             row.className = 'grid-row';
             row.innerHTML = `
+                <div>
+                    ${foto ? `<img src="${foto}" alt="Foto" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #e6e9ef;" />` : `<div style="width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;">${(nome||'?').charAt(0).toUpperCase()}</div>`}
+                </div>
                 <div>${nome}</div>
                 <div>${responsavelNome}</div>
                 <div>${tipo}</div>
@@ -1499,6 +1508,7 @@ async function salvarPastoral(event) {
                 nome: formData.get('nome'),
                 descricao: formData.get('observacao') || '',
                 responsavel_id: formData.get('responsavel_id') ? Number(formData.get('responsavel_id')) : null,
+                foto: formData.get('foto') || null,
                 ativo: statusStr === 'ativo'
             };
 
