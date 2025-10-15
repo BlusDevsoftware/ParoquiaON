@@ -1302,6 +1302,33 @@
             }
         }
 
+        // Cria uma linha (lista) para o grid de pastorais (4 colunas)
+        function createPastoralRow(pastoral) {
+            const nome = pastoral?.nome || 'Sem nome';
+            const responsavel = pastoral?.responsavel || '-';
+            const tipo = pastoral?.tipo || '-';
+            const id = pastoral?.id ?? '';
+            const row = document.createElement('div');
+            row.style.display = 'grid';
+            row.style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
+            row.style.gap = '16px';
+            row.style.padding = '12px 16px';
+            row.style.border = '1px solid #eee';
+            row.style.borderRadius = '8px';
+            row.style.alignItems = 'center';
+            row.style.background = '#fff';
+            row.innerHTML = `
+                <div>${nome}</div>
+                <div>${responsavel}</div>
+                <div>${tipo}</div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-edit" title="Editar" onclick="editarPastoral?.('${id}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn-delete" title="Excluir" onclick="excluirPastoral?.('${id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            return row;
+        }
+
         // Função para carregar pastorais (cards)
         async function carregarPastorais() {
             try {
@@ -1325,7 +1352,7 @@
                     empty.innerHTML = '<i class="fas fa-church" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhuma pastoral encontrada';
                     grid.appendChild(empty);
                 } else {
-                    lista.forEach(p => grid.appendChild(createPastoralCard(p)));
+                    lista.forEach(p => grid.appendChild(createPastoralRow(p)));
                 }
                 
                 // Ocultar spinner após carregar com sucesso
