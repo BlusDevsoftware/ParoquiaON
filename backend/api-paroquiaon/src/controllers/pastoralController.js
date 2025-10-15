@@ -27,12 +27,17 @@ async function buscarPastoral(req, res) {
 async function criarPastoral(req, res) {
     try {
         const dados = req.body;
+        console.log('Dados recebidos para criar pastoral:', dados);
         const { data, error } = await supabase.from('pastorais').insert([dados]).select().single();
-        if (error) throw error;
+        if (error) {
+            console.error('Erro do Supabase:', error);
+            throw error;
+        }
+        console.log('Pastoral criada com sucesso:', data);
         res.status(201).json(data);
     } catch (error) {
         console.error('Erro ao criar pastoral:', error);
-        res.status(500).json({ error: 'Erro ao criar pastoral' });
+        res.status(500).json({ error: 'Erro ao criar pastoral', details: error.message });
     }
 }
 

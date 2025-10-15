@@ -1151,7 +1151,7 @@
                              </div>
                              <div class="form-group">
                                  <label for="tipo"><i class="fas fa-tag"></i> Tipo</label>
-                                 <input type="text" id="tipo" name="tipo" autocomplete="off" placeholder="Tipo da pastoral">
+                                 <input type="text" id="tipo" name="tipo" autocomplete="off" placeholder="Tipo da pastoral" value="Geral">
                              </div>
                          </div>
                      </div>
@@ -1660,13 +1660,20 @@ async function salvarPastoral(event) {
             const statusStr = formData.get('status');
             const payload = {
                 nome: formData.get('nome'),
-                tipo: formData.get('tipo') || '',
+                tipo: formData.get('tipo') || 'Geral',
                 descricao: formData.get('observacao') || '',
                 responsavel_id: formData.get('responsavel_id') ? Number(formData.get('responsavel_id')) : null,
-                foto: formData.get('foto') || null,
                 ativo: statusStr === 'ativo'
             };
+            
+            // Adicionar foto apenas se não for base64 muito grande
+            const foto = formData.get('foto');
+            if (foto && foto.length < 1000000) { // Limitar a 1MB
+                payload.foto = foto;
+            }
 
+            console.log('📤 Payload sendo enviado:', payload);
+            
             try {
                 if (form.dataset.id) {
                     console.log('🔄 Atualizando pastoral...');
