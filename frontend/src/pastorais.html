@@ -307,7 +307,7 @@
 
         .grid-row {
             display: grid;
-            grid-template-columns: 56px 1fr 1fr 1fr 100px auto;
+            grid-template-columns: 56px 1fr 1fr 1fr 100px 100px auto;
             gap: 16px;
             padding: 12px 16px;
             border: 1px solid #eef1f6;
@@ -1088,12 +1088,12 @@
                 
             <div id="pastorais-grid" class="pastorais-grid">
                 <!-- Cabeçalho do Grid -->
-                <div class="grid-header" style="display: grid; grid-template-columns: 56px 1fr 1fr 1fr 100px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px; align-items:center;">
+                <div class="grid-header" style="display: grid; grid-template-columns: 56px 1fr 1fr 1fr 100px 100px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px; align-items:center;">
                     <div>Foto</div>
                     <div>Nome da Pastoral</div>
                     <div>Responsável</div>
-                    <div style="text-align: center;">Tipo</div>
-                    <div style="text-align: center;">Status</div>
+                    <div style="text-align: center; width: 100px;">Tipo</div>
+                    <div style="text-align: center; width: 100px;">Status</div>
                     <div style="text-align: center;">Ações</div>
                 </div>
                 <!-- Cards das pastorais serão carregados dinamicamente via JavaScript -->
@@ -1472,8 +1472,8 @@
                 </div>
                 <div>${nome}</div>
                 <div>${responsavelNome}</div>
-                <div style="text-align: center;">${tipo}</div>
-                <div style="text-align: center;">
+                <div style="text-align: center; width: 100px;">${tipo}</div>
+                <div style="text-align: center; width: 100px;">
                     <span class="status ${statusClass}">${statusText}</span>
                 </div>
                 <div class="grid-cell-actions">
