@@ -333,32 +333,70 @@
             align-items: center;
         }
 
-        /* Botões de ação da lista (tamanho consistente) */
+        /* Botões de ação da lista (padrão visual unificado) */
         .btn-icon {
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
-            border: 1px solid rgba(0,0,0,0.06);
-            background: #ffffff;
-            color: #40506d;
-            transition: background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+            color: #334155;
+            transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease;
+            box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06);
         }
+        .btn-icon i { font-size: 15px; }
         .btn-icon:hover {
-            background: #f1f5ff;
+            transform: translateY(-1px);
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
             color: #1e3a8a;
-            box-shadow: 0 1px 4px rgba(30,58,138,0.12);
-            border-color: rgba(30,58,138,0.18);
+            box-shadow: 0 2px 6px rgba(30, 64, 175, 0.18);
+            border-color: rgba(30, 58, 138, 0.22);
         }
-        .btn-icon i { font-size: 14px; }
-        .btn-icon.btn-delete { color: #b91c1c; }
-        .btn-icon.btn-delete:hover { background: #fef2f2; color: #991b1b; border-color: rgba(185,28,28,0.25); }
-        .btn-icon.btn-edit { color: #155e75; }
-        .btn-icon.btn-edit:hover { background: #ecfeff; color: #0e7490; border-color: rgba(14,116,144,0.25); }
-        .btn-icon.btn-duplicate { color: #5b21b6; }
-        .btn-icon.btn-duplicate:hover { background: #f5f3ff; color: #4c1d95; border-color: rgba(91,33,182,0.25); }
+        .btn-icon:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(2, 6, 23, 0.12) inset;
+        }
+        .btn-icon:focus-visible {
+            outline: 3px solid rgba(59, 130, 246, 0.35);
+            outline-offset: 2px;
+        }
+
+        /* Variações por ação */
+        .btn-icon.btn-edit {
+            color: #0e7490;
+            border-color: rgba(14, 116, 144, 0.18);
+        }
+        .btn-icon.btn-edit:hover {
+            background: linear-gradient(180deg, #ecfeff 0%, #cffafe 100%);
+            color: #155e75;
+            border-color: rgba(14, 116, 144, 0.35);
+            box-shadow: 0 2px 8px rgba(14, 116, 144, 0.20);
+        }
+
+        .btn-icon.btn-duplicate {
+            color: #6d28d9;
+            border-color: rgba(109, 40, 217, 0.18);
+        }
+        .btn-icon.btn-duplicate:hover {
+            background: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 100%);
+            color: #4c1d95;
+            border-color: rgba(109, 40, 217, 0.35);
+            box-shadow: 0 2px 8px rgba(109, 40, 217, 0.20);
+        }
+
+        .btn-icon.btn-delete {
+            color: #b91c1c;
+            border-color: rgba(185, 28, 28, 0.18);
+        }
+        .btn-icon.btn-delete:hover {
+            background: linear-gradient(180deg, #fff1f2 0%, #fee2e2 100%);
+            color: #991b1b;
+            border-color: rgba(185, 28, 28, 0.35);
+            box-shadow: 0 2px 8px rgba(185, 28, 28, 0.20);
+        }
 
         .pastoral-card {
             background: white;
@@ -978,6 +1016,11 @@
     </style>
 </head>
 <body>
+    <script type="module">
+        import { supabase } from './scripts/config/supabase.js'
+        // Torna o cliente disponível para scripts não-modulares
+        window.supabase = supabase
+    </script>
     <!-- Header Superior -->
     <div class="top-header">
         <div class="header-left">
@@ -1081,23 +1124,20 @@
                         <h3 class="section-title"><i class="fas fa-church"></i> Dados da Pastoral</h3>
                     <div class="form-row">
                             <div class="form-group" style="flex: 1 1 100%; align-items: center;">
-                            <div id="fotoPreview" style="margin-top: 10px; text-align: center;"></div>
+                                <div class="foto-container" style="justify-content: center; display:flex; align-items:center; gap:16px;">
+                                    <img id="fotoPreview" class="foto-preview" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0yMCA4MEMyMCA3MC4zNTg5IDI3LjM1ODkgNjMgMzcgNjNINjNDNzIuNjQxMSA2MyA4MCA3MC4zNTg5IDgwIDgwVjEwMEgyMFY4MFoiIGZpbGw9IiNDQ0NDQ0MiLz4KPC9zdmc+" alt="Pré-visualização" style="width:180px;height:180px;border-radius:12px;object-fit:cover;border:1px solid #ddd;background:#f5f5f5;">
+                                    <button type="button" class="btn-secondary" onclick="document.getElementById('fotoInput').click()"><i class="fas fa-upload"></i> Selecionar</button>
+                                    <input type="file" id="fotoInput" accept="image/*" style="display:none">
+                                </div>
+                                <input type="hidden" name="foto" value="">
+                            </div>
                         </div>
-                    </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="nome"><i class="fas fa-church"></i> Nome da Pastoral</label>
                             <input type="text" id="nome" name="nome" required autocomplete="name" placeholder="Digite o nome da pastoral">
                         </div>
-                        <div class="form-group">
-                            <label for="fotoInput"><i class="fas fa-image"></i> Foto da Pastoral</label>
-                            <div class="foto-container" style="display:flex; align-items:center; gap:12px;">
-                                <img id="fotoPreview" class="foto-preview" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0yMCA4MEMyMCA3MC4zNTg5IDI3LjM1ODkgNjMgMzcgNjNINjNDNzIuNjQxMSA2MyA4MCA3MC4zNTg5IDgwIDgwVjEwMEgyMFY4MFoiIGZpbGw9IiNDQ0NDQ0MiLz4KPC9zdmc+" alt="Pré-visualização" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #e6e9ef;">
-                                <button type="button" class="btn-secondary" onclick="document.getElementById('fotoInput').click()"><i class="fas fa-upload"></i> Selecionar</button>
-                                <input type="file" id="fotoInput" accept="image/*" style="display:none">
-                                <input type="hidden" name="foto" value="">
-                            </div>
-                        </div>
+                        
                         <div class="form-group">
                             <label for="responsavel_id"><i class="fas fa-user-tie"></i> Responsável</label>
                             <select id="responsavel_id" name="responsavel_id">
@@ -1337,16 +1377,46 @@
             fileInput.parentNode.replaceChild(novoInput, fileInput);
             const inputRef = document.getElementById('fotoInput');
 
-            inputRef.addEventListener('change', () => {
+            inputRef.addEventListener('change', async () => {
                 const file = inputRef.files && inputRef.files[0];
                 if (!file) return;
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const base64 = reader.result;
-                    preview.src = base64;
-                    hidden.value = base64;
-                };
-                reader.readAsDataURL(file);
+                try {
+                    // Se Supabase estiver disponível, faz upload e usa URL pública
+                    if (window.supabase && window.supabase.storage) {
+                        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+                        const random = Math.random().toString(36).slice(2);
+                        const path = `pastorais/${Date.now()}_${random}.${ext}`;
+                        const { error: uploadError } = await window.supabase.storage
+                            .from('Pastorais')
+                            .upload(path, file, { upsert: true, contentType: file.type });
+                        if (uploadError) throw uploadError;
+                        const { data } = window.supabase.storage.from('Pastorais').getPublicUrl(path);
+                        const publicUrl = data?.publicUrl || '';
+                        if (publicUrl) {
+                            preview.src = publicUrl;
+                            hidden.value = publicUrl;
+                            return;
+                        }
+                    }
+                    // Fallback: base64 direto
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const base64 = reader.result;
+                        preview.src = base64;
+                        hidden.value = base64;
+                    };
+                    reader.readAsDataURL(file);
+                } catch (e) {
+                    console.error('Erro no upload da imagem:', e);
+                    // Fallback em caso de erro de upload
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const base64 = reader.result;
+                        preview.src = base64;
+                        hidden.value = base64;
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
 
