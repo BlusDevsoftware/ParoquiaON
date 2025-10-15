@@ -1020,11 +1020,7 @@
     </style>
 </head>
 <body>
-    <script type="module">
-        import { supabase } from './scripts/config/supabase.js'
-        // Torna o cliente disponível para scripts não-modulares
-        window.supabase = supabase
-    </script>
+    <!-- Supabase import temporariamente removido para evitar erro de módulo -->
     <!-- Header Superior -->
     <div class="top-header">
         <div class="header-left">
@@ -1386,46 +1382,16 @@
             fileInput.parentNode.replaceChild(novoInput, fileInput);
             const inputRef = document.getElementById('fotoInput');
 
-            inputRef.addEventListener('change', async () => {
+            inputRef.addEventListener('change', () => {
                 const file = inputRef.files && inputRef.files[0];
                 if (!file) return;
-                try {
-                    // Se Supabase estiver disponível, faz upload e usa URL pública
-                    if (window.supabase && window.supabase.storage) {
-                        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-                        const random = Math.random().toString(36).slice(2);
-                        const path = `pastorais/${Date.now()}_${random}.${ext}`;
-                        const { error: uploadError } = await window.supabase.storage
-                            .from('Pastorais')
-                            .upload(path, file, { upsert: true, contentType: file.type });
-                        if (uploadError) throw uploadError;
-                        const { data } = window.supabase.storage.from('Pastorais').getPublicUrl(path);
-                        const publicUrl = data?.publicUrl || '';
-                        if (publicUrl) {
-                            preview.src = publicUrl;
-                            hidden.value = publicUrl;
-                            return;
-                        }
-                    }
-                    // Fallback: base64 direto
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        const base64 = reader.result;
-                        preview.src = base64;
-                        hidden.value = base64;
-                    };
-                    reader.readAsDataURL(file);
-                } catch (e) {
-                    console.error('Erro no upload da imagem:', e);
-                    // Fallback em caso de erro de upload
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        const base64 = reader.result;
-                        preview.src = base64;
-                        hidden.value = base64;
-                    };
-                    reader.readAsDataURL(file);
-                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result;
+                    preview.src = base64;
+                    hidden.value = base64;
+                };
+                reader.readAsDataURL(file);
             });
         }
 

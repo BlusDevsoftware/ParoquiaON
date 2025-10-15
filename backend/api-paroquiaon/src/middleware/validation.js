@@ -38,6 +38,7 @@ const validationSchemas = {
     // Validação para pastorais
     pastoral: {
         nome: (value) => validator.isLength(value, { min: 2, max: 100 }),
+        tipo: (value) => !value || validator.isLength(value, { max: 100 }),
         descricao: (value) => !value || validator.isLength(value, { max: 500 }),
         responsavel_id: (value) => !value || validator.isInt(value)
     },
@@ -123,6 +124,11 @@ const sanitizeData = (req, res, next) => {
                 if (key === 'nome' || key === 'titulo') {
                     // Capitalizar primeira letra de cada palavra
                     req.body[key] = req.body[key].replace(/\b\w/g, l => l.toUpperCase());
+                }
+                
+                if (key === 'tipo') {
+                    // Manter tipo em minúsculas para consistência
+                    req.body[key] = req.body[key].toLowerCase();
                 }
             }
         });
