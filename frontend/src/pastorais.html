@@ -1663,14 +1663,9 @@ async function salvarPastoral(event) {
                 tipo: formData.get('tipo') || 'Geral',
                 descricao: formData.get('observacao') || '',
                 responsavel_id: formData.get('responsavel_id') ? Number(formData.get('responsavel_id')) : null,
+                foto: formData.get('foto') || null,
                 ativo: statusStr === 'ativo'
             };
-            
-            // Adicionar foto apenas se não for base64 muito grande
-            const foto = formData.get('foto');
-            if (foto && foto.length < 1000000) { // Limitar a 1MB
-                payload.foto = foto;
-            }
 
             console.log('📤 Payload sendo enviado:', payload);
             
