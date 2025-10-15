@@ -1318,38 +1318,31 @@
             }
         }
 
-        // Função para carregar clientes
+        // Função para carregar pastorais (cards)
         async function carregarClientes() {
             try {
                 // Mostrar spinner ao iniciar carregamento
                 mostrarSpinner();
                 
-                const clientes = await api.get('/clientes');
-                const tbody = document.querySelector('#clientesTable tbody');
-                tbody.innerHTML = '';
+                const { data, error } = await api.get(endpoints.pastorais.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                const grid = document.getElementById('pastorais-grid');
+                if (!grid) return;
+                // mantém o cabeçalho
+                Array.from(grid.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
 
-                                 clientes.forEach(cliente => {
-                     const tr = document.createElement('tr');
-                     tr.innerHTML = `
-                         <td>${formatarCodigo(cliente.codigo)}</td>
-                         <td>${cliente.codigo_crm || '-'}</td>
-                         <td>${cliente.nome}</td>
-                         <td>${cliente.documento || '-'}</td>
-                         <td><span class="status ${cliente.status === 'ativo' ? 'ativo' : 'inativo'}">${cliente.status === 'ativo' ? 'Ativo' : 'Inativo'}</span></td>
-                         <td class="actions">
-                             <button class="action-btn view-btn" title="Visualizar" onclick="visualizarCliente('${cliente.codigo}')">
-                                 <i class="fas fa-eye"></i>
-                             </button>
-                             <button class="action-btn edit-btn" title="Editar" onclick="editarCliente('${cliente.codigo}')">
-                                 <i class="fas fa-edit"></i>
-                             </button>
-                             <button class="action-btn delete-btn" title="Excluir" onclick="excluirCliente('${cliente.codigo}')">
-                                 <i class="fas fa-trash"></i>
-                             </button>
-                         </td>
-                     `;
-                     tbody.appendChild(tr);
-                 });
+                if (lista.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.style.gridColumn = '1 / -1';
+                    empty.style.textAlign = 'center';
+                    empty.style.padding = '24px';
+                    empty.style.color = '#666';
+                    empty.innerHTML = '<i class="fas fa-church" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhuma pastoral encontrada';
+                    grid.appendChild(empty);
+                } else {
+                    lista.forEach(p => grid.appendChild(createPastoralCard(p)));
+                }
                 
                 // Ocultar spinner após carregar com sucesso
                 ocultarSpinner();
@@ -1423,7 +1416,8 @@
         // Função para editar cliente (abre modal customizado)
         async function editarCliente(codigo) {
             try {
-                const cliente = await api.get(`/clientes/${codigo}`);
+                const { data: cliente, error } = await api.get(endpoints.pastorais.get(codigo));
+                if (error) throw error;
                 const form = document.getElementById('clienteForm');
                 form.dataset.codigo = cliente.codigo;
                 form.codigo_crm.value = cliente.codigo_crm || '';
@@ -1462,10 +1456,8 @@
             const form = event.target;
             const formData = new FormData(form);
             const cliente = {
-                codigo_crm: formData.get('codigo_crm'),
                 nome: formData.get('nome'),
                 tipo: formData.get('tipo'),
-                documento: formData.get('documento'),
                 responsavel: formData.get('responsavel'),
                 contato: formData.get('contato'),
                 observacao: formData.get('observacao'),
@@ -1474,16 +1466,15 @@
 
             try {
                 if (form.dataset.codigo) {
-                    console.log('🔄 Atualizando cliente...');
-                    await api.put(`/clientes/${form.dataset.codigo}`, cliente);
+                    console.log('🔄 Atualizando pastoral...');
+                    await api.put(endpoints.pastorais.update(form.dataset.codigo), cliente);
                     console.log('✅ Cliente atualizado com sucesso');
                     // Mostrar modal de sucesso de atualização
                     console.log('🎯 Chamando showUpdateSuccessModal...');
                     window.showUpdateSuccessModal(cliente.status === 'ativo' ? 'Ativo' : 'Inativo');
                 } else {
-                    console.log('🆕 Criando novo cliente...');
-                    // Não enviar o campo codigo no POST
-                    await api.post('/clientes', cliente);
+                    console.log('🆕 Criando nova pastoral...');
+                    await api.post(endpoints.pastorais.create, cliente);
                     console.log('✅ Cliente criado com sucesso');
                     // Mostrar modal de sucesso de cadastro
                     console.log('🎯 Chamando showSuccessModal...');
@@ -1529,7 +1520,8 @@
         // Função para visualizar cliente
         async function visualizarCliente(codigo) {
             try {
-                const cliente = await api.get(`/clientes/${codigo}`);
+                const { data: cliente, error } = await api.get(endpoints.pastorais.get(codigo));
+                if (error) throw error;
                 const form = document.getElementById('clienteForm');
                 // Preencher formulário
                 form.codigo_crm.value = cliente.codigo_crm || '';
@@ -1601,7 +1593,7 @@
                 if (!codigoParaExcluir) return;
                 try {
                     await window.bloqueioExclusao.deleteWithCheck(
-                        'clientes',
+                        'pastorais',
                         codigoParaExcluir,
                         () => { closeDeleteModal(); carregarClientes(); window.showDeleteSuccessModal(); }
                     );
