@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ParoquiaON - Pastorais</title>
+    <title>ParoquiaON-Pastorais</title>
     <link rel="icon" type="image/png" href="assets/images/logo2.png">
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/login.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="scripts/auth-guard.js"></script>
     <script src="scripts/apply-auth-protection.js"></script>
-    <script src="scripts/config/api.js"></script>
+    
     <script src="scripts/bloqueio_exclusao.js"></script>
     <style>
         .modal {
@@ -1518,11 +1516,13 @@
 
         // Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA DE COLABORADORES
         function mostrarSpinner() {
-            document.getElementById('loader-clientes').style.display = 'flex';
+            const el = document.getElementById('loader-pastorais');
+            if (el) el.style.display = 'flex';
         }
         
         function ocultarSpinner() {
-            document.getElementById('loader-clientes').style.display = 'none';
+            const el = document.getElementById('loader-pastorais');
+            if (el) el.style.display = 'none';
         }
 
         // Função para visualizar cliente
@@ -1582,7 +1582,9 @@
                 mostrarSpinner();
                 
                 // Carregar dados
-                await carregarClientes();
+                if (typeof carregarPastoraisGrid === 'function') {
+                    await carregarPastoraisGrid();
+                }
                 
                 // Ocultar spinner centralizado quando tudo carregar
                 ocultarSpinner();
@@ -1707,9 +1709,8 @@
 
         document.addEventListener('DOMContentLoaded', carregarPastoraisGrid);
     </script>
-
+    
     <script src="scripts/navigation.js"></script>
-    <script src="scripts/hamburger-menu.js"></script>
 </body>
 </html> 
 
