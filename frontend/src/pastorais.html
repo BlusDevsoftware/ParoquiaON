@@ -1357,9 +1357,9 @@
             const form = document.getElementById('clienteForm');
             form.reset();
             delete form.dataset.codigo;
-            toggleTipoCliente('pf', true);
             // Limpar campos adicionais
-            form.responsavel.value = '';
+            const selectResp = document.getElementById('responsavel_id');
+            if (selectResp) selectResp.value = '';
             form.contato.value = '';
             form.observacao.value = '';
             // Resetar contador
@@ -1404,11 +1404,9 @@
                 if (error) throw error;
                 const form = document.getElementById('clienteForm');
                 form.dataset.codigo = cliente.codigo;
-                form.codigo_crm.value = cliente.codigo_crm || '';
                 form.nome.value = cliente.nome;
-                form.tipo.value = cliente.tipo;
-                form.documento.value = cliente.documento || '';
-                form.responsavel.value = cliente.responsavel || '';
+                const selectRespEdit = document.getElementById('responsavel_id');
+                if (selectRespEdit) selectRespEdit.value = cliente.responsavel_id || '';
                 form.contato.value = cliente.contato || '';
                 form.observacao.value = cliente.observacao || '';
                 // Atualizar contador
@@ -1421,7 +1419,7 @@
                 statusToggle.checked = status === 'ativo';
                 statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
                 statusInput.value = status;
-                toggleTipoCliente(cliente.tipo, false);
+                // sem tipo/documento
                 const modal = document.getElementById('clienteModal');
                 const modalTitle = document.getElementById('modalTitle');
                 modalTitle.innerHTML = '<i class="fas fa-church"></i> Editar Pastoral';
@@ -1504,11 +1502,9 @@
                 if (error) throw error;
                 const form = document.getElementById('clienteForm');
                 // Preencher formulário
-                form.codigo_crm.value = cliente.codigo_crm || '';
                 form.nome.value = cliente.nome;
-                form.tipo.value = cliente.tipo;
-                form.documento.value = cliente.documento || '';
-                form.responsavel.value = cliente.responsavel || '';
+                const selectRespView = document.getElementById('responsavel_id');
+                if (selectRespView) selectRespView.value = cliente.responsavel_id || '';
                 form.contato.value = cliente.contato || '';
                 form.observacao.value = cliente.observacao || '';
                 // Atualizar contador
@@ -1521,7 +1517,7 @@
                 statusToggle.checked = status === 'ativo';
                 statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
                 statusInput.value = status;
-                toggleTipoCliente(cliente.tipo, false);
+                // sem tipo/documento
                 // Desabilitar todos os campos
                 Array.from(form.elements).forEach(element => {
                     element.disabled = true;
@@ -1575,7 +1571,7 @@
                 ocultarSpinner();
             }
                          document.getElementById('clienteForm').addEventListener('submit', salvarCliente);
-             document.getElementById('tipo').addEventListener('change', (e) => toggleTipoCliente(e.target.value));
+            // remove listener de tipo inexistente
              document.getElementById('statusToggleModal').addEventListener('change', toggleStatus);
             document.getElementById('confirmDeleteBtn').onclick = async function() {
                 if (!codigoParaExcluir) return;
