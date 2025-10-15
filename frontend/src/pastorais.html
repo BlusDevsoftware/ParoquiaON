@@ -1398,12 +1398,12 @@ function novaPastoral() {
         }
 
         // Função para editar pastoral (abre modal customizado)
-async function editarPastoral(codigo) {
+async function editarPastoral(id) {
             try {
-                const { data: pastoral, error } = await api.get(endpoints.pastorais.get(codigo));
+                const { data: pastoral, error } = await api.get(endpoints.pastorais.get(id));
                 if (error) throw error;
     const form = document.getElementById('pastoralForm');
-                form.dataset.codigo = pastoral.codigo;
+                form.dataset.id = pastoral.id;
                 form.nome.value = pastoral.nome;
                 const selectRespEdit = document.getElementById('responsavel_id');
                 if (selectRespEdit) selectRespEdit.value = pastoral.responsavel_id || '';
@@ -1415,10 +1415,10 @@ async function editarPastoral(codigo) {
                 const statusToggle = document.getElementById('statusToggleModal');
                 const statusLabel = document.querySelector('.status-label-modal');
                 const statusInput = document.getElementById('status');
-                const status = pastoral.status || 'ativo';
-                statusToggle.checked = status === 'ativo';
-                statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
-                statusInput.value = status;
+                const ativo = pastoral.ativo !== false; // default true
+                statusToggle.checked = ativo;
+                statusLabel.textContent = ativo ? 'Ativo' : 'Inativo';
+                statusInput.value = ativo ? 'ativo' : 'inativo';
                 // sem tipo/documento
     const modal = document.getElementById('pastoralModal');
                 const modalTitle = document.getElementById('modalTitle');
@@ -1437,24 +1437,24 @@ async function salvarPastoral(event) {
             event.preventDefault();
             const form = event.target;
             const formData = new FormData(form);
-            const pastoral = {
+            const statusStr = formData.get('status');
+            const payload = {
                 nome: formData.get('nome'),
                 descricao: formData.get('observacao') || '',
-                responsavel_id: formData.get('responsavel_id') || null,
-                contato: formData.get('contato') || '',
-                status: formData.get('status')
+                responsavel_id: formData.get('responsavel_id') ? Number(formData.get('responsavel_id')) : null,
+                ativo: statusStr === 'ativo'
             };
 
             try {
-                if (form.dataset.codigo) {
+                if (form.dataset.id) {
                     console.log('🔄 Atualizando pastoral...');
-                    const { error } = await api.put(endpoints.pastorais.update(form.dataset.codigo), pastoral);
+                    const { error } = await api.put(endpoints.pastorais.update(form.dataset.id), payload);
                     if (error) throw error;
                     console.log('✅ Pastoral atualizada com sucesso');
-                    window.showUpdateSuccessModal(pastoral.status === 'ativo' ? 'Ativo' : 'Inativo');
+                    window.showUpdateSuccessModal(payload.ativo ? 'Ativo' : 'Inativo');
                 } else {
                     console.log('🆕 Criando nova pastoral...');
-                    const { error } = await api.post(endpoints.pastorais.create, pastoral);
+                    const { error } = await api.post(endpoints.pastorais.create, payload);
                     if (error) throw error;
                     console.log('✅ Pastoral criada com sucesso');
                     window.showSuccessModal();
@@ -1469,8 +1469,8 @@ async function salvarPastoral(event) {
 
         // Função para excluir pastoral
         let codigoParaExcluir = null;
-        function excluirPastoral(codigo) {
-            codigoParaExcluir = codigo;
+        function excluirPastoral(id) {
+            codigoParaExcluir = id;
             const modal = document.getElementById('deleteModal');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
@@ -1497,9 +1497,9 @@ async function salvarPastoral(event) {
         }
 
         // Função para visualizar pastoral
-async function visualizarPastoral(codigo) {
+async function visualizarPastoral(id) {
             try {
-                const { data: pastoral, error } = await api.get(endpoints.pastorais.get(codigo));
+                const { data: pastoral, error } = await api.get(endpoints.pastorais.get(id));
                 if (error) throw error;
     const form = document.getElementById('pastoralForm');
                 // Preencher formulário
@@ -1507,17 +1507,17 @@ async function visualizarPastoral(codigo) {
                 const selectRespView = document.getElementById('responsavel_id');
                 if (selectRespView) selectRespView.value = pastoral.responsavel_id || '';
                 form.contato.value = pastoral.contato || '';
-                form.observacao.value = pastoral.observacao || '';
+                form.observacao.value = pastoral.descricao || '';
                 // Atualizar contador
                 atualizarContador(form.observacao);
                 // Atualizar status
                 const statusToggle = document.getElementById('statusToggleModal');
                 const statusLabel = document.querySelector('.status-label-modal');
                 const statusInput = document.getElementById('status');
-                const status = pastoral.status || 'ativo';
-                statusToggle.checked = status === 'ativo';
-                statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
-                statusInput.value = status;
+                const ativo = pastoral.ativo !== false;
+                statusToggle.checked = ativo;
+                statusLabel.textContent = ativo ? 'Ativo' : 'Inativo';
+                statusInput.value = ativo ? 'ativo' : 'inativo';
                 // sem tipo/documento
                 // Desabilitar todos os campos
                 Array.from(form.elements).forEach(element => {
@@ -1632,7 +1632,7 @@ async function visualizarPastoral(codigo) {
             const nome = pastoral?.nome || 'Sem nome';
             const tipo = pastoral?.tipo || '-';
             const responsavel = pastoral?.responsavel || '-';
-            const status = (pastoral?.status || 'ativo').toLowerCase();
+            const ativo = pastoral?.ativo !== false;
 
             const div = document.createElement('div');
             div.className = 'pastoral-card';
@@ -1640,14 +1640,14 @@ async function visualizarPastoral(codigo) {
                 <div class="pastoral-header">
                     <h3 class="pastoral-title">${nome}</h3>
                     <div class="pastoral-actions">
-                        <button class="btn-edit" title="Editar" onclick="editarPastoral?.('${pastoral?.codigo ?? ''}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-delete" title="Excluir" onclick="excluirCliente?.('${pastoral?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
+                        <button class="btn-edit" title="Editar" onclick="editarPastoral?.('${pastoral?.id ?? ''}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-delete" title="Excluir" onclick="excluirPastoral?.('${pastoral?.id ?? ''}')"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
                 <div class="pastoral-info">
                     <p><i class="fas fa-tag"></i> Tipo: ${tipo}</p>
                     <p><i class="fas fa-user"></i> Responsável: ${responsavel}</p>
-                    <p><i class="fas fa-circle" style="color:${status === 'ativo' ? '#4CAF50' : '#f44336'}"></i> Status: ${status === 'ativo' ? 'Ativo' : 'Inativo'}</p>
+                    <p><i class="fas fa-circle" style="color:${ativo ? '#4CAF50' : '#f44336'}"></i> Status: ${ativo ? 'Ativo' : 'Inativo'}</p>
                 </div>
             `;
             return div;
