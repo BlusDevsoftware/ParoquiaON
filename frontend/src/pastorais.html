@@ -296,7 +296,7 @@
 
         .grid-row {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: 56px 1fr 1fr 1fr auto;
             gap: 16px;
             padding: 12px 16px;
             border: 1px solid #eef1f6;
@@ -365,14 +365,10 @@
             transition: all 0.2s ease;
         }
 
-        .btn-edit {
-            background: #007bff;
-            color: white;
-        }
+        .btn-edit { background: #1e88e5; color: #fff; }
+        .btn-secondary { background: #6c757d; color: #fff; }
 
-        .btn-edit:hover {
-            background: #0056b3;
-        }
+        .btn-edit:hover { background: #1565c0; }
 
         .btn-delete {
             background: #dc3545;
@@ -1056,8 +1052,13 @@
                             <input type="text" id="nome" name="nome" required autocomplete="name" placeholder="Digite o nome da pastoral">
                         </div>
                         <div class="form-group">
-                            <label for="foto"><i class="fas fa-image"></i> Foto da Pastoral (URL)</label>
-                            <input type="url" id="foto" name="foto" placeholder="https://...">
+                            <label for="fotoInput"><i class="fas fa-image"></i> Foto da Pastoral</label>
+                            <div class="foto-container" style="display:flex; align-items:center; gap:12px;">
+                                <img id="fotoPreview" class="foto-preview" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0yMCA4MEMyMCA3MC4zNTg5IDI3LjM1ODkgNjMgMzcgNjNINjNDNzIuNjQxMSA2MyA4MCA3MC4zNTg5IDgwIDgwVjEwMEgyMFY4MFoiIGZpbGw9IiNDQ0NDQ0MiLz4KPC9zdmc+" alt="Pré-visualização" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #e6e9ef;">
+                                <button type="button" class="btn-secondary" onclick="document.getElementById('fotoInput').click()"><i class="fas fa-upload"></i> Selecionar</button>
+                                <input type="file" id="fotoInput" accept="image/*" style="display:none">
+                                <input type="hidden" name="foto" value="">
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="responsavel_id"><i class="fas fa-user-tie"></i> Responsável</label>
@@ -1286,6 +1287,31 @@
             }, 300);
         }
 
+        // Inicializa handlers de foto (preview + hidden base64/URL)
+        function inicializarFotoHandlersPastoral() {
+            const fileInput = document.getElementById('fotoInput');
+            const preview = document.getElementById('fotoPreview');
+            const hidden = document.querySelector('input[name="foto"]');
+            if (!fileInput || !preview || !hidden) return;
+
+            // Reset listener substituindo input para evitar múltiplos handlers
+            const novoInput = fileInput.cloneNode(true);
+            fileInput.parentNode.replaceChild(novoInput, fileInput);
+            const inputRef = document.getElementById('fotoInput');
+
+            inputRef.addEventListener('change', () => {
+                const file = inputRef.files && inputRef.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result;
+                    preview.src = base64;
+                    hidden.value = base64;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
         // Função para formatar código com 5 dígitos
         function formatarCodigo(codigo) {
             return String(codigo).padStart(5, '0');
@@ -1361,8 +1387,9 @@
                 <div>${responsavelNome}</div>
                 <div>${tipo}</div>
                 <div class="grid-cell-actions">
-                    <button class="btn-edit" title="Editar" onclick="editarPastoral?.('${id}')"><i class="fas fa-edit"></i></button>
-                    <button class="btn-delete" title="Excluir" onclick="excluirPastoral?.('${id}')"><i class="fas fa-trash"></i></button>
+                    <button class="btn-edit" title="Editar" onclick="editarPastoral?.('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-secondary" title="Duplicar" onclick="duplicarPastoral?.('${id}')"><i class="fa-regular fa-copy"></i></button>
+                    <button class="btn-delete" title="Excluir" onclick="excluirPastoral?.('${id}')"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;
             return row;
@@ -1443,6 +1470,14 @@ function novaPastoral() {
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
             document.body.style.overflow = 'hidden';
+            // Reset preview/hidden
+            const preview = document.getElementById('fotoPreview');
+            const hiddenFoto = form.querySelector('input[name="foto"]');
+            if (preview) {
+                // mantém avatar default do src inicial
+            }
+            if (hiddenFoto) hiddenFoto.value = '';
+            inicializarFotoHandlersPastoral();
         }
 
         // Função para fechar o modal
@@ -1492,6 +1527,12 @@ async function editarPastoral(id) {
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('show'), 10);
                 document.body.style.overflow = 'hidden';
+                // Preencher/preview da foto
+                const fotoHidden = form.querySelector('input[name="foto"]');
+                const fotoPreview = document.getElementById('fotoPreview');
+                if (fotoHidden) fotoHidden.value = pastoral.foto || '';
+                if (fotoPreview && pastoral.foto) fotoPreview.src = pastoral.foto;
+                inicializarFotoHandlersPastoral();
             } catch (error) {
                 console.error('Erro ao carregar pastoral:', error);
                 alert('Erro ao carregar pastoral');
@@ -1679,6 +1720,27 @@ async function visualizarPastoral(id) {
         window.novaPastoral = novaPastoral;
         window.editarPastoral = editarPastoral;
         window.excluirPastoral = excluirPastoral;
+        window.duplicarPastoral = async function(id) {
+            try {
+                const { data: pastoral, error } = await api.get(endpoints.pastorais.get(id));
+                if (error) throw error;
+                const form = document.getElementById('pastoralForm');
+                novaPastoral();
+                form.nome.value = `${pastoral.nome} (cópia)`;
+                const selectResp = document.getElementById('responsavel_id');
+                if (selectResp) selectResp.value = pastoral.responsavel_id || '';
+                form.contato.value = pastoral.contato || '';
+                form.observacao.value = pastoral.descricao || '';
+                atualizarContador(form.observacao);
+                const hiddenFoto = form.querySelector('input[name="foto"]');
+                const fotoPreview = document.getElementById('fotoPreview');
+                if (hiddenFoto) hiddenFoto.value = pastoral.foto || '';
+                if (fotoPreview && pastoral.foto) fotoPreview.src = pastoral.foto;
+            } catch (e) {
+                console.error('Erro ao duplicar pastoral:', e);
+                alert('Erro ao duplicar pastoral');
+            }
+        }
         window.toggleTipoCliente = toggleTipoCliente;
         window.closeModal = closeModal;
         window.visualizarPastoral = visualizarPastoral;
