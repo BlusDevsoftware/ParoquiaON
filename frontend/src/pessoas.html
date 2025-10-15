@@ -1137,71 +1137,63 @@
             }, 300);
         }
 
-        // Função para carregar pessoas (mock data)
-        function carregarPessoas() {
-            const tbody = document.getElementById('pessoasTableBody');
-            const loader = document.getElementById('loader-pessoas');
-            
-            loader.style.display = 'flex';
-            
-            // Simular carregamento
-            setTimeout(() => {
-                const pessoas = [
-                    { 
-                        codigo: '001', 
-                        nome: 'João Silva Santos', 
-                        telefone: '(11) 99999-1234',
-                        endereco: 'Rua das Flores, 123 - Centro - São Paulo/SP',
-                        foto: '',
-                        status: 'Ativo' 
-                    },
-                    { 
-                        codigo: '002', 
-                        nome: 'Maria Oliveira Costa', 
-                        telefone: '(11) 88888-5678',
-                        endereco: 'Av. Paulista, 456 - Bela Vista - São Paulo/SP',
-                        foto: '',
-                        status: 'Ativo' 
-                    },
-                    { 
-                        codigo: '003', 
-                        nome: 'Pedro Santos Lima', 
-                        telefone: '(11) 77777-9012',
-                        endereco: 'Rua Augusta, 789 - Consolação - São Paulo/SP',
-                        foto: '',
-                        status: 'Inativo' 
-                    }
-                ];
-                
-                tbody.innerHTML = pessoas.map(pessoa => `
-                    <tr>
-                        <td>${pessoa.codigo}</td>
-                        <td>
-                            ${pessoa.foto ? 
-                                `<img src="${pessoa.foto}" class="profile-photo" alt="Foto">` : 
-                                `<div class="profile-photo-placeholder"><i class="fas fa-user"></i></div>`
-                            }
-                        </td>
-                        <td>${pessoa.nome}</td>
-                        <td>${pessoa.telefone}</td>
-                        <td>${pessoa.endereco}</td>
-                        <td><span class="status ${pessoa.status.toLowerCase()}">${pessoa.status}</span></td>
-                        <td class="actions">
-                            <button class="action-btn view-btn" onclick="openPessoaModal('Visualizar Pessoa', ${JSON.stringify(pessoa).replace(/"/g, '&quot;')}, 'visualizar')" title="Visualizar">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="action-btn edit-btn" onclick="openPessoaModal('Editar Pessoa', ${JSON.stringify(pessoa).replace(/"/g, '&quot;')}, 'editar')" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete-btn" onclick="openDeletePessoaModal('${pessoa.codigo}')" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-                
-                loader.style.display = 'none';
-            }, 1000);
+        // Listar pessoas via API e renderizar no grid de cards
+        const gridPessoas = document.getElementById('pessoas-grid');
+        const loaderPessoas = document.getElementById('loader-pessoas');
+
+        function createPessoaCard(pessoa) {
+            const nome = pessoa?.nome || 'Sem nome';
+            const telefone = pessoa?.telefone || '-';
+            const endereco = pessoa?.endereco || '-';
+            const status = (pessoa?.status || 'Ativo').toLowerCase();
+
+            const div = document.createElement('div');
+            div.className = 'pessoa-card';
+            div.innerHTML = `
+                <div class="pessoa-header">
+                    <h3 class="pessoa-title">${nome}</h3>
+                    <div class="pessoa-actions">
+                        <button class="btn-edit" title="Editar" onclick="openPessoaModal('Editar Pessoa', ${JSON.stringify(pessoa).replace(/"/g, '&quot;')}, 'editar')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-delete" title="Excluir" onclick="openDeletePessoaModal('${pessoa?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="pessoa-info">
+                    <p><i class="fas fa-phone"></i> ${telefone}</p>
+                    <p><i class="fas fa-map-marker-alt"></i> ${endereco}</p>
+                    <p><i class="fas fa-circle" style="color:${status === 'ativo' ? '#4CAF50' : '#f44336'}"></i> Status: ${status === 'ativo' ? 'Ativo' : 'Inativo'}</p>
+                </div>
+            `;
+            return div;
+        }
+
+        async function carregarPessoasGrid() {
+            try {
+                if (loaderPessoas) loaderPessoas.style.display = 'flex';
+                if (!gridPessoas) return;
+
+                const header = gridPessoas.querySelector('.grid-header');
+                Array.from(gridPessoas.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
+
+                const { data, error } = await window.api.get(window.endpoints.pessoas.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+
+                if (lista.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.style.gridColumn = '1 / -1';
+                    empty.style.textAlign = 'center';
+                    empty.style.padding = '24px';
+                    empty.style.color = '#666';
+                    empty.innerHTML = '<i class="fas fa-user" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhuma pessoa encontrada';
+                    gridPessoas.appendChild(empty);
+                } else {
+                    lista.forEach(p => gridPessoas.appendChild(createPessoaCard(p)));
+                }
+            } catch (e) {
+                console.error('Erro ao carregar pessoas:', e);
+            } finally {
+                if (loaderPessoas) loaderPessoas.style.display = 'none';
+            }
         }
 
         // Toggle de status no modal
@@ -1223,7 +1215,7 @@
             }
 
             // Carregar dados ao inicializar
-            carregarPessoas();
+            carregarPessoasGrid();
 
             // Form submit
             const form = document.getElementById('pessoaForm');

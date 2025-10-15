@@ -924,6 +924,66 @@
             modal.style.display = 'none';
         }
     </script>
+    <script type="module">
+        // Listar pilares via API e renderizar no grid de cards
+        const gridPilares = document.getElementById('pilares-grid');
+        const loaderPilares = document.getElementById('loader-pilares');
+
+        function createPilarCard(pilar) {
+            const nome = pilar?.nome || 'Sem nome';
+            const tipo = pilar?.tipo || '-';
+            const status = (pilar?.status || 'ativo').toLowerCase();
+
+            const div = document.createElement('div');
+            div.className = 'pilar-card';
+            div.innerHTML = `
+                <div class="pilar-header">
+                    <h3 class="pilar-title">${nome}</h3>
+                    <div class="pilar-actions">
+                        <button class="btn-edit" title="Editar" onclick="editarPilar?.('${pilar?.codigo ?? ''}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-delete" title="Excluir" onclick="excluirPilar?.('${pilar?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="pilar-info">
+                    <p><i class="fas fa-tag"></i> Tipo: ${tipo}</p>
+                    <p><i class="fas fa-circle" style="color:${status === 'ativo' ? '#4CAF50' : '#f44336'}"></i> Status: ${status === 'ativo' ? 'Ativo' : 'Inativo'}</p>
+                </div>
+            `;
+            return div;
+        }
+
+        async function carregarPilaresGrid() {
+            try {
+                if (loaderPilares) loaderPilares.style.display = 'flex';
+                if (!gridPilares) return;
+
+                const header = gridPilares.querySelector('.grid-header');
+                Array.from(gridPilares.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
+
+                const { data, error } = await window.api.get(window.endpoints.pilares.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+
+                if (lista.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.style.gridColumn = '1 / -1';
+                    empty.style.textAlign = 'center';
+                    empty.style.padding = '24px';
+                    empty.style.color = '#666';
+                    empty.innerHTML = '<i class="fas fa-columns" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum pilar encontrado';
+                    gridPilares.appendChild(empty);
+                } else {
+                    lista.forEach(p => gridPilares.appendChild(createPilarCard(p)));
+                }
+            } catch (e) {
+                console.error('Erro ao carregar pilares:', e);
+            } finally {
+                if (loaderPilares) loaderPilares.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarPilaresGrid);
+    </script>
 </head>
 <body>
     <!-- Header Superior -->

@@ -1083,72 +1083,63 @@
             }, 300);
         }
 
-        // Função para carregar usuários (mock data)
-        function carregarUsuarios() {
-            const tbody = document.getElementById('usuariosTableBody');
-            const loader = document.getElementById('loader-usuarios');
-            
-            loader.style.display = 'flex';
-            
-            // Simular carregamento
-            setTimeout(() => {
-                const usuarios = [
-                    { 
-                        codigo: '001', 
-                        email: 'joao.silva@paroquia.com', 
-                        login: 'joao.silva',
-                        perfil: 'admin',
-                        perfilNome: 'Administrador',
-                        pessoaId: '001',
-                        pessoaNome: 'João Silva Santos',
-                        status: 'Ativo' 
-                    },
-                    { 
-                        codigo: '002', 
-                        email: 'maria.oliveira@paroquia.com', 
-                        login: 'maria.oliveira',
-                        perfil: 'user',
-                        perfilNome: 'Usuário',
-                        pessoaId: '002',
-                        pessoaNome: 'Maria Oliveira Costa',
-                        status: 'Ativo' 
-                    },
-                    { 
-                        codigo: '003', 
-                        email: 'pedro.santos@paroquia.com', 
-                        login: 'pedro.santos',
-                        perfil: 'moderator',
-                        perfilNome: 'Moderador',
-                        pessoaId: '003',
-                        pessoaNome: 'Pedro Santos Lima',
-                        status: 'Inativo' 
-                    }
-                ];
-                
-                tbody.innerHTML = usuarios.map(usuario => `
-                    <tr>
-                        <td>${usuario.codigo}</td>
-                        <td>${usuario.email}</td>
-                        <td>${usuario.login}</td>
-                        <td><span class="profile-badge ${usuario.perfil}">${usuario.perfilNome}</span></td>
-                        <td>${usuario.pessoaNome}</td>
-                        <td><span class="status ${usuario.status.toLowerCase()}">${usuario.status}</span></td>
-                        <td class="actions">
-                            <button class="action-btn view-btn" onclick="openUsuarioModal('Visualizar Usuário', ${JSON.stringify(usuario).replace(/"/g, '&quot;')}, 'visualizar')" title="Visualizar">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="action-btn edit-btn" onclick="openUsuarioModal('Editar Usuário', ${JSON.stringify(usuario).replace(/"/g, '&quot;')}, 'editar')" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete-btn" onclick="openDeleteUsuarioModal('${usuario.codigo}')" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-                
-                loader.style.display = 'none';
-            }, 1000);
+        // Listar usuários via API e renderizar no grid de cards
+        const gridUsuarios = document.getElementById('usuarios-grid');
+        const loaderUsuarios = document.getElementById('loader-usuarios');
+
+        function createUsuarioCard(usuario) {
+            const email = usuario?.email || '-';
+            const login = usuario?.login || '-';
+            const perfilNome = usuario?.perfilNome || usuario?.perfil || '-';
+            const status = (usuario?.status || 'Ativo').toLowerCase();
+
+            const div = document.createElement('div');
+            div.className = 'usuario-card';
+            div.innerHTML = `
+                <div class="usuario-header">
+                    <h3 class="usuario-title">${login}</h3>
+                    <div class="usuario-actions">
+                        <button class="btn-edit" title="Editar" onclick="openUsuarioModal('Editar Usuário', ${JSON.stringify(usuario).replace(/"/g, '&quot;')}, 'editar')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-delete" title="Excluir" onclick="openDeleteUsuarioModal('${usuario?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="usuario-info">
+                    <p><i class="fas fa-envelope"></i> ${email}</p>
+                    <p><i class="fas fa-user-shield"></i> ${perfilNome}</p>
+                    <p><i class="fas fa-circle" style="color:${status === 'ativo' ? '#4CAF50' : '#f44336'}"></i> Status: ${status === 'ativo' ? 'Ativo' : 'Inativo'}</p>
+                </div>
+            `;
+            return div;
+        }
+
+        async function carregarUsuariosGrid() {
+            try {
+                if (loaderUsuarios) loaderUsuarios.style.display = 'flex';
+                if (!gridUsuarios) return;
+
+                const header = gridUsuarios.querySelector('.grid-header');
+                Array.from(gridUsuarios.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
+
+                const { data, error } = await window.api.get(window.endpoints.usuarios.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+
+                if (lista.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.style.gridColumn = '1 / -1';
+                    empty.style.textAlign = 'center';
+                    empty.style.padding = '24px';
+                    empty.style.color = '#666';
+                    empty.innerHTML = '<i class="fas fa-user-cog" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum usuário encontrado';
+                    gridUsuarios.appendChild(empty);
+                } else {
+                    lista.forEach(u => gridUsuarios.appendChild(createUsuarioCard(u)));
+                }
+            } catch (e) {
+                console.error('Erro ao carregar usuários:', e);
+            } finally {
+                if (loaderUsuarios) loaderUsuarios.style.display = 'none';
+            }
         }
 
         // Toggle de status no modal
@@ -1170,7 +1161,7 @@
             }
 
             // Carregar dados ao inicializar
-            carregarUsuarios();
+            carregarUsuariosGrid();
 
             // Form submit
             const form = document.getElementById('usuarioForm');

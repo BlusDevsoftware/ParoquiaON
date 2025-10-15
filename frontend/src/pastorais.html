@@ -1643,6 +1643,70 @@
         window.showDeleteSuccessModal = showDeleteSuccessModal;
         window.closeDeleteSuccessModal = closeDeleteSuccessModal;
     </script>
+    <script type="module">
+        // Listar pastorais via API e renderizar no grid de cards
+        const gridPastorais = document.getElementById('pastorais-grid');
+        const loaderPastorais = document.getElementById('loader-pastorais');
+
+        function createPastoralCard(pastoral) {
+            const nome = pastoral?.nome || 'Sem nome';
+            const tipo = pastoral?.tipo || '-';
+            const responsavel = pastoral?.responsavel || '-';
+            const status = (pastoral?.status || 'ativo').toLowerCase();
+
+            const div = document.createElement('div');
+            div.className = 'pastoral-card';
+            div.innerHTML = `
+                <div class="pastoral-header">
+                    <h3 class="pastoral-title">${nome}</h3>
+                    <div class="pastoral-actions">
+                        <button class="btn-edit" title="Editar" onclick="editarCliente?.('${pastoral?.codigo ?? ''}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-delete" title="Excluir" onclick="excluirCliente?.('${pastoral?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="pastoral-info">
+                    <p><i class="fas fa-tag"></i> Tipo: ${tipo}</p>
+                    <p><i class="fas fa-user"></i> Responsável: ${responsavel}</p>
+                    <p><i class="fas fa-circle" style="color:${status === 'ativo' ? '#4CAF50' : '#f44336'}"></i> Status: ${status === 'ativo' ? 'Ativo' : 'Inativo'}</p>
+                </div>
+            `;
+            return div;
+        }
+
+        async function carregarPastoraisGrid() {
+            try {
+                if (loaderPastorais) loaderPastorais.style.display = 'flex';
+                if (!gridPastorais) return;
+
+                // Preservar o cabeçalho já inserido
+                const header = gridPastorais.querySelector('.grid-header');
+                const items = Array.from(gridPastorais.children).filter(c => !c.classList.contains('grid-header'));
+                items.forEach(el => el.remove());
+
+                const { data, error } = await window.api.get(window.endpoints.pastorais.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+
+                if (lista.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.style.gridColumn = '1 / -1';
+                    empty.style.textAlign = 'center';
+                    empty.style.padding = '24px';
+                    empty.style.color = '#666';
+                    empty.innerHTML = '<i class="fas fa-church" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhuma pastoral encontrada';
+                    gridPastorais.appendChild(empty);
+                } else {
+                    lista.forEach(p => gridPastorais.appendChild(createPastoralCard(p)));
+                }
+            } catch (e) {
+                console.error('Erro ao carregar pastorais:', e);
+            } finally {
+                if (loaderPastorais) loaderPastorais.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarPastoraisGrid);
+    </script>
 
     <script src="scripts/navigation.js"></script>
     <script src="scripts/hamburger-menu.js"></script>

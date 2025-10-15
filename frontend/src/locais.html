@@ -1141,6 +1141,66 @@
 
     <script src="scripts/bloqueio_exclusao.js"></script>
     <script type="module">
+        // Listar locais via API e renderizar no grid de cards
+        const gridLocais = document.getElementById('locais-grid');
+        const loaderLocais = document.getElementById('loader-locais');
+
+        function createLocalCard(local) {
+            const nome = local?.nome || 'Sem nome';
+            const endereco = local?.endereco || '-';
+            const tipo = local?.tipo || '-';
+            const status = (local?.status || 'Ativo').toLowerCase();
+
+            const div = document.createElement('div');
+            div.className = 'local-card';
+            div.innerHTML = `
+                <div class="local-header">
+                    <h3 class="local-title">${nome}</h3>
+                    <div class="local-actions">
+                        <button class="btn-edit" title="Editar" onclick="editarServico?.('${local?.codigo ?? ''}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-delete" title="Excluir" onclick="openDeleteModal?.('${local?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="local-info">
+                    <p><i class="fas fa-map"></i> Endereço: ${endereco}</p>
+                    <p><i class="fas fa-tag"></i> Tipo: ${tipo}</p>
+                    <p><i class="fas fa-circle" style="color:${status === 'ativo' ? '#4CAF50' : '#f44336'}"></i> Status: ${status === 'ativo' ? 'Ativo' : 'Inativo'}</p>
+                </div>
+            `;
+            return div;
+        }
+
+        async function carregarLocaisGrid() {
+            try {
+                if (loaderLocais) loaderLocais.style.display = 'flex';
+                if (!gridLocais) return;
+
+                const header = gridLocais.querySelector('.grid-header');
+                Array.from(gridLocais.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
+
+                const { data, error } = await window.api.get(window.endpoints.locais.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+
+                if (lista.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.style.gridColumn = '1 / -1';
+                    empty.style.textAlign = 'center';
+                    empty.style.padding = '24px';
+                    empty.style.color = '#666';
+                    empty.innerHTML = '<i class="fas fa-map-marker-alt" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum local encontrado';
+                    gridLocais.appendChild(empty);
+                } else {
+                    lista.forEach(l => gridLocais.appendChild(createLocalCard(l)));
+                }
+            } catch (e) {
+                console.error('Erro ao carregar locais:', e);
+            } finally {
+                if (loaderLocais) loaderLocais.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarLocaisGrid);
         // Funções globais para modais
         window.openServicoModal = function(titulo = 'Novo Local', servico = null, modo = 'novo') {
             const modal = document.getElementById('servicoModal');

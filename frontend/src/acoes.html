@@ -917,43 +917,61 @@
             }, 300);
         }
 
-        // Função para carregar ações (mock data)
-        function carregarAcoes() {
-            const tbody = document.getElementById('acoesTableBody');
-            const loader = document.getElementById('loader-acoes');
-            
-            loader.style.display = 'flex';
-            
-            // Simular carregamento
-            setTimeout(() => {
-                const acoes = [
-                    { codigo: '001', nome: 'Campanha de Páscoa', descricao: 'Organização da campanha de Páscoa da paróquia', status: 'Ativo' },
-                    { codigo: '002', nome: 'Visita aos Enfermos', descricao: 'Visitas regulares aos membros enfermos da comunidade', status: 'Ativo' },
-                    { codigo: '003', nome: 'Catequese Infantil', descricao: 'Aulas de catequese para crianças de 7 a 10 anos', status: 'Inativo' }
-                ];
-                
-                tbody.innerHTML = acoes.map(acao => `
-                    <tr>
-                        <td>${acao.codigo}</td>
-                        <td>${acao.nome}</td>
-                        <td>${acao.descricao}</td>
-                        <td><span class="status ${acao.status.toLowerCase()}">${acao.status}</span></td>
-                        <td class="actions">
-                            <button class="action-btn view-btn" onclick="openAcaoModal('Visualizar Ação', ${JSON.stringify(acao).replace(/"/g, '&quot;')}, 'visualizar')" title="Visualizar">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="action-btn edit-btn" onclick="openAcaoModal('Editar Ação', ${JSON.stringify(acao).replace(/"/g, '&quot;')}, 'editar')" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete-btn" onclick="openDeleteAcaoModal('${acao.codigo}')" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-                
-                loader.style.display = 'none';
-            }, 1000);
+        // Listar ações via API e renderizar no grid de cards
+        const gridAcoes = document.getElementById('acoes-grid');
+        const loaderAcoes = document.getElementById('loader-acoes');
+
+        function createAcaoCard(acao) {
+            const nome = acao?.nome || 'Sem nome';
+            const descricao = acao?.descricao || '-';
+            const status = (acao?.status || 'Ativo').toLowerCase();
+
+            const div = document.createElement('div');
+            div.className = 'acao-card';
+            div.innerHTML = `
+                <div class="acao-header">
+                    <h3 class="acao-title">${nome}</h3>
+                    <div class="acao-actions">
+                        <button class="btn-edit" title="Editar" onclick="openAcaoModal('Editar Ação', ${JSON.stringify(acao).replace(/"/g, '&quot;')}, 'editar')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-delete" title="Excluir" onclick="openDeleteAcaoModal('${acao?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="acao-info">
+                    <p><i class="fas fa-align-left"></i> ${descricao}</p>
+                    <p><i class="fas fa-circle" style="color:${status === 'ativo' ? '#4CAF50' : '#f44336'}"></i> Status: ${status === 'ativo' ? 'Ativo' : 'Inativo'}</p>
+                </div>
+            `;
+            return div;
+        }
+
+        async function carregarAcoesGrid() {
+            try {
+                if (loaderAcoes) loaderAcoes.style.display = 'flex';
+                if (!gridAcoes) return;
+
+                const header = gridAcoes.querySelector('.grid-header');
+                Array.from(gridAcoes.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
+
+                const { data, error } = await window.api.get(window.endpoints.acoes.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+
+                if (lista.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.style.gridColumn = '1 / -1';
+                    empty.style.textAlign = 'center';
+                    empty.style.padding = '24px';
+                    empty.style.color = '#666';
+                    empty.innerHTML = '<i class="fas fa-tasks" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhuma ação encontrada';
+                    gridAcoes.appendChild(empty);
+                } else {
+                    lista.forEach(a => gridAcoes.appendChild(createAcaoCard(a)));
+                }
+            } catch (e) {
+                console.error('Erro ao carregar ações:', e);
+            } finally {
+                if (loaderAcoes) loaderAcoes.style.display = 'none';
+            }
         }
 
         // Toggle de status no modal
@@ -975,7 +993,7 @@
             }
 
             // Carregar dados ao inicializar
-            carregarAcoes();
+            carregarAcoesGrid();
 
             // Form submit
             const form = document.getElementById('acaoForm');

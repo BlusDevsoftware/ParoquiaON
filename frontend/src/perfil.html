@@ -1199,6 +1199,66 @@
             </div>
         </div>
     </div>
+    <script type="module">
+        // Listar perfis via API e renderizar no grid de cards
+        const gridPerfis = document.getElementById('perfis-grid');
+        const loaderPerfis = document.getElementById('loader-perfis');
+
+        function createPerfilCard(perfil) {
+            const nome = perfil?.nome || 'Sem nome';
+            const descricao = perfil?.descricao || '-';
+            const permissoes = Array.isArray(perfil?.permissoes) ? perfil.permissoes.join(', ') : (perfil?.permissoes || '-');
+
+            const div = document.createElement('div');
+            div.className = 'perfil-card';
+            div.innerHTML = `
+                <div class="perfil-header">
+                    <h3 class="perfil-title">${nome}</h3>
+                    <div class="perfil-actions">
+                        <button class="btn-edit" title="Editar" onclick="openPerfilModal?.('${perfil?.codigo ?? ''}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-delete" title="Excluir" onclick="openDeleteModal?.('${perfil?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="perfil-info">
+                    <p><i class="fas fa-align-left"></i> ${descricao}</p>
+                    <p><i class="fas fa-key"></i> ${permissoes}</p>
+                </div>
+            `;
+            return div;
+        }
+
+        async function carregarPerfisGrid() {
+            try {
+                if (loaderPerfis) loaderPerfis.style.display = 'flex';
+                if (!gridPerfis) return;
+
+                const header = gridPerfis.querySelector('.grid-header');
+                Array.from(gridPerfis.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
+
+                const { data, error } = await window.api.get(window.endpoints.perfis.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+
+                if (lista.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.style.gridColumn = '1 / -1';
+                    empty.style.textAlign = 'center';
+                    empty.style.padding = '24px';
+                    empty.style.color = '#666';
+                    empty.innerHTML = '<i class="fas fa-user-shield" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum perfil encontrado';
+                    gridPerfis.appendChild(empty);
+                } else {
+                    lista.forEach(p => gridPerfis.appendChild(createPerfilCard(p)));
+                }
+            } catch (e) {
+                console.error('Erro ao carregar perfis:', e);
+            } finally {
+                if (loaderPerfis) loaderPerfis.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarPerfisGrid);
+    </script>
     <script src="scripts/hamburger-menu.js"></script>
 </body>
 </html> 
