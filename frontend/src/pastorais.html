@@ -1269,10 +1269,11 @@
             return String(codigo).padStart(5, '0');
         }
 
-        // Função para alternar label e máscara do documento
+        // Função segura: alternar label/máscara do documento APENAS se os campos existirem
         function toggleTipoCliente(tipo, limpar = false) {
             const label = document.getElementById('documentoLabel');
             const input = document.getElementById('documento');
+            if (!label || !input) return; // não aplica em pastorais
             if (tipo === 'pj') {
                 label.textContent = 'CNPJ';
                 input.placeholder = '00.000.000/0000-00';
