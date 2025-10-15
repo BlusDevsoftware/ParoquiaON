@@ -289,6 +289,39 @@
             background: #fff;
         }
 
+        /* Estilo do cabeçalho e linhas da lista */
+        .grid-header {
+            border: 1px solid #e6e9ef;
+        }
+
+        .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            padding: 12px 16px;
+            border: 1px solid #eef1f6;
+            border-radius: 8px;
+            align-items: center;
+            background: #fff;
+            transition: background-color .15s ease, box-shadow .15s ease;
+        }
+
+        .grid-row:nth-child(odd) {
+            background: #fafbff;
+        }
+
+        .grid-row:hover {
+            background: #f5f8ff;
+            box-shadow: 0 1px 4px rgba(30,58,138,0.06);
+        }
+
+        .grid-cell-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
         .pastoral-card {
             background: white;
             border: 1px solid #e0e0e0;
@@ -1302,26 +1335,23 @@
             }
         }
 
+        // Cache de pessoas para exibir nome do responsável
+        let pessoasById = {};
+
         // Cria uma linha (lista) para o grid de pastorais (4 colunas)
         function createPastoralRow(pastoral) {
             const nome = pastoral?.nome || 'Sem nome';
-            const responsavel = pastoral?.responsavel || '-';
+            const responsavelId = pastoral?.responsavel_id;
+            const responsavelNome = (responsavelId && pessoasById[responsavelId]?.nome) ? pessoasById[responsavelId].nome : '-';
             const tipo = pastoral?.tipo || '-';
             const id = pastoral?.id ?? '';
             const row = document.createElement('div');
-            row.style.display = 'grid';
-            row.style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
-            row.style.gap = '16px';
-            row.style.padding = '12px 16px';
-            row.style.border = '1px solid #eee';
-            row.style.borderRadius = '8px';
-            row.style.alignItems = 'center';
-            row.style.background = '#fff';
+            row.className = 'grid-row';
             row.innerHTML = `
                 <div>${nome}</div>
-                <div>${responsavel}</div>
+                <div>${responsavelNome}</div>
                 <div>${tipo}</div>
-                <div style="display:flex; gap:8px;">
+                <div class="grid-cell-actions">
                     <button class="btn-edit" title="Editar" onclick="editarPastoral?.('${id}')"><i class="fas fa-edit"></i></button>
                     <button class="btn-delete" title="Excluir" onclick="excluirPastoral?.('${id}')"><i class="fas fa-trash"></i></button>
                 </div>
@@ -1578,16 +1608,20 @@ async function visualizarPastoral(id) {
                 // Mostrar spinner centralizado ao iniciar
                 mostrarSpinner();
                 
-                // Carregar dados
-                await carregarPastorais();
-                // Carregar pessoas para o select de responsável
+                // Carregar pessoas primeiro (para nomes de responsáveis)
                 try {
                     const { data: pessoas } = await api.get(endpoints.pessoas.list);
-                    const select = document.getElementById('responsavel_id');
-                    if (select && Array.isArray(pessoas)) {
-                        select.innerHTML = '<option value="">Selecione...</option>' + pessoas.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+                    if (Array.isArray(pessoas)) {
+                        pessoasById = pessoas.reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
+                        const select = document.getElementById('responsavel_id');
+                        if (select) {
+                            select.innerHTML = '<option value="">Selecione...</option>' + pessoas.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+                        }
                     }
-                } catch (_) {}
+                } catch (_) { pessoasById = {}; }
+
+                // Carregar dados das pastorais (já com nomes resolvidos)
+                await carregarPastorais();
                 
                 // Ocultar spinner centralizado quando tudo carregar
                 ocultarSpinner();
