@@ -1457,10 +1457,7 @@
             const formData = new FormData(form);
             const cliente = {
                 nome: formData.get('nome'),
-                tipo: formData.get('tipo'),
-                responsavel: formData.get('responsavel'),
-                contato: formData.get('contato'),
-                observacao: formData.get('observacao'),
+                descricao: formData.get('observacao') || '',
                 status: formData.get('status')
             };
 
