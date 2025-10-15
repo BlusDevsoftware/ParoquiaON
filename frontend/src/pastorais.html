@@ -1160,12 +1160,12 @@
     <div id="deleteSuccessModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
         <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
             <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
-                <h2 style="margin: 0; font-size: 1.3em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Cliente Excluído!</h2>
+                <h2 style="margin: 0; font-size: 1.3em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Pastoral Excluída!</h2>
                 <button class="close-modal" onclick="closeDeleteSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
             </div>
             <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
                 <i class="fas fa-check-circle" style="font-size: 3em; color: #4CAF50; margin-bottom: 16px;"></i>
-                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Cliente excluído com sucesso!</div>
+                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Pastoral excluída com sucesso!</div>
                 <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
                     O registro foi removido do sistema.
                 </div>
@@ -1467,24 +1467,22 @@
             try {
                 if (form.dataset.codigo) {
                     console.log('🔄 Atualizando pastoral...');
-                    await api.put(endpoints.pastorais.update(form.dataset.codigo), cliente);
-                    console.log('✅ Cliente atualizado com sucesso');
-                    // Mostrar modal de sucesso de atualização
-                    console.log('🎯 Chamando showUpdateSuccessModal...');
+                    const { error } = await api.put(endpoints.pastorais.update(form.dataset.codigo), cliente);
+                    if (error) throw error;
+                    console.log('✅ Pastoral atualizada com sucesso');
                     window.showUpdateSuccessModal(cliente.status === 'ativo' ? 'Ativo' : 'Inativo');
                 } else {
                     console.log('🆕 Criando nova pastoral...');
-                    await api.post(endpoints.pastorais.create, cliente);
-                    console.log('✅ Cliente criado com sucesso');
-                    // Mostrar modal de sucesso de cadastro
-                    console.log('🎯 Chamando showSuccessModal...');
+                    const { error } = await api.post(endpoints.pastorais.create, cliente);
+                    if (error) throw error;
+                    console.log('✅ Pastoral criada com sucesso');
                     window.showSuccessModal();
                 }
                 closeModal();
                 carregarClientes();
             } catch (error) {
-                console.error('Erro ao salvar cliente:', error);
-                alert('Erro ao salvar cliente');
+                console.error('Erro ao salvar pastoral:', error);
+                alert('Erro ao salvar pastoral');
             }
         }
 
