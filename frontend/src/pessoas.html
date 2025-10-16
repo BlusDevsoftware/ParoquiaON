@@ -1177,7 +1177,10 @@
             const form = document.getElementById('pessoaForm');
             if (!form) return;
             form.reset();
-            delete form.dataset.id;
+            // Só limpa dataset.id se for nova pessoa
+            if (!form.dataset.keepId) {
+                delete form.dataset.id;
+            }
             form.dataset.codigo = '';
             const preview = document.getElementById('photoPreview');
             const hiddenFoto = form.querySelector('input[name="foto"]');
@@ -1197,6 +1200,8 @@
             if (statusLabel) statusLabel.textContent = 'Ativo';
             // Recria handler de foto para evitar múltiplos listeners
             inicializarFotoHandlersPessoa();
+            // Limpa flag de keepId após reset
+            delete form.dataset.keepId;
         }
 
         // Funções globais para modais
@@ -1376,22 +1381,18 @@
             try {
                 const { data: pessoa, error } = await api.get(window.endpoints.pessoas.get(id));
                 if (error) throw error;
-                openPessoaModal('Editar Pessoa');
                 const form = document.getElementById('pessoaForm');
+                form.dataset.keepId = true;
                 form.dataset.id = pessoa.id ?? id;
-                form.nomePessoa.value = pessoa.nome || '';
-                form.telefonePessoa.value = pessoa.telefone || '';
-                form.enderecoPessoa.value = pessoa.endereco || '';
-                const statusToggle = document.getElementById('statusTogglePessoaModal');
-                const statusInput = document.getElementById('statusPessoa');
-                const statusLabel = document.querySelector('#pessoaModal .status-label-modal');
-                const status = pessoa.status || (pessoa.ativo === false ? 'inativo' : 'ativo');
-                if (statusToggle) statusToggle.checked = (String(status).toLowerCase() === 'ativo');
-                if (statusInput) statusInput.value = statusToggle.checked ? 'ativo' : 'inativo';
-                if (statusLabel) statusLabel.textContent = statusToggle.checked ? 'Ativo' : 'Inativo';
+                openPessoaModal('Editar Pessoa', pessoa, 'editar');
                 // foto
                 const preview = document.getElementById('photoPreview');
-                if (pessoa.foto) { preview.src = pessoa.foto; preview.style.display = 'block'; }
+                const hiddenFoto = form.querySelector('input[name="foto"]');
+                if (pessoa.foto) { 
+                    preview.src = pessoa.foto; 
+                    preview.style.display = 'block';
+                    if (hiddenFoto) hiddenFoto.value = pessoa.foto;
+                }
             } catch (e) {
                 alert('Erro ao carregar pessoa');
             }
@@ -1401,14 +1402,17 @@
             try {
                 const { data: pessoa, error } = await api.get(window.endpoints.pessoas.get(id));
                 if (error) throw error;
-                openPessoaModal('Nova Pessoa');
+                openPessoaModal('Nova Pessoa', pessoa, 'novo');
                 const form = document.getElementById('pessoaForm');
                 form.nomePessoa.value = `${pessoa?.nome || ''} (cópia)`;
-                form.telefonePessoa.value = pessoa?.telefone || '';
-                form.enderecoPessoa.value = pessoa?.endereco || '';
+                // foto
                 const preview = document.getElementById('photoPreview');
-                const placeholder = document.getElementById('photoPlaceholder');
-                if (pessoa?.foto) { preview.src = pessoa.foto; preview.style.display = 'block'; placeholder.style.display = 'none'; }
+                const hiddenFoto = form.querySelector('input[name="foto"]');
+                if (pessoa?.foto) { 
+                    preview.src = pessoa.foto; 
+                    preview.style.display = 'block';
+                    if (hiddenFoto) hiddenFoto.value = pessoa.foto;
+                }
             } catch (e) {
                 alert('Erro ao duplicar pessoa');
             }
