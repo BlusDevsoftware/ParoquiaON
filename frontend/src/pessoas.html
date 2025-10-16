@@ -1287,16 +1287,7 @@
             // Carregar dados ao inicializar
             carregarPessoas();
 
-            // Form submit
-            const form = document.getElementById('pessoaForm');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    // Aqui você pode implementar a lógica de salvamento
-                    console.log('Formulário enviado:', new FormData(form));
-                    closePessoaModal();
-                });
-            }
+            // Removido handler placeholder de submit; o handler real está mais abaixo
 
             // Confirmar exclusão
             const confirmDeleteBtn = document.getElementById('confirmDeletePessoaBtn');
