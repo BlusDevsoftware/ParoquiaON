@@ -27,6 +27,7 @@ async function buscarLocal(req, res) {
 async function criarLocal(req, res) {
     try {
         const body = req.body || {};
+        console.log('Dados recebidos para criar local:', body);
         const normalizedStatus = typeof body.status === 'string'
             ? (String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo')
             : 'ativo';
@@ -41,6 +42,7 @@ async function criarLocal(req, res) {
             criado_por_email: body.criado_por_email ?? null,
             criado_por_nome: body.criado_por_nome ?? null
         };
+        console.log('Payload para inserção em locais:', insertData);
 
         let insertResult = await supabase
             .from('locais')
@@ -49,6 +51,7 @@ async function criarLocal(req, res) {
             .single();
 
         if (insertResult.error && insertResult.error.code === '42703') {
+            console.error('Coluna status ausente em locais, aplicando fallback. Erro:', insertResult.error);
             const fallbackData = {
                 nome: insertData.nome,
                 endereco: insertData.endereco,
@@ -59,6 +62,7 @@ async function criarLocal(req, res) {
                 criado_por_email: insertData.criado_por_email,
                 criado_por_nome: insertData.criado_por_nome
             };
+            console.log('Payload fallback (ativo boolean) para locais:', fallbackData);
             insertResult = await supabase
                 .from('locais')
                 .insert([fallbackData])
@@ -66,7 +70,10 @@ async function criarLocal(req, res) {
                 .single();
         }
 
-        if (insertResult.error) throw insertResult.error;
+        if (insertResult.error) {
+            console.error('Erro do Supabase ao criar local:', insertResult.error);
+            throw insertResult.error;
+        }
         res.status(201).json(insertResult.data);
     } catch (error) {
         console.error('Erro ao criar local:', error);
@@ -78,6 +85,7 @@ async function atualizarLocal(req, res) {
     try {
         const { id } = req.params;
         const body = req.body || {};
+        console.log('Dados recebidos para atualizar local:', { id, body });
         const normalizedStatus = typeof body.status === 'string'
             ? (String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo')
             : undefined;
@@ -92,6 +100,7 @@ async function atualizarLocal(req, res) {
             ...(body.criado_por_email !== undefined ? { criado_por_email: body.criado_por_email } : {}),
             ...(body.criado_por_nome !== undefined ? { criado_por_nome: body.criado_por_nome } : {})
         };
+        console.log('Payload para atualização em locais:', updateData);
 
         let updateResult = await supabase
             .from('locais')
@@ -101,11 +110,13 @@ async function atualizarLocal(req, res) {
             .single();
 
         if (updateResult.error && updateResult.error.code === '42703' && normalizedStatus !== undefined) {
+            console.error('Coluna status ausente em locais no update, aplicando fallback. Erro:', updateResult.error);
             const fallbackUpdate = {
                 ...updateData,
                 status: undefined,
                 ativo: normalizedStatus === 'ativo'
             };
+            console.log('Payload fallback (ativo boolean) para update de locais:', fallbackUpdate);
             updateResult = await supabase
                 .from('locais')
                 .update(fallbackUpdate)
@@ -114,7 +125,10 @@ async function atualizarLocal(req, res) {
                 .single();
         }
 
-        if (updateResult.error) throw updateResult.error;
+        if (updateResult.error) {
+            console.error('Erro do Supabase ao atualizar local:', updateResult.error);
+            throw updateResult.error;
+        }
         if (!updateResult.data) return res.status(404).json({ error: 'Local não encontrado' });
         res.json(updateResult.data);
     } catch (error) {
