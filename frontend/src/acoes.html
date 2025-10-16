@@ -876,6 +876,55 @@
         </div>
     </div>
 
+    <!-- Modal de Sucesso - Cadastro -->
+    <div id="successModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; font-size: 1.3em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Cadastro Realizado!</h2>
+                <button class="close-modal" onclick="closeSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
+                <i class="fas fa-check-circle" style="font-size: 3em; color: #4CAF50; margin-bottom: 16px;"></i>
+                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Ação cadastrada com sucesso!</div>
+                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
+                    A ação foi adicionada ao sistema e já está disponível para uso.
+                </div>
+                <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
+                    <div style="margin-bottom: 8px;"><strong>Status:</strong> Ativo</div>
+                    <div style="margin-bottom: 8px;"><strong>Data de Cadastro:</strong> <span id="dataCadastro"></span></div>
+                    <div><strong>Sistema:</strong> ParoquiaON</div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="btn-secondary" onclick="closeSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso - Atualização -->
+    <div id="updateSuccessModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; font-size: 1.3em; color: #2196F3; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-sync-alt"></i> Dados Atualizados!</h2>
+                <button class="close-modal" onclick="closeUpdateSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
+                <i class="fas fa-sync-alt" style="font-size: 3em; color: #2196F3; margin-bottom: 16px;"></i>
+                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Dados atualizados com sucesso!</div>
+                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
+                    As informações da ação foram atualizadas no sistema.
+                </div>
+                <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
+                    <div style="margin-bottom: 8px;"><strong>Status:</strong> <span id="statusAtualizado"></span></div>
+                    <div style="margin-bottom: 8px;"><strong>Data de Atualização:</strong> <span id="dataAtualizacao"></span></div>
+                    <div><strong>Sistema:</strong> ParoquiaON</div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="btn-secondary" onclick="closeUpdateSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="scripts/bloqueio_exclusao.js"></script>
     <script type="module">
         // Funções globais para modais
@@ -1092,6 +1141,61 @@
                     }
                 });
             }
+        });
+
+        // Funções de modal de sucesso/atualização
+        window.showSuccessModal = function() {
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            const dc = document.getElementById('dataCadastro');
+            if (dc) dc.textContent = dataAtual;
+            const modal = document.getElementById('successModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        window.closeSuccessModal = function() {
+            const modal = document.getElementById('successModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        window.showUpdateSuccessModal = function(status) {
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            const da = document.getElementById('dataAtualizacao');
+            const sa = document.getElementById('statusAtualizado');
+            if (da) da.textContent = dataAtual;
+            if (sa) sa.textContent = status || 'Ativo';
+            const modal = document.getElementById('updateSuccessModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        window.closeUpdateSuccessModal = function() {
+            const modal = document.getElementById('updateSuccessModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Fechar modais de sucesso ao clicar fora
+        window.addEventListener('click', function(event) {
+            const sm = document.getElementById('successModal');
+            if (event.target === sm) closeSuccessModal();
+            const um = document.getElementById('updateSuccessModal');
+            if (event.target === um) closeUpdateSuccessModal();
         });
 
         // CRUD Ações
