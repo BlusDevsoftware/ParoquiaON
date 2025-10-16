@@ -246,7 +246,7 @@
         }
         
         .switch-modal input:checked + .slider-modal {
-            background-color: #2196F3;
+            background-color: #1e3a8a;
         }
         
         .switch-modal input:checked + .slider-modal:before {
@@ -1234,10 +1234,11 @@
                 }
                 
                 // Atualizar toggle de status
-                const status = pessoa.status || 'Ativo';
-                if (statusToggle) statusToggle.checked = status === 'Ativo';
-                if (statusInput) statusInput.value = status === 'Ativo' ? 'ativo' : 'inativo';
-                if (statusLabel) statusLabel.textContent = status === 'Ativo' ? 'Ativo' : 'Inativo';
+                const statusRaw = pessoa.status ?? (pessoa.ativo === false ? 'inativo' : 'ativo');
+                const statusNorm = String(statusRaw).toLowerCase() === 'inativo' ? 'inativo' : 'ativo';
+                if (statusToggle) statusToggle.checked = (statusNorm === 'ativo');
+                if (statusInput) statusInput.value = statusNorm;
+                if (statusLabel) statusLabel.textContent = (statusNorm === 'ativo' ? 'Ativo' : 'Inativo');
             }
             
             // Modo visualização: desabilitar campos e esconder botões
@@ -1354,13 +1355,9 @@
             
             if (statusToggle && statusInput && statusLabel) {
                 statusToggle.addEventListener('change', function() {
-                    if (this.checked) {
-                        statusInput.value = 'ativo';
-                        statusLabel.textContent = 'Ativo';
-                    } else {
-                        statusInput.value = 'inativo';
-                        statusLabel.textContent = 'Inativo';
-                    }
+                    const norm = this.checked ? 'ativo' : 'inativo';
+                    statusInput.value = norm;
+                    statusLabel.textContent = norm === 'ativo' ? 'Ativo' : 'Inativo';
                 });
             }
 
