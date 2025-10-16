@@ -919,7 +919,7 @@
 
         async function carregarPilares() {
             try {
-                if (loaderPilares) loaderPilares.style.display = 'flex';
+                mostrarSpinner();
                 if (!gridPilares) return;
                 Array.from(gridPilares.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
 
@@ -941,7 +941,7 @@
             } catch (e) {
                 console.error('Erro ao carregar pilares:', e);
             } finally {
-                if (loaderPilares) loaderPilares.style.display = 'none';
+                ocultarSpinner();
             }
         }
 
