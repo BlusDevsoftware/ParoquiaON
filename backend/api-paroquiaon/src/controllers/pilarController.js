@@ -36,7 +36,6 @@ async function criarPilar(req, res) {
         const insertData = {
             nome: body.nome,
             descricao: body.descricao ?? null,
-            cor: body.cor ?? '#1976d2',
             status: normalizedStatus,
             // Colunas de autoria (adicionadas por migração recente)
             usuario_id: body.usuario_id ?? null,
@@ -56,7 +55,6 @@ async function criarPilar(req, res) {
             const fallbackData = {
                 nome: insertData.nome,
                 descricao: insertData.descricao,
-                cor: insertData.cor,
                 ativo: normalizedStatus === 'ativo',
                 usuario_id: insertData.usuario_id,
                 criado_por_email: insertData.criado_por_email,
@@ -89,7 +87,6 @@ async function atualizarPilar(req, res) {
         const updateData = {
             ...(body.nome !== undefined ? { nome: body.nome } : {}),
             ...(body.descricao !== undefined ? { descricao: body.descricao } : {}),
-            ...(body.cor !== undefined ? { cor: body.cor } : {}),
             ...(normalizedStatus !== undefined ? { status: normalizedStatus } : {}),
             ...(body.usuario_id !== undefined ? { usuario_id: body.usuario_id } : {}),
             ...(body.criado_por_email !== undefined ? { criado_por_email: body.criado_por_email } : {}),
