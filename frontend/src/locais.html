@@ -146,12 +146,12 @@
             transition: all 0.3s;
         }
         .btn-primary {
-            background-color: #2196F3;
+            background-color: #1e3a8a;
             color: white;
             border: none;
         }
         .btn-primary:hover {
-            background-color: #1976D2;
+            background-color: #2740a6;
         }
         .btn-secondary {
             background-color: #f5f5f5;
@@ -304,94 +304,53 @@
         }
 
         .locais-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 8px;
             padding: 8px;
             overflow-y: auto;
-            /* Ocupar todo o espaço do container */
             height: 100%;
             position: relative;
             border-radius: 8px;
             background: #fff;
         }
 
-        .local-card {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .local-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .local-header {
-            display: flex;
-            justify-content: space-between;
+        .grid-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 120px auto;
+            gap: 16px;
+            padding: 12px 16px;
             align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .local-title {
-            font-size: 18px;
+            border: 1px solid #e6e9ef;
+            background: #f8f9fa;
+            border-radius: 8px;
             font-weight: 600;
-            color: #333;
-            margin: 0;
-        }
-
-        .local-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .local-actions button {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-edit {
-            background: #007bff;
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background: #0056b3;
-        }
-
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background: #c82333;
-        }
-
-        .local-info {
-            color: #666;
+            color: #495057;
             font-size: 14px;
-            line-height: 1.4;
         }
-
-        .local-info p {
-            margin: 4px 0;
+        .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 120px auto;
+            gap: 16px;
+            padding: 12px 16px;
+            border: 1px solid #eef1f6;
+            border-radius: 8px;
+            align-items: center;
+            background: #fff;
+            transition: background-color .15s ease, box-shadow .15s ease;
         }
-
-        .local-info i {
-            margin-right: 8px;
-            width: 16px;
-            color: #007bff;
-        }
+        .grid-row:nth-child(odd) { background: #fafbff; }
+        .grid-row:hover { background: #f5f8ff; box-shadow: 0 1px 4px rgba(30,58,138,0.06); }
+        .grid-row > div:nth-child(3) { display: flex; justify-content: center; align-items: center; }
+        .grid-cell-actions { display: flex; gap: 8px; justify-content: center; align-items: center; }
+        .btn-icon { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%); color: #334155; transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease; box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06); }
+        .btn-icon i { font-size: 15px; color: currentColor; }
+        .btn-icon:hover { transform: translateY(-1px); background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); color: #1e3a8a; box-shadow: 0 2px 6px rgba(30, 64, 175, 0.18); border-color: rgba(30, 58, 138, 0.22); }
+        .btn-icon:active { transform: translateY(0); box-shadow: 0 1px 3px rgba(2, 6, 23, 0.12) inset; }
+        .btn-icon.btn-edit, .btn-icon.btn-duplicate { background: #1e3a8a; color: #fff; border-color: #1e3a8a; box-shadow: 0 1px 2px rgba(30,58,138,0.25); }
+        .btn-icon.btn-edit:hover, .btn-icon.btn-duplicate:hover { background: #2740a6; color: #fff; border-color: #2740a6; box-shadow: 0 2px 8px rgba(30,58,138,0.35); }
+        .btn-icon.btn-delete { background: #b91c1c; color: #fff; border-color: #b91c1c; box-shadow: 0 1px 2px rgba(185,28,28,0.25); }
+        .btn-icon.btn-delete:hover { background: #991b1b; color: #fff; border-color: #991b1b; box-shadow: 0 2px 8px rgba(185,28,28,0.35); }
 
         /* Spinner de carregamento - IDÊNTICO AO DA ABA DE COLABORADORES */
         @keyframes spin {
@@ -399,8 +358,8 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Loader específico para a tabela de serviços */
-        .loader-overlay-servicos {
+        /* Loader específico para locais */
+        .loader-overlay-locais {
             display: none;
             position: absolute;
             top: 0;
@@ -698,15 +657,9 @@
             font-size: 0.9em;
         }
         
-        .status.ativo {
-            background-color: #e8f5e9;
-            color: #4CAF50;
-        }
+        .status.ativo { background-color: #1e3a8a; color: #ffffff; }
         
-        .status.inativo {
-            background-color: #ffebee;
-            color: #f44336;
-        }
+        .status.inativo { background-color: #dc2626; color: #ffffff; }
 
         /* Barra superior ocupando toda a largura */
         .top-header {
@@ -988,17 +941,17 @@
         <!-- Cards Grid -->
         <div class="cards-container">
             <!-- Spinner de Carregamento -->
-            <div id="loader-locais" class="loader-overlay-servicos">
+            <div id="loader-locais" class="loader-overlay-locais">
                 <div class="spinner-main"></div>
                 <div class="loading-text">Carregando locais...</div>
             </div>
             
             <div id="locais-grid" class="locais-grid">
                 <!-- Cabeçalho do Grid -->
-                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
+                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 120px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
                     <div>Nome do Local</div>
                     <div>Endereço</div>
-                    <div>Tipo</div>
+                    <div>Status</div>
                     <div>Ações</div>
                 </div>
                 <!-- Cards dos locais serão carregados dinamicamente via JavaScript -->
@@ -1125,7 +1078,7 @@
                 <i class="fas fa-sync-alt" style="font-size: 3em; color: #2196F3; margin-bottom: 16px;"></i>
                 <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Dados atualizados com sucesso!</div>
                 <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
-                    As informações do serviço foram atualizadas no sistema.
+                    As informações do local foram atualizadas no sistema.
                 </div>
                 <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
                     <div style="margin-bottom: 8px;"><strong>Status:</strong> <span id="statusAtualizado"></span></div>
@@ -1141,41 +1094,39 @@
 
     <script src="scripts/bloqueio_exclusao.js"></script>
     <script type="module">
-        // Listar locais via API e renderizar no grid de cards
+        // Listar locais via API e renderizar em linhas
         const gridLocais = document.getElementById('locais-grid');
         const loaderLocais = document.getElementById('loader-locais');
 
-        function createLocalCard(local) {
+        function mostrarSpinner() { if (loaderLocais) loaderLocais.style.display = 'flex'; }
+        function ocultarSpinner() { if (loaderLocais) loaderLocais.style.display = 'none'; }
+
+        function createLocalRow(local) {
             const nome = local?.nome || 'Sem nome';
             const endereco = local?.endereco || '-';
-            const tipo = local?.tipo || '-';
-            const status = (local?.status || 'Ativo').toLowerCase();
-
-            const div = document.createElement('div');
-            div.className = 'local-card';
-            div.innerHTML = `
-                <div class="local-header">
-                    <h3 class="local-title">${nome}</h3>
-                    <div class="local-actions">
-                        <button class="btn-edit" title="Editar" onclick="editarServico?.('${local?.codigo ?? ''}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-delete" title="Excluir" onclick="openDeleteModal?.('${local?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-                <div class="local-info">
-                    <p><i class="fas fa-map"></i> Endereço: ${endereco}</p>
-                    <p><i class="fas fa-tag"></i> Tipo: ${tipo}</p>
-                    <p><i class="fas fa-circle" style="color:${status === 'ativo' ? '#4CAF50' : '#f44336'}"></i> Status: ${status === 'ativo' ? 'Ativo' : 'Inativo'}</p>
+            const ativo = local?.ativo !== false && (local?.status ? String(local.status).toLowerCase() === 'ativo' : true);
+            const statusText = ativo ? 'Ativo' : 'Inativo';
+            const statusClass = ativo ? 'ativo' : 'inativo';
+            const id = local?.id ?? local?.codigo ?? '';
+            const row = document.createElement('div');
+            row.className = 'grid-row';
+            row.innerHTML = `
+                <div>${nome}</div>
+                <div>${endereco}</div>
+                <div><span class="status ${statusClass}">${statusText}</span></div>
+                <div class="grid-cell-actions">
+                    <button class="btn-icon btn-edit" title="Editar" onclick="editarLocal?.('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon btn-duplicate" title="Duplicar" onclick="duplicarLocal?.('${id}')"><i class="fa-regular fa-copy"></i></button>
+                    <button class="btn-icon btn-delete" title="Excluir" onclick="excluirLocal?.('${id}')"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;
-            return div;
+            return row;
         }
 
-        async function carregarLocaisGrid() {
+        async function carregarLocais() {
             try {
-                if (loaderLocais) loaderLocais.style.display = 'flex';
+                mostrarSpinner();
                 if (!gridLocais) return;
-
-                const header = gridLocais.querySelector('.grid-header');
                 Array.from(gridLocais.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
 
                 const { data, error } = await window.api.get(window.endpoints.locais.list);
@@ -1191,16 +1142,16 @@
                     empty.innerHTML = '<i class="fas fa-map-marker-alt" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum local encontrado';
                     gridLocais.appendChild(empty);
                 } else {
-                    lista.forEach(l => gridLocais.appendChild(createLocalCard(l)));
+                    lista.forEach(l => gridLocais.appendChild(createLocalRow(l)));
                 }
             } catch (e) {
                 console.error('Erro ao carregar locais:', e);
             } finally {
-                if (loaderLocais) loaderLocais.style.display = 'none';
+                ocultarSpinner();
             }
         }
 
-        document.addEventListener('DOMContentLoaded', carregarLocaisGrid);
+        document.addEventListener('DOMContentLoaded', carregarLocais);
         // Funções globais para modais
         window.openServicoModal = function(titulo = 'Novo Local', servico = null, modo = 'novo') {
             const modal = document.getElementById('servicoModal');
@@ -1381,60 +1332,89 @@
             }
         }
         
-        // CRUD
-        window.visualizarServico = async function(codigo) {
+        // CRUD Locais
+        window.excluirLocal = function(id) { window.openDeleteModal(id); };
+        window.editarLocal = async function(id) {
             try {
-                const servico = await api.get(`/servicos/${codigo}`);
-                window.openServicoModal('Visualizar Serviço', servico, 'visualizar');
+                const { data: local, error } = await api.get(window.endpoints.locais.get(id));
+                if (error) throw error;
+                const modal = document.getElementById('servicoModal');
+                const modalTitle = document.getElementById('servicoModalTitle');
+                const form = document.getElementById('servicoForm');
+                modalTitle.innerHTML = '<i class="fas fa-map-marker-alt"></i> Editar Local';
+                form.dataset.id = local.id ?? id;
+                form.nome.value = local.nome || '';
+                form.endereco.value = local.endereco || '';
+                form.observacao.value = local.observacao || local.descricao || '';
+                const statusToggle = document.getElementById('statusToggleModal');
+                const statusInput = document.getElementById('status');
+                const statusLabel = document.querySelector('.status-label-modal');
+                const status = local.status || (local.ativo === false ? 'inativo' : 'ativo');
+                if (statusToggle) statusToggle.checked = status === 'ativo' || status === 'Ativo';
+                if (statusInput) statusInput.value = statusToggle.checked ? 'ativo' : 'inativo';
+                if (statusLabel) statusLabel.textContent = statusToggle.checked ? 'Ativo' : 'Inativo';
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
             } catch (error) {
-                alert('Erro ao carregar serviço');
+                alert('Erro ao carregar local');
             }
         }
-        window.editarServico = async function(codigo) {
+        window.duplicarLocal = async function(id) {
             try {
-                const servico = await api.get(`/servicos/${codigo}`);
-                window.openServicoModal('Editar Local', servico, 'editar');
+                const { data: local, error } = await api.get(window.endpoints.locais.get(id));
+                if (error) throw error;
+                window.openServicoModal('Novo Local');
+                const form = document.getElementById('servicoForm');
+                form.nome.value = `${local?.nome || ''} (cópia)`;
+                form.endereco.value = local?.endereco || '';
+                form.observacao.value = local?.observacao || local?.descricao || '';
             } catch (error) {
-                alert('Erro ao carregar serviço');
+                alert('Erro ao duplicar local');
             }
         }
         document.getElementById('servicoForm').onsubmit = async function(event) {
             event.preventDefault();
             const form = event.target;
-            const servico = {
+            const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') ? window.authGuard.getCurrentUser() : null;
+            const rawUserId = currentUser && (currentUser.id ?? currentUser.usuario_id ?? currentUser.userId);
+            const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
+            const payload = {
                 nome: form.nome.value,
-                tipo: form.tipo.value,
                 endereco: form.endereco.value,
-                status: form.status.value === 'ativo' ? 'Ativo' : 'Inativo',
-                observacao: form.observacao.value
+                status: form.status.value,
+                observacao: form.observacao.value || '',
+                usuario_id: usuarioId ?? undefined,
+                criado_por_email: currentUser?.email ?? undefined,
+                criado_por_nome: (currentUser?.nome ?? currentUser?.name) ?? undefined
             };
             try {
-                if (form.dataset.codigo) {
-                    await api.put(`/servicos/${form.dataset.codigo}`, servico);
-                    // Mostrar modal de sucesso de atualização
-                    window.showUpdateSuccessModal(servico.status);
+                if (form.dataset.id) {
+                    const { error } = await api.put(window.endpoints.locais.update(form.dataset.id), payload);
+                    if (error) throw error;
+                    window.showUpdateSuccessModal(payload.status === 'ativo' ? 'Ativo' : 'Inativo');
                 } else {
-                    await api.post('/servicos', servico);
-                    // Mostrar modal de sucesso de cadastro
+                    const { error } = await api.post(window.endpoints.locais.create, payload);
+                    if (error) throw error;
                     window.showSuccessModal();
                 }
                 closeServicoModal();
-                carregarServicos();
+                carregarLocais();
             } catch (error) {
-                alert('Erro ao salvar serviço');
+                alert('Erro ao salvar local');
             }
         }
         document.getElementById('confirmDeleteBtn').onclick = async function() {
             const modal = document.getElementById('deleteModal');
-            const codigo = modal.dataset.codigo;
+            const id = modal.dataset.codigo;
             try {
                 await window.bloqueioExclusao.deleteWithCheck(
-                    'servicos',
-                    codigo,
-                    () => { closeDeleteModal(); carregarServicos(); }
+                    'locais',
+                    id,
+                    () => { closeDeleteModal(); carregarLocais(); }
                 );
             } catch (error) {
-                console.error('Erro ao excluir serviço:', error);
+                console.error('Erro ao excluir local:', error);
             }
         }
         document.addEventListener('DOMContentLoaded', async () => {
@@ -1443,7 +1423,7 @@
                 mostrarSpinner();
                 
                 // Carregar dados
-                await carregarServicos();
+                await carregarLocais();
                 
                 // Ocultar spinner centralizado quando tudo carregar
                 ocultarSpinner();
@@ -1481,6 +1461,5 @@
         window.closeUpdateSuccessModal = closeUpdateSuccessModal;
     </script>
     <script src="scripts/navigation.js"></script>
-    <script src="scripts/hamburger-menu.js"></script>
 </body>
 </html>
