@@ -1,5 +1,45 @@
 const { supabase } = require('../config/supabase');
 
+// Helpers de upload para Supabase Storage (bucket: "pessoas")
+const STORAGE_BUCKET = 'pessoas';
+
+function isBase64DataUrl(value) {
+    return typeof value === 'string' && /^data:image\/(png|jpe?g|webp);base64,/.test(value);
+}
+
+function dataUrlToBuffer(dataUrl) {
+    const base64 = dataUrl.split(',')[1];
+    return Buffer.from(base64, 'base64');
+}
+
+async function uploadFotoIfNeeded(dados, identificador) {
+    if (!dados || !dados.foto || !isBase64DataUrl(dados.foto)) {
+        return dados;
+    }
+
+    const buffer = dataUrlToBuffer(dados.foto);
+    const ext = (dados.foto.match(/^data:image\/(png|jpe?g|webp)/i) || [null, 'jpeg'])[1]
+        .replace('jpg', 'jpeg');
+    const path = `fotos/${identificador}.${ext}`;
+
+    const { error: uploadError } = await supabase
+        .storage
+        .from(STORAGE_BUCKET)
+        .upload(path, buffer, { contentType: `image/${ext}`, upsert: true });
+
+    if (uploadError) {
+        console.error('Erro ao fazer upload da imagem para o Storage (pessoas):', uploadError);
+        return dados;
+    }
+
+    const { data: publicUrlData } = supabase
+        .storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(path);
+
+    return { ...dados, foto: publicUrlData?.publicUrl || dados.foto };
+}
+
 async function listarPessoas(req, res) {
     try {
         const { data, error } = await supabase.from('pessoas').select('*').order('id', { ascending: true });
@@ -26,7 +66,7 @@ async function buscarPessoa(req, res) {
 
 async function criarPessoa(req, res) {
     try {
-        const body = req.body || {};
+        let body = req.body || {};
         const normalizedStatus = typeof body.status === 'string'
             ? (String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo')
             : 'ativo';
@@ -66,6 +106,27 @@ async function criarPessoa(req, res) {
         }
 
         if (insertResult.error) throw insertResult.error;
+
+        // Se enviou foto base64, faz upload no bucket "pessoas" e atualiza o registro com a URL
+        if (isBase64DataUrl(body.foto)) {
+            const created = insertResult.data;
+            const identificador = created?.id ?? created?.codigo ?? Date.now();
+            const dadosComFotoUrl = await uploadFotoIfNeeded(body, identificador);
+            if (dadosComFotoUrl.foto && dadosComFotoUrl.foto !== body.foto) {
+                const { data: updated, error: updateError } = await supabase
+                    .from('pessoas')
+                    .update({ foto: dadosComFotoUrl.foto })
+                    .eq('id', created.id)
+                    .select()
+                    .single();
+                if (!updateError && updated) {
+                    return res.status(201).json(updated);
+                }
+                // Se falhar o update, retorna o created mesmo assim
+                if (updateError) console.error('Erro ao salvar URL da foto (pessoas):', updateError);
+            }
+        }
+
         res.status(201).json(insertResult.data);
     } catch (error) {
         console.error('Erro ao criar pessoa:', error);
@@ -76,16 +137,22 @@ async function criarPessoa(req, res) {
 async function atualizarPessoa(req, res) {
     try {
         const { id } = req.params;
-        const body = req.body || {};
+        let body = req.body || {};
         const normalizedStatus = typeof body.status === 'string'
             ? (String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo')
             : undefined;
+
+        // Se houver foto base64, faz upload e troca por URL antes de atualizar
+        if (isBase64DataUrl(body.foto)) {
+            body = await uploadFotoIfNeeded(body, id);
+        }
 
         const updateData = {
             ...(body.nome !== undefined ? { nome: body.nome } : {}),
             ...(body.telefone !== undefined ? { telefone: body.telefone } : {}),
             ...(body.endereco !== undefined ? { endereco: body.endereco } : {}),
             ...(normalizedStatus !== undefined ? { status: normalizedStatus } : {}),
+            ...(body.foto !== undefined ? { foto: body.foto } : {}),
             ...(body.usuario_id !== undefined ? { usuario_id: body.usuario_id } : {}),
             ...(body.criado_por_email !== undefined ? { criado_por_email: body.criado_por_email } : {}),
             ...(body.criado_por_nome !== undefined ? { criado_por_nome: body.criado_por_nome } : {})
