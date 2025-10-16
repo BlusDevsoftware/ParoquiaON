@@ -146,12 +146,12 @@
             transition: all 0.3s;
         }
         .btn-primary {
-            background-color: #2196F3;
+            background-color: #1e3a8a;
             color: white;
             border: none;
         }
         .btn-primary:hover {
-            background-color: #1976D2;
+            background-color: #2740a6;
         }
         .btn-secondary {
             background-color: #f5f5f5;
@@ -271,15 +271,8 @@
             font-size: 0.9em;
         }
         
-        .status.ativo {
-            background-color: #e8f5e9;
-            color: #4CAF50;
-        }
-        
-        .status.inativo {
-            background-color: #ffebee;
-            color: #f44336;
-        }
+        .status.ativo { background-color: #1e3a8a; color: #ffffff; }
+        .status.inativo { background-color: #dc2626; color: #ffffff; }
 
         /* Estilos para o grid de usuários - Baseado no communities-grid */
         .cards-container {
@@ -290,17 +283,53 @@
         }
 
         .usuarios-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 8px;
             padding: 8px;
             overflow-y: auto;
-            /* Ocupar todo o espaço do container */
             height: 100%;
             position: relative;
             border-radius: 8px;
             background: #fff;
         }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 120px auto;
+            gap: 16px;
+            padding: 12px 16px;
+            align-items: center;
+            border: 1px solid #e6e9ef;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+        .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 120px auto;
+            gap: 16px;
+            padding: 12px 16px;
+            border: 1px solid #eef1f6;
+            border-radius: 8px;
+            align-items: center;
+            background: #fff;
+            transition: background-color .15s ease, box-shadow .15s ease;
+        }
+        .grid-row:nth-child(odd) { background: #fafbff; }
+        .grid-row:hover { background: #f5f8ff; box-shadow: 0 1px 4px rgba(30,58,138,0.06); }
+        .grid-row > div:nth-child(4) { display: flex; justify-content: center; align-items: center; }
+        .grid-cell-actions { display: flex; gap: 8px; justify-content: center; align-items: center; }
+        .btn-icon { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%); color: #334155; transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease; box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06); }
+        .btn-icon i { font-size: 15px; color: currentColor; }
+        .btn-icon:hover { transform: translateY(-1px); background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); color: #1e3a8a; box-shadow: 0 2px 6px rgba(30, 64, 175, 0.18); border-color: rgba(30, 58, 138, 0.22); }
+        .btn-icon:active { transform: translateY(0); box-shadow: 0 1px 3px rgba(2, 6, 23, 0.12) inset; }
+        .btn-icon.btn-edit, .btn-icon.btn-duplicate { background: #1e3a8a; color: #fff; border-color: #1e3a8a; box-shadow: 0 1px 2px rgba(30,58,138,0.25); }
+        .btn-icon.btn-edit:hover, .btn-icon.btn-duplicate:hover { background: #2740a6; color: #fff; border-color: #2740a6; box-shadow: 0 2px 8px rgba(30,58,138,0.35); }
+        .btn-icon.btn-delete { background: #b91c1c; color: #fff; border-color: #b91c1c; box-shadow: 0 1px 2px rgba(185,28,28,0.25); }
+        .btn-icon.btn-delete:hover { background: #991b1b; color: #fff; border-color: #991b1b; box-shadow: 0 2px 8px rgba(185,28,28,0.35); }
 
         .usuario-card {
             background: white;
@@ -887,17 +916,18 @@
         <!-- Cards Grid -->
         <div class="cards-container">
             <!-- Spinner de Carregamento -->
-            <div id="loader-usuarios" class="loader-overlay-servicos">
+            <div id="loader-usuarios" class="loader-overlay-usuarios">
                 <div class="spinner-main"></div>
                 <div class="loading-text">Carregando usuários...</div>
             </div>
             
             <div id="usuarios-grid" class="usuarios-grid">
                 <!-- Cabeçalho do Grid -->
-                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
+                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 120px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
                     <div>Email</div>
                     <div>Login</div>
                     <div>Perfil</div>
+                    <div>Status</div>
                     <div>Ações</div>
                 </div>
                 <!-- Cards dos usuários serão carregados dinamicamente via JavaScript -->
@@ -1087,32 +1117,31 @@
         const gridUsuarios = document.getElementById('usuarios-grid');
         const loaderUsuarios = document.getElementById('loader-usuarios');
 
-        function createUsuarioCard(usuario) {
+        function createUsuarioRow(usuario) {
             const email = usuario?.email || '-';
             const login = usuario?.login || '-';
             const perfilNome = usuario?.perfilNome || usuario?.perfil || '-';
-            const status = (usuario?.status || 'Ativo').toLowerCase();
-
-            const div = document.createElement('div');
-            div.className = 'usuario-card';
-            div.innerHTML = `
-                <div class="usuario-header">
-                    <h3 class="usuario-title">${login}</h3>
-                    <div class="usuario-actions">
-                        <button class="btn-edit" title="Editar" onclick="openUsuarioModal('Editar Usuário', ${JSON.stringify(usuario).replace(/"/g, '&quot;')}, 'editar')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-delete" title="Excluir" onclick="openDeleteUsuarioModal('${usuario?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-                <div class="usuario-info">
-                    <p><i class="fas fa-envelope"></i> ${email}</p>
-                    <p><i class="fas fa-user-shield"></i> ${perfilNome}</p>
-                    <p><i class="fas fa-circle" style="color:${status === 'ativo' ? '#4CAF50' : '#f44336'}"></i> Status: ${status === 'ativo' ? 'Ativo' : 'Inativo'}</p>
+            const ativo = usuario?.ativo !== false && (usuario?.status ? String(usuario.status).toLowerCase() === 'ativo' : true);
+            const statusText = ativo ? 'Ativo' : 'Inativo';
+            const statusClass = ativo ? 'ativo' : 'inativo';
+            const id = usuario?.id ?? usuario?.codigo ?? '';
+            const row = document.createElement('div');
+            row.className = 'grid-row';
+            row.innerHTML = `
+                <div>${email}</div>
+                <div>${login}</div>
+                <div>${perfilNome}</div>
+                <div><span class="status ${statusClass}">${statusText}</span></div>
+                <div class="grid-cell-actions">
+                    <button class="btn-icon btn-edit" title="Editar" onclick="editarUsuario?.('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon btn-duplicate" title="Duplicar" onclick="duplicarUsuario?.('${id}')"><i class="fa-regular fa-copy"></i></button>
+                    <button class="btn-icon btn-delete" title="Excluir" onclick="excluirUsuario?.('${id}')"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;
-            return div;
+            return row;
         }
 
-        async function carregarUsuariosGrid() {
+        async function carregarUsuarios() {
             try {
                 if (loaderUsuarios) loaderUsuarios.style.display = 'flex';
                 if (!gridUsuarios) return;
@@ -1133,7 +1162,7 @@
                     empty.innerHTML = '<i class="fas fa-user-cog" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum usuário encontrado';
                     gridUsuarios.appendChild(empty);
                 } else {
-                    lista.forEach(u => gridUsuarios.appendChild(createUsuarioCard(u)));
+                    lista.forEach(u => gridUsuarios.appendChild(createUsuarioRow(u)));
                 }
             } catch (e) {
                 console.error('Erro ao carregar usuários:', e);
@@ -1161,7 +1190,7 @@
             }
 
             // Carregar dados ao inicializar
-            carregarUsuariosGrid();
+            carregarUsuarios();
 
             // Form submit
             const form = document.getElementById('usuarioForm');
@@ -1189,15 +1218,89 @@
             if (confirmDeleteBtn) {
                 confirmDeleteBtn.addEventListener('click', function() {
                     const modal = document.getElementById('deleteUsuarioModal');
-                    const codigo = modal.dataset.codigo;
-                    console.log('Excluir usuário:', codigo);
-                    closeDeleteUsuarioModal();
-                    carregarUsuarios(); // Recarregar tabela
+                    const id = modal.dataset.codigo;
+                    window.bloqueioExclusao.deleteWithCheck('usuarios', id, () => { closeDeleteUsuarioModal(); carregarUsuarios(); });
                 });
+            }
+        });
+
+        // CRUD Usuários
+        window.editarUsuario = async function(id) {
+            try {
+                const { data: usuario, error } = await api.get(window.endpoints.usuarios.get(id));
+                if (error) throw error;
+                openUsuarioModal('Editar Usuário');
+                const form = document.getElementById('usuarioForm');
+                form.dataset.id = usuario.id ?? id;
+                form.emailUsuario.value = usuario.email || '';
+                form.loginUsuario.value = usuario.login || '';
+                form.perfilUsuario.value = usuario.perfil || '';
+                form.pessoaUsuario.value = usuario.pessoaId || '';
+                const statusToggle = document.getElementById('statusToggleUsuarioModal');
+                const statusInput = document.getElementById('statusUsuario');
+                const statusLabel = document.querySelector('#usuarioModal .status-label-modal');
+                const status = usuario.status || (usuario.ativo === false ? 'inativo' : 'ativo');
+                if (statusToggle) statusToggle.checked = (String(status).toLowerCase() === 'ativo');
+                if (statusInput) statusInput.value = statusToggle.checked ? 'ativo' : 'inativo';
+                if (statusLabel) statusLabel.textContent = statusToggle.checked ? 'Ativo' : 'Inativo';
+            } catch (e) {
+                alert('Erro ao carregar usuário');
+            }
+        }
+
+        window.duplicarUsuario = async function(id) {
+            try {
+                const { data: usuario, error } = await api.get(window.endpoints.usuarios.get(id));
+                if (error) throw error;
+                openUsuarioModal('Novo Usuário');
+                const form = document.getElementById('usuarioForm');
+                form.emailUsuario.value = usuario?.email || '';
+                form.loginUsuario.value = `${usuario?.login || ''}_copia`;
+                form.perfilUsuario.value = usuario?.perfil || '';
+                form.pessoaUsuario.value = usuario?.pessoaId || '';
+            } catch (e) {
+                alert('Erro ao duplicar usuário');
+            }
+        }
+
+        document.getElementById('usuarioForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            // validar senha
+            const senha = form.senhaUsuario.value;
+            const confirmarSenha = form.confirmarSenhaUsuario.value;
+            if (senha && senha !== confirmarSenha) { alert('As senhas não coincidem!'); return; }
+            const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') ? window.authGuard.getCurrentUser() : null;
+            const rawUserId = currentUser && (currentUser.id ?? currentUser.usuario_id ?? currentUser.userId);
+            const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
+            const payload = {
+                email: form.emailUsuario.value,
+                login: form.loginUsuario.value,
+                perfil: form.perfilUsuario.value,
+                pessoaId: form.pessoaUsuario.value || null,
+                status: form.statusUsuario.value,
+                senha: senha || undefined,
+                usuario_id: usuarioId ?? undefined,
+                criado_por_email: currentUser?.email ?? undefined,
+                criado_por_nome: (currentUser?.nome ?? currentUser?.name) ?? undefined
+            };
+            try {
+                if (form.dataset.id) {
+                    const { error } = await api.put(window.endpoints.usuarios.update(form.dataset.id), payload);
+                    if (error) throw error;
+                    window.showUpdateSuccessModal(payload.status === 'ativo' ? 'Ativo' : 'Inativo');
+                } else {
+                    const { error } = await api.post(window.endpoints.usuarios.create, payload);
+                    if (error) throw error;
+                    window.showSuccessModal();
+                }
+                closeUsuarioModal();
+                carregarUsuarios();
+            } catch (err) {
+                alert('Erro ao salvar usuário');
             }
         });
     </script>
     <script src="scripts/navigation.js"></script>
-    <script src="scripts/hamburger-menu.js"></script>
 </body>
 </html>

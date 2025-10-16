@@ -146,12 +146,12 @@
             transition: all 0.3s;
         }
         .btn-primary {
-            background-color: #2196F3;
+            background-color: #1e3a8a;
             color: white;
             border: none;
         }
         .btn-primary:hover {
-            background-color: #1976D2;
+            background-color: #2740a6;
         }
         .btn-secondary {
             background-color: #f5f5f5;
@@ -271,15 +271,8 @@
             font-size: 0.9em;
         }
         
-        .status.ativo {
-            background-color: #e8f5e9;
-            color: #4CAF50;
-        }
-        
-        .status.inativo {
-            background-color: #ffebee;
-            color: #f44336;
-        }
+        .status.ativo { background-color: #1e3a8a; color: #ffffff; }
+        .status.inativo { background-color: #dc2626; color: #ffffff; }
 
         /* Estilos para o grid de pessoas - Baseado no communities-grid */
         .cards-container {
@@ -290,17 +283,53 @@
         }
 
         .pessoas-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 8px;
             padding: 8px;
             overflow-y: auto;
-            /* Ocupar todo o espaço do container */
             height: 100%;
             position: relative;
             border-radius: 8px;
             background: #fff;
         }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: 1fr 200px 1fr 120px auto;
+            gap: 16px;
+            padding: 12px 16px;
+            align-items: center;
+            border: 1px solid #e6e9ef;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+        .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 200px 1fr 120px auto;
+            gap: 16px;
+            padding: 12px 16px;
+            border: 1px solid #eef1f6;
+            border-radius: 8px;
+            align-items: center;
+            background: #fff;
+            transition: background-color .15s ease, box-shadow .15s ease;
+        }
+        .grid-row:nth-child(odd) { background: #fafbff; }
+        .grid-row:hover { background: #f5f8ff; box-shadow: 0 1px 4px rgba(30,58,138,0.06); }
+        .grid-row > div:nth-child(4) { display: flex; justify-content: center; align-items: center; }
+        .grid-cell-actions { display: flex; gap: 8px; justify-content: center; align-items: center; }
+        .btn-icon { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%); color: #334155; transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease; box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06); }
+        .btn-icon i { font-size: 15px; color: currentColor; }
+        .btn-icon:hover { transform: translateY(-1px); background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); color: #1e3a8a; box-shadow: 0 2px 6px rgba(30, 64, 175, 0.18); border-color: rgba(30, 58, 138, 0.22); }
+        .btn-icon:active { transform: translateY(0); box-shadow: 0 1px 3px rgba(2, 6, 23, 0.12) inset; }
+        .btn-icon.btn-edit, .btn-icon.btn-duplicate { background: #1e3a8a; color: #fff; border-color: #1e3a8a; box-shadow: 0 1px 2px rgba(30,58,138,0.25); }
+        .btn-icon.btn-edit:hover, .btn-icon.btn-duplicate:hover { background: #2740a6; color: #fff; border-color: #2740a6; box-shadow: 0 2px 8px rgba(30,58,138,0.35); }
+        .btn-icon.btn-delete { background: #b91c1c; color: #fff; border-color: #b91c1c; box-shadow: 0 1px 2px rgba(185,28,28,0.25); }
+        .btn-icon.btn-delete:hover { background: #991b1b; color: #fff; border-color: #991b1b; box-shadow: 0 2px 8px rgba(185,28,28,0.35); }
 
         .pessoa-card {
             background: white;
@@ -449,7 +478,7 @@
         }
 
         /* Loader específico para a tabela de pessoas */
-        .loader-overlay-servicos {
+        .loader-overlay-pessoas {
             display: none;
             position: absolute;
             top: 0;
@@ -915,17 +944,18 @@
         <!-- Cards Grid -->
         <div class="cards-container">
             <!-- Spinner de Carregamento -->
-            <div id="loader-pessoas" class="loader-overlay-servicos">
+            <div id="loader-pessoas" class="loader-overlay-pessoas">
                 <div class="spinner-main"></div>
                 <div class="loading-text">Carregando pessoas...</div>
             </div>
             
             <div id="pessoas-grid" class="pessoas-grid">
                 <!-- Cabeçalho do Grid -->
-                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
+                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 200px 1fr 120px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
                     <div>Nome</div>
                     <div>Telefone</div>
                     <div>Endereço</div>
+                    <div>Status</div>
                     <div>Ações</div>
                 </div>
                 <!-- Cards das pessoas serão carregados dinamicamente via JavaScript -->
@@ -1141,32 +1171,31 @@
         const gridPessoas = document.getElementById('pessoas-grid');
         const loaderPessoas = document.getElementById('loader-pessoas');
 
-        function createPessoaCard(pessoa) {
+        function createPessoaRow(pessoa) {
             const nome = pessoa?.nome || 'Sem nome';
             const telefone = pessoa?.telefone || '-';
             const endereco = pessoa?.endereco || '-';
-            const status = (pessoa?.status || 'Ativo').toLowerCase();
-
-            const div = document.createElement('div');
-            div.className = 'pessoa-card';
-            div.innerHTML = `
-                <div class="pessoa-header">
-                    <h3 class="pessoa-title">${nome}</h3>
-                    <div class="pessoa-actions">
-                        <button class="btn-edit" title="Editar" onclick="openPessoaModal('Editar Pessoa', ${JSON.stringify(pessoa).replace(/"/g, '&quot;')}, 'editar')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-delete" title="Excluir" onclick="openDeletePessoaModal('${pessoa?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-                <div class="pessoa-info">
-                    <p><i class="fas fa-phone"></i> ${telefone}</p>
-                    <p><i class="fas fa-map-marker-alt"></i> ${endereco}</p>
-                    <p><i class="fas fa-circle" style="color:${status === 'ativo' ? '#4CAF50' : '#f44336'}"></i> Status: ${status === 'ativo' ? 'Ativo' : 'Inativo'}</p>
+            const ativo = pessoa?.ativo !== false && (pessoa?.status ? String(pessoa.status).toLowerCase() === 'ativo' : true);
+            const statusText = ativo ? 'Ativo' : 'Inativo';
+            const statusClass = ativo ? 'ativo' : 'inativo';
+            const id = pessoa?.id ?? pessoa?.codigo ?? '';
+            const row = document.createElement('div');
+            row.className = 'grid-row';
+            row.innerHTML = `
+                <div>${nome}</div>
+                <div>${telefone}</div>
+                <div>${endereco}</div>
+                <div><span class="status ${statusClass}">${statusText}</span></div>
+                <div class="grid-cell-actions">
+                    <button class="btn-icon btn-edit" title="Editar" onclick="editarPessoa?.('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon btn-duplicate" title="Duplicar" onclick="duplicarPessoa?.('${id}')"><i class="fa-regular fa-copy"></i></button>
+                    <button class="btn-icon btn-delete" title="Excluir" onclick="excluirPessoa?.('${id}')"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;
-            return div;
+            return row;
         }
 
-        async function carregarPessoasGrid() {
+        async function carregarPessoas() {
             try {
                 if (loaderPessoas) loaderPessoas.style.display = 'flex';
                 if (!gridPessoas) return;
@@ -1187,7 +1216,7 @@
                     empty.innerHTML = '<i class="fas fa-user" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhuma pessoa encontrada';
                     gridPessoas.appendChild(empty);
                 } else {
-                    lista.forEach(p => gridPessoas.appendChild(createPessoaCard(p)));
+                    lista.forEach(p => gridPessoas.appendChild(createPessoaRow(p)));
                 }
             } catch (e) {
                 console.error('Erro ao carregar pessoas:', e);
@@ -1215,7 +1244,7 @@
             }
 
             // Carregar dados ao inicializar
-            carregarPessoasGrid();
+            carregarPessoas();
 
             // Form submit
             const form = document.getElementById('pessoaForm');
@@ -1233,15 +1262,88 @@
             if (confirmDeleteBtn) {
                 confirmDeleteBtn.addEventListener('click', function() {
                     const modal = document.getElementById('deletePessoaModal');
-                    const codigo = modal.dataset.codigo;
-                    console.log('Excluir pessoa:', codigo);
-                    closeDeletePessoaModal();
-                    carregarPessoas(); // Recarregar tabela
+                    const id = modal.dataset.codigo;
+                    window.bloqueioExclusao.deleteWithCheck('pessoas', id, () => { closeDeletePessoaModal(); carregarPessoas(); });
                 });
+            }
+        });
+
+        // CRUD Pessoas
+        window.editarPessoa = async function(id) {
+            try {
+                const { data: pessoa, error } = await api.get(window.endpoints.pessoas.get(id));
+                if (error) throw error;
+                openPessoaModal('Editar Pessoa');
+                const form = document.getElementById('pessoaForm');
+                form.dataset.id = pessoa.id ?? id;
+                form.nomePessoa.value = pessoa.nome || '';
+                form.telefonePessoa.value = pessoa.telefone || '';
+                form.enderecoPessoa.value = pessoa.endereco || '';
+                const statusToggle = document.getElementById('statusTogglePessoaModal');
+                const statusInput = document.getElementById('statusPessoa');
+                const statusLabel = document.querySelector('#pessoaModal .status-label-modal');
+                const status = pessoa.status || (pessoa.ativo === false ? 'inativo' : 'ativo');
+                if (statusToggle) statusToggle.checked = (String(status).toLowerCase() === 'ativo');
+                if (statusInput) statusInput.value = statusToggle.checked ? 'ativo' : 'inativo';
+                if (statusLabel) statusLabel.textContent = statusToggle.checked ? 'Ativo' : 'Inativo';
+                // foto
+                const preview = document.getElementById('photoPreview');
+                const placeholder = document.getElementById('photoPlaceholder');
+                if (pessoa.foto) { preview.src = pessoa.foto; preview.style.display = 'block'; placeholder.style.display = 'none'; }
+            } catch (e) {
+                alert('Erro ao carregar pessoa');
+            }
+        }
+
+        window.duplicarPessoa = async function(id) {
+            try {
+                const { data: pessoa, error } = await api.get(window.endpoints.pessoas.get(id));
+                if (error) throw error;
+                openPessoaModal('Nova Pessoa');
+                const form = document.getElementById('pessoaForm');
+                form.nomePessoa.value = `${pessoa?.nome || ''} (cópia)`;
+                form.telefonePessoa.value = pessoa?.telefone || '';
+                form.enderecoPessoa.value = pessoa?.endereco || '';
+                const preview = document.getElementById('photoPreview');
+                const placeholder = document.getElementById('photoPlaceholder');
+                if (pessoa?.foto) { preview.src = pessoa.foto; preview.style.display = 'block'; placeholder.style.display = 'none'; }
+            } catch (e) {
+                alert('Erro ao duplicar pessoa');
+            }
+        }
+
+        document.getElementById('pessoaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') ? window.authGuard.getCurrentUser() : null;
+            const rawUserId = currentUser && (currentUser.id ?? currentUser.usuario_id ?? currentUser.userId);
+            const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
+            const payload = {
+                nome: form.nomePessoa.value,
+                telefone: form.telefonePessoa.value || '',
+                endereco: form.enderecoPessoa.value || '',
+                status: form.statusPessoa.value,
+                usuario_id: usuarioId ?? undefined,
+                criado_por_email: currentUser?.email ?? undefined,
+                criado_por_nome: (currentUser?.nome ?? currentUser?.name) ?? undefined
+            };
+            try {
+                if (form.dataset.id) {
+                    const { error } = await api.put(window.endpoints.pessoas.update(form.dataset.id), payload);
+                    if (error) throw error;
+                    window.showUpdateSuccessModal(payload.status === 'ativo' ? 'Ativo' : 'Inativo');
+                } else {
+                    const { error } = await api.post(window.endpoints.pessoas.create, payload);
+                    if (error) throw error;
+                    window.showSuccessModal();
+                }
+                closePessoaModal();
+                carregarPessoas();
+            } catch (err) {
+                alert('Erro ao salvar pessoa');
             }
         });
     </script>
     <script src="scripts/navigation.js"></script>
-    <script src="scripts/hamburger-menu.js"></script>
 </body>
 </html>
