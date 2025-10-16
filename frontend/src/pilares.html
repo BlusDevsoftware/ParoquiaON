@@ -149,12 +149,12 @@
             transition: all 0.3s;
         }
         .btn-primary {
-            background-color: #2196F3;
+            background-color: #1e3a8a;
             color: white;
             border: none;
         }
         .btn-primary:hover {
-            background-color: #1976D2;
+            background-color: #2740a6;
         }
         .btn-secondary {
             background-color: #f5f5f5;
@@ -300,7 +300,7 @@
         }
         
         .status.ativo {
-            background-color: #16a34a; /* verde */
+            background-color: #1e3a8a; /* azul do menu */
             color: #ffffff;
         }
         
@@ -368,6 +368,8 @@
         .btn-icon:focus-visible { outline: 3px solid rgba(59,130,246,0.35); outline-offset: 2px; }
         .btn-icon.btn-edit { background: #1e3a8a; color: #fff; border-color: #1e3a8a; box-shadow: 0 1px 2px rgba(30, 58, 138, 0.25); }
         .btn-icon.btn-edit:hover { background: #2740a6; color: #fff; border-color: #2740a6; box-shadow: 0 2px 8px rgba(30, 58, 138, 0.35); }
+        .btn-icon.btn-duplicate { background: #1e3a8a; color: #fff; border-color: #1e3a8a; box-shadow: 0 1px 2px rgba(30, 58, 138, 0.25); }
+        .btn-icon.btn-duplicate:hover { background: #2740a6; color: #fff; border-color: #2740a6; box-shadow: 0 2px 8px rgba(30, 58, 138, 0.35); }
         .btn-icon.btn-delete { background: #b91c1c; color: #fff; border-color: #b91c1c; box-shadow: 0 1px 2px rgba(185, 28, 28, 0.25); }
         .btn-icon.btn-delete:hover { background: #991b1b; color: #fff; border-color: #991b1b; box-shadow: 0 2px 8px rgba(185, 28, 28, 0.35); }
 
@@ -647,7 +649,7 @@
         }
         
         .switch-modal input:checked + .slider-modal {
-            background-color: #2196F3;
+            background-color: #1e3a8a;
         }
         
         .switch-modal input:checked + .slider-modal:before {
@@ -910,6 +912,7 @@
                 <div><span class="status ${statusClass}">${statusText}</span></div>
                 <div class="grid-cell-actions">
                     <button class="btn-icon btn-edit" title="Editar" onclick="editarPilar?.('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon btn-duplicate" title="Duplicar" onclick="duplicarPilar?.('${id}')"><i class="fa-regular fa-copy"></i></button>
                     <button class="btn-icon btn-delete" title="Excluir" onclick="excluirPilar?.('${id}')"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;
@@ -1194,52 +1197,8 @@
         function formatarCodigo(codigo) {
             return String(codigo).padStart(5, '0');
         }
-
-        // Função para carregar pilares
-        async function carregarPilars() {
-            try {
-                // Mostrar spinner ao iniciar carregamento
-                mostrarSpinner();
-                
-                const produtos = await api.get('/pilares');
-                const tbody = document.querySelector('.table-container table tbody');
-                tbody.innerHTML = '';
-
-                produtos.forEach(produto => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${formatarCodigo(produto.codigo)}</td>
-                        <td>${produto.nome}</td>
-                        <td>R$ ${parseFloat(produto.preco).toFixed(2)}</td>
-                        <td>
-                            <span class="status ${produto.status === 'ativo' ? 'ativo' : 'inativo'}">
-                                ${produto.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                            </span>
-                        </td>
-                        <td class="actions">
-                            <button class="action-btn view-btn" title="Visualizar" onclick="visualizarPilar('${produto.codigo}')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="action-btn edit-btn" title="Editar" onclick="editarPilar('${produto.codigo}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete-btn" title="Excluir" onclick="excluirPilar('${produto.codigo}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-                
-                // Ocultar spinner após carregar com sucesso
-                ocultarSpinner();
-            } catch (error) {
-                console.error('Erro ao carregar pilares:', error);
-                alert('Erro ao carregar pilares');
-                // Ocultar spinner mesmo em caso de erro
-                ocultarSpinner();
-            }
-        }
+        // Proxy para manter compatibilidade com chamadas antigas
+        async function carregarPilars() { return carregarPilares(); }
 
         // Função para abrir modal de novo pilar
         function novoPilar() {
@@ -1286,24 +1245,26 @@
             event.preventDefault();
             const form = event.target;
             const formData = new FormData(form);
-            const produto = {
+            const payload = {
                 nome: formData.get('nome'),
                 tipo: formData.get('tipo'),
                 status: formData.get('status'),
-                descricao: formData.get('descricao')
+                descricao: formData.get('descricao') || ''
             };
             try {
                 if (form.dataset.codigo) {
-                    await api.put(window.endpoints.pilares.update(form.dataset.codigo), produto);
+                    const { error } = await api.put(window.endpoints.pilares.update(form.dataset.codigo), payload);
+                    if (error) throw error;
                     // Mostrar modal de sucesso de atualização
-                    window.showUpdateSuccessModal(produto.status === 'ativo' ? 'Ativo' : 'Inativo');
+                    window.showUpdateSuccessModal(payload.status === 'ativo' ? 'Ativo' : 'Inativo');
                 } else {
-                    await api.post(window.endpoints.pilares.create, produto);
+                    const { error } = await api.post(window.endpoints.pilares.create, payload);
+                    if (error) throw error;
                     // Mostrar modal de sucesso de cadastro
                     window.showSuccessModal();
                 }
                 closeModal();
-                carregarPilars();
+                carregarPilares();
             } catch (error) {
                 console.error('Erro ao salvar pilar:', error);
                 alert('Erro ao salvar pilar');
@@ -1313,18 +1274,20 @@
         // Função para editar pilar
         async function editarPilar(codigo) {
             try {
-                const { data: produto } = await api.get(window.endpoints.pilares.get(codigo));
+                const { data: pilar, error } = await api.get(window.endpoints.pilares.get(codigo));
+                if (error) throw error;
                 const form = document.getElementById('pilarForm');
-                form.dataset.codigo = produto.codigo;
-                form.nome.value = produto.nome;
-                form.preco.value = produto.preco;
-                form.descricao.value = produto.descricao || '';
+                form.dataset.codigo = pilar.id ?? pilar.codigo;
+                form.nome.value = pilar.nome || '';
+                const selectTipo = form.querySelector('#tipo');
+                if (selectTipo) selectTipo.value = pilar.tipo || '';
+                form.descricao.value = pilar.descricao || '';
                 
                 // Atualizar toggle de status
                 const statusToggle = document.getElementById('statusToggleModal');
                 const statusInput = document.getElementById('status');
                 const statusLabel = document.querySelector('.status-label-modal');
-                const status = produto.status || 'ativo';
+                const status = pilar.status || (pilar.ativo === false ? 'inativo' : 'ativo');
                 if (statusToggle) statusToggle.checked = status === 'ativo';
                 if (statusInput) statusInput.value = status;
                 if (statusLabel) statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
@@ -1344,17 +1307,19 @@
         // Função para visualizar pilar
         async function visualizarPilar(codigo) {
             try {
-                const { data: produto } = await api.get(window.endpoints.pilares.get(codigo));
+                const { data: pilar, error } = await api.get(window.endpoints.pilares.get(codigo));
+                if (error) throw error;
                 const form = document.getElementById('pilarForm');
-                form.nome.value = produto.nome;
-                form.preco.value = produto.preco;
-                form.descricao.value = produto.descricao || '';
+                form.nome.value = pilar.nome || '';
+                const selectTipo = form.querySelector('#tipo');
+                if (selectTipo) selectTipo.value = pilar.tipo || '';
+                form.descricao.value = pilar.descricao || '';
                 
                 // Atualizar toggle de status
                 const statusToggle = document.getElementById('statusToggleModal');
                 const statusInput = document.getElementById('status');
                 const statusLabel = document.querySelector('.status-label-modal');
-                const status = produto.status || 'ativo';
+                const status = pilar.status || (pilar.ativo === false ? 'inativo' : 'ativo');
                 if (statusToggle) statusToggle.checked = status === 'ativo';
                 if (statusInput) statusInput.value = status;
                 if (statusLabel) statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
@@ -1421,13 +1386,8 @@
         }
         
         // Funções para controlar o spinner centralizado
-        function mostrarSpinner() {
-            document.getElementById('loader-pilares').style.display = 'flex';
-        }
-        
-        function ocultarSpinner() {
-            document.getElementById('loader-pilares').style.display = 'none';
-        }
+        function mostrarSpinner() { document.getElementById('loader-pilares').style.display = 'flex'; }
+        function ocultarSpinner() { document.getElementById('loader-pilares').style.display = 'none'; }
 
         // Função para mostrar modal de sucesso
         window.showSuccessModal = function() {
@@ -1509,7 +1469,7 @@
                 mostrarSpinner();
                 
                 // Carregar dados
-                await carregarPilars();
+                await carregarPilares();
                 
                 // Ocultar spinner centralizado quando tudo carregar
                 ocultarSpinner();
@@ -1532,7 +1492,7 @@
                     const result = await window.bloqueioExclusao.deleteWithCheck(
                         'pilares',
                         codigoParaExcluir,
-                        () => { closeDeleteModal(); carregarPilars(); window.showDeleteSuccessModal(); }
+                        () => { closeDeleteModal(); carregarPilares(); window.showDeleteSuccessModal(); }
                     );
                     if (!result || result.blocked) return;
                 } catch (error) {
@@ -1563,6 +1523,27 @@
         window.editarPilar = editarPilar;
         window.excluirPilar = excluirPilar;
         window.visualizarPilar = visualizarPilar;
+        window.duplicarPilar = async function(id) {
+            try {
+                const { data: pilar, error } = await api.get(window.endpoints.pilares.get(id));
+                if (error) throw error;
+                novoPilar();
+                const form = document.getElementById('pilarForm');
+                form.nome.value = `${pilar?.nome || ''} (cópia)`;
+                const selectTipo = form.querySelector('#tipo');
+                if (selectTipo) selectTipo.value = pilar?.tipo || '';
+                form.descricao.value = pilar?.descricao || '';
+                const statusInput = document.getElementById('status');
+                if (statusInput) statusInput.value = (pilar?.status || (pilar?.ativo === false ? 'inativo' : 'ativo'));
+                const statusToggle = document.getElementById('statusToggleModal');
+                if (statusToggle) statusToggle.checked = statusInput.value === 'ativo';
+                const statusLabel = document.querySelector('.status-label-modal');
+                if (statusLabel) statusLabel.textContent = statusToggle.checked ? 'Ativo' : 'Inativo';
+            } catch (e) {
+                console.error('Erro ao duplicar pilar:', e);
+                alert('Erro ao duplicar pilar');
+            }
+        }
         window.closeModal = closeModal;
         window.closeDeleteModal = closeDeleteModal;
         window.toggleStatus = toggleStatus;
