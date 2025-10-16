@@ -161,6 +161,9 @@
         .btn-secondary:hover {
             background-color: #e0e0e0;
         }
+        /* Estado de carregamento do botão */
+        .btn-loading { opacity: .85; pointer-events: none; }
+        .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .9s linear infinite; display: inline-block; }
         .actions {
             white-space: nowrap !important;
             min-width: 110px;
@@ -1028,6 +1031,13 @@
             if (form) {
                 form.addEventListener('submit', async function(e) {
                     e.preventDefault();
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalLabel = submitBtn ? submitBtn.innerHTML : '';
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('btn-loading');
+                        submitBtn.innerHTML = '<span class="btn-spinner"></span> &nbsp;Salvando...';
+                    }
                     const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') ? window.authGuard.getCurrentUser() : null;
                     const rawUserId = currentUser && (currentUser.id ?? currentUser.usuario_id ?? currentUser.userId);
                     const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
@@ -1055,6 +1065,12 @@
                     } catch (err) {
                         console.error('Erro ao salvar ação:', err);
                         alert('Erro ao salvar ação');
+                    } finally {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('btn-loading');
+                            submitBtn.innerHTML = originalLabel;
+                        }
                     }
                 });
             }

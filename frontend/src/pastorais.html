@@ -179,6 +179,9 @@
         .btn-secondary:hover {
             background-color: #e0e0e0;
         }
+        /* Estado de carregamento do botão */
+        .btn-loading { opacity: .85; pointer-events: none; }
+        .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .9s linear infinite; display: inline-block; }
         .modal-content.delete-confirmation {
             max-width: 400px;
             width: 90%;
@@ -1628,6 +1631,13 @@ async function editarPastoral(id) {
 async function salvarPastoral(event) {
             event.preventDefault();
             const form = event.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalLabel = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('btn-loading');
+                submitBtn.innerHTML = '<span class="btn-spinner"></span> &nbsp;Salvando...';
+            }
             const formData = new FormData(form);
             const statusStr = formData.get('status');
             const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') ? window.authGuard.getCurrentUser() : null;
@@ -1666,6 +1676,12 @@ async function salvarPastoral(event) {
             } catch (error) {
                 console.error('Erro ao salvar pastoral:', error);
                 alert('Erro ao salvar pastoral');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('btn-loading');
+                    submitBtn.innerHTML = originalLabel;
+                }
             }
         }
 

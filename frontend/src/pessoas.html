@@ -1315,6 +1315,13 @@
         document.getElementById('pessoaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalLabel = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('btn-loading');
+                submitBtn.innerHTML = '<span class="btn-spinner"></span> &nbsp;Salvando...';
+            }
             const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') ? window.authGuard.getCurrentUser() : null;
             const rawUserId = currentUser && (currentUser.id ?? currentUser.usuario_id ?? currentUser.userId);
             const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
@@ -1341,6 +1348,12 @@
                 carregarPessoas();
             } catch (err) {
                 alert('Erro ao salvar pessoa');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('btn-loading');
+                    submitBtn.innerHTML = originalLabel;
+                }
             }
         });
     </script>

@@ -161,6 +161,9 @@
         .btn-secondary:hover {
             background-color: #e0e0e0;
         }
+        /* Estado de carregamento do botão */
+        .btn-loading { opacity: .85; pointer-events: none; }
+        .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .9s linear infinite; display: inline-block; }
         .actions {
             white-space: nowrap !important;
             min-width: 110px;
@@ -1266,6 +1269,13 @@
         document.getElementById('usuarioForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalLabel = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('btn-loading');
+                submitBtn.innerHTML = '<span class="btn-spinner"></span> &nbsp;Salvando...';
+            }
             // validar senha
             const senha = form.senhaUsuario.value;
             const confirmarSenha = form.confirmarSenhaUsuario.value;
@@ -1298,6 +1308,12 @@
                 carregarUsuarios();
             } catch (err) {
                 alert('Erro ao salvar usuário');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('btn-loading');
+                    submitBtn.innerHTML = originalLabel;
+                }
             }
         });
     </script>
