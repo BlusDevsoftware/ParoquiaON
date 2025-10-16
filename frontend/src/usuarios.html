@@ -1286,26 +1286,7 @@
             // Carregar dados ao inicializar
             carregarUsuarios();
 
-            // Form submit
-            const form = document.getElementById('usuarioForm');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    // Validação de senha
-                    const senha = form.senhaUsuario.value;
-                    const confirmarSenha = form.confirmarSenhaUsuario.value;
-                    
-                    if (senha && senha !== confirmarSenha) {
-                        alert('As senhas não coincidem!');
-                        return;
-                    }
-                    
-                    // Aqui você pode implementar a lógica de salvamento
-                    console.log('Formulário enviado:', new FormData(form));
-                    closeUsuarioModal();
-                });
-            }
+            // Form submit removido - usando o handler mais abaixo
 
             // Confirmar exclusão
             const confirmDeleteBtn = document.getElementById('confirmDeleteUsuarioBtn');
