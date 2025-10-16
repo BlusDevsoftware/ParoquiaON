@@ -76,8 +76,8 @@ async function criarPessoa(req, res) {
             telefone: body.telefone ?? null,
             endereco: body.endereco ?? null,
             status: normalizedStatus,
-            // Se já vier uma URL (não base64), persiste direto na criação
-            ...(body.foto && !isBase64DataUrl(body.foto) ? { foto: body.foto } : {}),
+            // Igual Pastorais: persiste o que vier (base64 ou URL)
+            foto: body.foto ?? null,
             usuario_id: body.usuario_id ?? null,
             criado_por_email: body.criado_por_email ?? null,
             criado_por_nome: body.criado_por_nome ?? null
@@ -108,27 +108,6 @@ async function criarPessoa(req, res) {
         }
 
         if (insertResult.error) throw insertResult.error;
-
-        // Se enviou foto base64, faz upload no bucket "pessoas" e atualiza o registro com a URL
-        if (isBase64DataUrl(body.foto)) {
-            const created = insertResult.data;
-            const identificador = created?.id ?? created?.codigo ?? Date.now();
-            const dadosComFotoUrl = await uploadFotoIfNeeded(body, identificador);
-            if (dadosComFotoUrl.foto && dadosComFotoUrl.foto !== body.foto) {
-                const { data: updated, error: updateError } = await supabase
-                    .from('pessoas')
-                    .update({ foto: dadosComFotoUrl.foto })
-                    .eq('id', created.id)
-                    .select()
-                    .single();
-                if (!updateError && updated) {
-                    return res.status(201).json(updated);
-                }
-                // Se falhar o update, retorna o created mesmo assim
-                if (updateError) console.error('Erro ao salvar URL da foto (pessoas):', updateError);
-            }
-        }
-
         res.status(201).json(insertResult.data);
     } catch (error) {
         console.error('Erro ao criar pessoa:', error);
@@ -143,13 +122,6 @@ async function atualizarPessoa(req, res) {
         const normalizedStatus = typeof body.status === 'string'
             ? (String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo')
             : undefined;
-
-        // Se houver foto base64, faz upload e troca por URL antes de atualizar
-        if (isBase64DataUrl(body.foto)) {
-            body = await uploadFotoIfNeeded(body, id);
-        }
-        // Se vier uma URL já pronta (não base64), também permite atualizar diretamente
-        // (nada a fazer aqui além de incluir no updateData abaixo)
 
         const updateData = {
             ...(body.nome !== undefined ? { nome: body.nome } : {}),
