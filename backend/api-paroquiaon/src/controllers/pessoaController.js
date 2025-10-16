@@ -76,6 +76,8 @@ async function criarPessoa(req, res) {
             telefone: body.telefone ?? null,
             endereco: body.endereco ?? null,
             status: normalizedStatus,
+            // Se já vier uma URL (não base64), persiste direto na criação
+            ...(body.foto && !isBase64DataUrl(body.foto) ? { foto: body.foto } : {}),
             usuario_id: body.usuario_id ?? null,
             criado_por_email: body.criado_por_email ?? null,
             criado_por_nome: body.criado_por_nome ?? null
@@ -146,6 +148,8 @@ async function atualizarPessoa(req, res) {
         if (isBase64DataUrl(body.foto)) {
             body = await uploadFotoIfNeeded(body, id);
         }
+        // Se vier uma URL já pronta (não base64), também permite atualizar diretamente
+        // (nada a fazer aqui além de incluir no updateData abaixo)
 
         const updateData = {
             ...(body.nome !== undefined ? { nome: body.nome } : {}),
