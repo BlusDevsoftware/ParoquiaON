@@ -300,13 +300,13 @@
         }
         
         .status.ativo {
-            background-color: #e8f5e9;
-            color: #4CAF50;
+            background-color: #16a34a; /* verde */
+            color: #ffffff;
         }
         
         .status.inativo {
-            background-color: #ffebee;
-            color: #f44336;
+            background-color: #dc2626; /* vermelho */
+            color: #ffffff;
         }
 
         /* Estilos para o grid de pilares - Baseado no communities-grid */
@@ -318,103 +318,70 @@
         }
 
         .pilares-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 8px;
             padding: 8px;
             overflow-y: auto;
-            /* Ocupar todo o espaço do container */
             height: 100%;
             position: relative;
             border-radius: 8px;
             background: #fff;
         }
 
-        .pilar-card {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .pilar-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .pilar-header {
-            display: flex;
-            justify-content: space-between;
+        /* Estilo de linhas e ações (igual aba Pastorais) */
+        .grid-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 120px auto;
+            gap: 16px;
+            padding: 12px 16px;
             align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .pilar-title {
-            font-size: 18px;
+            border: 1px solid #e6e9ef;
+            background: #f8f9fa;
+            border-radius: 8px;
             font-weight: 600;
-            color: #333;
-            margin: 0;
-        }
-
-        .pilar-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .pilar-actions button {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-edit {
-            background: #007bff;
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background: #0056b3;
-        }
-
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background: #c82333;
-        }
-
-        .pilar-info {
-            color: #666;
+            color: #495057;
             font-size: 14px;
-            line-height: 1.4;
+            margin-bottom: 8px;
         }
 
-        .pilar-info p {
-            margin: 4px 0;
+        .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 120px auto;
+            gap: 16px;
+            padding: 12px 16px;
+            border: 1px solid #eef1f6;
+            border-radius: 8px;
+            align-items: center;
+            background: #fff;
+            transition: background-color .15s ease, box-shadow .15s ease;
         }
+        .grid-row:nth-child(odd) { background: #fafbff; }
+        .grid-row:hover { background: #f5f8ff; box-shadow: 0 1px 4px rgba(30,58,138,0.06); }
 
-        .pilar-info i {
-            margin-right: 8px;
-            width: 16px;
-            color: #007bff;
-        }
+        .grid-cell-actions { display: flex; gap: 8px; justify-content: center; align-items: center; }
 
-        /* Spinner de carregamento - IDÊNTICO AO DA ABA DE COLABORADORES */
+        .btn-icon { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%); color: #334155; transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease; box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06); }
+        .btn-icon i { font-size: 15px; color: currentColor; }
+        .btn-icon:hover { transform: translateY(-1px); background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); color: #1e3a8a; box-shadow: 0 2px 6px rgba(30, 64, 175, 0.18); border-color: rgba(30, 58, 138, 0.22); }
+        .btn-icon:active { transform: translateY(0); box-shadow: 0 1px 3px rgba(2, 6, 23, 0.12) inset; }
+        .btn-icon:focus-visible { outline: 3px solid rgba(59,130,246,0.35); outline-offset: 2px; }
+        .btn-icon.btn-edit { background: #1e3a8a; color: #fff; border-color: #1e3a8a; box-shadow: 0 1px 2px rgba(30, 58, 138, 0.25); }
+        .btn-icon.btn-edit:hover { background: #2740a6; color: #fff; border-color: #2740a6; box-shadow: 0 2px 8px rgba(30, 58, 138, 0.35); }
+        .btn-icon.btn-delete { background: #b91c1c; color: #fff; border-color: #b91c1c; box-shadow: 0 1px 2px rgba(185, 28, 28, 0.25); }
+        .btn-icon.btn-delete:hover { background: #991b1b; color: #fff; border-color: #991b1b; box-shadow: 0 2px 8px rgba(185, 28, 28, 0.35); }
+
+        /* Centralizar exatamente a célula de Status sob o título */
+        .grid-row > div:nth-child(3) { display: flex; justify-content: center; align-items: center; }
+
+        /* Spinner de carregamento - padrão */
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* Loader específico para a tabela de produtos */
-        .loader-overlay-produtos {
+        /* Loader específico para a lista de pilares */
+        .loader-overlay-pilares {
             display: none;
             position: absolute;
             top: 0;
@@ -905,12 +872,12 @@
     <script>
         // Funções de Modal - Escopo Global
         window.openModal = function() {
-            const modal = document.getElementById('produtoModal');
+            const modal = document.getElementById('pilarModal');
             modal.style.display = 'flex';
         }
 
         window.closeModal = function() {
-            const modal = document.getElementById('produtoModal');
+            const modal = document.getElementById('pilarModal');
             modal.style.display = 'none';
         }
 
@@ -925,39 +892,34 @@
         }
     </script>
     <script type="module">
-        // Listar pilares via API e renderizar no grid de cards
         const gridPilares = document.getElementById('pilares-grid');
         const loaderPilares = document.getElementById('loader-pilares');
 
-        function createPilarCard(pilar) {
+        function createPilarRow(pilar) {
             const nome = pilar?.nome || 'Sem nome';
             const tipo = pilar?.tipo || '-';
-            const status = (pilar?.status || 'ativo').toLowerCase();
-
-            const div = document.createElement('div');
-            div.className = 'pilar-card';
-            div.innerHTML = `
-                <div class="pilar-header">
-                    <h3 class="pilar-title">${nome}</h3>
-                    <div class="pilar-actions">
-                        <button class="btn-edit" title="Editar" onclick="editarPilar?.('${pilar?.codigo ?? ''}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-delete" title="Excluir" onclick="excluirPilar?.('${pilar?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-                <div class="pilar-info">
-                    <p><i class="fas fa-tag"></i> Tipo: ${tipo}</p>
-                    <p><i class="fas fa-circle" style="color:${status === 'ativo' ? '#4CAF50' : '#f44336'}"></i> Status: ${status === 'ativo' ? 'Ativo' : 'Inativo'}</p>
+            const ativo = pilar?.ativo !== false && (pilar?.status ? String(pilar.status).toLowerCase() === 'ativo' : true);
+            const statusText = ativo ? 'Ativo' : 'Inativo';
+            const statusClass = ativo ? 'ativo' : 'inativo';
+            const id = pilar?.id ?? pilar?.codigo ?? '';
+            const row = document.createElement('div');
+            row.className = 'grid-row';
+            row.innerHTML = `
+                <div>${nome}</div>
+                <div>${tipo}</div>
+                <div><span class="status ${statusClass}">${statusText}</span></div>
+                <div class="grid-cell-actions">
+                    <button class="btn-icon btn-edit" title="Editar" onclick="editarPilar?.('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon btn-delete" title="Excluir" onclick="excluirPilar?.('${id}')"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;
-            return div;
+            return row;
         }
 
-        async function carregarPilaresGrid() {
+        async function carregarPilares() {
             try {
                 if (loaderPilares) loaderPilares.style.display = 'flex';
                 if (!gridPilares) return;
-
-                const header = gridPilares.querySelector('.grid-header');
                 Array.from(gridPilares.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
 
                 const { data, error } = await window.api.get(window.endpoints.pilares.list);
@@ -973,7 +935,7 @@
                     empty.innerHTML = '<i class="fas fa-columns" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum pilar encontrado';
                     gridPilares.appendChild(empty);
                 } else {
-                    lista.forEach(p => gridPilares.appendChild(createPilarCard(p)));
+                    lista.forEach(p => gridPilares.appendChild(createPilarRow(p)));
                 }
             } catch (e) {
                 console.error('Erro ao carregar pilares:', e);
@@ -982,7 +944,7 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', carregarPilaresGrid);
+        document.addEventListener('DOMContentLoaded', carregarPilares);
     </script>
 </head>
 <body>
@@ -1060,7 +1022,7 @@
         <!-- Cards Grid -->
         <div class="cards-container">
             <!-- Spinner de Carregamento -->
-            <div id="loader-pilares" class="loader-overlay-produtos">
+            <div id="loader-pilares" class="loader-overlay-pilares">
                 <div class="spinner-main"></div>
                 <div class="loading-text">Carregando pilares...</div>
             </div>
@@ -1079,7 +1041,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal" id="produtoModal">
+    <div class="modal" id="pilarModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle"><i class="fas fa-columns"></i> Novo Pilar</h2>
@@ -1095,7 +1057,7 @@
                 </div>
             </div>
             <div class="modal-body">
-                <form id="produtoForm">
+                <form id="pilarForm">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="nome"><i class="fas fa-columns"></i> Nome do Pilar</label>
@@ -1139,7 +1101,7 @@
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
                 <div class="delete-message">
-                    Tem certeza que deseja excluir este produto?
+                    Tem certeza que deseja excluir este pilar?
                 </div>
                 <div class="delete-warning">
                     Esta ação não pode ser desfeita.
@@ -1194,7 +1156,7 @@
                 <i class="fas fa-sync-alt" style="font-size: 3em; color: #2196F3; margin-bottom: 16px;"></i>
                 <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Dados atualizados com sucesso!</div>
                 <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
-                    As informações do produto foram atualizadas no sistema.
+                    As informações do pilar foram atualizadas no sistema.
                 </div>
                 <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
                     <div style="margin-bottom: 8px;"><strong>Status:</strong> <span id="statusAtualizado"></span></div>
@@ -1233,13 +1195,13 @@
             return String(codigo).padStart(5, '0');
         }
 
-        // Função para carregar produtos
+        // Função para carregar pilares
         async function carregarPilars() {
             try {
                 // Mostrar spinner ao iniciar carregamento
                 mostrarSpinner();
                 
-                const produtos = await api.get('/produtos');
+                const produtos = await api.get('/pilares');
                 const tbody = document.querySelector('.table-container table tbody');
                 tbody.innerHTML = '';
 
@@ -1272,16 +1234,16 @@
                 // Ocultar spinner após carregar com sucesso
                 ocultarSpinner();
             } catch (error) {
-                console.error('Erro ao carregar produtos:', error);
-                alert('Erro ao carregar produtos');
+                console.error('Erro ao carregar pilares:', error);
+                alert('Erro ao carregar pilares');
                 // Ocultar spinner mesmo em caso de erro
                 ocultarSpinner();
             }
         }
 
-        // Função para abrir modal de novo produto
+        // Função para abrir modal de novo pilar
         function novoPilar() {
-            const form = document.getElementById('produtoForm');
+            const form = document.getElementById('pilarForm');
             form.reset();
             delete form.dataset.codigo;
             
@@ -1293,7 +1255,7 @@
             if (statusInput) statusInput.value = 'ativo';
             if (statusLabel) statusLabel.textContent = 'Ativo';
             
-            const modal = document.getElementById('produtoModal');
+            const modal = document.getElementById('pilarModal');
             const modalTitle = document.getElementById('modalTitle');
             modalTitle.innerHTML = '<i class="fas fa-columns"></i> Novo Pilar';
             modal.style.display = 'flex';
@@ -1303,8 +1265,8 @@
 
         // Função para fechar o modal
         function closeModal() {
-            const modal = document.getElementById('produtoModal');
-            const form = document.getElementById('produtoForm');
+            const modal = document.getElementById('pilarModal');
+            const form = document.getElementById('pilarForm');
             // Reabilitar campos
             Array.from(form.elements).forEach(element => {
                 element.disabled = false;
@@ -1319,40 +1281,40 @@
             }, 300);
         }
 
-        // Função para salvar produto
+        // Função para salvar pilar
         async function salvarPilar(event) {
             event.preventDefault();
             const form = event.target;
             const formData = new FormData(form);
             const produto = {
                 nome: formData.get('nome'),
-                preco: parseFloat(formData.get('preco')),
+                tipo: formData.get('tipo'),
                 status: formData.get('status'),
                 descricao: formData.get('descricao')
             };
             try {
                 if (form.dataset.codigo) {
-                    await api.put(`/produtos/${form.dataset.codigo}`, produto);
+                    await api.put(window.endpoints.pilares.update(form.dataset.codigo), produto);
                     // Mostrar modal de sucesso de atualização
                     window.showUpdateSuccessModal(produto.status === 'ativo' ? 'Ativo' : 'Inativo');
                 } else {
-                    await api.post('/produtos', produto);
+                    await api.post(window.endpoints.pilares.create, produto);
                     // Mostrar modal de sucesso de cadastro
                     window.showSuccessModal();
                 }
                 closeModal();
                 carregarPilars();
             } catch (error) {
-                console.error('Erro ao salvar produto:', error);
-                alert('Erro ao salvar produto');
+                console.error('Erro ao salvar pilar:', error);
+                alert('Erro ao salvar pilar');
             }
         }
 
-        // Função para editar produto
+        // Função para editar pilar
         async function editarPilar(codigo) {
             try {
-                const produto = await api.get(`/produtos/${codigo}`);
-                const form = document.getElementById('produtoForm');
+                const { data: produto } = await api.get(window.endpoints.pilares.get(codigo));
+                const form = document.getElementById('pilarForm');
                 form.dataset.codigo = produto.codigo;
                 form.nome.value = produto.nome;
                 form.preco.value = produto.preco;
@@ -1367,23 +1329,23 @@
                 if (statusInput) statusInput.value = status;
                 if (statusLabel) statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
                 
-                const modal = document.getElementById('produtoModal');
+                const modal = document.getElementById('pilarModal');
                 const modalTitle = document.getElementById('modalTitle');
                 modalTitle.innerHTML = '<i class="fas fa-box"></i> Editar Pilar';
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('show'), 10);
                 document.body.style.overflow = 'hidden';
             } catch (error) {
-                console.error('Erro ao carregar produto:', error);
-                alert('Erro ao carregar produto');
+                console.error('Erro ao carregar pilar:', error);
+                alert('Erro ao carregar pilar');
             }
         }
 
-        // Função para visualizar produto
+        // Função para visualizar pilar
         async function visualizarPilar(codigo) {
             try {
-                const produto = await api.get(`/produtos/${codigo}`);
-                const form = document.getElementById('produtoForm');
+                const { data: produto } = await api.get(window.endpoints.pilares.get(codigo));
+                const form = document.getElementById('pilarForm');
                 form.nome.value = produto.nome;
                 form.preco.value = produto.preco;
                 form.descricao.value = produto.descricao || '';
@@ -1403,7 +1365,7 @@
                 });
                 
                 // Ajustar título
-                const modal = document.getElementById('produtoModal');
+                const modal = document.getElementById('pilarModal');
                 const modalTitle = document.getElementById('modalTitle');
                 modalTitle.innerHTML = '<i class="fas fa-eye"></i> Visualizar Pilar';
                 
@@ -1422,8 +1384,8 @@
                     closeModal();
                 };
             } catch (error) {
-                console.error('Erro ao visualizar produto:', error);
-                alert('Erro ao visualizar produto');
+                console.error('Erro ao visualizar pilar:', error);
+                alert('Erro ao visualizar pilar');
             }
         }
 
@@ -1458,13 +1420,13 @@
             }
         }
         
-        // Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA DE COLABORADORES
+        // Funções para controlar o spinner centralizado
         function mostrarSpinner() {
-            document.getElementById('loader-produtos').style.display = 'flex';
+            document.getElementById('loader-pilares').style.display = 'flex';
         }
         
         function ocultarSpinner() {
-            document.getElementById('loader-produtos').style.display = 'none';
+            document.getElementById('loader-pilares').style.display = 'none';
         }
 
         // Função para mostrar modal de sucesso
@@ -1563,18 +1525,18 @@
                 statusToggle.addEventListener('change', toggleStatus);
             }
             
-            document.getElementById('produtoForm').addEventListener('submit', salvarPilar);
+            document.getElementById('pilarForm').addEventListener('submit', salvarPilar);
             document.getElementById('confirmDeleteBtn').onclick = async function() {
                 if (!codigoParaExcluir) return;
                 try {
                     const result = await window.bloqueioExclusao.deleteWithCheck(
-                        'produtos',
+                        'pilares',
                         codigoParaExcluir,
                         () => { closeDeleteModal(); carregarPilars(); window.showDeleteSuccessModal(); }
                     );
                     if (!result || result.blocked) return;
                 } catch (error) {
-                    console.error('Erro ao excluir produto:', error);
+                    console.error('Erro ao excluir pilar:', error);
                 } finally {
                     codigoParaExcluir = null;
                 }

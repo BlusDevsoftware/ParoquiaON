@@ -235,6 +235,20 @@
             border-top: 1px solid #eee;
             background: #fff;
         }
+        /* Filtro de Status (igual padrão da aba Comunidades) */
+        .status-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-filter select {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fff;
+            color: #333;
+            font-size: 14px;
+        }
         .btn-danger {
             background-color: #dc3545;
             color: #fff;
@@ -1006,6 +1020,13 @@
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Buscar pastoral...">
                 </div>
+                    <div class="status-filter">
+                        <select id="statusFilter" aria-label="Filtrar por status">
+                            <option value="todos" selected>Status</option>
+                            <option value="ativo">Ativo</option>
+                            <option value="inativo">Inativo</option>
+                        </select>
+                    </div>
                     
                 <button class="btn-primary" onclick="novaPastoral()" style="background:#1e3a8a; border-color:#1e3a8a;">
                     <i class="fas fa-plus"></i>
@@ -1430,12 +1451,20 @@
                 const { data, error } = await api.get(endpoints.pastorais.list);
                 if (error) throw error;
                 const lista = Array.isArray(data) ? data : [];
+                // Aplicar filtro de status, se existir
+                const statusSelect = document.getElementById('statusFilter');
+                const filtro = statusSelect ? statusSelect.value : 'todos';
+                const listaFiltrada = lista.filter(p => {
+                    if (filtro === 'todos') return true;
+                    const ativo = p?.ativo !== false;
+                    return filtro === 'ativo' ? ativo : !ativo;
+                });
                 const grid = document.getElementById('pastorais-grid');
                 if (!grid) return;
                 // mantém o cabeçalho
                 Array.from(grid.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
 
-                if (lista.length === 0) {
+                if (listaFiltrada.length === 0) {
                     const empty = document.createElement('div');
                     empty.style.gridColumn = '1 / -1';
                     empty.style.textAlign = 'center';
@@ -1444,7 +1473,7 @@
                     empty.innerHTML = '<i class="fas fa-church" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhuma pastoral encontrada';
                     grid.appendChild(empty);
                 } else {
-                    lista.forEach(p => grid.appendChild(createPastoralRow(p)));
+                    listaFiltrada.forEach(p => grid.appendChild(createPastoralRow(p)));
                 }
                 
                 // Ocultar spinner após carregar com sucesso
@@ -1741,7 +1770,12 @@ async function visualizarPastoral(id) {
                 // Ocultar spinner mesmo em caso de erro
                 ocultarSpinner();
             }
-                         document.getElementById('pastoralForm').addEventListener('submit', salvarPastoral);
+            document.getElementById('pastoralForm').addEventListener('submit', salvarPastoral);
+            // Filtro de status: recarregar lista ao mudar
+            const statusSelect = document.getElementById('statusFilter');
+            if (statusSelect) {
+                statusSelect.addEventListener('change', carregarPastorais);
+            }
             // remove listener de tipo inexistente
              document.getElementById('statusToggleModal').addEventListener('change', toggleStatus);
             document.getElementById('confirmDeleteBtn').onclick = async function() {
