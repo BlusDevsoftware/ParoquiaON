@@ -26,27 +26,72 @@ async function buscarPilar(req, res) {
 
 async function criarPilar(req, res) {
     try {
-        const dados = req.body;
-        const { data, error } = await supabase.from('pilares').insert([dados]).select().single();
+        const body = req.body || {};
+        // Mapear "status" (ativo/inativo) para coluna booleana "ativo"
+        const status = body.status;
+        const ativoFromBody = typeof body.ativo === 'boolean' ? body.ativo : undefined;
+        const ativo = typeof status === 'string'
+            ? String(status).toLowerCase() === 'ativo'
+            : (ativoFromBody !== undefined ? ativoFromBody : true);
+
+        // Montar somente campos existentes na tabela
+        const insertData = {
+            nome: body.nome,
+            descricao: body.descricao ?? null,
+            cor: body.cor ?? '#1976d2',
+            ativo,
+            // Colunas de autoria (adicionadas por migração recente)
+            usuario_id: body.usuario_id ?? null,
+            criado_por_email: body.criado_por_email ?? null,
+            criado_por_nome: body.criado_por_nome ?? null
+        };
+
+        const { data, error } = await supabase
+            .from('pilares')
+            .insert([insertData])
+            .select()
+            .single();
         if (error) throw error;
         res.status(201).json(data);
     } catch (error) {
         console.error('Erro ao criar pilar:', error);
-        res.status(500).json({ error: 'Erro ao criar pilar' });
+        res.status(500).json({ error: 'Erro ao criar pilar', details: error?.message });
     }
 }
 
 async function atualizarPilar(req, res) {
     try {
         const { id } = req.params;
-        const dados = req.body;
-        const { data, error } = await supabase.from('pilares').update(dados).eq('id', id).select().single();
+        const body = req.body || {};
+        const status = body.status;
+        const ativoFromBody = typeof body.ativo === 'boolean' ? body.ativo : undefined;
+        const ativo = typeof status === 'string'
+            ? String(status).toLowerCase() === 'ativo'
+            : ativoFromBody;
+
+        // Somente campos conhecidos
+        const updateData = {
+            ...(body.nome !== undefined ? { nome: body.nome } : {}),
+            ...(body.descricao !== undefined ? { descricao: body.descricao } : {}),
+            ...(body.cor !== undefined ? { cor: body.cor } : {}),
+            ...(ativo !== undefined ? { ativo } : {}),
+            ...(body.usuario_id !== undefined ? { usuario_id: body.usuario_id } : {}),
+            ...(body.criado_por_email !== undefined ? { criado_por_email: body.criado_por_email } : {}),
+            ...(body.criado_por_nome !== undefined ? { criado_por_nome: body.criado_por_nome } : {})
+        };
+
+        const { data, error } = await supabase
+            .from('pilares')
+            .update(updateData)
+            .eq('id', id)
+            .select()
+            .single();
         if (error) throw error;
         if (!data) return res.status(404).json({ error: 'Pilar não encontrado' });
         res.json(data);
     } catch (error) {
         console.error('Erro ao atualizar pilar:', error);
-        res.status(500).json({ error: 'Erro ao atualizar pilar' });
+        res.status(500).json({ error: 'Erro ao atualizar pilar', details: error?.message });
     }
 }
 
