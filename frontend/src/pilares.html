@@ -332,7 +332,7 @@
         /* Estilo de linhas e ações (igual aba Pastorais) */
         .grid-header {
             display: grid;
-            grid-template-columns: 1fr 1fr 120px auto;
+            grid-template-columns: 1fr 120px auto;
             gap: 16px;
             padding: 12px 16px;
             align-items: center;
@@ -347,7 +347,7 @@
 
         .grid-row {
             display: grid;
-            grid-template-columns: 1fr 1fr 120px auto;
+            grid-template-columns: 1fr 120px auto;
             gap: 16px;
             padding: 12px 16px;
             border: 1px solid #eef1f6;
@@ -374,7 +374,7 @@
         .btn-icon.btn-delete:hover { background: #991b1b; color: #fff; border-color: #991b1b; box-shadow: 0 2px 8px rgba(185, 28, 28, 0.35); }
 
         /* Centralizar exatamente a célula de Status sob o título */
-        .grid-row > div:nth-child(3) { display: flex; justify-content: center; align-items: center; }
+        .grid-row > div:nth-child(2) { display: flex; justify-content: center; align-items: center; }
 
         /* Spinner de carregamento - padrão */
         @keyframes spin {
@@ -899,7 +899,6 @@
 
         function createPilarRow(pilar) {
             const nome = pilar?.nome || 'Sem nome';
-            const tipo = pilar?.tipo || '-';
             const ativo = pilar?.ativo !== false && (pilar?.status ? String(pilar.status).toLowerCase() === 'ativo' : true);
             const statusText = ativo ? 'Ativo' : 'Inativo';
             const statusClass = ativo ? 'ativo' : 'inativo';
@@ -908,7 +907,6 @@
             row.className = 'grid-row';
             row.innerHTML = `
                 <div>${nome}</div>
-                <div>${tipo}</div>
                 <div><span class="status ${statusClass}">${statusText}</span></div>
                 <div class="grid-cell-actions">
                     <button class="btn-icon btn-edit" title="Editar" onclick="editarPilar?.('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -1000,21 +998,7 @@
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Buscar pilar...">
                 </div>
-                <div class="filter-options">
-                    <select style="min-width:120px;">
-                        <option value="">Tipo de Pilar</option>
-                        <option value="liturgico">Litúrgico</option>
-                        <option value="social">Social</option>
-                        <option value="educativo">Educativo</option>
-                        <option value="pastoral">Pastoral</option>
-                        <option value="administrativo">Administrativo</option>
-                    </select>
-                    <select style="min-width:120px;">
-                        <option value="">Status</option>
-                        <option value="ativo">Ativo</option>
-                        <option value="inativo">Inativo</option>
-                    </select>
-                </div>
+                <div class="filter-options"></div>
                 <button class="btn-primary" onclick="novoPilar()" style="background:#1e3a8a; border-color:#1e3a8a;">
                     <i class="fas fa-plus"></i>
                     Novo Pilar
@@ -1032,9 +1016,8 @@
             
             <div id="pilares-grid" class="pilares-grid">
                 <!-- Cabeçalho do Grid -->
-                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
+                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 120px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
                     <div>Nome do Pilar</div>
-                    <div>Tipo</div>
                     <div>Status</div>
                     <div>Ações</div>
                 </div>
@@ -1066,17 +1049,7 @@
                             <label for="nome"><i class="fas fa-columns"></i> Nome do Pilar</label>
                             <input type="text" id="nome" name="nome" required>
                         </div>
-                        <div class="form-group">
-                            <label for="tipo"><i class="fas fa-tag"></i> Tipo de Pilar</label>
-                            <select id="tipo" name="tipo" required>
-                                <option value="">Selecione...</option>
-                                <option value="liturgico">Litúrgico</option>
-                                <option value="social">Social</option>
-                                <option value="educativo">Educativo</option>
-                                <option value="pastoral">Pastoral</option>
-                                <option value="administrativo">Administrativo</option>
-                            </select>
-                        </div>
+                        
                     </div>
                     <input type="hidden" id="status" name="status" value="ativo">
                     <div class="form-group">
@@ -1245,11 +1218,16 @@
             event.preventDefault();
             const form = event.target;
             const formData = new FormData(form);
+            const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') ? window.authGuard.getCurrentUser() : null;
+            const rawUserId = currentUser && (currentUser.id ?? currentUser.usuario_id ?? currentUser.userId);
+            const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
             const payload = {
                 nome: formData.get('nome'),
-                tipo: formData.get('tipo'),
                 status: formData.get('status'),
-                descricao: formData.get('descricao') || ''
+                descricao: formData.get('descricao') || '',
+                usuario_id: usuarioId ?? undefined,
+                criado_por_email: currentUser?.email ?? undefined,
+                criado_por_nome: (currentUser?.nome ?? currentUser?.name) ?? undefined
             };
             try {
                 if (form.dataset.codigo) {
@@ -1279,8 +1257,7 @@
                 const form = document.getElementById('pilarForm');
                 form.dataset.codigo = pilar.id ?? pilar.codigo;
                 form.nome.value = pilar.nome || '';
-                const selectTipo = form.querySelector('#tipo');
-                if (selectTipo) selectTipo.value = pilar.tipo || '';
+                
                 form.descricao.value = pilar.descricao || '';
                 
                 // Atualizar toggle de status
@@ -1311,8 +1288,7 @@
                 if (error) throw error;
                 const form = document.getElementById('pilarForm');
                 form.nome.value = pilar.nome || '';
-                const selectTipo = form.querySelector('#tipo');
-                if (selectTipo) selectTipo.value = pilar.tipo || '';
+                
                 form.descricao.value = pilar.descricao || '';
                 
                 // Atualizar toggle de status
@@ -1530,8 +1506,7 @@
                 novoPilar();
                 const form = document.getElementById('pilarForm');
                 form.nome.value = `${pilar?.nome || ''} (cópia)`;
-                const selectTipo = form.querySelector('#tipo');
-                if (selectTipo) selectTipo.value = pilar?.tipo || '';
+                
                 form.descricao.value = pilar?.descricao || '';
                 const statusInput = document.getElementById('status');
                 if (statusInput) statusInput.value = (pilar?.status || (pilar?.ativo === false ? 'inativo' : 'ativo'));

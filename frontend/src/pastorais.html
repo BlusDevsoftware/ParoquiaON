@@ -1630,13 +1630,19 @@ async function salvarPastoral(event) {
             const form = event.target;
             const formData = new FormData(form);
             const statusStr = formData.get('status');
+            const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') ? window.authGuard.getCurrentUser() : null;
+            const rawUserId = currentUser && (currentUser.id ?? currentUser.usuario_id ?? currentUser.userId);
+            const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
             const payload = {
                 nome: formData.get('nome'),
                 tipo: formData.get('tipo') || 'Geral',
                 descricao: formData.get('observacao') || '',
                 responsavel_id: formData.get('responsavel_id') ? Number(formData.get('responsavel_id')) : null,
                 foto: formData.get('foto') || null,
-                ativo: statusStr === 'ativo'
+                ativo: statusStr === 'ativo',
+                usuario_id: usuarioId ?? undefined,
+                criado_por_email: currentUser?.email ?? undefined,
+                criado_por_nome: (currentUser?.nome ?? currentUser?.name) ?? undefined
             };
 
             console.log('📤 Payload sendo enviado:', payload);
