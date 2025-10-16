@@ -1098,8 +1098,8 @@
         const gridLocais = document.getElementById('locais-grid');
         const loaderLocais = document.getElementById('loader-locais');
 
-        function mostrarSpinner() { if (loaderLocais) loaderLocais.style.display = 'flex'; }
-        function ocultarSpinner() { if (loaderLocais) loaderLocais.style.display = 'none'; }
+        const locaisMostrarSpinner = () => { if (loaderLocais) loaderLocais.style.display = 'flex'; };
+        const locaisOcultarSpinner = () => { if (loaderLocais) loaderLocais.style.display = 'none'; };
 
         function createLocalRow(local) {
             const nome = local?.nome || 'Sem nome';
@@ -1125,7 +1125,7 @@
 
         async function carregarLocais() {
             try {
-                mostrarSpinner();
+                locaisMostrarSpinner();
                 if (!gridLocais) return;
                 Array.from(gridLocais.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
 
@@ -1147,11 +1147,18 @@
             } catch (e) {
                 console.error('Erro ao carregar locais:', e);
             } finally {
-                ocultarSpinner();
+                locaisOcultarSpinner();
             }
         }
 
-        document.addEventListener('DOMContentLoaded', carregarLocais);
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                locaisMostrarSpinner();
+                await carregarLocais();
+            } finally {
+                locaisOcultarSpinner();
+            }
+        });
         // Funções globais para modais
         window.openServicoModal = function(titulo = 'Novo Local', servico = null, modo = 'novo') {
             const modal = document.getElementById('servicoModal');
@@ -1172,15 +1179,15 @@
             // Preencher dados se for edição ou visualização
             if (servico) {
                 form.nome.value = servico.nome;
-                form.valor.value = servico.valor;
-                form.descricao.value = servico.descricao;
-                form.dataset.codigo = servico.codigo;
+                form.endereco.value = servico.endereco || '';
+                form.observacao.value = servico.observacao || servico.descricao || '';
+                form.dataset.id = servico.id ?? servico.codigo;
                 
                 // Atualizar toggle de status
-                const status = servico.status || 'Ativo';
-                if (statusToggle) statusToggle.checked = status === 'Ativo';
-                if (statusInput) statusInput.value = status === 'Ativo' ? 'ativo' : 'inativo';
-                if (statusLabel) statusLabel.textContent = status === 'Ativo' ? 'Ativo' : 'Inativo';
+                const status = servico.status || (servico.ativo === false ? 'inativo' : 'ativo');
+                if (statusToggle) statusToggle.checked = (String(status).toLowerCase() === 'ativo');
+                if (statusInput) statusInput.value = statusToggle.checked ? 'ativo' : 'inativo';
+                if (statusLabel) statusLabel.textContent = statusToggle.checked ? 'Ativo' : 'Inativo';
             }
             // Modo visualização: desabilitar campos e esconder botões
             Array.from(form.elements).forEach(el => {
@@ -1220,14 +1227,7 @@
             }, 300);
         }
 
-        // Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA DE COLABORADORES
-        function mostrarSpinner() {
-            document.getElementById('loader-servicos').style.display = 'flex';
-        }
         
-        function ocultarSpinner() {
-            document.getElementById('loader-servicos').style.display = 'none';
-        }
 
         // Função para mostrar modal de sucesso
         window.showSuccessModal = function() {
