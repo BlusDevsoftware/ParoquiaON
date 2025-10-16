@@ -1212,6 +1212,11 @@
             modalTitle.innerHTML = `<i class='fas fa-user'></i> ${titulo}`;
             // Reset total para evitar vazamento de dados
             resetPessoaFormUI();
+            // Refs locais usadas abaixo
+            const statusToggle = document.getElementById('statusTogglePessoaModal');
+            const statusInput = document.getElementById('statusPessoa');
+            const statusLabel = document.querySelector('#pessoaModal .status-label-modal');
+            const preview = document.getElementById('photoPreview');
             
             // Preencher dados se for edição ou visualização
             if (pessoa) {
@@ -1219,11 +1224,10 @@
                 form.telefonePessoa.value = pessoa.telefone || '';
                 form.enderecoPessoa.value = pessoa.endereco || '';
                 form.dataset.codigo = pessoa.codigo || '';
-                delete form.dataset.id;
+                // Não apagar id aqui; edição define id antes
                 
                 // Carregar foto se existir
                 if (pessoa.foto) {
-                    const preview = document.getElementById('photoPreview');
                     if (preview) { preview.src = pessoa.foto; preview.style.display = 'block'; }
                     const hiddenFoto = form.querySelector('input[name="foto"]');
                     if (hiddenFoto) hiddenFoto.value = pessoa.foto;
@@ -1301,9 +1305,9 @@
                 <div>${endereco}</div>
                 <div><span class="status ${statusClass}">${statusText}</span></div>
                 <div class="grid-cell-actions">
-                    <button class="btn-icon btn-edit" title="Editar" onclick="editarPessoa?.('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button class="btn-icon btn-duplicate" title="Duplicar" onclick="duplicarPessoa?.('${id}')"><i class="fa-regular fa-copy"></i></button>
-                    <button class="btn-icon btn-delete" title="Excluir" onclick="excluirPessoa?.('${id}')"><i class="fa-solid fa-trash"></i></button>
+                    <button class="btn-icon btn-edit" title="Editar" onclick="editarPessoa('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon btn-duplicate" title="Duplicar" onclick="duplicarPessoa('${id}')"><i class="fa-regular fa-copy"></i></button>
+                    <button class="btn-icon btn-delete" title="Excluir" onclick="excluirPessoa('${id}')"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;
             return row;
