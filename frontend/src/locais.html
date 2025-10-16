@@ -1285,7 +1285,7 @@
         async function carregarServicos() {
             try {
                 // Mostrar spinner ao iniciar carregamento
-                mostrarSpinner();
+                locaisMostrarSpinner();
                 
                 const servicos = await api.get('/servicos');
                 const tbody = document.getElementById('servicosTableBody');
@@ -1311,12 +1311,12 @@
                 });
                 
                 // Ocultar spinner após carregar com sucesso
-                ocultarSpinner();
+                locaisOcultarSpinner();
             } catch (error) {
                 console.error('Erro ao carregar serviços:', error);
                 alert('Erro ao carregar serviços');
                 // Ocultar spinner mesmo em caso de erro
-                ocultarSpinner();
+                locaisOcultarSpinner();
             }
         }
         // Função para controlar o toggle de status
@@ -1420,13 +1420,13 @@
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // Mostrar spinner centralizado ao iniciar
-                mostrarSpinner();
+                locaisMostrarSpinner();
                 
                 // Carregar dados
                 await carregarLocais();
                 
                 // Ocultar spinner centralizado quando tudo carregar
-                ocultarSpinner();
+                locaisOcultarSpinner();
                 
                 // Adicionar event listener para o toggle de status
                 const statusToggle = document.getElementById('statusToggleModal');
@@ -1436,7 +1436,7 @@
             } catch (error) {
                 console.error('Erro ao inicializar página:', error);
                 // Ocultar spinner mesmo em caso de erro
-                ocultarSpinner();
+                locaisOcultarSpinner();
             }
         });
         
