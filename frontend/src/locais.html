@@ -1159,14 +1159,7 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                locaisMostrarSpinner();
-                await carregarLocais();
-            } finally {
-                locaisOcultarSpinner();
-            }
-        });
+        // Removido listener duplicado; inicialização ocorre no bloco mais abaixo
         // Funções globais para modais
         window.openServicoModal = function(titulo = 'Novo Local', servico = null, modo = 'novo') {
             const modal = document.getElementById('servicoModal');
@@ -1439,6 +1432,8 @@
             }
         }
         document.addEventListener('DOMContentLoaded', async () => {
+            if (window.__locaisInit) return; // evitar execução dupla
+            window.__locaisInit = true;
             try {
                 // Mostrar spinner centralizado ao iniciar
                 locaisMostrarSpinner();
