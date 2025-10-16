@@ -1134,13 +1134,18 @@
                 const lista = Array.isArray(data) ? data : [];
 
                 if (lista.length === 0) {
-                    const empty = document.createElement('div');
-                    empty.style.gridColumn = '1 / -1';
-                    empty.style.textAlign = 'center';
-                    empty.style.padding = '24px';
-                    empty.style.color = '#666';
-                    empty.innerHTML = '<i class="fas fa-map-marker-alt" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum local encontrado';
-                    gridLocais.appendChild(empty);
+                    // Evitar duplicação da mensagem vazia
+                    let empty = document.getElementById('locais-empty');
+                    if (!empty) {
+                        empty = document.createElement('div');
+                        empty.id = 'locais-empty';
+                        empty.style.gridColumn = '1 / -1';
+                        empty.style.textAlign = 'center';
+                        empty.style.padding = '24px';
+                        empty.style.color = '#666';
+                        empty.innerHTML = '<i class="fas fa-map-marker-alt" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum local encontrado';
+                        gridLocais.appendChild(empty);
+                    }
                 } else {
                     lista.forEach(l => gridLocais.appendChild(createLocalRow(l)));
                 }
