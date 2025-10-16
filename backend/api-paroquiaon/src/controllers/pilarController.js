@@ -27,20 +27,17 @@ async function buscarPilar(req, res) {
 async function criarPilar(req, res) {
     try {
         const body = req.body || {};
-        // Mapear "status" (ativo/inativo) para coluna booleana "ativo"
-        const status = body.status;
-        const ativoFromBody = typeof body.ativo === 'boolean' ? body.ativo : undefined;
-        const ativo = typeof status === 'string'
-            ? String(status).toLowerCase() === 'ativo'
-            : (ativoFromBody !== undefined ? ativoFromBody : true);
+        // Normalizar status (texto): 'ativo' | 'inativo' (default: 'ativo')
+        const normalizedStatus = typeof body.status === 'string'
+            ? String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo'
+            : 'ativo';
 
-        // Montar somente campos existentes na tabela
+        // Montar somente campos existentes na tabela (sem coluna ativo)
         const insertData = {
             nome: body.nome,
             descricao: body.descricao ?? null,
             cor: body.cor ?? '#1976d2',
-            ativo,
-            status: ativo ? 'ativo' : 'inativo',
+            status: normalizedStatus,
             // Colunas de autoria (adicionadas por migração recente)
             usuario_id: body.usuario_id ?? null,
             criado_por_email: body.criado_por_email ?? null,
@@ -64,19 +61,16 @@ async function atualizarPilar(req, res) {
     try {
         const { id } = req.params;
         const body = req.body || {};
-        const status = body.status;
-        const ativoFromBody = typeof body.ativo === 'boolean' ? body.ativo : undefined;
-        const ativo = typeof status === 'string'
-            ? String(status).toLowerCase() === 'ativo'
-            : ativoFromBody;
+        const normalizedStatus = typeof body.status === 'string'
+            ? String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo'
+            : undefined;
 
-        // Somente campos conhecidos
+        // Somente campos conhecidos (sem coluna ativo)
         const updateData = {
             ...(body.nome !== undefined ? { nome: body.nome } : {}),
             ...(body.descricao !== undefined ? { descricao: body.descricao } : {}),
             ...(body.cor !== undefined ? { cor: body.cor } : {}),
-            ...(ativo !== undefined ? { ativo } : {}),
-            ...(ativo !== undefined ? { status: ativo ? 'ativo' : 'inativo' } : (typeof status === 'string' ? { status: String(status).toLowerCase() } : {})),
+            ...(normalizedStatus !== undefined ? { status: normalizedStatus } : {}),
             ...(body.usuario_id !== undefined ? { usuario_id: body.usuario_id } : {}),
             ...(body.criado_por_email !== undefined ? { criado_por_email: body.criado_por_email } : {}),
             ...(body.criado_por_nome !== undefined ? { criado_por_nome: body.criado_por_nome } : {})
