@@ -40,6 +40,7 @@ async function criarPilar(req, res) {
             descricao: body.descricao ?? null,
             cor: body.cor ?? '#1976d2',
             ativo,
+            status: ativo ? 'ativo' : 'inativo',
             // Colunas de autoria (adicionadas por migração recente)
             usuario_id: body.usuario_id ?? null,
             criado_por_email: body.criado_por_email ?? null,
@@ -75,6 +76,7 @@ async function atualizarPilar(req, res) {
             ...(body.descricao !== undefined ? { descricao: body.descricao } : {}),
             ...(body.cor !== undefined ? { cor: body.cor } : {}),
             ...(ativo !== undefined ? { ativo } : {}),
+            ...(ativo !== undefined ? { status: ativo ? 'ativo' : 'inativo' } : (typeof status === 'string' ? { status: String(status).toLowerCase() } : {})),
             ...(body.usuario_id !== undefined ? { usuario_id: body.usuario_id } : {}),
             ...(body.criado_por_email !== undefined ? { criado_por_email: body.criado_por_email } : {}),
             ...(body.criado_por_nome !== undefined ? { criado_por_nome: body.criado_por_nome } : {})
