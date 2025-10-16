@@ -317,6 +317,13 @@
             transition: background-color .15s ease, box-shadow .15s ease;
         }
 
+        /* Centralizar exatamente a célula de Status sob o título da coluna */
+        .grid-row > div:nth-child(5) {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .grid-row:nth-child(odd) {
             background: #fafbff;
         }
@@ -664,15 +671,15 @@
              font-size: 0.9em;
          }
          
-         .status.ativo {
-             background-color: #1e3a8a;
-             color: #ffffff;
-         }
+        .status.ativo {
+            background-color: #16a34a; /* verde */
+            color: #ffffff;
+        }
          
-         .status.inativo {
-             background-color: #ffebee;
-             color: #f44336;
-         }
+        .status.inativo {
+            background-color: #dc2626; /* vermelho */
+            color: #ffffff;
+        }
          
          /* Estilos para o toggle switch do modal */
          .modal-header-actions {
