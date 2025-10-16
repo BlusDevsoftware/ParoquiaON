@@ -274,6 +274,10 @@
         .status.ativo { background-color: #1e3a8a; color: #ffffff; }
         .status.inativo { background-color: #dc2626; color: #ffffff; }
 
+        /* Estado de carregamento do botão - mesmo padrão das outras abas */
+        .btn-loading { opacity: .85; pointer-events: none; }
+        .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .9s linear infinite; display: inline-block; }
+
         /* Estilos para o grid de pessoas - Baseado no communities-grid */
         .cards-container {
             margin-top: 20px;
@@ -1168,30 +1172,41 @@
             });
         }
 
-        // Funções globais para modais
-        window.openPessoaModal = function(titulo = 'Nova Pessoa', pessoa = null, modo = 'novo') {
-            const modal = document.getElementById('pessoaModal');
-            const modalTitle = document.getElementById('pessoaModalTitle');
+        // Util: reset total do formulário/modal de pessoa
+        function resetPessoaFormUI() {
             const form = document.getElementById('pessoaForm');
-            modalTitle.innerHTML = `<i class='fas fa-user'></i> ${titulo}`;
+            if (!form) return;
             form.reset();
+            delete form.dataset.id;
             form.dataset.codigo = '';
-            
-            // Resetar foto
             const preview = document.getElementById('photoPreview');
             const hiddenFoto = form.querySelector('input[name="foto"]');
             const photoInput = document.getElementById('photoInput');
-            if (preview) { preview.src = preview.src; }
+            if (preview) {
+                const placeholder = preview.dataset?.placeholder || preview.getAttribute('data-placeholder') || preview.src;
+                preview.src = placeholder;
+                preview.style.display = 'block';
+            }
             if (hiddenFoto) hiddenFoto.value = '';
             if (photoInput) photoInput.value = '';
-            
-            // Inicializar toggle de status
             const statusToggle = document.getElementById('statusTogglePessoaModal');
             const statusInput = document.getElementById('statusPessoa');
             const statusLabel = document.querySelector('#pessoaModal .status-label-modal');
             if (statusToggle) statusToggle.checked = true;
             if (statusInput) statusInput.value = 'ativo';
             if (statusLabel) statusLabel.textContent = 'Ativo';
+            // Recria handler de foto para evitar múltiplos listeners
+            inicializarFotoHandlersPessoa();
+        }
+
+        // Funções globais para modais
+        window.openPessoaModal = function(titulo = 'Nova Pessoa', pessoa = null, modo = 'novo') {
+            const modal = document.getElementById('pessoaModal');
+            const modalTitle = document.getElementById('pessoaModalTitle');
+            const form = document.getElementById('pessoaForm');
+            modalTitle.innerHTML = `<i class='fas fa-user'></i> ${titulo}`;
+            // Reset total para evitar vazamento de dados
+            resetPessoaFormUI();
             
             // Preencher dados se for edição ou visualização
             if (pessoa) {
@@ -1199,11 +1214,12 @@
                 form.telefonePessoa.value = pessoa.telefone || '';
                 form.enderecoPessoa.value = pessoa.endereco || '';
                 form.dataset.codigo = pessoa.codigo || '';
+                delete form.dataset.id;
                 
                 // Carregar foto se existir
                 if (pessoa.foto) {
-                    preview.src = pessoa.foto;
-                    preview.style.display = 'block';
+                    const preview = document.getElementById('photoPreview');
+                    if (preview) { preview.src = pessoa.foto; preview.style.display = 'block'; }
                     const hiddenFoto = form.querySelector('input[name="foto"]');
                     if (hiddenFoto) hiddenFoto.value = pessoa.foto;
                 }
@@ -1237,6 +1253,8 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 document.body.style.overflow = 'auto';
+                // Garante reset ao fechar para próxima abertura limpa
+                resetPessoaFormUI();
             }, 300);
         }
 
@@ -1318,6 +1336,9 @@
 
         // Toggle de status no modal
         document.addEventListener('DOMContentLoaded', function() {
+            // Salva placeholder da imagem para resets futuros
+            const pp = document.getElementById('photoPreview');
+            if (pp) { pp.dataset.placeholder = pp.src; }
             const statusToggle = document.getElementById('statusTogglePessoaModal');
             const statusInput = document.getElementById('statusPessoa');
             const statusLabel = document.querySelector('#pessoaModal .status-label-modal');
