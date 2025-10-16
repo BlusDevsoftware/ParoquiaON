@@ -480,8 +480,8 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Loader específico para a tabela de usuários */
-        .loader-overlay-servicos {
+        /* Loader centralizado para a lista de usuários (igual às demais abas) */
+        .loader-overlay-usuarios {
             display: none;
             position: absolute;
             top: 0;
@@ -988,17 +988,6 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fas fa-lock"></i> Senha</label>
-                            <input type="password" id="senhaUsuario" name="senhaUsuario" placeholder="Digite a senha">
-                            <div class="form-text">Deixe em branco para manter a senha atual</div>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-lock"></i> Confirmar Senha</label>
-                            <input type="password" id="confirmarSenhaUsuario" name="confirmarSenhaUsuario" placeholder="Confirme a senha">
-                        </div>
-                    </div>
 
                     <input type="hidden" id="statusUsuario" name="statusUsuario" value="ativo">
                     <div class="form-actions">
@@ -1041,9 +1030,109 @@
         </div>
     </div>
 
-    <script src="scripts/bloqueio_exclusao.js"></script>
+    <!-- Modal de Sucesso - Cadastro com Credenciais -->
+    <div id="successModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; font-size: 1.3em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Cadastro Realizado!</h2>
+                <button class="close-modal" onclick="closeSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
+                <i class="fas fa-check-circle" style="font-size: 3em; color: #4CAF50; margin-bottom: 16px;"></i>
+                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Usuário cadastrado com sucesso!</div>
+                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
+                    O usuário foi adicionado ao sistema e já está disponível para uso.
+                </div>
+                <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
+                    <div style="margin-bottom: 8px;"><strong>Status:</strong> Ativo</div>
+                    <div style="margin-bottom: 8px;"><strong>Data de Cadastro:</strong> <span id="dataCadastro"></span></div>
+                    <div><strong>Sistema:</strong> ParoquiaON</div>
+                </div>
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
+                    <div style="margin-bottom: 12px; font-weight: 600; color: #856404; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-user" style="color: #856404;"></i>
+                        Credenciais de Acesso Geradas
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <div style="margin-bottom: 4px; font-weight: 500; color: #856404; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-envelope" style="color: #856404;"></i>
+                            Login (Email):
+                        </div>
+                        <input type="text" id="emailCredencial" readonly style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #fff; font-family: monospace; font-size: 14px;">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <div style="margin-bottom: 4px; font-weight: 500; color: #856404; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-key" style="color: #856404;"></i>
+                            Senha Temporária:
+                        </div>
+                        <input type="text" id="senhaCredencial" readonly style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #fff; font-family: monospace; font-size: 14px;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; color: #856404; font-size: 0.9em;">
+                        <i class="fas fa-exclamation-triangle" style="color: #f39c12;"></i>
+                        <span>Anote estas credenciais! Elas serão necessárias para o primeiro acesso do usuário.</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="btn-secondary" onclick="closeSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="module">
-        // Funções globais para modais
+        async function carregarPessoasParaUsuarios() {
+            try {
+                const select = document.getElementById('pessoaUsuario');
+                if (!select) return;
+                select.innerHTML = '<option value="">Carregando pessoas...</option>';
+                const { data, error } = await window.api.get(window.endpoints.pessoas.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                if (lista.length === 0) {
+                    select.innerHTML = '<option value="">Nenhuma pessoa encontrada</option>';
+                    return;
+                }
+                const options = ['<option value="">Selecione uma pessoa</option>']
+                    .concat(lista.map(p => `<option value="${p.id}">${p.nome}</option>`));
+                select.innerHTML = options.join('');
+            } catch (e) {
+                const select = document.getElementById('pessoaUsuario');
+                if (select) select.innerHTML = '<option value="">Erro ao carregar pessoas</option>';
+                console.error('Erro ao carregar pessoas para usuários:', e);
+            }
+        }
+
+        // Funções de sucesso
+        window.showSuccessModal = function(email, senhaTemporaria) {
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            const dc = document.getElementById('dataCadastro');
+            const emailInput = document.getElementById('emailCredencial');
+            const senhaInput = document.getElementById('senhaCredencial');
+            if (dc) dc.textContent = dataAtual;
+            if (emailInput) emailInput.value = email || '';
+            if (senhaInput) senhaInput.value = senhaTemporaria || '';
+            const modal = document.getElementById('successModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        window.closeSuccessModal = function() {
+            const modal = document.getElementById('successModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Fechar modal de sucesso ao clicar fora
+        window.addEventListener('click', function(event) {
+            const sm = document.getElementById('successModal');
+            if (event.target === sm) closeSuccessModal();
+        });
         window.openUsuarioModal = function(titulo = 'Novo Usuário', usuario = null, modo = 'novo') {
             const modal = document.getElementById('usuarioModal');
             const modalTitle = document.getElementById('usuarioModalTitle');
@@ -1051,6 +1140,8 @@
             modalTitle.innerHTML = `<i class='fas fa-user-cog'></i> ${titulo}`;
             form.reset();
             form.dataset.codigo = '';
+            // Carregar pessoas no select ao abrir modal
+            carregarPessoasParaUsuarios();
             
             // Inicializar toggle de status
             const statusToggle = document.getElementById('statusToggleUsuarioModal');
@@ -1276,10 +1367,7 @@
                 submitBtn.classList.add('btn-loading');
                 submitBtn.innerHTML = '<span class="btn-spinner"></span> &nbsp;Salvando...';
             }
-            // validar senha
-            const senha = form.senhaUsuario.value;
-            const confirmarSenha = form.confirmarSenhaUsuario.value;
-            if (senha && senha !== confirmarSenha) { alert('As senhas não coincidem!'); return; }
+            // Senha removida - sistema gera automaticamente
             const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') ? window.authGuard.getCurrentUser() : null;
             const rawUserId = currentUser && (currentUser.id ?? currentUser.usuario_id ?? currentUser.userId);
             const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
@@ -1287,9 +1375,8 @@
                 email: form.emailUsuario.value,
                 login: form.loginUsuario.value,
                 perfil: form.perfilUsuario.value,
-                pessoaId: form.pessoaUsuario.value || null,
-                status: form.statusUsuario.value,
-                senha: senha || undefined,
+                pessoa_id: form.pessoaUsuario.value ? Number(form.pessoaUsuario.value) : null,
+                ativo: form.statusUsuario.value === 'ativo',
                 usuario_id: usuarioId ?? undefined,
                 criado_por_email: currentUser?.email ?? undefined,
                 criado_por_nome: (currentUser?.nome ?? currentUser?.name) ?? undefined
@@ -1298,11 +1385,14 @@
                 if (form.dataset.id) {
                     const { error } = await api.put(window.endpoints.usuarios.update(form.dataset.id), payload);
                     if (error) throw error;
-                    window.showUpdateSuccessModal(payload.status === 'ativo' ? 'Ativo' : 'Inativo');
+                    window.showUpdateSuccessModal(payload.ativo ? 'Ativo' : 'Inativo');
                 } else {
                     const { error } = await api.post(window.endpoints.usuarios.create, payload);
                     if (error) throw error;
-                    window.showSuccessModal();
+                    // Mostrar modal com credenciais geradas
+                    const email = payload.email;
+                    const senhaTemporaria = data?.senha_temporaria || data?.senhaTemporaria || 'Gerada pelo sistema';
+                    window.showSuccessModal(email, senhaTemporaria);
                 }
                 closeUsuarioModal();
                 carregarUsuarios();

@@ -1,4 +1,15 @@
 const { supabase } = require('../config/supabase');
+const crypto = require('crypto');
+
+// Gerar senha temporária aleatória
+function gerarSenhaTemporaria() {
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*';
+    let senha = '';
+    for (let i = 0; i < 8; i++) {
+        senha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+    }
+    return senha;
+}
 
 // Listar todos os usuários
 async function listarUsuarios(req, res) {
@@ -41,14 +52,29 @@ async function buscarUsuario(req, res) {
 async function criarUsuario(req, res) {
     try {
         const dados = req.body;
+        
+        // Gerar senha temporária se não fornecida
+        const senhaTemporaria = gerarSenhaTemporaria();
+        const dadosComSenha = {
+            ...dados,
+            senha: senhaTemporaria,
+            senha_temporaria: senhaTemporaria,
+            trocar_senha_proximo_login: true
+        };
+        
         const { data, error } = await supabase
             .from('usuarios')
-            .insert([dados])
+            .insert([dadosComSenha])
             .select()
             .single();
 
         if (error) throw error;
-        res.status(201).json(data);
+        
+        // Retornar dados com senha temporária para o frontend
+        res.status(201).json({
+            ...data,
+            senha_temporaria: senhaTemporaria
+        });
     } catch (error) {
         console.error('Erro ao criar usuário:', error);
         res.status(500).json({ error: 'Erro ao criar usuário' });
