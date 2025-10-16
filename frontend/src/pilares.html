@@ -897,6 +897,10 @@
         const gridPilares = document.getElementById('pilares-grid');
         const loaderPilares = document.getElementById('loader-pilares');
 
+        // Spinner local deste módulo e export para window
+        function mostrarSpinner() { if (loaderPilares) loaderPilares.style.display = 'flex'; }
+        function ocultarSpinner() { if (loaderPilares) loaderPilares.style.display = 'none'; }
+
         function createPilarRow(pilar) {
             const nome = pilar?.nome || 'Sem nome';
             const ativo = pilar?.ativo !== false && (pilar?.status ? String(pilar.status).toLowerCase() === 'ativo' : true);
@@ -944,6 +948,11 @@
                 ocultarSpinner();
             }
         }
+
+        // Disponibiliza funções para outros módulos/handlers
+        window.carregarPilares = carregarPilares;
+        window.pilaresMostrarSpinner = mostrarSpinner;
+        window.pilaresOcultarSpinner = ocultarSpinner;
 
         document.addEventListener('DOMContentLoaded', carregarPilares);
     </script>
@@ -1529,7 +1538,7 @@
         window.showDeleteSuccessModal = showDeleteSuccessModal;
         window.closeDeleteSuccessModal = closeDeleteSuccessModal;
     </script>
-    <script src="scripts/hamburger-menu.js"></script>
+    
 </body>
 </html> 
 
