@@ -1101,6 +1101,28 @@
             }
         }
 
+        async function carregarPerfisParaUsuarios() {
+            try {
+                const select = document.getElementById('perfilUsuario');
+                if (!select) return;
+                select.innerHTML = '<option value="">Carregando perfis...</option>';
+                const { data, error } = await window.api.get(window.endpoints.perfis.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                if (lista.length === 0) {
+                    select.innerHTML = '<option value="">Nenhum perfil encontrado</option>';
+                    return;
+                }
+                const options = ['<option value="">Selecione um perfil</option>']
+                    .concat(lista.map(p => `<option value="${p.id}">${p.nome}</option>`));
+                select.innerHTML = options.join('');
+            } catch (e) {
+                const select = document.getElementById('perfilUsuario');
+                if (select) select.innerHTML = '<option value="">Erro ao carregar perfis</option>';
+                console.error('Erro ao carregar perfis para usuários:', e);
+            }
+        }
+
         // Funções de sucesso
         window.showSuccessModal = function(email, senhaTemporaria) {
             const dataAtual = new Date().toLocaleDateString('pt-BR');
@@ -1140,8 +1162,9 @@
             modalTitle.innerHTML = `<i class='fas fa-user-cog'></i> ${titulo}`;
             form.reset();
             form.dataset.codigo = '';
-            // Carregar pessoas no select ao abrir modal
+            // Carregar pessoas e perfis no select ao abrir modal
             carregarPessoasParaUsuarios();
+            carregarPerfisParaUsuarios();
             
             // Inicializar toggle de status
             const statusToggle = document.getElementById('statusToggleUsuarioModal');
@@ -1355,7 +1378,7 @@
             const payload = {
                 email: form.emailUsuario.value,
                 login: form.loginUsuario.value,
-                perfil: form.perfilUsuario.value,
+                perfil_id: form.perfilUsuario.value ? Number(form.perfilUsuario.value) : null,
                 pessoa_id: form.pessoaUsuario.value ? Number(form.pessoaUsuario.value) : null,
                 ativo: form.statusUsuario.value === 'ativo',
                 usuario_id: usuarioId ?? undefined,

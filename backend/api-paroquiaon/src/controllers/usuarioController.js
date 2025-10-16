@@ -52,23 +52,40 @@ async function buscarUsuario(req, res) {
 async function criarUsuario(req, res) {
     try {
         const dados = req.body;
+        console.log('Dados recebidos para criar usuário:', dados);
         
-        // Gerar senha temporária se não fornecida
+        // Gerar senha temporária
         const senhaTemporaria = gerarSenhaTemporaria();
-        const dadosComSenha = {
-            ...dados,
+        
+        // Preparar dados básicos (só incluir campos que existem na tabela)
+        const dadosBasicos = {
+            email: dados.email,
+            login: dados.login,
             senha: senhaTemporaria,
-            senha_temporaria: senhaTemporaria,
-            trocar_senha_proximo_login: true
+            pessoa_id: dados.pessoa_id || null,
+            ativo: dados.ativo !== false, // default true
+            usuario_id: dados.usuario_id || null,
+            criado_por_email: dados.criado_por_email || null,
+            criado_por_nome: dados.criado_por_nome || null
         };
+        
+        // Incluir perfil_id se fornecido
+        if (dados.perfil_id) dadosBasicos.perfil_id = dados.perfil_id;
+        
+        console.log('Dados preparados para inserção:', dadosBasicos);
         
         const { data, error } = await supabase
             .from('usuarios')
-            .insert([dadosComSenha])
+            .insert([dadosBasicos])
             .select()
             .single();
 
-        if (error) throw error;
+        if (error) {
+            console.error('Erro do Supabase:', error);
+            throw error;
+        }
+        
+        console.log('Usuário criado com sucesso:', data);
         
         // Retornar dados com senha temporária para o frontend
         res.status(201).json({
@@ -77,7 +94,11 @@ async function criarUsuario(req, res) {
         });
     } catch (error) {
         console.error('Erro ao criar usuário:', error);
-        res.status(500).json({ error: 'Erro ao criar usuário' });
+        res.status(500).json({ 
+            error: 'Erro ao criar usuário', 
+            details: error.message,
+            code: error.code 
+        });
     }
 }
 
