@@ -1178,7 +1178,7 @@
             const form = document.getElementById('usuarioForm');
             modalTitle.innerHTML = `<i class='fas fa-user-cog'></i> ${titulo}`;
             form.reset();
-            form.dataset.codigo = '';
+            form.dataset.id = '';
             // Carregar pessoas e perfis no select ao abrir modal
             carregarPessoasParaUsuarios();
             carregarPerfisParaUsuarios();
@@ -1195,9 +1195,9 @@
             if (usuario) {
                 form.emailUsuario.value = usuario.email || '';
                 form.loginUsuario.value = usuario.login || '';
-                form.perfilUsuario.value = usuario.perfil || '';
-                form.pessoaUsuario.value = usuario.pessoaId || '';
-                form.dataset.codigo = usuario.codigo || '';
+                form.perfilUsuario.value = usuario.perfil_id || '';
+                form.pessoaUsuario.value = usuario.pessoa_id || '';
+                form.dataset.id = usuario.id || '';
                 
                 // Atualizar toggle de status
                 const status = usuario.status || 'Ativo';
@@ -1421,8 +1421,8 @@
                 form.dataset.id = usuario.id ?? id;
                 form.emailUsuario.value = usuario.email || '';
                 form.loginUsuario.value = usuario.login || '';
-                form.perfilUsuario.value = usuario.perfil || '';
-                form.pessoaUsuario.value = usuario.pessoaId || '';
+                form.perfilUsuario.value = usuario.perfil_id || '';
+                form.pessoaUsuario.value = usuario.pessoa_id || '';
                 const statusToggle = document.getElementById('statusToggleUsuarioModal');
                 const statusInput = document.getElementById('statusUsuario');
                 const statusLabel = document.querySelector('#usuarioModal .status-label-modal');
@@ -1443,8 +1443,8 @@
                 const form = document.getElementById('usuarioForm');
                 form.emailUsuario.value = usuario?.email || '';
                 form.loginUsuario.value = `${usuario?.login || ''}_copia`;
-                form.perfilUsuario.value = usuario?.perfil || '';
-                form.pessoaUsuario.value = usuario?.pessoaId || '';
+                form.perfilUsuario.value = usuario?.perfil_id || '';
+                form.pessoaUsuario.value = usuario?.pessoa_id || '';
             } catch (e) {
                 alert('Erro ao duplicar usuário');
             }
@@ -1476,21 +1476,22 @@
             };
             try {
                 if (form.dataset.id) {
-                    const { error } = await api.put(window.endpoints.usuarios.update(form.dataset.id), payload);
+                    const { data: updateData, error } = await window.api.put(window.endpoints.usuarios.update(form.dataset.id), payload);
                     if (error) throw error;
                     window.showUpdateSuccessModal(payload.ativo ? 'Ativo' : 'Inativo');
                 } else {
-                    const { error } = await api.post(window.endpoints.usuarios.create, payload);
+                    const { data: createData, error } = await window.api.post(window.endpoints.usuarios.create, payload);
                     if (error) throw error;
                     // Mostrar modal com credenciais geradas
                     const email = payload.email;
-                    const senhaTemporaria = data?.senha_temporaria || data?.senhaTemporaria || 'Gerada pelo sistema';
+                    const senhaTemporaria = createData?.senha_temporaria || createData?.senhaTemporaria || 'Gerada pelo sistema';
                     window.showSuccessModal(email, senhaTemporaria);
                 }
                 closeUsuarioModal();
                 carregarUsuarios();
             } catch (err) {
-                alert('Erro ao salvar usuário');
+                console.error('Erro ao salvar usuário:', err);
+                alert('Erro ao salvar usuário: ' + (err.message || 'Erro desconhecido'));
             } finally {
                 if (submitBtn) {
                     submitBtn.disabled = false;
