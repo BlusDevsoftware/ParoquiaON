@@ -32,12 +32,24 @@ async function apiRequest(endpoint, options = {}) {
   try {
     const response = await fetch(url, config)
     
+    let parsed
+    try {
+      parsed = await response.json()
+    } catch (_) {
+      parsed = null
+    }
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      const message = (parsed && (parsed.error || parsed.message || parsed.details))
+        ? `${parsed.error || parsed.message}${parsed.details ? `: ${parsed.details}` : ''}`
+        : `HTTP error! status: ${response.status}`
+      const err = new Error(message)
+      err.status = response.status
+      err.body = parsed
+      throw err
     }
     
-    const data = await response.json()
-    return { data, error: null }
+    return { data: parsed, error: null }
   } catch (error) {
     console.error('API Request Error:', error)
     return { data: null, error }
