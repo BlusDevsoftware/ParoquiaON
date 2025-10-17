@@ -14,6 +14,7 @@
     <script src="scripts/auth-guard.js"></script>
     <script src="scripts/apply-auth-protection.js"></script>
     <script src="scripts/config/api.js"></script>
+    <script src="scripts/bloqueio_exclusao.js"></script>
     <style>
         /* Copiado e adaptado de pilares.html para padronização */
         .modal {
@@ -249,7 +250,7 @@
         }
         
         .switch-modal input:checked + .slider-modal {
-            background-color: #2196F3;
+            background-color: #1e3a8a;
         }
         
         .switch-modal input:checked + .slider-modal:before {
@@ -554,44 +555,32 @@
         }
 
         /* Larguras específicas para cada coluna */
-        .table-scroll th:nth-child(1), /* Código */
+        .table-scroll th:nth-child(1), /* Email */
         .table-scroll td:nth-child(1) {
-            width: 80px;
-            min-width: 80px;
-        }
-
-        .table-scroll th:nth-child(2), /* Email */
-        .table-scroll td:nth-child(2) {
             width: 200px;
             min-width: 200px;
         }
 
-        .table-scroll th:nth-child(3), /* Login */
+        .table-scroll th:nth-child(2), /* Login */
+        .table-scroll td:nth-child(2) {
+            width: 150px;
+            min-width: 150px;
+        }
+
+        .table-scroll th:nth-child(3), /* Perfil */
         .table-scroll td:nth-child(3) {
             width: 150px;
             min-width: 150px;
         }
 
-        .table-scroll th:nth-child(4), /* Perfil */
+        .table-scroll th:nth-child(4), /* Status */
         .table-scroll td:nth-child(4) {
-            width: 150px;
-            min-width: 150px;
-        }
-
-        .table-scroll th:nth-child(5), /* Pessoa */
-        .table-scroll td:nth-child(5) {
-            width: 200px;
-            min-width: 200px;
-        }
-
-        .table-scroll th:nth-child(6), /* Status */
-        .table-scroll td:nth-child(6) {
             width: 100px;
             min-width: 100px;
         }
 
-        .table-scroll th:nth-child(7), /* Ações */
-        .table-scroll td:nth-child(7) {
+        .table-scroll th:nth-child(5), /* Ações */
+        .table-scroll td:nth-child(5) {
             width: 120px;
             min-width: 120px;
         }
@@ -926,7 +915,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Email</th>
                         <th>Login</th>
                         <th>Perfil</th>
@@ -1077,6 +1065,30 @@
                 </div>
                 <div style="display: flex; justify-content: center; gap: 12px;">
                     <button class="btn-secondary" onclick="closeSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Sucesso - Atualização -->
+    <div id="updateSuccessModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; font-size: 1.3em; color: #2196F3; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-sync-alt"></i> Dados Atualizados!</h2>
+                <button class="close-modal" onclick="closeUpdateSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
+                <i class="fas fa-sync-alt" style="font-size: 3em; color: #2196F3; margin-bottom: 16px;"></i>
+                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Dados atualizados com sucesso!</div>
+                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
+                    As informações foram atualizadas no sistema.
+                </div>
+                <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
+                    <div style="margin-bottom: 8px;"><strong>Status:</strong> <span id="statusAtualizado"></span></div>
+                    <div style="margin-bottom: 8px;"><strong>Data de Atualização:</strong> <span id="dataAtualizacao"></span></div>
+                    <div><strong>Sistema:</strong> ParoquiaON</div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="btn-secondary" onclick="closeUpdateSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
                 </div>
             </div>
         </div>
@@ -1297,15 +1309,14 @@
                     const status = usuario.ativo ? 'Ativo' : 'Inativo';
                     
                     tr.innerHTML = `
-                        <td>${String(id).padStart(5, '0')}</td>
                         <td>${email}</td>
                         <td>${login}</td>
                         <td>${perfil}</td>
-                        <td><span class="status-badge ${usuario.ativo ? 'ativo' : 'inativo'}">${status}</span></td>
+                        <td><span class="status ${usuario.ativo ? 'ativo' : 'inativo'}">${status}</span></td>
                         <td class="actions">
-                            <button class="action-btn view-btn" title="Visualizar" onclick="visualizarUsuario('${id}')"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar" onclick="editarUsuario('${id}')"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir" onclick="confirmarExclusaoUsuario('${id}')"><i class="fas fa-trash"></i></button>
+                            <button class="btn-icon" title="Visualizar" onclick="visualizarUsuario('${id}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn-icon btn-edit" title="Editar" onclick="editarUsuario('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn-icon btn-delete" title="Excluir" onclick="openDeleteUsuarioModal('${id}')"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -1359,22 +1370,8 @@
         }
 
         async function confirmarExclusaoUsuario(id) {
-            if (confirm('Tem certeza que deseja excluir este usuário?')) {
-                try {
-                    const { error } = await window.api.delete(window.endpoints.usuarios.delete(id));
-                    if (error) throw error;
-                    
-                    if (typeof mostrarToast === 'function') {
-                        mostrarToast('Usuário excluído com sucesso!', 'success');
-                    }
-                    carregarUsuarios();
-                } catch (e) {
-                    console.error('Erro ao excluir usuário:', e);
-                    if (typeof mostrarToast === 'function') {
-                        mostrarToast('Erro ao excluir usuário', 'error');
-                    }
-                }
-            }
+            // Mantido por retrocompatibilidade: redireciona para o modal padronizado
+            openDeleteUsuarioModal(id);
         }
 
         // Toggle de status no modal
@@ -1499,6 +1496,37 @@
                     submitBtn.innerHTML = originalLabel;
                 }
             }
+        });
+
+        // Sucesso de atualização (padrão das demais abas)
+        window.showUpdateSuccessModal = function(status) {
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            const da = document.getElementById('dataAtualizacao');
+            const sa = document.getElementById('statusAtualizado');
+            if (da) da.textContent = dataAtual;
+            if (sa) sa.textContent = status || 'Ativo';
+            const modal = document.getElementById('updateSuccessModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        window.closeUpdateSuccessModal = function() {
+            const modal = document.getElementById('updateSuccessModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Fechar modal de sucesso ao clicar fora
+        window.addEventListener('click', function(event) {
+            const um = document.getElementById('updateSuccessModal');
+            if (event.target === um) closeUpdateSuccessModal();
         });
     </script>
     <script src="scripts/navigation.js"></script>
