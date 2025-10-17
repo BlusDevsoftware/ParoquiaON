@@ -7,7 +7,7 @@ const listarRegistros = async (req, res) => {
         const { tabela } = req.params;
         const { page = 1, limit = 10, search, ...filters } = req.query;
         
-        // Mapear tabelas do eGerente para ParóquiaON
+        // Mapear tabelas herdadas para ParóquiaON
         const tabelaMap = {
             'colaboradores': 'usuarios',
             'clientes': 'pessoas',
@@ -63,7 +63,7 @@ const buscarRegistro = async (req, res) => {
     try {
         const { tabela, id } = req.params;
         
-        // Mapear tabelas do eGerente para ParóquiaON
+        // Mapear tabelas herdadas para ParóquiaON
         const tabelaMap = {
             'colaboradores': 'usuarios',
             'clientes': 'pessoas',
@@ -97,7 +97,7 @@ const criarRegistro = async (req, res) => {
         const { tabela } = req.params;
         const dados = req.body;
 
-        // Mapear tabelas do eGerente para ParóquiaON
+        // Mapear tabelas herdadas para ParóquiaON
         const tabelaMap = {
             'colaboradores': 'usuarios',
             'clientes': 'pessoas',
@@ -160,7 +160,7 @@ const atualizarRegistro = async (req, res) => {
         const { tabela, id } = req.params;
         const dados = req.body;
 
-        // Mapear tabelas do eGerente para ParóquiaON
+        // Mapear tabelas herdadas para ParóquiaON
         const tabelaMap = {
             'colaboradores': 'usuarios',
             'clientes': 'pessoas',

@@ -1,6 +1,6 @@
-# eGerente Gateway API
+# ParóquiaON Gateway API
 
-Gateway API para o sistema eGerente, responsável por gerenciar as requisições entre o frontend e o banco de dados Supabase.
+Gateway API para o sistema ParóquiaON, responsável por gerenciar as requisições entre o frontend e o banco de dados Supabase.
 
 ## Requisitos
 

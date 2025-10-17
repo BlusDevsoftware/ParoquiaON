@@ -1,6 +1,6 @@
 # ParóquiaON API
 
-API principal para o sistema ParóquiaON, adaptada do eGerente para gestão paroquial.
+API principal para o sistema ParóquiaON, voltada à gestão paroquial.
 
 ## 🚀 Tecnologias
 

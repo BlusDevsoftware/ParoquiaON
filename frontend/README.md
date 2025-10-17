@@ -1,6 +1,6 @@
-# eGerente Frontend
+# ParóquiaON Frontend
 
-Interface do usuário para o sistema eGerente, desenvolvida com HTML, CSS e JavaScript.
+Interface do usuário para o sistema ParóquiaON, desenvolvida com HTML, CSS e JavaScript.
 
 ## Requisitos
 

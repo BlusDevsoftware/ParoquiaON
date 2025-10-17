@@ -66,26 +66,18 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
     };
     
     // Ícone especial para "Visualizar Todos os Títulos"
-    const iconByTitle = {
-        'Comissões/Visualizar Todos os Títulos': 'fa-globe'
-    };
+    const iconByTitle = {};
     const grupos = [
         { titulo: 'Dashboard', acoes: ['ver'] },
-        { titulo: 'Cadastros/Colaboradores', acoes: ['ver','criar','editar','excluir'] },
-        { titulo: 'Cadastros/Clientes', acoes: ['ver','criar','editar','excluir'] },
-        { titulo: 'Cadastros/Pilares', acoes: ['ver','criar','editar','excluir'] },
-        { titulo: 'Cadastros/Serviços', acoes: ['ver','criar','editar','excluir'] },
-        { titulo: 'Cadastros/Perfis', acoes: ['ver','criar','editar','excluir'] },
-        { titulo: 'Comissões/Lançar', acoes: ['ver','criar'] },
-        { titulo: 'Comissões/Lançar (Múltiplos)', acoes: ['ver','criar'] },
-        { titulo: 'Comissões/Movimento', acoes: ['ver','criar','editar','excluir'] },
-        { titulo: 'Comissões/Consulta', acoes: ['ver'] },
-        { titulo: 'Comissões/Visualizar Todos os Títulos', acoes: ['ver'] },
-        { titulo: 'Relatórios/Recebimento', acoes: ['ver','exportar'] },
-        { titulo: 'Relatórios/Conferência', acoes: ['ver','exportar'] },
-        { titulo: 'Relatórios/Dinâmico', acoes: ['ver','exportar'] },
-        { titulo: 'Configurações/Manutenção BD', acoes: ['ver','executar'] },
-        { titulo: 'Configurações/Sincronizar', acoes: ['ver','executar'] },
+        { titulo: 'Usuários', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Pessoas', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Comunidades', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Pastorais', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Pilares', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Locais', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Ações', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Agenda', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Relatórios', acoes: ['ver','exportar'] }
     ];
     
     grupos.forEach((g, gi) => {
@@ -154,21 +146,15 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
 function sectionKeyToTitle(sectionKey) {
     const map = {
         'dashboard': 'Dashboard',
-        'cadastros_colaboradores': 'Cadastros/Colaboradores',
-        'cadastros_clientes': 'Cadastros/Clientes',
-        'cadastros_pilares': 'Cadastros/Pilares',
-        'cadastros_servicos': 'Cadastros/Serviços',
-        'cadastros_perfis': 'Cadastros/Perfis',
-        'comissoes_lancar': 'Comissões/Lançar',
-        'comissoes_lancar_multiplos': 'Comissões/Lançar (Múltiplos)',
-        'comissoes_movimento': 'Comissões/Movimento',
-        'comissoes_consulta': 'Comissões/Consulta',
-        'comissoes_visualizar_todos_titulos': 'Comissões/Visualizar Todos os Títulos',
-        'relatorios_recebimento': 'Relatórios/Recebimento',
-        'relatorios_conferencia': 'Relatórios/Conferência',
-        'relatorios_dinamico': 'Relatórios/Dinâmico',
-        'configuracoes_manutencao': 'Configurações/Manutenção BD',
-        'configuracoes_sincronizar': 'Configurações/Sincronizar'
+        'usuarios': 'Usuários',
+        'pessoas': 'Pessoas',
+        'comunidades': 'Comunidades',
+        'pastorais': 'Pastorais',
+        'pilares': 'Pilares',
+        'locais': 'Locais',
+        'acoes': 'Ações',
+        'agenda': 'Agenda',
+        'relatorios': 'Relatórios'
     };
     return map[sectionKey] || sectionKey;
 }
@@ -179,19 +165,7 @@ function buildPermissionsMapFromProfile(profileObj) {
     
     Object.keys(profileObj).forEach(key => {
         if (typeof profileObj[key] !== 'boolean') return;
-        
-        // Tratamento especial para comissoes_visualizar_todos_titulos
-        if (key === 'comissoes_visualizar_todos_titulos') {
-            console.log('🔍 DEBUG - Encontrou comissoes_visualizar_todos_titulos:', profileObj[key]);
-            const title = 'Comissões/Visualizar Todos os Títulos';
-            if (!mapa[title]) mapa[title] = [];
-            if (profileObj[key] === true) {
-                mapa[title].push('ver');
-                console.log('🔍 DEBUG - Adicionou ver para Comissões/Visualizar Todos os Títulos');
-            }
-            return;
-        }
-        
+
         const lastUnderscore = key.lastIndexOf('_');
         if (lastUnderscore <= 0) return;
         const sectionKey = key.substring(0, lastUnderscore); // e.g., cadastros_colaboradores
@@ -335,12 +309,15 @@ async function carregarPerfis() {
             return;
         }
 
-        const perfis = await api.get('/perfis');
+        const { data, error } = await window.api.get(window.endpoints.perfis.list);
+        if (error) throw error;
+        const perfis = Array.isArray(data) ? data : [];
 
         tbody.innerHTML = '';
         (perfis || []).forEach((perfil) => {
             const tr = document.createElement('tr');
-            const codigo = (perfil.codigo ?? '').toString().padStart(5, '0');
+            const id = perfil.id ?? '';
+            const idFmt = id ? String(id).padStart(5, '0') : '';
             const nome = perfil.nome ?? '';
             
             // Contar permissões ativas
@@ -354,13 +331,13 @@ async function carregarPerfis() {
             const permissoesResumo = `${permissoesAtivas} permissão(ões)`;
             
             tr.innerHTML = `
-                <td>${codigo}</td>
+                <td>${idFmt}</td>
                 <td>${nome}</td>
                 <td>${permissoesResumo}</td>
                 <td class="actions">
-                    <button class="action-btn view-btn" title="Visualizar" onclick="visualizarPerfil('${codigo}')"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn edit-btn" title="Editar" onclick="editarPerfil('${codigo}')"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete-btn" title="Excluir" onclick="confirmarExclusaoPerfil('${codigo}')"><i class="fas fa-trash"></i></button>
+                    <button class="action-btn view-btn" title="Visualizar" onclick="visualizarPerfil('${id}')"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit-btn" title="Editar" onclick="editarPerfil('${id}')"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete-btn" title="Excluir" onclick="confirmarExclusaoPerfil('${id}')"><i class="fas fa-trash"></i></button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -377,13 +354,15 @@ async function carregarPerfis() {
 }
 
 // Visualizar perfil
-async function visualizarPerfil(codigo) {
+async function visualizarPerfil(id) {
     try {
-        const perfil = await api.get(`/perfis/${parseInt(codigo, 10)}`);
+        const { data, error } = await window.api.get(window.endpoints.perfis.get(parseInt(id, 10)));
+        if (error) throw error;
+        const perfil = data;
         // Reaproveita o modal de perfil em modo somente leitura
         const form = document.getElementById('perfilForm');
         document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-eye"></i> Visualizar Perfil';
-        form.codigo.value = perfil.codigo || '';
+        form.id.value = perfil.id || '';
         // Campo codigo_perfil removido; exibição do código não é mais necessária
         form.nome.value = perfil.nome || '';
         
@@ -409,12 +388,14 @@ async function visualizarPerfil(codigo) {
 }
 
 // Editar perfil
-async function editarPerfil(codigo) {
+async function editarPerfil(id) {
     try {
-        const perfil = await api.get(`/perfis/${parseInt(codigo, 10)}`);
+        const { data, error } = await window.api.get(window.endpoints.perfis.get(parseInt(id, 10)));
+        if (error) throw error;
+        const perfil = data;
         const form = document.getElementById('perfilForm');
         document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Perfil';
-        form.codigo.value = perfil.codigo || '';
+        form.id.value = perfil.id || '';
         // Campo codigo_perfil removido; exibição do código não é mais necessária
         form.nome.value = perfil.nome || '';
         
@@ -440,7 +421,7 @@ async function editarPerfil(codigo) {
 }
 
 // Confirmar exclusão de perfil
-function confirmarExclusaoPerfil(codigo) {
+function confirmarExclusaoPerfil(id) {
     try {
         const modal = document.getElementById('deleteModal');
         const confirmBtn = document.getElementById('confirmDeleteBtn');
@@ -451,7 +432,7 @@ function confirmarExclusaoPerfil(codigo) {
             try {
                 await window.bloqueioExclusao.deleteWithCheck(
                     'perfis',
-                    parseInt(codigo, 10),
+                    parseInt(id, 10),
                     async () => { closeDeleteModal(); await carregarPerfis(); }
                 );
             } catch (error) {
@@ -467,12 +448,12 @@ function confirmarExclusaoPerfil(codigo) {
 }
 
 // Excluir perfil
-async function excluirPerfil(codigo) {
+async function excluirPerfil(id) {
     // Mantido apenas para compatibilidade se chamado diretamente em outro lugar
     try {
         await window.bloqueioExclusao.deleteWithCheck(
             'perfis',
-            parseInt(codigo, 10),
+            parseInt(id, 10),
             async () => { closeDeleteModal(); await carregarPerfis(); }
         );
     } catch (error) {
@@ -694,80 +675,63 @@ async function salvarPerfil(e) {
     console.log('🔍 FRONTEND - Form data:', { nome });
     console.log('🔍 FRONTEND - Permissões mapa:', permissoesMapa);
     
-    // Converter mapa de permissões para o novo formato de colunas
+    // Converter mapa de permissões para o formato de colunas do banco atual
     const permissoes = {};
     
     // Dashboard
     permissoes.dashboard_ver = permissoesMapa['Dashboard']?.includes('ver') || false;
-    
-    // Cadastros/Colaboradores
-    permissoes.cadastros_colaboradores_ver = permissoesMapa['Cadastros/Colaboradores']?.includes('ver') || false;
-    permissoes.cadastros_colaboradores_criar = permissoesMapa['Cadastros/Colaboradores']?.includes('criar') || false;
-    permissoes.cadastros_colaboradores_editar = permissoesMapa['Cadastros/Colaboradores']?.includes('editar') || false;
-    permissoes.cadastros_colaboradores_excluir = permissoesMapa['Cadastros/Colaboradores']?.includes('excluir') || false;
-    
-    // Cadastros/Clientes
-    permissoes.cadastros_clientes_ver = permissoesMapa['Cadastros/Clientes']?.includes('ver') || false;
-    permissoes.cadastros_clientes_criar = permissoesMapa['Cadastros/Clientes']?.includes('criar') || false;
-    permissoes.cadastros_clientes_editar = permissoesMapa['Cadastros/Clientes']?.includes('editar') || false;
-    permissoes.cadastros_clientes_excluir = permissoesMapa['Cadastros/Clientes']?.includes('excluir') || false;
-    
-    // Cadastros/Pilares
-    permissoes.cadastros_pilares_ver = permissoesMapa['Cadastros/Pilares']?.includes('ver') || false;
-    permissoes.cadastros_pilares_criar = permissoesMapa['Cadastros/Pilares']?.includes('criar') || false;
-    permissoes.cadastros_pilares_editar = permissoesMapa['Cadastros/Pilares']?.includes('editar') || false;
-    permissoes.cadastros_pilares_excluir = permissoesMapa['Cadastros/Pilares']?.includes('excluir') || false;
-    
-    // Cadastros/Serviços
-    permissoes.cadastros_servicos_ver = permissoesMapa['Cadastros/Serviços']?.includes('ver') || false;
-    permissoes.cadastros_servicos_criar = permissoesMapa['Cadastros/Serviços']?.includes('criar') || false;
-    permissoes.cadastros_servicos_editar = permissoesMapa['Cadastros/Serviços']?.includes('editar') || false;
-    permissoes.cadastros_servicos_excluir = permissoesMapa['Cadastros/Serviços']?.includes('excluir') || false;
-    
-    // Cadastros/Perfis
-    permissoes.cadastros_perfis_ver = permissoesMapa['Cadastros/Perfis']?.includes('ver') || false;
-    permissoes.cadastros_perfis_criar = permissoesMapa['Cadastros/Perfis']?.includes('criar') || false;
-    permissoes.cadastros_perfis_editar = permissoesMapa['Cadastros/Perfis']?.includes('editar') || false;
-    permissoes.cadastros_perfis_excluir = permissoesMapa['Cadastros/Perfis']?.includes('excluir') || false;
-    
-    // Comissões/Lançar
-    permissoes.comissoes_lancar_ver = permissoesMapa['Comissões/Lançar']?.includes('ver') || false;
-    permissoes.comissoes_lancar_criar = permissoesMapa['Comissões/Lançar']?.includes('criar') || false;
-    // Comissões/Lançar (Múltiplos)
-    permissoes.comissoes_lancar_multiplos_ver = permissoesMapa['Comissões/Lançar (Múltiplos)']?.includes('ver') || false;
-    permissoes.comissoes_lancar_multiplos_criar = permissoesMapa['Comissões/Lançar (Múltiplos)']?.includes('criar') || false;
-    
-    // Comissões/Movimento
-    permissoes.comissoes_movimento_ver = permissoesMapa['Comissões/Movimento']?.includes('ver') || false;
-    permissoes.comissoes_movimento_criar = permissoesMapa['Comissões/Movimento']?.includes('criar') || false;
-    permissoes.comissoes_movimento_editar = permissoesMapa['Comissões/Movimento']?.includes('editar') || false;
-    permissoes.comissoes_movimento_excluir = permissoesMapa['Comissões/Movimento']?.includes('excluir') || false;
-    
-    // Comissões/Consulta
-    permissoes.comissoes_consulta_ver = permissoesMapa['Comissões/Consulta']?.includes('ver') || false;
-    
-    // Comissões/Visualizar Todos os Títulos
-    permissoes.comissoes_visualizar_todos_titulos = permissoesMapa['Comissões/Visualizar Todos os Títulos']?.includes('ver') || false;
-    
-    // Relatórios/Recebimento
-    permissoes.relatorios_recebimento_ver = permissoesMapa['Relatórios/Recebimento']?.includes('ver') || false;
-    permissoes.relatorios_recebimento_exportar = permissoesMapa['Relatórios/Recebimento']?.includes('exportar') || false;
-    
-    // Relatórios/Conferência
-    permissoes.relatorios_conferencia_ver = permissoesMapa['Relatórios/Conferência']?.includes('ver') || false;
-    permissoes.relatorios_conferencia_exportar = permissoesMapa['Relatórios/Conferência']?.includes('exportar') || false;
-    
-    // Relatórios/Dinâmico
-    permissoes.relatorios_dinamico_ver = permissoesMapa['Relatórios/Dinâmico']?.includes('ver') || false;
-    permissoes.relatorios_dinamico_exportar = permissoesMapa['Relatórios/Dinâmico']?.includes('exportar') || false;
-    
-    // Configurações/Manutenção BD
-    permissoes.configuracoes_manutencao_ver = permissoesMapa['Configurações/Manutenção BD']?.includes('ver') || false;
-    permissoes.configuracoes_manutencao_executar = permissoesMapa['Configurações/Manutenção BD']?.includes('executar') || false;
-    
-    // Configurações/Sincronizar
-    permissoes.configuracoes_sincronizar_ver = permissoesMapa['Configurações/Sincronizar']?.includes('ver') || false;
-    permissoes.configuracoes_sincronizar_executar = permissoesMapa['Configurações/Sincronizar']?.includes('executar') || false;
+
+    // Usuários
+    permissoes.usuarios_ver = permissoesMapa['Usuários']?.includes('ver') || false;
+    permissoes.usuarios_criar = permissoesMapa['Usuários']?.includes('criar') || false;
+    permissoes.usuarios_editar = permissoesMapa['Usuários']?.includes('editar') || false;
+    permissoes.usuarios_excluir = permissoesMapa['Usuários']?.includes('excluir') || false;
+
+    // Pessoas
+    permissoes.pessoas_ver = permissoesMapa['Pessoas']?.includes('ver') || false;
+    permissoes.pessoas_criar = permissoesMapa['Pessoas']?.includes('criar') || false;
+    permissoes.pessoas_editar = permissoesMapa['Pessoas']?.includes('editar') || false;
+    permissoes.pessoas_excluir = permissoesMapa['Pessoas']?.includes('excluir') || false;
+
+    // Comunidades
+    permissoes.comunidades_ver = permissoesMapa['Comunidades']?.includes('ver') || false;
+    permissoes.comunidades_criar = permissoesMapa['Comunidades']?.includes('criar') || false;
+    permissoes.comunidades_editar = permissoesMapa['Comunidades']?.includes('editar') || false;
+    permissoes.comunidades_excluir = permissoesMapa['Comunidades']?.includes('excluir') || false;
+
+    // Pastorais
+    permissoes.pastorais_ver = permissoesMapa['Pastorais']?.includes('ver') || false;
+    permissoes.pastorais_criar = permissoesMapa['Pastorais']?.includes('criar') || false;
+    permissoes.pastorais_editar = permissoesMapa['Pastorais']?.includes('editar') || false;
+    permissoes.pastorais_excluir = permissoesMapa['Pastorais']?.includes('excluir') || false;
+
+    // Pilares
+    permissoes.pilares_ver = permissoesMapa['Pilares']?.includes('ver') || false;
+    permissoes.pilares_criar = permissoesMapa['Pilares']?.includes('criar') || false;
+    permissoes.pilares_editar = permissoesMapa['Pilares']?.includes('editar') || false;
+    permissoes.pilares_excluir = permissoesMapa['Pilares']?.includes('excluir') || false;
+
+    // Locais
+    permissoes.locais_ver = permissoesMapa['Locais']?.includes('ver') || false;
+    permissoes.locais_criar = permissoesMapa['Locais']?.includes('criar') || false;
+    permissoes.locais_editar = permissoesMapa['Locais']?.includes('editar') || false;
+    permissoes.locais_excluir = permissoesMapa['Locais']?.includes('excluir') || false;
+
+    // Ações
+    permissoes.acoes_ver = permissoesMapa['Ações']?.includes('ver') || false;
+    permissoes.acoes_criar = permissoesMapa['Ações']?.includes('criar') || false;
+    permissoes.acoes_editar = permissoesMapa['Ações']?.includes('editar') || false;
+    permissoes.acoes_excluir = permissoesMapa['Ações']?.includes('excluir') || false;
+
+    // Agenda
+    permissoes.agenda_ver = permissoesMapa['Agenda']?.includes('ver') || false;
+    permissoes.agenda_criar = permissoesMapa['Agenda']?.includes('criar') || false;
+    permissoes.agenda_editar = permissoesMapa['Agenda']?.includes('editar') || false;
+    permissoes.agenda_excluir = permissoesMapa['Agenda']?.includes('excluir') || false;
+
+    // Relatórios (agregados)
+    permissoes.relatorios_ver = permissoesMapa['Relatórios']?.includes('ver') || false;
+    permissoes.relatorios_exportar = permissoesMapa['Relatórios']?.includes('exportar') || false;
     
     console.log('🔍 FRONTEND - Permissões convertidas para colunas:', permissoes);
     
@@ -776,14 +740,16 @@ async function salvarPerfil(e) {
     console.log('🔍 FRONTEND - Dados a enviar:', dadosEnvio);
     
     try {
-        if (form.codigo.value) {
-            console.log('🔍 FRONTEND - Atualizando perfil:', form.codigo.value);
-            await api.put(`/perfis/${form.codigo.value}`, dadosEnvio);
+        if (form.id.value) {
+            console.log('🔍 FRONTEND - Atualizando perfil:', form.id.value);
+            const { error: putError } = await window.api.put(window.endpoints.perfis.update(form.id.value), dadosEnvio);
+            if (putError) throw putError;
             // Mostrar modal de sucesso de atualização
             window.showUpdateSuccessModal();
         } else {
             console.log('🔍 FRONTEND - Criando novo perfil');
-            await api.post('/perfis', dadosEnvio);
+            const { error: postError } = await window.api.post(window.endpoints.perfis.create, dadosEnvio);
+            if (postError) throw postError;
             // Mostrar modal de sucesso de cadastro
             window.showSuccessModal();
         }

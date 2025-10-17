@@ -26,11 +26,11 @@ async function checkDatabase() {
             console.log('Estrutura completa:', colaborador);
         }
 
-        console.log('\n2. Verificando admin@egerente.com:');
+        console.log('\n2. Verificando admin@paroquiaon.com:');
         const { data: admin, error: error2 } = await supabase
             .from('colaboradores')
             .select('*')
-            .eq('email', 'admin@egerente.com')
+            .eq('email', 'admin@paroquiaon.com')
             .single();
 
         if (error2) {
@@ -49,7 +49,7 @@ async function checkDatabase() {
         const { data: updateResult, error: error3 } = await supabase
             .from('colaboradores')
             .update({ senha: 'teste123' })
-            .eq('email', 'admin@egerente.com')
+            .eq('email', 'admin@paroquiaon.com')
             .select()
             .single();
 

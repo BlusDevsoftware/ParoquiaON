@@ -689,7 +689,7 @@
         }
 
         /* Larguras específicas para cada coluna */
-        .table-scroll th:nth-child(1), /* Código */
+        .table-scroll th:nth-child(1), /* ID */
         .table-scroll td:nth-child(1) {
             width: 80px;
             min-width: 80px;
@@ -701,26 +701,14 @@
             min-width: 200px;
         }
 
-        .table-scroll th:nth-child(3), /* Email */
+        .table-scroll th:nth-child(3), /* Permissões */
         .table-scroll td:nth-child(3) {
-            width: 200px;
-            min-width: 200px;
+            width: 150px;
+            min-width: 150px;
         }
 
-        .table-scroll th:nth-child(4), /* Perfil */
+        .table-scroll th:nth-child(4), /* Ações */
         .table-scroll td:nth-child(4) {
-            width: 120px;
-            min-width: 120px;
-        }
-
-        .table-scroll th:nth-child(5), /* Status */
-        .table-scroll td:nth-child(5) {
-            width: 100px;
-            min-width: 100px;
-        }
-
-        .table-scroll th:nth-child(6), /* Ações */
-        .table-scroll td:nth-child(6) {
             width: 120px;
             min-width: 120px;
         }
@@ -1036,24 +1024,27 @@
                 </div>
             </div>
 
-            <!-- Cards Grid -->
-            <div class="cards-container">
-                <!-- Spinner de Carregamento -->
-                <div id="loader-perfis" class="loader-overlay-usuarios">
+            <!-- Tabela de Perfis -->
+            <div class="table-container">
+                <div id="loader-usuarios" class="loader-overlay-usuarios">
                     <div class="spinner-main"></div>
                     <div class="loading-text">Carregando perfis...</div>
                 </div>
-                
-            <div id="perfis-grid" class="perfis-grid">
-                <!-- Cabeçalho do Grid -->
-                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
-                    <div>Nome do Perfil</div>
-                    <div>Descrição</div>
-                    <div>Permissões</div>
-                    <div>Ações</div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Permissões</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profilesTableBody">
+                            <!-- Linhas inseridas via scripts/perfil.js -->
+                        </tbody>
+                    </table>
                 </div>
-                <!-- Cards dos perfis serão carregados dinamicamente via JavaScript -->
-            </div>
             </div>
     </div>
 
@@ -1069,7 +1060,7 @@
             </div>
             <div class="modal-body">
                 <form id="perfilForm" class="form-container">
-                    <input type="hidden" name="codigo">
+                    <input type="hidden" name="id">
                     <div class="form-row">
                         <div class="form-group" style="flex: 1 1 100%">
                             <label><i class="fas fa-id-badge"></i> Nome do Perfil</label>
@@ -1199,66 +1190,7 @@
             </div>
         </div>
     </div>
-    <script type="module">
-        // Listar perfis via API e renderizar no grid de cards
-        const gridPerfis = document.getElementById('perfis-grid');
-        const loaderPerfis = document.getElementById('loader-perfis');
-
-        function createPerfilCard(perfil) {
-            const nome = perfil?.nome || 'Sem nome';
-            const descricao = perfil?.descricao || '-';
-            const permissoes = Array.isArray(perfil?.permissoes) ? perfil.permissoes.join(', ') : (perfil?.permissoes || '-');
-
-            const div = document.createElement('div');
-            div.className = 'perfil-card';
-            div.innerHTML = `
-                <div class="perfil-header">
-                    <h3 class="perfil-title">${nome}</h3>
-                    <div class="perfil-actions">
-                        <button class="btn-edit" title="Editar" onclick="openPerfilModal?.('${perfil?.codigo ?? ''}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-delete" title="Excluir" onclick="openDeleteModal?.('${perfil?.codigo ?? ''}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-                <div class="perfil-info">
-                    <p><i class="fas fa-align-left"></i> ${descricao}</p>
-                    <p><i class="fas fa-key"></i> ${permissoes}</p>
-                </div>
-            `;
-            return div;
-        }
-
-        async function carregarPerfisGrid() {
-            try {
-                if (loaderPerfis) loaderPerfis.style.display = 'flex';
-                if (!gridPerfis) return;
-
-                const header = gridPerfis.querySelector('.grid-header');
-                Array.from(gridPerfis.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
-
-                const { data, error } = await window.api.get(window.endpoints.perfis.list);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-
-                if (lista.length === 0) {
-                    const empty = document.createElement('div');
-                    empty.style.gridColumn = '1 / -1';
-                    empty.style.textAlign = 'center';
-                    empty.style.padding = '24px';
-                    empty.style.color = '#666';
-                    empty.innerHTML = '<i class="fas fa-user-shield" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum perfil encontrado';
-                    gridPerfis.appendChild(empty);
-                } else {
-                    lista.forEach(p => gridPerfis.appendChild(createPerfilCard(p)));
-                }
-            } catch (e) {
-                console.error('Erro ao carregar perfis:', e);
-            } finally {
-                if (loaderPerfis) loaderPerfis.style.display = 'none';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', carregarPerfisGrid);
-    </script>
+    <!-- scripts/perfil.js cuida do carregamento da lista -->
     <script src="scripts/hamburger-menu.js"></script>
 </body>
 </html> 

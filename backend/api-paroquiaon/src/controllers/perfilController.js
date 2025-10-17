@@ -1,23 +1,6 @@
 const { supabase } = require('../config/supabase');
 
-// Gerar próximo código de perfil
-async function gerarProximoCodigo() {
-    try {
-        const { data, error } = await supabase
-            .from('perfis')
-            .select('codigo')
-            .order('codigo', { ascending: false })
-            .limit(1);
-        
-        if (error) throw error;
-        
-        const ultimoCodigo = data?.[0]?.codigo || '00000';
-        return String(parseInt(ultimoCodigo, 10) + 1).padStart(5, '0');
-    } catch (error) {
-        console.error('Erro ao gerar próximo código:', error);
-        throw error;
-    }
-}
+// Removido: geração de "codigo" (banco usa id inteiro)
 
 // Listar perfis
 async function listarPerfis(req, res) {
@@ -25,7 +8,7 @@ async function listarPerfis(req, res) {
         const { data, error } = await supabase
             .from('perfis')
             .select('*')
-            .order('codigo', { ascending: true });
+            .order('id', { ascending: true });
         
         if (error) throw error;
         
@@ -39,12 +22,12 @@ async function listarPerfis(req, res) {
 // Buscar perfil específico
 async function buscarPerfil(req, res) {
     try {
-        const { codigo } = req.params;
+        const { id } = req.params;
         
         const { data, error } = await supabase
             .from('perfis')
             .select('*')
-            .eq('codigo', codigo)
+            .eq('id', id)
             .single();
         
         if (error) throw error;
@@ -59,25 +42,7 @@ async function buscarPerfil(req, res) {
     }
 }
 
-// Buscar permissões do perfil
-async function listarPermissoes(req, res) {
-    try {
-        const { codigo } = req.params;
-        
-        const { data, error } = await supabase
-            .from('perfis_permissoes')
-            .select('*')
-            .eq('perfil_codigo', codigo)
-            .order('secao', { ascending: true });
-        
-        if (error) throw error;
-        
-        res.json(data || []);
-    } catch (error) {
-        console.error('Erro ao listar permissões:', error);
-        res.status(500).json({ error: 'Erro ao listar permissões' });
-    }
-}
+// listarPermissoes removido: permissões são colunas na tabela perfis
 
 // Criar perfil com permissões
 async function criarPerfil(req, res) {
@@ -90,13 +55,8 @@ async function criarPerfil(req, res) {
             return res.status(400).json({ error: 'Nome do perfil é obrigatório' });
         }
         
-        // Gerar código único
-        const novoCodigo = await gerarProximoCodigo();
-        console.log('🔍 DEBUG - Novo código gerado:', novoCodigo);
-        
         // Preparar dados para inserção (incluindo todas as permissões)
         const dadosPerfil = {
-            codigo: novoCodigo,
             nome,
             status,
             ...permissoes // Todas as permissões vão direto para a tabela perfis
@@ -130,7 +90,7 @@ async function criarPerfil(req, res) {
 // Atualizar perfil e permissões
 async function atualizarPerfil(req, res) {
     try {
-        const { codigo } = req.params;
+        const { id } = req.params;
         const { nome, status, ...permissoes } = req.body || {};
         
         console.log('🔍 DEBUG - Atualizando perfil:', { codigo, nome, status, permissoes });
@@ -138,8 +98,8 @@ async function atualizarPerfil(req, res) {
         // Verificar se perfil existe
         const { data: perfilExistente, error: errCheck } = await supabase
             .from('perfis')
-            .select('codigo')
-            .eq('codigo', codigo)
+            .select('id')
+            .eq('id', id)
             .single();
         
         if (errCheck || !perfilExistente) {
@@ -164,7 +124,7 @@ async function atualizarPerfil(req, res) {
         const { data: perfilAtualizado, error: errUpdate } = await supabase
             .from('perfis')
             .update(updates)
-            .eq('codigo', codigo)
+            .eq('id', id)
             .select()
             .single();
         
@@ -187,13 +147,13 @@ async function atualizarPerfil(req, res) {
 // Excluir perfil (cascade remove permissões)
 async function excluirPerfil(req, res) {
     try {
-        const { codigo } = req.params;
+        const { id } = req.params;
         
         // Verificar se perfil existe
         const { data: perfilExistente, error: errCheck } = await supabase
             .from('perfis')
-            .select('codigo')
-            .eq('codigo', codigo)
+            .select('id')
+            .eq('id', id)
             .single();
         
         if (errCheck || !perfilExistente) {
@@ -204,7 +164,7 @@ async function excluirPerfil(req, res) {
         const { error } = await supabase
             .from('perfis')
             .delete()
-            .eq('codigo', codigo);
+            .eq('id', id);
         
         if (error) throw error;
         
