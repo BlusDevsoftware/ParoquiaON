@@ -168,10 +168,14 @@ function buildPermissionsMapFromProfile(profileObj) {
 
         const lastUnderscore = key.lastIndexOf('_');
         if (lastUnderscore <= 0) return;
-        const sectionKey = key.substring(0, lastUnderscore); // e.g., cadastros_colaboradores
+        const sectionKey = key.substring(0, lastUnderscore); // e.g., dashboard, usuarios
         const action = key.substring(lastUnderscore + 1);    // e.g., ver/editar
         if (!['ver','criar','editar','excluir','exportar','executar'].includes(action)) return;
-        const title = sectionKeyToTitle(sectionKey);
+        
+        // Mapear dashboard para Minha Comunidade
+        const mappedSectionKey = sectionKey === 'dashboard' ? 'minha_comunidade' : sectionKey;
+        const title = sectionKeyToTitle(mappedSectionKey);
+        
         if (!mapa[title]) mapa[title] = [];
         if (profileObj[key] === true) {
             mapa[title].push(action);
@@ -679,7 +683,7 @@ async function salvarPerfil(e) {
     const permissoes = {};
     
     // Minha Comunidade
-    permissoes.dashboard_ver = permissoesMapa['Minha Comunidade']?.includes('ver') || false;
+    permissoes.minha_comunidade_ver = permissoesMapa['Minha Comunidade']?.includes('ver') || false;
 
     // Usuários
     permissoes.usuarios_ver = permissoesMapa['Usuários']?.includes('ver') || false;
