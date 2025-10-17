@@ -68,7 +68,7 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
     // Ícone especial para "Visualizar Todos os Títulos"
     const iconByTitle = {};
     const grupos = [
-        { titulo: 'Dashboard', acoes: ['ver'] },
+        { titulo: 'Minha Comunidade', acoes: ['ver'] },
         { titulo: 'Usuários', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Pessoas', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Comunidades', acoes: ['ver','criar','editar','excluir'] },
@@ -145,7 +145,7 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
 // Funções de Modal de Perfil
 function sectionKeyToTitle(sectionKey) {
     const map = {
-        'dashboard': 'Dashboard',
+        'dashboard': 'Minha Comunidade',
         'usuarios': 'Usuários',
         'pessoas': 'Pessoas',
         'comunidades': 'Comunidades',
@@ -678,8 +678,8 @@ async function salvarPerfil(e) {
     // Converter mapa de permissões para o formato de colunas do banco atual
     const permissoes = {};
     
-    // Dashboard
-    permissoes.dashboard_ver = permissoesMapa['Dashboard']?.includes('ver') || false;
+    // Minha Comunidade
+    permissoes.dashboard_ver = permissoesMapa['Minha Comunidade']?.includes('ver') || false;
 
     // Usuários
     permissoes.usuarios_ver = permissoesMapa['Usuários']?.includes('ver') || false;
