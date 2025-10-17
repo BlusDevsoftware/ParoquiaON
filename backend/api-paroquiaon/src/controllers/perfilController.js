@@ -93,7 +93,7 @@ async function atualizarPerfil(req, res) {
         const { id } = req.params;
         const { nome, status, ...permissoes } = req.body || {};
         
-        console.log('🔍 DEBUG - Atualizando perfil:', { codigo, nome, status, permissoes });
+        console.log('🔍 DEBUG - Atualizando perfil:', { id, nome, status, permissoes });
         
         // Verificar se perfil existe
         const { data: perfilExistente, error: errCheck } = await supabase
@@ -181,7 +181,6 @@ async function excluirPerfil(req, res) {
 module.exports = {
     listarPerfis,
     buscarPerfil,
-    listarPermissoes,
     criarPerfil,
     atualizarPerfil,
     excluirPerfil
