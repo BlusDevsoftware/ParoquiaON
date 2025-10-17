@@ -1,5 +1,6 @@
 const { supabase } = require('../config/supabase');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 // Gerar senha temporária aleatória
 function gerarSenhaTemporaria() {
@@ -9,6 +10,26 @@ function gerarSenhaTemporaria() {
         senha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
     }
     return senha;
+}
+
+// Validar dados de usuário
+function validarUsuario(dados, isUpdate = false) {
+    const erros = [];
+    
+    if (!isUpdate) {
+        if (!dados.email) erros.push('Email é obrigatório');
+        if (!dados.login) erros.push('Login é obrigatório');
+    }
+    
+    if (dados.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) {
+        erros.push('Email deve ter formato válido');
+    }
+    
+    if (dados.login && dados.login.length < 3) {
+        erros.push('Login deve ter pelo menos 3 caracteres');
+    }
+    
+    return erros;
 }
 
 // Listar todos os usuários
@@ -54,25 +75,59 @@ async function criarUsuario(req, res) {
         const dados = req.body;
         console.log('Dados recebidos para criar usuário:', dados);
         
-        // Gerar senha temporária
-        const senhaTemporaria = gerarSenhaTemporaria();
+        // Validar dados
+        const erros = validarUsuario(dados);
+        if (erros.length > 0) {
+            return res.status(400).json({ 
+                error: 'Dados inválidos', 
+                details: erros 
+            });
+        }
         
-        // Preparar dados básicos (só incluir campos que existem na tabela)
+        // Verificar se email já existe
+        const { data: emailExistente, error: emailError } = await supabase
+            .from('usuarios')
+            .select('id')
+            .eq('email', dados.email)
+            .single();
+            
+        if (emailExistente) {
+            return res.status(400).json({ 
+                error: 'Email já está em uso' 
+            });
+        }
+        
+        // Verificar se login já existe
+        const { data: loginExistente, error: loginError } = await supabase
+            .from('usuarios')
+            .select('id')
+            .eq('login', dados.login)
+            .single();
+            
+        if (loginExistente) {
+            return res.status(400).json({ 
+                error: 'Login já está em uso' 
+            });
+        }
+        
+        // Gerar senha temporária e criptografar
+        const senhaTemporaria = gerarSenhaTemporaria();
+        const senhaCriptografada = await bcrypt.hash(senhaTemporaria, 10);
+        
+        // Preparar dados básicos
         const dadosBasicos = {
             email: dados.email,
             login: dados.login,
-            senha: senhaTemporaria,
+            senha: senhaCriptografada,
             pessoa_id: dados.pessoa_id || null,
+            perfil_id: dados.perfil_id || null,
             ativo: dados.ativo !== false, // default true
             usuario_id: dados.usuario_id || null,
             criado_por_email: dados.criado_por_email || null,
             criado_por_nome: dados.criado_por_nome || null
         };
         
-        // Incluir perfil_id se fornecido
-        if (dados.perfil_id) dadosBasicos.perfil_id = dados.perfil_id;
-        
-        console.log('Dados preparados para inserção:', dadosBasicos);
+        console.log('Dados preparados para inserção:', { ...dadosBasicos, senha: '[CRIPTOGRAFADA]' });
         
         const { data, error } = await supabase
             .from('usuarios')
@@ -107,6 +162,59 @@ async function atualizarUsuario(req, res) {
     try {
         const { id } = req.params;
         const dados = req.body;
+        
+        // Validar dados
+        const erros = validarUsuario(dados, true);
+        if (erros.length > 0) {
+            return res.status(400).json({ 
+                error: 'Dados inválidos', 
+                details: erros 
+            });
+        }
+        
+        // Verificar se usuário existe
+        const { data: usuarioExistente, error: checkError } = await supabase
+            .from('usuarios')
+            .select('id')
+            .eq('id', id)
+            .single();
+            
+        if (checkError || !usuarioExistente) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+        
+        // Verificar se email já existe (exceto para o próprio usuário)
+        if (dados.email) {
+            const { data: emailExistente, error: emailError } = await supabase
+                .from('usuarios')
+                .select('id')
+                .eq('email', dados.email)
+                .neq('id', id)
+                .single();
+                
+            if (emailExistente) {
+                return res.status(400).json({ 
+                    error: 'Email já está em uso' 
+                });
+            }
+        }
+        
+        // Verificar se login já existe (exceto para o próprio usuário)
+        if (dados.login) {
+            const { data: loginExistente, error: loginError } = await supabase
+                .from('usuarios')
+                .select('id')
+                .eq('login', dados.login)
+                .neq('id', id)
+                .single();
+                
+            if (loginExistente) {
+                return res.status(400).json({ 
+                    error: 'Login já está em uso' 
+                });
+            }
+        }
+        
         const { data, error } = await supabase
             .from('usuarios')
             .update(dados)

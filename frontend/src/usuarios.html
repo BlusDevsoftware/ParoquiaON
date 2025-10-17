@@ -916,25 +916,28 @@
             </div>
         </div>
 
-        <!-- Cards Grid -->
-        <div class="cards-container">
-            <!-- Spinner de Carregamento -->
-            <div id="loader-usuarios" class="loader-overlay-usuarios">
-                <div class="spinner-main"></div>
-                <div class="loading-text">Carregando usuários...</div>
-            </div>
-            
-            <div id="usuarios-grid" class="usuarios-grid">
-                <!-- Cabeçalho do Grid -->
-                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 120px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
-                    <div>Email</div>
-                    <div>Login</div>
-                    <div>Perfil</div>
-                    <div>Status</div>
-                    <div>Ações</div>
-                </div>
-                <!-- Cards dos usuários serão carregados dinamicamente via JavaScript -->
-            </div>
+        <!-- Table Layout -->
+        <div id="loader-usuarios" class="loader-overlay-usuarios">
+            <div class="spinner-main"></div>
+            <div class="loading-text">Carregando usuários...</div>
+        </div>
+        
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Login</th>
+                        <th>Perfil</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="usuariosTableBody">
+                    <!-- Usuários serão carregados aqui via JavaScript -->
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -1274,31 +1277,103 @@
 
         async function carregarUsuarios() {
             try {
-                if (loaderUsuarios) loaderUsuarios.style.display = 'flex';
-                if (!gridUsuarios) return;
-
-                const header = gridUsuarios.querySelector('.grid-header');
-                Array.from(gridUsuarios.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
-
-                const { data, error } = await window.api.get(window.endpoints.usuarios.list);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-
-                if (lista.length === 0) {
-                    const empty = document.createElement('div');
-                    empty.style.gridColumn = '1 / -1';
-                    empty.style.textAlign = 'center';
-                    empty.style.padding = '24px';
-                    empty.style.color = '#666';
-                    empty.innerHTML = '<i class="fas fa-user-cog" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum usuário encontrado';
-                    gridUsuarios.appendChild(empty);
-                } else {
-                    lista.forEach(u => gridUsuarios.appendChild(createUsuarioRow(u)));
+                mostrarSpinner();
+                const tbody = document.getElementById('usuariosTableBody');
+                if (!tbody) {
+                    console.error('Tabela de usuários não encontrada.');
+                    return;
                 }
+
+                const { data: usuarios, error } = await window.api.get(window.endpoints.usuarios.list);
+                if (error) throw error;
+
+                tbody.innerHTML = '';
+                (usuarios || []).forEach((usuario) => {
+                    const tr = document.createElement('tr');
+                    const id = usuario.id ?? '';
+                    const email = usuario.email ?? '';
+                    const login = usuario.login ?? '';
+                    const perfil = usuario.perfil || 'Sem perfil';
+                    const status = usuario.ativo ? 'Ativo' : 'Inativo';
+                    
+                    tr.innerHTML = `
+                        <td>${String(id).padStart(5, '0')}</td>
+                        <td>${email}</td>
+                        <td>${login}</td>
+                        <td>${perfil}</td>
+                        <td><span class="status-badge ${usuario.ativo ? 'ativo' : 'inativo'}">${status}</span></td>
+                        <td class="actions">
+                            <button class="action-btn view-btn" title="Visualizar" onclick="visualizarUsuario('${id}')"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn edit-btn" title="Editar" onclick="editarUsuario('${id}')"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir" onclick="confirmarExclusaoUsuario('${id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             } catch (e) {
                 console.error('Erro ao carregar usuários:', e);
+                if (typeof mostrarToast === 'function') {
+                    mostrarToast('Erro ao carregar usuários', 'error');
+                }
             } finally {
-                if (loaderUsuarios) loaderUsuarios.style.display = 'none';
+                ocultarSpinner();
+            }
+        }
+
+        // Funções de spinner
+        function mostrarSpinner() {
+            const spinner = document.getElementById('loader-usuarios');
+            if (spinner) spinner.style.display = 'flex';
+        }
+
+        function ocultarSpinner() {
+            const spinner = document.getElementById('loader-usuarios');
+            if (spinner) spinner.style.display = 'none';
+        }
+
+        // Funções de ação
+        async function visualizarUsuario(id) {
+            try {
+                const { data: usuario, error } = await window.api.get(window.endpoints.usuarios.get(id));
+                if (error) throw error;
+                openUsuarioModal('Visualizar Usuário', usuario, 'visualizar');
+            } catch (e) {
+                console.error('Erro ao visualizar usuário:', e);
+                if (typeof mostrarToast === 'function') {
+                    mostrarToast('Erro ao carregar usuário', 'error');
+                }
+            }
+        }
+
+        async function editarUsuario(id) {
+            try {
+                const { data: usuario, error } = await window.api.get(window.endpoints.usuarios.get(id));
+                if (error) throw error;
+                openUsuarioModal('Editar Usuário', usuario, 'editar');
+            } catch (e) {
+                console.error('Erro ao editar usuário:', e);
+                if (typeof mostrarToast === 'function') {
+                    mostrarToast('Erro ao carregar usuário', 'error');
+                }
+            }
+        }
+
+        async function confirmarExclusaoUsuario(id) {
+            if (confirm('Tem certeza que deseja excluir este usuário?')) {
+                try {
+                    const { error } = await window.api.delete(window.endpoints.usuarios.delete(id));
+                    if (error) throw error;
+                    
+                    if (typeof mostrarToast === 'function') {
+                        mostrarToast('Usuário excluído com sucesso!', 'success');
+                    }
+                    carregarUsuarios();
+                } catch (e) {
+                    console.error('Erro ao excluir usuário:', e);
+                    if (typeof mostrarToast === 'function') {
+                        mostrarToast('Erro ao excluir usuário', 'error');
+                    }
+                }
             }
         }
 
