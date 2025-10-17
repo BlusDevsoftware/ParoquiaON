@@ -1046,10 +1046,10 @@
                     </div>
                     <div style="margin-bottom: 12px;">
                         <div style="margin-bottom: 4px; font-weight: 500; color: #856404; display: flex; align-items: center; gap: 6px;">
-                            <i class="fas fa-envelope" style="color: #856404;"></i>
-                            Login (Email):
+                            <i class="fas fa-user" style="color: #856404;"></i>
+                            Login (Usuário):
                         </div>
-                        <input type="text" id="emailCredencial" readonly style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #fff; font-family: monospace; font-size: 14px;">
+                        <input type="text" id="loginCredencial" readonly style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #fff; font-family: monospace; font-size: 14px;">
                     </div>
                     <div style="margin-bottom: 12px;">
                         <div style="margin-bottom: 4px; font-weight: 500; color: #856404; display: flex; align-items: center; gap: 6px;">
@@ -1153,13 +1153,13 @@
         }
 
         // Funções de sucesso
-        window.showSuccessModal = function(email, senhaTemporaria) {
+        window.showSuccessModal = function(login, senhaTemporaria) {
             const dataAtual = new Date().toLocaleDateString('pt-BR');
             const dc = document.getElementById('dataCadastro');
-            const emailInput = document.getElementById('emailCredencial');
+            const loginInput = document.getElementById('loginCredencial');
             const senhaInput = document.getElementById('senhaCredencial');
             if (dc) dc.textContent = dataAtual;
-            if (emailInput) emailInput.value = email || '';
+            if (loginInput) loginInput.value = login || '';
             if (senhaInput) senhaInput.value = senhaTemporaria || '';
             const modal = document.getElementById('successModal');
             if (modal) {
@@ -1480,9 +1480,9 @@
                     const { data: createData, error } = await window.api.post(window.endpoints.usuarios.create, payload);
                     if (error) throw error;
                     // Mostrar modal com credenciais geradas
-                    const email = payload.email;
+                    const login = payload.login;
                     const senhaTemporaria = createData?.senha_temporaria || createData?.senhaTemporaria || 'Gerada pelo sistema';
-                    window.showSuccessModal(email, senhaTemporaria);
+                    window.showSuccessModal(login, senhaTemporaria);
                 }
                 closeUsuarioModal();
                 carregarUsuarios();
