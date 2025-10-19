@@ -271,10 +271,10 @@
                 
                 // Fechar modal
                 closeModal();
-                
-                // Mostrar sucesso
-                mostrarToast('Comunidade cadastrada com sucesso!', 'success');
-                
+
+                // Mostrar modal de sucesso (padrão)
+                showSuccessModal();
+
                 // Recarregar lista
                 await carregarComunidades();
                 
@@ -468,13 +468,13 @@
                 }
                 
                 console.log('✅ Comunidade atualizada:', data);
-                
+
                 // Fechar modal
                 closeModal();
-                
-                // Mostrar sucesso
-                mostrarToast('Comunidade atualizada com sucesso!', 'success');
-                
+
+                // Mostrar modal de atualização (padrão)
+                showUpdateSuccessModal((dadosAtualizacao.status || 'Ativo'));
+
                 // Recarregar lista
                 await carregarComunidades();
                 
@@ -806,15 +806,24 @@
                 document.getElementById('credenciaisContainer').style.display = 'none';
             }
             
-            // Mostrar modal
-            document.getElementById('successModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            // Mostrar modal com transição (padrão das outras abas)
+            const sm = document.getElementById('successModal');
+            if (sm) {
+                sm.style.display = 'flex';
+                setTimeout(() => sm.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
         }
 
         // Função para fechar modal de sucesso
         window.closeSuccessModal = function() {
-            document.getElementById('successModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
+            const sm = document.getElementById('successModal');
+            if (!sm) return;
+            sm.classList.remove('show');
+            setTimeout(() => {
+                sm.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
 
         // Função para mostrar modal de sucesso de atualização
@@ -824,15 +833,24 @@
             document.getElementById('dataAtualizacao').textContent = dataAtual;
             document.getElementById('statusAtualizado').textContent = status || 'Ativo';
             
-            // Mostrar modal
-            document.getElementById('updateSuccessModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            // Mostrar modal com transição (padrão das outras abas)
+            const um = document.getElementById('updateSuccessModal');
+            if (um) {
+                um.style.display = 'flex';
+                setTimeout(() => um.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
         }
 
         // Função para fechar modal de sucesso de atualização
         window.closeUpdateSuccessModal = function() {
-            document.getElementById('updateSuccessModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
+            const um = document.getElementById('updateSuccessModal');
+            if (!um) return;
+            um.classList.remove('show');
+            setTimeout(() => {
+                um.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
 
         // Fechar modal de sucesso quando clicar fora dele
