@@ -168,10 +168,29 @@
         
         // Função para salvar comunidade (cadastrar ou editar)
         async function salvarComunidade() {
-            if (comunidadeEditando) {
-                await salvarEdicao();
-            } else {
-                await cadastrarComunidade();
+            const submitBtn = document.querySelector('#comunidadeModal .btn-primary');
+            const originalLabel = submitBtn ? submitBtn.innerHTML : '';
+            
+            try {
+                // Ativar spinner no botão
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('btn-loading');
+                    submitBtn.innerHTML = '<span class="btn-spinner"></span> &nbsp;Salvando...';
+                }
+
+                if (comunidadeEditando) {
+                    await salvarEdicao();
+                } else {
+                    await cadastrarComunidade();
+                }
+            } finally {
+                // Restaurar botão
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('btn-loading');
+                    submitBtn.innerHTML = originalLabel;
+                }
             }
         }
         
@@ -929,6 +948,10 @@
             height: 60px;
             animation: spin 1s linear infinite;
         }
+
+        /* Estado de carregamento do botão - mesmo padrão das outras abas */
+        .btn-loading { opacity: .85; pointer-events: none; }
+        .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .9s linear infinite; display: inline-block; }
 
         .loading-text {
             margin-top: 20px;
