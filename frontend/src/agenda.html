@@ -925,12 +925,45 @@
             background: white;
             padding: 30px;
             border-radius: 16px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
+            max-width: 840px;
+            width: 96%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
             border: 1px solid #f0f0f0;
+        }
+        .modal-body {
+            overflow-y: auto;
+            max-height: calc(90vh - 120px);
+            padding-right: 6px; /* evita sobrepor borda arredondada */
+        }
+
+        /* Layout refinado do formulário */
+        .form-section {
+            margin-bottom: 18px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #374151;
+            margin: 8px 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title i {
+            color: #1976d2;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .form-grid .form-group { margin-bottom: 0; }
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
         }
 
         .modal-header {
@@ -1345,135 +1378,80 @@
                 <h2 class="modal-title" id="modalTitle">Novo Agendamento</h2>
                 <button class="close-btn" onclick="closeEventModal()">&times;</button>
             </div>
+            <div class="modal-body">
             <form id="eventForm">
-                <div class="form-group">
+                <!-- Seção: Título do evento -->
+                <div class="form-section">
+                    <div class="section-title"><i class="fas fa-heading"></i> Título do evento</div>
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column: 1 / -1;">
                     <label class="form-label" for="eventTitle">Título do Evento</label>
                     <input type="text" id="eventTitle" class="form-input" required>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="eventType">Tipo de Evento</label>
-                    <select id="eventType" class="form-input" required>
-                        <option value="">Selecione o tipo</option>
-                        <option value="missa">Missa</option>
-                        <option value="batizado">Batizado</option>
-                        <option value="casamento">Casamento</option>
-                        <option value="comunhao">Primeira Comunhão</option>
-                        <option value="crisma">Crisma</option>
-                        <option value="funeral">Funeral</option>
-                        <option value="reuniao">Reunião</option>
-                        <option value="outro">Outro</option>
-                    </select>
+                </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label" for="eventDate">Data</label>
-                    <input type="date" id="eventDate" class="form-input" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="eventTime">Horário</label>
-                    <input type="time" id="eventTime" class="form-input" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="eventDuration">Duração (minutos)</label>
-                    <div style="display:flex; gap:8px; align-items:center;">
-                        <input type="number" id="eventDuration" class="form-input" value="60" min="15" max="480" style="flex:1;">
-                        <div style="display:flex; gap:6px;">
-                            <button type="button" class="btn btn-secondary" data-duration="30">30</button>
-                            <button type="button" class="btn btn-secondary" data-duration="60">60</button>
-                            <button type="button" class="btn btn-secondary" data-duration="90">90</button>
-                            <button type="button" class="btn btn-secondary" data-duration="120">120</button>
+                <!-- Seção: Vínculos -->
+                <div class="form-section">
+                    <div class="section-title"><i class="fas fa-link"></i> Vínculos</div>
+                    <div id="comunidadesContainer" class="form-grid" style="grid-column: 1 / -1;">
+                        <div class="form-group" data-placeholder="comunidades" style="grid-column: 1 / -1; color:#6b7280; font-size:13px;">
+                            Nenhuma comunidade vinculada ainda.
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
+                            <button type="button" id="addComunidadeBtn" class="btn btn-secondary"><i class="fas fa-plus"></i> Adicionar comunidade</button>
                         </div>
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label" for="eventLocation">Local</label>
-                    <input type="text" id="eventLocation" class="form-input" placeholder="Ex: Igreja Matriz, Salão Paroquial">
+                <!-- Seção: Horários -->
+                <div class="form-section">
+                    <div class="section-title"><i class="fas fa-clock"></i> Horários</div>
+                    <div id="horariosContainer" class="form-grid" style="grid-column: 1 / -1;">
+                        <div class="form-group" data-placeholder="horarios" style="grid-column: 1 / -1; color:#6b7280; font-size:13px;">
+                            Nenhum horário adicionado ainda.
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
+                            <button type="button" id="addHorarioBtn" class="btn btn-secondary"><i class="fas fa-plus"></i> Adicionar horário</button>
                 </div>
-
-                <!-- Novos campos de vínculo -->
-                <div class="form-group" style="display:flex; gap:12px;">
-                    <div style="flex:1;">
-                        <label class="form-label" for="eventComunidade">Comunidade</label>
-                        <select id="eventComunidade" class="form-input">
-                            <option value="">Selecione</option>
-                        </select>
-                    </div>
-                    <div style="flex:1;">
-                        <label class="form-label" for="eventPastoral">Pastoral</label>
-                        <select id="eventPastoral" class="form-input">
-                            <option value="">Selecione</option>
-                        </select>
-                    </div>
-                    <div style="flex:1;">
-                        <label class="form-label" for="eventPilar">Pilar</label>
-                        <select id="eventPilar" class="form-input">
-                            <option value="">Selecione</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group" style="display:flex; gap:12px;">
-                    <div style="flex:1;">
-                        <label class="form-label" for="eventLocalSelect">Local (vinculado)</label>
-                        <select id="eventLocalSelect" class="form-input">
-                            <option value="">Selecione</option>
-                        </select>
-                    </div>
-                    <div style="flex:1;">
-                        <label class="form-label" for="eventAcao">Ação</label>
-                        <select id="eventAcao" class="form-input">
-                            <option value="">Selecione</option>
-                        </select>
+                
                     </div>
                 </div>
                 
-                <div class="form-group">
+                <!-- Seção: Detalhes -->
+                <div class="form-section">
+                    <div class="section-title"><i class="fas fa-align-left"></i> Detalhes</div>
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column: 1 / -1;">
                     <label class="form-label" for="eventDescription">Descrição</label>
                     <textarea id="eventDescription" class="form-input form-textarea" placeholder="Detalhes do evento..."></textarea>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="eventObjetivo">Objetivo</label>
-                    <textarea id="eventObjetivo" class="form-input form-textarea" placeholder="Qual o objetivo deste evento?"></textarea>
-                </div>
-
-                <div class="form-group" style="display:flex; align-items:center; gap:12px;">
-                    <label class="form-label" style="margin:0;">Evento Paroquial?</label>
-                    <input type="checkbox" id="eventParoquial" style="width:18px; height:18px;">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="eventAnexo">Anexo (PDF/Imagem)</label>
-                    <input type="file" id="eventAnexo" class="form-input" accept="application/pdf,image/*">
-                </div>
-
-                <div class="form-group" style="display:flex; gap:12px;">
-                    <div style="flex:1;">
-                        <label class="form-label" for="eventStatus">Status</label>
-                        <select id="eventStatus" class="form-input" required>
-                            <option value="confirmado">Confirmado</option>
-                            <option value="pendente">Pendente</option>
-                            <option value="cancelado">Cancelado</option>
-                        </select>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label class="form-label" for="eventObjetivo">Objetivo</label>
+                            <textarea id="eventObjetivo" class="form-input form-textarea" placeholder="Qual o objetivo deste evento?"></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1; display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;">
+                            <div>
+                                <label class="form-label" style="display:block;">Status</label>
+                                <div id="eventStatusGroup" class="status-group" role="group" aria-label="Status do evento" style="display:flex; gap:8px; flex-wrap:wrap;">
+                                    <button type="button" class="btn status-btn" data-status="confirmado" style="background:#1e3a8a; color:#fff;">Confirmado</button>
+                                    <button type="button" class="btn status-btn" data-status="pendente" style="background:#f59e0b; color:#fff;">Pendente</button>
+                                    <button type="button" class="btn status-btn" data-status="cancelado" style="background:#dc2626; color:#fff;">Cancelado</button>
+                                </div>
+                                <input type="hidden" id="eventStatus" value="confirmado">
+                            </div>
+                            
+                        </div>
+                        <div class="form-group" style="display:flex; align-items:center; gap:12px; grid-column: 1 / -1;">
+                            <label class="form-label" style="margin:0;">Evento Paroquial?</label>
+                            <input type="checkbox" id="eventParoquial" style="width:18px; height:18px;">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label class="form-label" for="eventAnexo">Anexo (PDF/Imagem)</label>
+                            <input type="file" id="eventAnexo" class="form-input" accept="application/pdf,image/*">
+                        </div>
+                        
                     </div>
-                    <div style="flex:1;">
-                        <label class="form-label" for="eventRecurrence">Recorrência</label>
-                        <select id="eventRecurrence" class="form-input">
-                            <option value="nenhuma">Nenhuma</option>
-                            <option value="diaria">Diária</option>
-                            <option value="semanal">Semanal</option>
-                            <option value="mensal">Mensal</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="eventContact">Contato Responsável</label>
-                    <input type="text" id="eventContact" class="form-input" placeholder="Nome e telefone">
                 </div>
                 
                 <div class="btn-group">
@@ -1481,6 +1459,7 @@
                     <button type="submit" id="eventSubmitBtn" class="btn btn-primary">Salvar Evento</button>
                 </div>
             </form>
+            </div>
         </div>
     </div>
 
@@ -1520,15 +1499,63 @@
             // Formulário de evento
             document.getElementById('eventForm').addEventListener('submit', handleEventSubmit);
 
-            // Presets de duração
-            const durationButtons = document.querySelectorAll('[data-duration]');
-            durationButtons.forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const minutes = parseInt(btn.getAttribute('data-duration'));
-                    const input = document.getElementById('eventDuration');
-                    if (input && !Number.isNaN(minutes)) input.value = String(minutes);
+            // Adicionar mais comunidade
+            const addComunidadeBtn = document.getElementById('addComunidadeBtn');
+            if (addComunidadeBtn) {
+                addComunidadeBtn.addEventListener('click', async function() {
+                    const container = document.getElementById('comunidadesContainer');
+                    if (!container) return;
+                    const placeholder = container.querySelector('[data-placeholder="comunidades"]');
+                    if (placeholder) placeholder.remove();
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'form-group';
+                    wrapper.setAttribute('data-comunidade-row', '');
+                    wrapper.innerHTML = `
+                        <label class="form-label">Comunidade</label>
+                        <select class="form-input comunidade-select"><option value="">Carregando...</option></select>
+                    `;
+                    container.insertBefore(wrapper, addComunidadeBtn.parentElement);
+                    // Popular select
+                    await loadSelectOptionsForElement(wrapper.querySelector('select'), window.endpoints.comunidades.list);
                 });
-            });
+            }
+
+            // Adicionar horário extra
+            const addHorarioBtn = document.getElementById('addHorarioBtn');
+            if (addHorarioBtn) {
+                addHorarioBtn.addEventListener('click', function() {
+                    const container = document.getElementById('horariosContainer');
+                    if (!container) return;
+                    const placeholder = container.querySelector('[data-placeholder="horarios"]');
+                    if (placeholder) placeholder.remove();
+                    const row = document.createElement('div');
+                    row.className = 'form-grid';
+                    row.innerHTML = `
+                        <div class="form-group" data-schedule-row>
+                            <label class="form-label">Data</label>
+                            <input type="date" class="form-input" required>
+                        </div>
+                        <div class="form-group" data-schedule-row>
+                            <label class="form-label">Horário</label>
+                            <input type="time" class="form-input" required>
+                        </div>
+                        <div class="form-group" data-schedule-row>
+                            <label class="form-label">Duração (minutos)</label>
+                            <input type="number" class="form-input" value="60" min="15" max="480">
+                        </div>
+                        <div class="form-group" data-schedule-row>
+                            <label class="form-label">Recorrência</label>
+                            <select class="form-input recurrence-select">
+                                <option value="nenhuma">Nenhuma</option>
+                                <option value="semanal">Semanal</option>
+                                <option value="mensal">Mensal</option>
+                                <option value="anual">Anual</option>
+                            </select>
+                        </div>
+                    `;
+                    container.insertBefore(row, addHorarioBtn.parentElement);
+                });
+            }
 
             // Fechar modal ao clicar fora
             document.getElementById('eventModal').addEventListener('click', function(e) {
@@ -1544,6 +1571,19 @@
                     const minutes = parseInt(btn.getAttribute('data-duration'));
                     const input = document.getElementById('eventDuration');
                     if (input && !Number.isNaN(minutes)) input.value = String(minutes);
+                });
+            });
+
+            // Status buttons (toggle selection)
+            const statusBtns = document.querySelectorAll('.status-btn');
+            statusBtns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const status = btn.getAttribute('data-status');
+                    document.getElementById('eventStatus').value = status;
+                    statusBtns.forEach(b => b.style.outline = 'none');
+                    // Visual selection by border
+                    statusBtns.forEach(b => b.style.boxShadow = 'none');
+                    btn.style.boxShadow = '0 0 0 2px rgba(0,0,0,0.15) inset';
                 });
             });
         }
@@ -1752,7 +1792,6 @@
             document.getElementById('eventDuration').value = event.duration;
             document.getElementById('eventLocation').value = event.location || '';
             document.getElementById('eventDescription').value = event.description || '';
-            document.getElementById('eventContact').value = event.contact || '';
             
             document.getElementById('modalTitle').textContent = 'Editar Evento';
             
@@ -1762,9 +1801,35 @@
 
         async function handleEventSubmit(e) {
             e.preventDefault();
+            
+            // Coletar múltiplos horários
+            const horarios = Array.from(document.querySelectorAll('#horariosContainer [data-schedule-row]'))
+                .reduce((acc, el, idx, arr) => {
+                    // Agrupar a cada 4 (data/hora/duracao/recorrencia)
+                    if (idx % 4 === 0) {
+                        const dateEl = arr[idx].querySelector('input[type="date"]') || document.getElementById('eventDate');
+                        const timeEl = arr[idx + 1]?.querySelector('input[type="time"]') || document.getElementById('eventTime');
+                        const durEl = arr[idx + 2]?.querySelector('input[type="number"]') || document.getElementById('eventDuration');
+                        const recEl = arr[idx + 3]?.querySelector('select.recurrence-select');
+                        if (dateEl && timeEl && durEl && dateEl.value && timeEl.value) {
+                            const startLocal = new Date(`${dateEl.value}T${timeEl.value}`);
+                            const dur = parseInt(durEl.value || '60');
+                            acc.push({
+                                date: dateEl.value,
+                                time: timeEl.value,
+                                startTime: startLocal.toISOString(),
+                                endTime: new Date(startLocal.getTime() + dur * 60000).toISOString(),
+                                duration: dur,
+                                recurrence: recEl ? recEl.value : 'nenhuma'
+                            });
+                        }
+                    }
+                    return acc;
+                }, []);
 
-            const start = new Date(`${document.getElementById('eventDate').value}T${document.getElementById('eventTime').value}`);
-            const durationMin = parseInt(document.getElementById('eventDuration').value);
+            const firstSchedule = horarios[0] || null;
+            const start = firstSchedule ? new Date(firstSchedule.startTime) : new Date(`${document.getElementById('eventDate').value}T${document.getElementById('eventTime').value}`);
+            const durationMin = firstSchedule ? firstSchedule.duration : parseInt(document.getElementById('eventDuration').value);
             // Ler anexo (opcional)
             async function readFileAsBase64(file) {
                 if (!file) return null;
@@ -1787,14 +1852,15 @@
                 duration: durationMin,
                 location: document.getElementById('eventLocation').value,
                 description: document.getElementById('eventDescription').value,
-                contact: document.getElementById('eventContact').value,
                 status: document.getElementById('eventStatus').value,
-                recurrence: document.getElementById('eventRecurrence').value,
-                comunidade_id: document.getElementById('eventComunidade').value ? Number(document.getElementById('eventComunidade').value) : null,
-                pastoral_id: document.getElementById('eventPastoral').value ? Number(document.getElementById('eventPastoral').value) : null,
-                pilar_id: document.getElementById('eventPilar').value ? Number(document.getElementById('eventPilar').value) : null,
-                local_id: document.getElementById('eventLocalSelect').value ? Number(document.getElementById('eventLocalSelect').value) : null,
-                acao_id: document.getElementById('eventAcao').value ? Number(document.getElementById('eventAcao').value) : null,
+                vinculos: Array.from(document.querySelectorAll('#comunidadesContainer [data-comunidade-row]')).map(row => ({
+                    comunidade_id: (row.querySelector('.comunidade-select')?.value ? Number(row.querySelector('.comunidade-select').value) : null),
+                    pastoral_id: (document.getElementById('eventPastoral')?.value ? Number(document.getElementById('eventPastoral').value) : null),
+                    pilar_id: (document.getElementById('eventPilar')?.value ? Number(document.getElementById('eventPilar').value) : null),
+                    local_id: (document.getElementById('eventLocalSelect')?.value ? Number(document.getElementById('eventLocalSelect').value) : null),
+                    acao_id: (document.getElementById('eventAcao')?.value ? Number(document.getElementById('eventAcao').value) : null)
+                })).filter(v => v.comunidade_id || v.pastoral_id || v.pilar_id || v.local_id || v.acao_id),
+                horarios: horarios,
                 objetivo: document.getElementById('eventObjetivo').value || null,
                 paroquial: !!document.getElementById('eventParoquial').checked,
                 anexo_nome: anexoFile ? anexoFile.name : null,
@@ -1810,17 +1876,17 @@
                     const { error } = await window.api.put(window.endpoints.agenda.update(editingEvent.id), formData);
                     if (error) throw error;
                     showToast('Evento atualizado com sucesso!', 'success');
-                } else {
+            } else {
                     const { data, error } = await window.api.post(window.endpoints.agenda.create, formData);
                     if (error) throw error;
                     showToast('Evento criado com sucesso!', 'success');
-                }
+            }
 
                 await loadEventsFromApi();
-                updateWeeklyCalendar();
-                updateMiniCalendar();
-                updateRecentAppointments();
-                closeEventModal();
+            updateWeeklyCalendar();
+            updateMiniCalendar();
+            updateRecentAppointments();
+            closeEventModal();
             } catch (err) {
                 console.error('Erro ao salvar evento:', err);
                 showToast('Erro ao salvar evento', 'error');
@@ -1961,6 +2027,22 @@
             }
         }
 
+        // Carregar opções para um select específico (elemento já existente)
+        async function loadSelectOptionsForElement(selectEl, endpoint) {
+            try {
+                if (!selectEl) return;
+                selectEl.innerHTML = '<option value="">Carregando...</option>';
+                const { data, error } = await window.api.get(endpoint);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                const options = ['<option value="">Selecione</option>']
+                    .concat(lista.map(item => `<option value="${item.id || item.codigo}">${item.nome || item.titulo || item.descricao || 'Registro'}</option>`));
+                selectEl.innerHTML = options.join('');
+            } catch (e) {
+                if (selectEl) selectEl.innerHTML = '<option value="">Erro ao carregar</option>';
+            }
+        }
+
         async function loadAgendaLookups() {
             await Promise.all([
                 loadSelectOptions('eventComunidade', window.endpoints.comunidades.list),
@@ -2013,5 +2095,4 @@
         document.head.appendChild(style);
     </script>
 </body>
-</html>
 </html>
