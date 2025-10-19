@@ -296,6 +296,7 @@
             position: relative;
             border-radius: 8px;
             background: #fff;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
         }
 
         .grid-header {
@@ -840,24 +841,26 @@
             </div>
         </div>
 
-        <!-- Table Layout -->
-        <div id="loader-usuarios" class="loader-overlay-usuarios">
-            <div class="spinner-main"></div>
-            <div class="loading-text">Carregando usuários...</div>
-        </div>
-        
         <!-- Cards Grid -->
-        <div id="usuarios-grid" class="usuarios-grid">
-            <!-- Cabeçalho do Grid -->
-            <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 120px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
-                <div>Email</div>
-                <div>Login</div>
-                <div>Perfil</div>
-                <div>Status</div>
-                <div>Ações</div>
+        <div class="cards-container">
+            <!-- Spinner de Carregamento -->
+            <div id="loader-usuarios" class="loader-overlay-usuarios">
+                <div class="spinner-main"></div>
+                <div class="loading-text">Carregando usuários...</div>
             </div>
-            
-            <!-- Usuários serão carregados aqui via JavaScript -->
+
+            <div id="usuarios-grid" class="usuarios-grid">
+                <!-- Cabeçalho do Grid -->
+                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 120px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
+                    <div>Email</div>
+                    <div>Login</div>
+                    <div>Perfil</div>
+                    <div>Status</div>
+                    <div>Ações</div>
+                </div>
+                
+                <!-- Usuários serão carregados aqui via JavaScript -->
+            </div>
         </div>
     </div>
 
