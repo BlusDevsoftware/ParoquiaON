@@ -305,7 +305,7 @@
             gap: 16px;
             padding: 12px 16px;
             align-items: center;
-            border: 1px solid #e6e9ef;
+            border: 1px solid #e9ecef;
             background: #f8f9fa;
             border-radius: 8px;
             font-weight: 600;
@@ -317,7 +317,7 @@
             grid-template-columns: 1fr 1fr 1fr 120px auto;
             gap: 16px;
             padding: 12px 16px;
-            border: 1px solid #eef1f6;
+            border: 1px solid #e9ecef;
             border-radius: 8px;
             align-items: center;
             background: #fff;
@@ -1061,10 +1061,12 @@
                 const options = ['<option value="">Selecione uma pessoa</option>']
                     .concat(lista.map(p => `<option value="${p.id}">${p.nome}</option>`));
                 select.innerHTML = options.join('');
+                return true;
             } catch (e) {
                 const select = document.getElementById('pessoaUsuario');
                 if (select) select.innerHTML = '<option value="">Erro ao carregar pessoas</option>';
                 console.error('Erro ao carregar pessoas para usuários:', e);
+                return false;
             }
         }
 
@@ -1089,6 +1091,7 @@
                 const options = ['<option value="">Selecione um perfil</option>']
                     .concat(lista.map(p => `<option value="${p.id || p.codigo}">${p.nome}</option>`));
                 select.innerHTML = options.join('');
+                return true;
             } catch (e) {
                 const select = document.getElementById('perfilUsuario');
                 if (select) {
@@ -1101,6 +1104,7 @@
                     `;
                 }
                 console.error('Erro ao carregar perfis para usuários:', e);
+                return false;
             }
         }
 
@@ -1136,7 +1140,7 @@
             const sm = document.getElementById('successModal');
             if (event.target === sm) closeSuccessModal();
         });
-        window.openUsuarioModal = function(titulo = 'Novo Usuário', usuario = null, modo = 'novo') {
+        window.openUsuarioModal = async function(titulo = 'Novo Usuário', usuario = null, modo = 'novo') {
             const modal = document.getElementById('usuarioModal');
             const modalTitle = document.getElementById('usuarioModalTitle');
             const form = document.getElementById('usuarioForm');
@@ -1144,8 +1148,7 @@
             form.reset();
             form.dataset.id = '';
             // Carregar pessoas e perfis no select ao abrir modal
-            carregarPessoasParaUsuarios();
-            carregarPerfisParaUsuarios();
+            await Promise.all([carregarPessoasParaUsuarios(), carregarPerfisParaUsuarios()]);
             
             // Inicializar toggle de status
             const statusToggle = document.getElementById('statusToggleUsuarioModal');
@@ -1159,8 +1162,8 @@
             if (usuario) {
                 form.emailUsuario.value = usuario.email || '';
                 form.loginUsuario.value = usuario.login || '';
-                form.perfilUsuario.value = usuario.perfil_id || '';
-                form.pessoaUsuario.value = usuario.pessoa_id || '';
+                if (usuario.perfil_id != null) form.perfilUsuario.value = String(usuario.perfil_id);
+                if (usuario.pessoa_id != null) form.pessoaUsuario.value = String(usuario.pessoa_id);
                 form.dataset.id = usuario.id || '';
                 
                 // Atualizar toggle de status
@@ -1365,13 +1368,8 @@
             try {
                 const { data: usuario, error } = await api.get(window.endpoints.usuarios.get(id));
                 if (error) throw error;
-                openUsuarioModal('Editar Usuário');
+                await openUsuarioModal('Editar Usuário', usuario, 'editar');
                 const form = document.getElementById('usuarioForm');
-                form.dataset.id = usuario.id ?? id;
-                form.emailUsuario.value = usuario.email || '';
-                form.loginUsuario.value = usuario.login || '';
-                form.perfilUsuario.value = usuario.perfil_id || '';
-                form.pessoaUsuario.value = usuario.pessoa_id || '';
                 const statusToggle = document.getElementById('statusToggleUsuarioModal');
                 const statusInput = document.getElementById('statusUsuario');
                 const statusLabel = document.querySelector('#usuarioModal .status-label-modal');
