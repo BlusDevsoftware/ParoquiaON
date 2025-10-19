@@ -475,6 +475,30 @@
             background: #a8a8a8;
         }
 
+        .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 120px auto;
+            gap: 16px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            align-items: center;
+            transition: all 0.2s ease;
+            color: #495057;
+            font-size: 14px;
+        }
+        .grid-row:nth-child(even) { background: #fafbff; }
+        .grid-row:hover { background: #f5f8ff; box-shadow: 0 1px 4px rgba(30,58,138,0.06); }
+        .grid-row > div:nth-child(4) { display: flex; justify-content: center; align-items: center; }
+        .grid-cell-actions { display: flex; gap: 8px; justify-content: center; align-items: center; }
+        .btn-icon { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%); color: #334155; transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s thorough, border-color .15s ease; box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06); }
+        .btn-icon i { font-size: 15px; color: currentColor; }
+        .btn-icon:hover { transform: translateY(-1px); background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%); box-shadow: 0 4px 8px rgba(2, 6, 23, 0.1); border-color: rgba(0,0,0,0.1); }
+        .btn-edit:hover { color: #059669; border-color: rgba(5,150,105,0.2); background: linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 100%); }
+        .btn-duplicate:hover { color: #7c3aed; border-color: rgba(124,58,237,0.2); background: linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%); }
+        .btn-delete:hover { color: #dc2626; border-color: rgba(220,38,38,0.2); background: linear-gradient(180deg, #fef2f2 0%, #fee2e2 100%); }
+
         /* Spinner de carregamento - IDÊNTICO AO DA ABA DE COLABORADORES */
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -514,97 +538,8 @@
             text-align: center;
         }
 
-        /* Scroll personalizado para a tabela completa */
-        .table-scroll {
-            /* Ocupar máximo da tela com pequeno espaçamento */
-            height: calc(100vh - 300px);
-            overflow-y: auto;
-            overflow-x: auto;
-            position: relative;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
-            background: #fff;
-            margin-bottom: 16px;
-            padding-bottom: 24px;
-            flex: 1 1 auto;
-        }
 
-        .table-scroll table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0;
-            table-layout: auto;
-            min-width: 700px;
-        }
 
-        .table-scroll thead {
-            background: #f8f9fa;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .table-scroll thead th {
-            padding: 15px 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #495057;
-            border-bottom: 2px solid #dee2e6;
-            white-space: nowrap;
-            background: #f8f9fa;
-        }
-
-        /* Larguras específicas para cada coluna */
-        .table-scroll th:nth-child(1), /* Email */
-        .table-scroll td:nth-child(1) {
-            width: 200px;
-            min-width: 200px;
-        }
-
-        .table-scroll th:nth-child(2), /* Login */
-        .table-scroll td:nth-child(2) {
-            width: 150px;
-            min-width: 150px;
-        }
-
-        .table-scroll th:nth-child(3), /* Perfil */
-        .table-scroll td:nth-child(3) {
-            width: 150px;
-            min-width: 150px;
-        }
-
-        .table-scroll th:nth-child(4), /* Status */
-        .table-scroll td:nth-child(4) {
-            width: 100px;
-            min-width: 100px;
-        }
-
-        .table-scroll th:nth-child(5), /* Ações */
-        .table-scroll td:nth-child(5) {
-            width: 120px;
-            min-width: 120px;
-        }
-
-        .table-scroll tbody tr {
-            border-bottom: 1px solid #e9ecef;
-            transition: background-color 0.2s ease;
-        }
-
-        .table-scroll tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .table-scroll tbody td {
-            padding: 12px;
-            vertical-align: middle;
-            color: #495057;
-            font-size: 0.9rem;
-        }
-
-        .table-scroll tbody td:first-child {
-            font-weight: 600;
-            color: #1976D2;
-        }
 
         /* Estilos para badges de perfil */
         .profile-badge {
@@ -911,21 +846,18 @@
             <div class="loading-text">Carregando usuários...</div>
         </div>
         
-        <div class="table-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Login</th>
-                        <th>Perfil</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="usuariosTableBody">
-                    <!-- Usuários serão carregados aqui via JavaScript -->
-                </tbody>
-            </table>
+        <!-- Cards Grid -->
+        <div id="usuarios-grid" class="usuarios-grid">
+            <!-- Cabeçalho do Grid -->
+            <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 120px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
+                <div>Email</div>
+                <div>Login</div>
+                <div>Perfil</div>
+                <div>Status</div>
+                <div>Ações</div>
+            </div>
+            
+            <!-- Usuários serão carregados aqui via JavaScript -->
         </div>
     </div>
 
@@ -1279,9 +1211,9 @@
                 <div>${perfilNome}</div>
                 <div><span class="status ${statusClass}">${statusText}</span></div>
                 <div class="grid-cell-actions">
-                    <button class="btn-icon btn-edit" title="Editar" onclick="editarUsuario?.('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button class="btn-icon btn-duplicate" title="Duplicar" onclick="duplicarUsuario?.('${id}')"><i class="fa-regular fa-copy"></i></button>
-                    <button class="btn-icon btn-delete" title="Excluir" onclick="excluirUsuario?.('${id}')"><i class="fa-solid fa-trash"></i></button>
+                    <button class="btn-icon" title="Visualizar" onclick="visualizarUsuario('${id}')"><i class="fas fa-eye"></i></button>
+                    <button class="btn-icon btn-edit" title="Editar" onclick="editarUsuario('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon btn-delete" title="Excluir" onclick="openDeleteUsuarioModal('${id}')"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;
             return row;
@@ -1290,36 +1222,36 @@
         async function carregarUsuarios() {
             try {
                 mostrarSpinner();
-                const tbody = document.getElementById('usuariosTableBody');
-                if (!tbody) {
-                    console.error('Tabela de usuários não encontrada.');
+                const grid = document.getElementById('usuarios-grid');
+                if (!grid) {
+                    console.error('Grid de usuários não encontrado.');
                     return;
                 }
 
                 const { data: usuarios, error } = await window.api.get(window.endpoints.usuarios.list);
                 if (error) throw error;
 
-                tbody.innerHTML = '';
-                (usuarios || []).forEach((usuario) => {
-                    const tr = document.createElement('tr');
-                    const id = usuario.id ?? '';
-                    const email = usuario.email ?? '';
-                    const login = usuario.login ?? '';
-                    const perfil = usuario.perfil || 'Sem perfil';
-                    const status = usuario.ativo ? 'Ativo' : 'Inativo';
-                    
-                    tr.innerHTML = `
-                        <td>${email}</td>
-                        <td>${login}</td>
-                        <td>${perfil}</td>
-                        <td><span class="status ${usuario.ativo ? 'ativo' : 'inativo'}">${status}</span></td>
-                        <td class="actions">
-                            <button class="btn-icon" title="Visualizar" onclick="visualizarUsuario('${id}')"><i class="fas fa-eye"></i></button>
-                            <button class="btn-icon btn-edit" title="Editar" onclick="editarUsuario('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="btn-icon btn-delete" title="Excluir" onclick="openDeleteUsuarioModal('${id}')"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
+                // Limpar grid (mantendo cabeçalho)
+                const header = grid.querySelector('.grid-header');
+                grid.innerHTML = '';
+                if (header) grid.appendChild(header);
+                
+                if (!usuarios || usuarios.length === 0) {
+                    const emptyRow = document.createElement('div');
+                    emptyRow.className = 'grid-row';
+                    emptyRow.style.gridColumn = '1 / -1';
+                    emptyRow.style.textAlign = 'center';
+                    emptyRow.style.padding = '40px';
+                    emptyRow.style.color = '#6c757d';
+                    emptyRow.textContent = 'Nenhum usuário encontrado';
+                    grid.appendChild(emptyRow);
+                    return;
+                }
+
+                // Renderizar usuários
+                usuarios.forEach(usuario => {
+                    const row = createUsuarioRow(usuario);
+                    grid.appendChild(row);
                 });
             } catch (e) {
                 console.error('Erro ao carregar usuários:', e);
