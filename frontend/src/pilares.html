@@ -330,6 +330,7 @@
             position: relative;
             border-radius: 8px;
             background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         /* Estilo de linhas e ações (igual aba Pastorais) */
@@ -933,8 +934,16 @@
                 const { data, error } = await window.api.get(window.endpoints.pilares.list);
                 if (error) throw error;
                 const lista = Array.isArray(data) ? data : [];
+                // Aplicar filtro de status, se existir
+                const statusSelect = document.getElementById('statusFilter');
+                const filtro = statusSelect ? statusSelect.value : 'todos';
+                const listaFiltrada = lista.filter(p => {
+                    if (filtro === 'todos') return true;
+                    const ativo = p?.ativo !== false && (p?.status ? String(p.status).toLowerCase() === 'ativo' : true);
+                    return filtro === 'ativo' ? ativo : !ativo;
+                });
 
-                if (lista.length === 0) {
+                if (listaFiltrada.length === 0) {
                     const empty = document.createElement('div');
                     empty.style.gridColumn = '1 / -1';
                     empty.style.textAlign = 'center';
@@ -943,7 +952,7 @@
                     empty.innerHTML = '<i class="fas fa-columns" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhum pilar encontrado';
                     gridPilares.appendChild(empty);
                 } else {
-                    lista.forEach(p => gridPilares.appendChild(createPilarRow(p)));
+                    listaFiltrada.forEach(p => gridPilares.appendChild(createPilarRow(p)));
                 }
             } catch (e) {
                 console.error('Erro ao carregar pilares:', e);
@@ -957,7 +966,11 @@
         window.pilaresMostrarSpinner = mostrarSpinner;
         window.pilaresOcultarSpinner = ocultarSpinner;
 
-        document.addEventListener('DOMContentLoaded', carregarPilares);
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarPilares();
+            const sf = document.getElementById('statusFilter');
+            if (sf) sf.addEventListener('change', carregarPilares);
+        });
     </script>
 </head>
 <body>
@@ -1010,7 +1023,13 @@
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Buscar pilar...">
                 </div>
-                <div class="filter-options"></div>
+                <div class="filter-options">
+                    <select id="statusFilter" style="min-width:120px;">
+                        <option value="todos" selected>Status</option>
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
                 <button class="btn-primary" onclick="novoPilar()" style="background:#1e3a8a; border-color:#1e3a8a;">
                     <i class="fas fa-plus"></i>
                     Novo Pilar
