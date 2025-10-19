@@ -1028,6 +1028,23 @@
             </div>
         </div>
     </div>
+    <!-- Modal de Erro - Duplicidade de Usuário/Email -->
+    <div id="duplicateUsuarioModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 96%; box-shadow: 0 8px 32px rgba(244,67,54,0.13); padding: 0;">
+            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; font-size: 1.3em; color: #dc3545; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-circle"></i> Não foi possível salvar</h2>
+                <button class="close-modal" onclick="closeDuplicateUsuarioModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px 36px 24px 36px;">
+                <div style="font-size: 1em; color: #666; margin-bottom: 16px;">Já existe um usuário cadastrado utilizando os dados informados:</div>
+                <ul id="duplicateUsuarioList" style="margin: 0 0 16px 18px; color: #333;">
+                </ul>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="btn-secondary" onclick="closeDuplicateUsuarioModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="module">
         async function carregarPessoasParaUsuarios() {
             try {
@@ -1407,6 +1424,30 @@
                 criado_por_nome: (currentUser?.nome ?? currentUser?.name) ?? undefined
             };
             try {
+                // Validação de duplicidade (email/login)
+                const { data: usuariosExistentes } = await window.api.get(window.endpoints.usuarios.list);
+                const lista = Array.isArray(usuariosExistentes) ? usuariosExistentes : [];
+                const isUpdate = Boolean(form.dataset.id);
+                const currentId = isUpdate ? (Number(form.dataset.id) || String(form.dataset.id)) : null;
+                const lower = s => (s || '').trim().toLowerCase();
+                const dupEmail = payload.email ? lista.find(u => lower(u.email) === lower(payload.email) && (currentId == null || String(u.id ?? u.codigo) !== String(currentId))) : null;
+                const dupLogin = payload.login ? lista.find(u => lower(u.login) === lower(payload.login) && (currentId == null || String(u.id ?? u.codigo) !== String(currentId))) : null;
+                if (dupEmail || dupLogin) {
+                    const ul = document.getElementById('duplicateUsuarioList');
+                    if (ul) {
+                        const items = [];
+                        if (dupEmail) items.push('<li>Email já utilizado</li>');
+                        if (dupLogin) items.push('<li>Login (usuário) já utilizado</li>');
+                        ul.innerHTML = items.join('');
+                    }
+                    const modal = document.getElementById('duplicateUsuarioModal');
+                    if (modal) {
+                        modal.style.display = 'flex';
+                        setTimeout(() => modal.classList.add('show'), 10);
+                        document.body.style.overflow = 'hidden';
+                    }
+                    return; // bloqueia envio
+                }
                 if (form.dataset.id) {
                     const { data: updateData, error } = await window.api.put(window.endpoints.usuarios.update(form.dataset.id), payload);
                     if (error) throw error;
@@ -1458,10 +1499,23 @@
             }, 300);
         }
 
+        // Modal duplicidade
+        window.closeDuplicateUsuarioModal = function() {
+            const modal = document.getElementById('duplicateUsuarioModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
         // Fechar modal de sucesso ao clicar fora
         window.addEventListener('click', function(event) {
             const um = document.getElementById('updateSuccessModal');
             if (event.target === um) closeUpdateSuccessModal();
+            const dm = document.getElementById('duplicateUsuarioModal');
+            if (event.target === dm) closeDuplicateUsuarioModal();
         });
     </script>
     <script src="scripts/navigation.js"></script>

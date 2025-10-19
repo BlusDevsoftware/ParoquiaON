@@ -35,13 +35,25 @@ function validarUsuario(dados, isUpdate = false) {
 // Listar todos os usuários
 async function listarUsuarios(req, res) {
     try {
+        // Buscar usuários com informações de perfil e pessoa vinculados
         const { data, error } = await supabase
             .from('usuarios')
-            .select('*')
+            .select(`
+                id, email, login, ativo, perfil_id, pessoa_id,
+                criado_por_email, criado_por_nome, usuario_id,
+                perfis:perfis ( id, nome ),
+                pessoas:pessoas ( id, nome )
+            `)
             .order('id', { ascending: true });
 
         if (error) throw error;
-        res.json(data);
+        // Mapear nomes resolvidos para facilitar o frontend
+        const mapped = (data || []).map(u => ({
+            ...u,
+            perfilNome: u?.perfis?.nome || null,
+            pessoaNome: u?.pessoas?.nome || null
+        }));
+        res.json(mapped);
     } catch (error) {
         console.error('Erro ao listar usuários:', error);
         res.status(500).json({ error: 'Erro ao listar usuários' });
@@ -54,7 +66,12 @@ async function buscarUsuario(req, res) {
         const { id } = req.params;
         const { data, error } = await supabase
             .from('usuarios')
-            .select('*')
+            .select(`
+                id, email, login, ativo, perfil_id, pessoa_id,
+                criado_por_email, criado_por_nome, usuario_id,
+                perfis:perfis ( id, nome ),
+                pessoas:pessoas ( id, nome )
+            `)
             .eq('id', id)
             .single();
 
@@ -62,7 +79,11 @@ async function buscarUsuario(req, res) {
         if (!data) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
-        res.json(data);
+        res.json({
+            ...data,
+            perfilNome: data?.perfis?.nome || null,
+            pessoaNome: data?.pessoas?.nome || null
+        });
     } catch (error) {
         console.error('Erro ao buscar usuário:', error);
         res.status(500).json({ error: 'Erro ao buscar usuário' });
