@@ -1218,7 +1218,7 @@
         function createUsuarioRow(usuario) {
             const email = usuario?.email || '-';
             const login = usuario?.login || '-';
-            const perfilNome = usuario?.perfilNome || usuario?.perfil || '-';
+            const perfilNome = usuario?.perfilNome || '-';
             const ativo = usuario?.ativo !== false && (usuario?.status ? String(usuario.status).toLowerCase() === 'ativo' : true);
             const statusText = ativo ? 'Ativo' : 'Inativo';
             const statusClass = ativo ? 'ativo' : 'inativo';

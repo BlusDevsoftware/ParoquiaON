@@ -41,7 +41,42 @@ async function listarUsuarios(req, res) {
             .order('id', { ascending: true });
 
         if (error) throw error;
-        res.json(data);
+        
+        // Buscar nomes dos perfis e pessoas vinculados
+        const usuariosComNomes = await Promise.all(
+            (data || []).map(async (usuario) => {
+                let perfilNome = null;
+                let pessoaNome = null;
+                
+                // Buscar nome do perfil se perfil_id existir
+                if (usuario.perfil_id) {
+                    const { data: perfil } = await supabase
+                        .from('perfis')
+                        .select('nome')
+                        .eq('id', usuario.perfil_id)
+                        .single();
+                    perfilNome = perfil?.nome || null;
+                }
+                
+                // Buscar nome da pessoa se pessoa_id existir
+                if (usuario.pessoa_id) {
+                    const { data: pessoa } = await supabase
+                        .from('pessoas')
+                        .select('nome')
+                        .eq('id', usuario.pessoa_id)
+                        .single();
+                    pessoaNome = pessoa?.nome || null;
+                }
+                
+                return {
+                    ...usuario,
+                    perfilNome,
+                    pessoaNome
+                };
+            })
+        );
+        
+        res.json(usuariosComNomes);
     } catch (error) {
         console.error('Erro ao listar usuários:', error);
         res.status(500).json({ error: 'Erro ao listar usuários' });
