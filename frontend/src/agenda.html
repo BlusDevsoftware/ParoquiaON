@@ -1378,7 +1378,15 @@
                 
                 <div class="form-group">
                     <label class="form-label" for="eventDuration">Duração (minutos)</label>
-                    <input type="number" id="eventDuration" class="form-input" value="60" min="15" max="480">
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="number" id="eventDuration" class="form-input" value="60" min="15" max="480" style="flex:1;">
+                        <div style="display:flex; gap:6px;">
+                            <button type="button" class="btn btn-secondary" data-duration="30">30</button>
+                            <button type="button" class="btn btn-secondary" data-duration="60">60</button>
+                            <button type="button" class="btn btn-secondary" data-duration="90">90</button>
+                            <button type="button" class="btn btn-secondary" data-duration="120">120</button>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -1391,6 +1399,26 @@
                     <textarea id="eventDescription" class="form-input form-textarea" placeholder="Detalhes do evento..."></textarea>
                 </div>
                 
+                <div class="form-group" style="display:flex; gap:12px;">
+                    <div style="flex:1;">
+                        <label class="form-label" for="eventStatus">Status</label>
+                        <select id="eventStatus" class="form-input" required>
+                            <option value="confirmado">Confirmado</option>
+                            <option value="pendente">Pendente</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label class="form-label" for="eventRecurrence">Recorrência</label>
+                        <select id="eventRecurrence" class="form-input">
+                            <option value="nenhuma">Nenhuma</option>
+                            <option value="diaria">Diária</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="mensal">Mensal</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label" for="eventContact">Contato Responsável</label>
                     <input type="text" id="eventContact" class="form-input" placeholder="Nome e telefone">
@@ -1398,7 +1426,7 @@
                 
                 <div class="btn-group">
                     <button type="button" class="btn btn-secondary" onclick="closeEventModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Evento</button>
+                    <button type="submit" id="eventSubmitBtn" class="btn btn-primary">Salvar Evento</button>
                 </div>
             </form>
         </div>
@@ -1412,14 +1440,14 @@
     <script>
         // Variáveis globais
         let currentDate = new Date();
-        let events = JSON.parse(localStorage.getItem('paroquiaEvents')) || [];
+        let events = [];
         let editingEvent = null;
         let miniCalendarDate = new Date();
 
         // Inicializar aplicação
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             initializeApp();
-            loadEvents();
+            await loadEventsFromApi();
             setupEventListeners();
         });
 
@@ -1438,6 +1466,16 @@
 
             // Formulário de evento
             document.getElementById('eventForm').addEventListener('submit', handleEventSubmit);
+
+            // Presets de duração
+            const durationButtons = document.querySelectorAll('[data-duration]');
+            durationButtons.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const minutes = parseInt(btn.getAttribute('data-duration'));
+                    const input = document.getElementById('eventDuration');
+                    if (input && !Number.isNaN(minutes)) input.value = String(minutes);
+                });
+            });
 
             // Fechar modal ao clicar fora
             document.getElementById('eventModal').addEventListener('click', function(e) {
@@ -1659,56 +1697,86 @@
             modal.classList.add('active');
         }
 
-        function handleEventSubmit(e) {
+        async function handleEventSubmit(e) {
             e.preventDefault();
-            
+
+            const start = new Date(`${document.getElementById('eventDate').value}T${document.getElementById('eventTime').value}`);
+            const durationMin = parseInt(document.getElementById('eventDuration').value);
             const formData = {
-                id: editingEvent ? editingEvent.id : Date.now(),
                 title: document.getElementById('eventTitle').value,
                 type: document.getElementById('eventType').value,
                 date: document.getElementById('eventDate').value,
                 time: document.getElementById('eventTime').value,
-                startTime: new Date(`${document.getElementById('eventDate').value}T${document.getElementById('eventTime').value}`),
-                endTime: new Date(new Date(`${document.getElementById('eventDate').value}T${document.getElementById('eventTime').value}`).getTime() + parseInt(document.getElementById('eventDuration').value) * 60000),
-                duration: parseInt(document.getElementById('eventDuration').value),
+                startTime: start.toISOString(),
+                endTime: new Date(start.getTime() + durationMin * 60000).toISOString(),
+                duration: durationMin,
                 location: document.getElementById('eventLocation').value,
                 description: document.getElementById('eventDescription').value,
-                contact: document.getElementById('eventContact').value
+                contact: document.getElementById('eventContact').value,
+                status: document.getElementById('eventStatus').value,
+                recurrence: document.getElementById('eventRecurrence').value
             };
 
-            if (editingEvent) {
-                const index = events.findIndex(event => event.id === editingEvent.id);
-                events[index] = formData;
-            } else {
-                events.push(formData);
-            }
+            try {
+                const btn = document.getElementById('eventSubmitBtn');
+                const original = btn ? btn.innerHTML : '';
+                if (btn) { btn.disabled = true; btn.innerHTML = '<span style="width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .9s linear infinite"></span>&nbsp;&nbsp;Salvando...'; }
+                if (editingEvent && editingEvent.id != null) {
+                    const { error } = await window.api.put(window.endpoints.agenda.update(editingEvent.id), formData);
+                    if (error) throw error;
+                    showToast('Evento atualizado com sucesso!', 'success');
+                } else {
+                    const { data, error } = await window.api.post(window.endpoints.agenda.create, formData);
+                    if (error) throw error;
+                    showToast('Evento criado com sucesso!', 'success');
+                }
 
-            saveEvents();
-            updateWeeklyCalendar();
-            updateMiniCalendar();
-            updateRecentAppointments();
-            closeEventModal();
-            
-            showToast(editingEvent ? 'Evento atualizado com sucesso!' : 'Evento criado com sucesso!', 'success');
+                await loadEventsFromApi();
+                updateWeeklyCalendar();
+                updateMiniCalendar();
+                updateRecentAppointments();
+                closeEventModal();
+            } catch (err) {
+                console.error('Erro ao salvar evento:', err);
+                showToast('Erro ao salvar evento', 'error');
+            } finally {
+                const btn = document.getElementById('eventSubmitBtn');
+                if (btn) { btn.disabled = false; btn.innerHTML = 'Salvar Evento'; }
+            }
         }
 
-        function deleteEvent(eventId) {
-            if (confirm('Tem certeza que deseja excluir este evento?')) {
-                events = events.filter(event => event.id !== eventId);
-                saveEvents();
+        async function deleteEvent(eventId) {
+            if (!confirm('Tem certeza que deseja excluir este evento?')) return;
+            try {
+                const { error } = await window.api.delete(window.endpoints.agenda.delete(eventId));
+                if (error) throw error;
+                await loadEventsFromApi();
                 updateWeeklyCalendar();
                 updateMiniCalendar();
                 updateRecentAppointments();
                 showToast('Evento excluído com sucesso!', 'success');
+            } catch (err) {
+                console.error('Erro ao excluir evento:', err);
+                showToast('Erro ao excluir evento', 'error');
             }
         }
 
-        function saveEvents() {
-            localStorage.setItem('paroquiaEvents', JSON.stringify(events));
-        }
-
-        function loadEvents() {
-            events = JSON.parse(localStorage.getItem('paroquiaEvents')) || [];
+        async function loadEventsFromApi() {
+            try {
+                const { data, error } = await window.api.get(window.endpoints.agenda.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                // Normalizar objetos para uso no calendário
+                events = lista.map(ev => ({
+                    ...ev,
+                    // Garantir compatibilidade de tipos
+                    startTime: ev.startTime || ev.start_time || ev.inicio || ev.data_inicio || ev.dataHoraInicio || ev.start || ev.startedAt || ev.inicio_iso || ev.inicioISO || ev.data_inicio_iso || ev.dataInicioISO || ev.data_inicio_iso || ev.start_iso || ev.startISO || ev.startDate || ev.start_date,
+                    endTime: ev.endTime || ev.end_time || ev.fim || ev.data_fim || ev.dataHoraFim || ev.end || ev.endedAt || ev.fim_iso || ev.fimISO || ev.data_fim_iso || ev.dataFimISO || ev.data_fim_iso || ev.end_iso || ev.endISO || ev.endDate || ev.end_date
+                }));
+            } catch (err) {
+                console.error('Erro ao carregar eventos da API:', err);
+                events = [];
+            }
         }
 
         function updateRecentAppointments() {
