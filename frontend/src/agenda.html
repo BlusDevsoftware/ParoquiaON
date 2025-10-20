@@ -780,6 +780,85 @@
             font-weight: 500;
         }
 
+        /* Community Dropdown styles (igual ao dropdown de visualização) */
+        .community-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .community-dropdown-trigger {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            min-width: 200px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .community-dropdown-trigger:hover {
+            border-color: #1976d2;
+            background: #f8f9fa;
+        }
+
+        .community-dropdown-trigger i {
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .community-dropdown:hover .community-dropdown-trigger i {
+            transform: rotate(180deg);
+        }
+
+        .community-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1000;
+            border: 1px solid #e0e0e0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .community-dropdown:hover .community-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .community-dropdown-item {
+            display: block;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .community-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .community-dropdown-item:hover {
+            background: #f8f9fa;
+            color: #1976d2;
+        }
 
         /* Calendário semanal */
         .weekly-calendar {
@@ -1415,9 +1494,15 @@
                         <div class="info-location">
                             <div class="info-location-container">
                                 <div class="info-location-label">Você está em:</div>
-                                <select id="communitySelector" class="info-location-select">
-                                    <option value="">Carregando comunidades...</option>
-                                </select>
+                                <div class="community-dropdown">
+                                    <div class="community-dropdown-trigger">
+                                        <span id="currentCommunityText">Carregando comunidades...</span>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="community-dropdown-menu">
+                                        <a href="#" class="community-dropdown-item" data-community-id="">Todas as comunidades</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2362,24 +2447,48 @@
                 if (error) throw error;
                 const lista = Array.isArray(data) ? data : [];
                 
-                const select = document.getElementById('communitySelector');
-                if (select) {
-                    select.innerHTML = '<option value="">Todas as comunidades</option>' +
-                        lista.map(comunidade => 
-                            `<option value="${comunidade.id}">${comunidade.nome}</option>`
-                        ).join('');
+                // Atualizar dropdown de comunidades
+                const communityDropdownMenu = document.querySelector('.community-dropdown-menu');
+                const currentCommunityText = document.getElementById('currentCommunityText');
+                
+                if (communityDropdownMenu && currentCommunityText) {
+                    // Criar opção "Todas as comunidades"
+                    let menuHTML = '<a href="#" class="community-dropdown-item" data-community-id="">Todas as comunidades</a>';
                     
-                    // Adicionar evento de mudança
-                    select.addEventListener('change', function() {
-                        selectedCommunityId = this.value ? parseInt(this.value) : null;
-                        filterEventsByCommunity();
+                    // Adicionar comunidades
+                    menuHTML += lista.map(comunidade => 
+                        `<a href="#" class="community-dropdown-item" data-community-id="${comunidade.id}">${comunidade.nome}</a>`
+                    ).join('');
+                    
+                    communityDropdownMenu.innerHTML = menuHTML;
+                    currentCommunityText.textContent = 'Todas as comunidades';
+                    
+                    // Event listeners para os itens do dropdown
+                    const communityItems = document.querySelectorAll('.community-dropdown-item');
+                    communityItems.forEach(item => {
+                        item.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const communityId = this.getAttribute('data-community-id');
+                            const communityName = this.textContent;
+                            
+                            // Atualizar texto do trigger
+                            currentCommunityText.textContent = communityName;
+                            
+                            // Atualizar filtro
+                            selectedCommunityId = communityId ? parseInt(communityId) : null;
+                            filterEventsByCommunity();
+                            
+                            if (typeof showToast === 'function') {
+                                showToast(`Filtrando por: ${communityName}`, 'info');
+                            }
+                        });
                     });
                 }
             } catch (err) {
                 console.error('Erro ao carregar comunidades:', err);
-                const select = document.getElementById('communitySelector');
-                if (select) {
-                    select.innerHTML = '<option value="">Erro ao carregar comunidades</option>';
+                const currentCommunityText = document.getElementById('currentCommunityText');
+                if (currentCommunityText) {
+                    currentCommunityText.textContent = 'Erro ao carregar';
                 }
             }
         }
