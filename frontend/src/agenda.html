@@ -1706,12 +1706,12 @@
                     <div class="info-left">
                         <div class="info-location">
                             <div class="info-location-container">
-                                <div class="info-location-label">Você está em:</div>
+                            <div class="info-location-label">Você está em:</div>
                                 <div class="community-dropdown">
                                     <div class="community-dropdown-trigger">
                                         <span id="currentCommunityText">Carregando comunidades...</span>
                                         <i class="fas fa-chevron-down"></i>
-                                    </div>
+                        </div>
                                     <div class="community-dropdown-menu">
                                         <a href="#" class="community-dropdown-item" data-community-id="">Todas as comunidades</a>
                                     </div>
@@ -1726,7 +1726,7 @@
                         <div class="view-dropdown">
                             <div class="view-dropdown-trigger">
                                 <span id="currentViewText">Semana</span>
-                                <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-chevron-down"></i>
                             </div>
                             <div class="view-dropdown-menu">
                                 <a href="#" class="view-dropdown-item" data-view="dia">Dia</a>
@@ -1796,11 +1796,69 @@
         
         async function loadModals() {
             try {
-                const response = await fetch('modais_agenda.html');
-                const html = await response.text();
-                document.getElementById('modals-container').innerHTML = html;
+                console.log('Carregando modais...');
+                
+                // Tentar diferentes caminhos possíveis
+                const possiblePaths = [
+                    'modais_agenda.html',
+                    './modais_agenda.html',
+                    'src/modais_agenda.html',
+                    './src/modais_agenda.html'
+                ];
+                
+                let html = '';
+                let loaded = false;
+                
+                for (const path of possiblePaths) {
+                    try {
+                        console.log(`Tentando carregar: ${path}`);
+                        const response = await fetch(path);
+                        if (response.ok) {
+                            html = await response.text();
+                            console.log(`Sucesso! HTML carregado de: ${path}`, html.length, 'caracteres');
+                            loaded = true;
+                            break;
+                        } else {
+                            console.log(`Falha ao carregar ${path}: ${response.status}`);
+                        }
+                    } catch (err) {
+                        console.log(`Erro ao carregar ${path}:`, err.message);
+                    }
+                }
+                
+                if (!loaded) {
+                    throw new Error('Não foi possível carregar o arquivo de modais em nenhum dos caminhos testados');
+                }
+                
+                const container = document.getElementById('modals-container');
+                if (container) {
+                    container.innerHTML = html;
+                    console.log('Modais inseridos no container');
+                    
+                    // Verificar se os elementos foram inseridos
+                    const eventModal = document.getElementById('eventModal');
+                    const multplusModal = document.getElementById('multplusModal');
+                    console.log('eventModal encontrado:', !!eventModal);
+                    console.log('multplusModal encontrado:', !!multplusModal);
+                } else {
+                    console.error('Container modals-container não encontrado');
+                }
             } catch (error) {
                 console.error('Erro ao carregar modais:', error);
+                // Fallback: inserir modais diretamente
+                const container = document.getElementById('modals-container');
+                if (container) {
+                    container.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #ef4444;">
+                            <h3>Erro ao carregar modais</h3>
+                            <p>Os modais não puderam ser carregados. Verifique o console para mais detalhes.</p>
+                            <p>Erro: ${error.message}</p>
+                            <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                Recarregar Página
+                            </button>
+                        </div>
+                    `;
+                }
             }
         }
     </script>
@@ -2387,11 +2445,11 @@
             } else if (currentView === 'ano') {
                 rangeElement.textContent = currentDate.getFullYear().toString();
             } else {
-                const weekStart = new Date(currentDate);
+            const weekStart = new Date(currentDate);
                 weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Domingo = 0
-                const weekEnd = new Date(weekStart);
-                weekEnd.setDate(weekStart.getDate() + 6);
-                rangeElement.textContent = `${weekStart.getDate()} - ${weekEnd.getDate()} ${weekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`;
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            rangeElement.textContent = `${weekStart.getDate()} - ${weekEnd.getDate()} ${weekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`;
             }
         }
 
@@ -2403,7 +2461,7 @@
             } else if (currentView === 'ano') {
                 currentDate.setFullYear(currentDate.getFullYear() + direction);
             } else {
-                currentDate.setDate(currentDate.getDate() + (direction * 7));
+            currentDate.setDate(currentDate.getDate() + (direction * 7));
             }
             renderCalendar();
             updateCurrentWeekRange();
@@ -2435,7 +2493,18 @@
             });
         }
 
-        function openEventModal(date = null) {
+        async function openEventModal(date = null) {
+            // Verificar se os modais estão carregados
+            if (!areModalsLoaded()) {
+                console.log('Modais não carregados, aguardando...');
+                const loaded = await waitForModals();
+                if (!loaded) {
+                    console.error('Timeout aguardando carregamento dos modais');
+                    alert('Erro: Modais não carregados. Recarregue a página.');
+                    return;
+                }
+            }
+            
             const modal = document.getElementById('eventModal');
             const form = document.getElementById('eventForm');
             
@@ -2848,7 +2917,18 @@
         }
 
 
-        function openMultplusModal() {
+        async function openMultplusModal() {
+            // Verificar se os modais estão carregados
+            if (!areModalsLoaded()) {
+                console.log('Modais não carregados, aguardando...');
+                const loaded = await waitForModals();
+                if (!loaded) {
+                    console.error('Timeout aguardando carregamento dos modais');
+                    alert('Erro: Modais não carregados. Recarregue a página.');
+                    return;
+                }
+            }
+            
             const modal = document.getElementById('multplusModal');
             modal.classList.add('active');
             
@@ -2857,15 +2937,25 @@
             
             // Definir data inicial como hoje
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('multplusStartDate').value = today;
+            const startDate = document.getElementById('multplusStartDate');
+            if (startDate) {
+                startDate.value = today;
+            }
             
             // Limpar preview
-            document.getElementById('multplusPreview').innerHTML = `
-                <div class="preview-placeholder">
-                    <i class="fas fa-calendar-plus"></i>
-                    <p>Configure os parâmetros acima para ver o preview dos eventos</p>
-                </div>
-            `;
+            const preview = document.getElementById('multplusPreview');
+            if (preview) {
+                preview.innerHTML = `
+                    <div class="preview-placeholder">
+                        <i class="fas fa-calendar-plus"></i>
+                        <p>Configure os parâmetros acima para ver o preview dos eventos</p>
+                    </div>
+                `;
+            }
+            
+            // Resetar tabs
+            currentTab = 'config';
+            updateTabDisplay();
         }
 
         function closeMultplusModal() {
@@ -3080,6 +3170,26 @@
                 });
             }
         });
+
+        // Função para verificar se os modais estão carregados
+        function areModalsLoaded() {
+            const eventModal = document.getElementById('eventModal');
+            const multplusModal = document.getElementById('multplusModal');
+            return !!(eventModal && multplusModal);
+        }
+
+        // Função para aguardar o carregamento dos modais
+        async function waitForModals(maxAttempts = 10) {
+            for (let i = 0; i < maxAttempts; i++) {
+                if (areModalsLoaded()) {
+                    console.log('Modais carregados com sucesso');
+                    return true;
+                }
+                console.log(`Aguardando modais... tentativa ${i + 1}/${maxAttempts}`);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            return false;
+        }
 
         // Funções para os modais melhorados
         let currentStep = 1;
