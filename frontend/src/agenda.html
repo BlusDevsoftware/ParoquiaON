@@ -663,10 +663,7 @@
             color: #333;
             font-weight: 700;
             text-align: center;
-            background: #f8f9fa;
             padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
         }
 
         .info-today-btn {
@@ -688,6 +685,92 @@
             box-shadow: 0 4px 8px rgba(25, 118, 210, 0.4);
         }
 
+        /* View Dropdown styles (igual ao dropdown de relatórios) */
+        .view-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .view-dropdown-trigger {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            min-width: 120px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .view-dropdown-trigger:hover {
+            border-color: #1976d2;
+            background: #f8f9fa;
+        }
+
+        .view-dropdown-trigger i {
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .view-dropdown:hover .view-dropdown-trigger i {
+            transform: rotate(180deg);
+        }
+
+        .view-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1000;
+            border: 1px solid #e0e0e0;
+        }
+
+        .view-dropdown:hover .view-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .view-dropdown-item {
+            display: block;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .view-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .view-dropdown-item:hover {
+            background: #f8f9fa;
+            color: #1976d2;
+        }
+
+        /* Estilos para visualização de dia */
+        .day-month {
+            font-size: 12px;
+            color: #666;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
         .info-online-toggle {
             display: flex;
             align-items: center;
@@ -697,25 +780,6 @@
             font-weight: 500;
         }
 
-        .info-view-selector {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 10px 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            min-width: 110px;
-            font-size: 15px;
-            transition: all 0.2s ease;
-        }
-
-        .info-view-selector:hover {
-            border-color: #1976d2;
-            background: #f8f9fa;
-        }
 
         /* Calendário semanal */
         .weekly-calendar {
@@ -1361,9 +1425,17 @@
                         <div class="info-date">12 - 18 outubro de 2025</div>
                         <button class="info-today-btn" onclick="goToToday()">Hoje</button>
                         
-                        <div class="info-view-selector" id="viewSelector" style="position:relative; z-index: 10; overflow: visible;">
-                            <span>Semana</span>
-                            <i class="fas fa-chevron-down"></i>
+                        <div class="view-dropdown">
+                            <div class="view-dropdown-trigger">
+                                <span id="currentViewText">Semana</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="view-dropdown-menu">
+                                <a href="#" class="view-dropdown-item" data-view="dia">Dia</a>
+                                <a href="#" class="view-dropdown-item" data-view="semana">Semana</a>
+                                <a href="#" class="view-dropdown-item" data-view="mês">Mês</a>
+                                <a href="#" class="view-dropdown-item" data-view="ano">Ano</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1534,18 +1606,44 @@
         }
 
         function renderCalendar() {
-            console.log('renderCalendar chamada com currentView:', currentView);
-            if (currentView === 'mês') {
-                console.log('Atualizando calendário mensal');
+            if (currentView === 'dia') {
+                updateDailyCalendar();
+            } else if (currentView === 'mês') {
                 updateMonthlyCalendar();
+            } else if (currentView === 'ano') {
+                updateYearlyCalendar();
             } else {
-                console.log('Atualizando calendário semanal');
                 updateWeeklyCalendar();
             }
         }
 
         function setupEventListeners() {
             // Toggle online removido
+
+            // Seletor de visualização (dropdown igual ao de relatórios)
+            const viewDropdownItems = document.querySelectorAll('.view-dropdown-item');
+            viewDropdownItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const selectedView = this.getAttribute('data-view');
+                    console.log('Visualização alterada para:', selectedView);
+                    
+                    // Atualizar texto do trigger
+                    const currentViewText = document.getElementById('currentViewText');
+                    if (currentViewText) {
+                        currentViewText.textContent = selectedView.charAt(0).toUpperCase() + selectedView.slice(1);
+                    }
+                    
+                    // Atualizar visualização
+                    currentView = selectedView;
+                    renderCalendar();
+                    updateCurrentWeekRange();
+                    
+                    if (typeof showToast === 'function') {
+                        showToast(`Visualização alterada para ${selectedView}`, 'info');
+                    }
+                });
+            });
 
             // Formulário de evento
             document.getElementById('eventForm').addEventListener('submit', handleEventSubmit);
@@ -1670,63 +1768,6 @@
                 if (hidden) hidden.value = btn.getAttribute('data-recurrence');
             });
 
-            // View selector (Semana/Mês/Ano)
-            const viewSelector = document.getElementById('viewSelector');
-            if (viewSelector && !viewSelector.dataset.bound) {
-                viewSelector.dataset.bound = 'true';
-                // Ensure selector can anchor an absolute child
-                viewSelector.style.position = 'relative';
-                viewSelector.style.userSelect = 'none';
-                viewSelector.style.cursor = 'pointer';
-
-                // Create dropdown menu for selecting a view (Semana/Mês/Ano)
-                const menu = document.createElement('div');
-                menu.className = 'dropdown-menu view-menu';
-                menu.style.position = 'absolute';
-                menu.style.right = '0';
-                menu.style.top = 'calc(100% + 6px)';
-                menu.style.background = '#fff';
-                menu.style.border = '1px solid #e0e0e0';
-                menu.style.borderRadius = '8px';
-                menu.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                menu.style.minWidth = '140px';
-                menu.style.zIndex = '3000';
-                menu.style.padding = '6px 0';
-                menu.style.display = 'none';
-                menu.innerHTML = `
-                    <a href="#" data-view="semana" class="dropdown-item">Semana</a>
-                    <a href="#" data-view="mês" class="dropdown-item">Mês</a>
-                    <a href="#" data-view="ano" class="dropdown-item">Ano</a>
-                `;
-                viewSelector.appendChild(menu);
-
-                function openMenu() { menu.style.display = 'block'; }
-                function closeMenu() { menu.style.display = 'none'; }
-
-                viewSelector.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (menu.style.display === 'block') closeMenu(); else openMenu();
-                });
-
-                document.addEventListener('click', function(e) {
-                    if (!viewSelector.contains(e.target)) closeMenu();
-                });
-
-                menu.addEventListener('click', function(e) {
-                    const a = e.target.closest('a[data-view]');
-                    if (!a) return;
-                    e.preventDefault();
-                    const chosen = a.getAttribute('data-view');
-                    console.log('Visualização selecionada:', chosen);
-                    const span = viewSelector.querySelector('span');
-                    if (span) span.textContent = chosen.charAt(0).toUpperCase() + chosen.slice(1);
-                    currentView = chosen;
-                    renderCalendar();
-                    if (typeof showToast === 'function') showToast(`Visão alterada para ${span.textContent}`, 'info');
-                    closeMenu();
-                });
-            }
         }
 
         function updateMiniCalendar() {
@@ -1782,7 +1823,6 @@
         }
 
         function updateWeeklyCalendar() {
-            console.log('updateWeeklyCalendar chamada');
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
 
@@ -1878,7 +1918,6 @@
         }
 
         function updateMonthlyCalendar() {
-            console.log('updateMonthlyCalendar chamada');
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
 
@@ -1937,15 +1976,187 @@
             }
         }
 
+        function updateYearlyCalendar() {
+            const calendarBody = document.getElementById('calendarBody');
+            calendarBody.innerHTML = '';
+
+            // Cabeçalho simples - apenas o ano
+            const header = document.querySelector('.calendar-header');
+            if (header) {
+                header.innerHTML = `
+                    <div class="time-column-header"></div>
+                    <div class="day-header" style="grid-column: span 3;"><div class="day-name">${currentDate.getFullYear()}</div></div>
+                `;
+            }
+
+            const year = currentDate.getFullYear();
+            const months = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+
+            // Criar grid 3x4 (3 colunas, 4 linhas) como Google Calendar
+            for (let row = 0; row < 4; row++) {
+                // Linha vazia para espaçamento
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'time-slot';
+                emptyCell.textContent = '';
+                calendarBody.appendChild(emptyCell);
+
+                // 3 meses da linha
+                for (let col = 0; col < 3; col++) {
+                    const monthIndex = row * 3 + col;
+                    const monthDate = new Date(year, monthIndex, 1);
+                    
+                    const monthCell = document.createElement('div');
+                    monthCell.className = 'day-slot';
+                    monthCell.style.height = '140px';
+                    monthCell.style.padding = '12px';
+                    monthCell.style.border = '1px solid #e0e0e0';
+                    monthCell.style.cursor = 'pointer';
+                    monthCell.style.transition = 'all 0.2s ease';
+                    monthCell.style.display = 'flex';
+                    monthCell.style.flexDirection = 'column';
+                    monthCell.style.position = 'relative';
+
+                    // Título do mês (estilo Google Calendar)
+                    const monthTitle = document.createElement('div');
+                    monthTitle.style.fontWeight = '500';
+                    monthTitle.style.fontSize = '14px';
+                    monthTitle.style.marginBottom = '8px';
+                    monthTitle.style.color = '#333';
+                    monthTitle.style.textAlign = 'left';
+                    monthTitle.textContent = months[monthIndex];
+                    monthCell.appendChild(monthTitle);
+
+                    // Grid de dias do mês (estilo Google Calendar)
+                    const daysGrid = document.createElement('div');
+                    daysGrid.style.display = 'grid';
+                    daysGrid.style.gridTemplateColumns = 'repeat(7, 1fr)';
+                    daysGrid.style.gap = '2px';
+                    daysGrid.style.flex = '1';
+                    daysGrid.style.fontSize = '11px';
+
+                    // Cabeçalhos dos dias da semana (D S T Q Q S S)
+                    const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+                    weekDays.forEach(day => {
+                        const dayHeader = document.createElement('div');
+                        dayHeader.style.textAlign = 'center';
+                        dayHeader.style.fontWeight = '500';
+                        dayHeader.style.color = '#666';
+                        dayHeader.style.padding = '2px';
+                        dayHeader.textContent = day;
+                        daysGrid.appendChild(dayHeader);
+                    });
+
+                    // Dias do mês
+                    const firstDay = new Date(year, monthIndex, 1);
+                    const lastDay = new Date(year, monthIndex + 1, 0);
+                    const startDate = new Date(firstDay);
+                    startDate.setDate(startDate.getDate() - firstDay.getDay()); // Começar no domingo
+
+                    for (let i = 0; i < 42; i++) {
+                        const date = new Date(startDate);
+                        date.setDate(startDate.getDate() + i);
+                        
+                        const dayCell = document.createElement('div');
+                        dayCell.style.textAlign = 'center';
+                        dayCell.style.padding = '2px';
+                        dayCell.style.cursor = 'pointer';
+                        dayCell.style.borderRadius = '2px';
+                        dayCell.style.fontSize = '11px';
+                        
+                        if (date.getMonth() !== monthIndex) {
+                            dayCell.style.color = '#ccc';
+                        } else {
+                            dayCell.style.color = '#333';
+                        }
+                        
+                        if (isToday(date)) {
+                            dayCell.style.background = '#1976d2';
+                            dayCell.style.color = 'white';
+                            dayCell.style.fontWeight = 'bold';
+                        }
+                        
+                        dayCell.textContent = date.getDate();
+                        daysGrid.appendChild(dayCell);
+                    }
+
+                    monthCell.appendChild(daysGrid);
+
+                    // Contador de eventos (estilo Google Calendar)
+                    const monthEvents = events.filter(event => {
+                        const eventDate = new Date(event.startTime);
+                        return eventDate.getFullYear() === year && eventDate.getMonth() === monthIndex;
+                    });
+
+                    if (monthEvents.length > 0) {
+                        const eventIndicator = document.createElement('div');
+                        eventIndicator.style.cssText = `
+                            position: absolute;
+                            bottom: 8px;
+                            left: 12px;
+                            right: 12px;
+                            font-size: 10px;
+                            color: #1976d2;
+                            font-weight: 500;
+                            text-align: center;
+                            background: rgba(25, 118, 210, 0.1);
+                            padding: 2px 4px;
+                            border-radius: 4px;
+                        `;
+                        eventIndicator.textContent = `${monthEvents.length} evento${monthEvents.length !== 1 ? 's' : ''}`;
+                        monthCell.appendChild(eventIndicator);
+                    }
+
+                    // Hover effect (estilo Google Calendar)
+                    monthCell.addEventListener('mouseenter', function() {
+                        this.style.background = '#f8f9fa';
+                        this.style.borderColor = '#1976d2';
+                    });
+
+                    monthCell.addEventListener('mouseleave', function() {
+                        this.style.background = 'white';
+                        this.style.borderColor = '#e0e0e0';
+                    });
+
+                    // Click para ir para o mês
+                    monthCell.addEventListener('click', function() {
+                        currentDate = new Date(year, monthIndex, 1);
+                        currentView = 'mês';
+                        renderCalendar();
+                        updateCurrentWeekRange();
+                    });
+
+                    calendarBody.appendChild(monthCell);
+                }
+            }
+        }
+
         function updateCurrentWeekRange() {
             const rangeElement = document.getElementById('currentWeekRange');
             if (!rangeElement) return; // Evita erro se o elemento não existir no layout
             
-            if (currentView === 'mês') {
+            // Atualizar texto do dropdown
+            const currentViewText = document.getElementById('currentViewText');
+            if (currentViewText) {
+                currentViewText.textContent = currentView.charAt(0).toUpperCase() + currentView.slice(1);
+            }
+            
+            if (currentView === 'dia') {
+                rangeElement.textContent = currentDate.toLocaleDateString('pt-BR', { 
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+            } else if (currentView === 'mês') {
                 rangeElement.textContent = currentDate.toLocaleDateString('pt-BR', { 
                     month: 'long', 
                     year: 'numeric' 
                 });
+            } else if (currentView === 'ano') {
+                rangeElement.textContent = currentDate.getFullYear().toString();
             } else {
                 const weekStart = new Date(currentDate);
                 weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Domingo = 0
@@ -1956,8 +2167,12 @@
         }
 
         function navigateWeek(direction) {
-            if (currentView === 'mês') {
+            if (currentView === 'dia') {
+                currentDate.setDate(currentDate.getDate() + direction);
+            } else if (currentView === 'mês') {
                 currentDate.setMonth(currentDate.getMonth() + direction);
+            } else if (currentView === 'ano') {
+                currentDate.setFullYear(currentDate.getFullYear() + direction);
             } else {
                 currentDate.setDate(currentDate.getDate() + (direction * 7));
             }
@@ -2362,6 +2577,74 @@
                     document.body.removeChild(toast);
                 }, 300);
             }, 3000);
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            currentView = 'dia';
+            renderCalendar();
+            updateCurrentWeekRange();
+        }
+
+        function updateDailyCalendar() {
+            const calendarBody = document.getElementById('calendarBody');
+            calendarBody.innerHTML = '';
+
+            // Cabeçalho do dia (igual ao estilo da semana)
+            const header = document.querySelector('.calendar-header');
+            if (header) {
+                const dayNames = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+                const dayName = dayNames[currentDate.getDay()];
+                const dayNumber = currentDate.getDate();
+                const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                const monthName = monthNames[currentDate.getMonth()];
+                const year = currentDate.getFullYear();
+                
+                header.innerHTML = `
+                    <div class="time-column-header">Hora</div>
+                    <div class="day-header today" style="grid-column: span 1;">
+                        <div class="day-name">${dayName}</div>
+                        <div class="day-number">${dayNumber}</div>
+                        <div class="day-month">${monthName} ${year}</div>
+                    </div>
+                `;
+            }
+
+            // Gerar horários (06:00 - 22:00) - estilo Google Calendar
+            for (let hour = 6; hour <= 22; hour++) {
+                // Coluna de hora (primeira coluna) - igual ao estilo da semana
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                timeSlot.textContent = `${hour.toString().padStart(2, '0')}:00`;
+                calendarBody.appendChild(timeSlot);
+
+                // Coluna do dia (segunda coluna) - igual ao estilo da semana
+                const daySlot = document.createElement('div');
+                daySlot.className = 'day-slot';
+                
+                // Adicionar eventos para este horário - igual ao estilo da semana
+                const hourEvents = getEventsForHour(currentDate, hour);
+                hourEvents.forEach(event => {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'event-item';
+                    eventElement.textContent = event.title || 'Evento';
+                    eventElement.title = `${event.title || 'Evento'}\n${event.time || ''}\n${event.location || ''}`;
+                    eventElement.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        editEvent(event);
+                    });
+                    daySlot.appendChild(eventElement);
+                });
+
+                // Adicionar click para criar evento
+                daySlot.addEventListener('click', (e) => {
+                    if (e.target === daySlot) {
+                        openEventModal(currentDate, `${hour.toString().padStart(2, '0')}:00`);
+                    }
+                });
+
+                calendarBody.appendChild(daySlot);
+            }
         }
 
         // Adicionar estilos de animação
