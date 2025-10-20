@@ -1968,7 +1968,9 @@
             });
 
             // Recorrência por horário (toggle buttons) e remover linha
-            document.getElementById('horariosContainer').addEventListener('click', function(e) {
+            const horariosContainer = document.getElementById('horariosContainer');
+            if (horariosContainer) {
+                horariosContainer.addEventListener('click', function(e) {
                 const removeBtn = e.target.closest('.remove-horario');
                 if (removeBtn) {
                     const container = document.getElementById('horariosContainer');
@@ -1993,8 +1995,8 @@
                 siblings.forEach(b => b.style.boxShadow = 'none');
                 btn.style.boxShadow = '0 0 0 2px rgba(0,0,0,0.15) inset';
                 if (hidden) hidden.value = btn.getAttribute('data-recurrence');
-            });
-
+                });
+            }
         }
 
         function updateMiniCalendar() {
@@ -3015,20 +3017,214 @@
         // Event listeners para o modal Multplus
         document.addEventListener('DOMContentLoaded', function() {
             // Frequência change
-            document.getElementById('multplusFrequency').addEventListener('change', function() {
-                const daysContainer = document.getElementById('multplusDaysContainer');
-                if (this.value === 'weekly' || this.value === 'custom') {
-                    daysContainer.style.display = 'block';
-                } else {
-                    daysContainer.style.display = 'none';
-                }
-            });
+            const multplusFrequency = document.getElementById('multplusFrequency');
+            if (multplusFrequency) {
+                multplusFrequency.addEventListener('change', function() {
+                    const daysContainer = document.getElementById('multplusDaysContainer');
+                    if (this.value === 'weekly' || this.value === 'custom') {
+                        daysContainer.style.display = 'block';
+                    } else {
+                        daysContainer.style.display = 'none';
+                    }
+                });
+            }
             
             // Form submit
-            document.getElementById('multplusForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await handleMultplusSubmit();
+            const multplusForm = document.getElementById('multplusForm');
+            if (multplusForm) {
+                multplusForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    await handleMultplusSubmit();
+                });
+            }
+        });
+
+        // Funções para os modais melhorados
+        let currentStep = 1;
+        let currentTab = 'config';
+
+        // Funções do Modal de Evento (Steps)
+        function nextStep() {
+            if (validateCurrentStep()) {
+                if (currentStep < 3) {
+                    currentStep++;
+                    updateStepDisplay();
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepDisplay();
+            }
+        }
+
+        function updateStepDisplay() {
+            // Atualizar steps
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
             });
+            document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+
+            // Atualizar progress bar
+            const progressFill = document.getElementById('eventProgressFill');
+            progressFill.style.width = `${(currentStep / 3) * 100}%`;
+
+            // Mostrar/ocultar passos
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+
+            // Atualizar botões
+            const prevBtn = document.getElementById('prevStepBtn');
+            const nextBtn = document.getElementById('nextStepBtn');
+            const submitBtn = document.getElementById('eventSubmitBtn');
+
+            prevBtn.style.display = currentStep > 1 ? 'flex' : 'none';
+            nextBtn.style.display = currentStep < 3 ? 'flex' : 'none';
+            submitBtn.style.display = currentStep === 3 ? 'flex' : 'none';
+        }
+
+        function validateCurrentStep() {
+            const currentStepElement = document.querySelector(`[data-step="${currentStep}"]`);
+            const requiredInputs = currentStepElement.querySelectorAll('input[required], select[required]');
+            
+            let isValid = true;
+            requiredInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    showInputError(input, 'Este campo é obrigatório');
+                } else {
+                    clearInputError(input);
+                }
+            });
+
+            return isValid;
+        }
+
+        // Funções do Modal Multplus (Tabs)
+        function nextTab() {
+            if (validateCurrentTab()) {
+                const tabs = ['config', 'schedule', 'preview'];
+                const currentIndex = tabs.indexOf(currentTab);
+                if (currentIndex < tabs.length - 1) {
+                    currentTab = tabs[currentIndex + 1];
+                    updateTabDisplay();
+                }
+            }
+        }
+
+        function prevTab() {
+            const tabs = ['config', 'schedule', 'preview'];
+            const currentIndex = tabs.indexOf(currentTab);
+            if (currentIndex > 0) {
+                currentTab = tabs[currentIndex - 1];
+                updateTabDisplay();
+            }
+        }
+
+        function updateTabDisplay() {
+            // Atualizar tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${currentTab}"]`).classList.add('active');
+
+            // Mostrar/ocultar panes
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${currentTab}"]`).classList.add('active');
+
+            // Atualizar botões
+            const prevBtn = document.getElementById('prevTabBtn');
+            const nextBtn = document.getElementById('nextTabBtn');
+            const submitBtn = document.getElementById('multplusSubmitBtn');
+
+            prevBtn.style.display = currentTab !== 'config' ? 'flex' : 'none';
+            nextBtn.style.display = currentTab !== 'preview' ? 'flex' : 'none';
+            submitBtn.style.display = currentTab === 'preview' ? 'flex' : 'none';
+        }
+
+        function validateCurrentTab() {
+            const currentTabElement = document.querySelector(`[data-tab="${currentTab}"]`);
+            const requiredInputs = currentTabElement.querySelectorAll('input[required], select[required]');
+            
+            let isValid = true;
+            requiredInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    showInputError(input, 'Este campo é obrigatório');
+                } else {
+                    clearInputError(input);
+                }
+            });
+
+            return isValid;
+        }
+
+        // Funções de validação
+        function showInputError(input, message) {
+            const container = input.closest('.input-container');
+            const feedback = container.querySelector('.input-feedback');
+            
+            container.classList.add('input-error');
+            container.classList.remove('input-success');
+            
+            if (feedback) {
+                feedback.textContent = message;
+                feedback.classList.add('show');
+            }
+        }
+
+        function clearInputError(input) {
+            const container = input.closest('.input-container');
+            const feedback = container.querySelector('.input-feedback');
+            
+            container.classList.remove('input-error');
+            container.classList.add('input-success');
+            
+            if (feedback) {
+                feedback.classList.remove('show');
+            }
+        }
+
+        // Event listeners para tabs
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = this.getAttribute('data-tab');
+                    currentTab = tab;
+                    updateTabDisplay();
+                });
+            });
+
+            // Step buttons
+            document.querySelectorAll('.step').forEach(step => {
+                step.addEventListener('click', function() {
+                    const stepNumber = parseInt(this.getAttribute('data-step'));
+                    if (stepNumber <= currentStep || validateCurrentStep()) {
+                        currentStep = stepNumber;
+                        updateStepDisplay();
+                    }
+                });
+            });
+
+            // Duration change
+            const eventDuration = document.getElementById('eventDuration');
+            if (eventDuration) {
+                eventDuration.addEventListener('change', function() {
+                    const customGroup = document.getElementById('customDurationGroup');
+                    if (this.value === 'custom') {
+                        customGroup.style.display = 'block';
+                    } else {
+                        customGroup.style.display = 'none';
+                    }
+                });
+            }
         });
 
         async function handleMultplusSubmit() {
