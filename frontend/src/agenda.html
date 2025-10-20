@@ -578,17 +578,47 @@
             gap: 4px;
         }
 
+        .info-location-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .info-location-label {
-            font-size: 13px;
-            color: #666;
-            font-weight: 500;
-            margin-bottom: 2px;
+            font-size: 15px;
+            color: #333;
+            font-weight: 600;
+            white-space: nowrap;
         }
 
         .info-location-name {
             font-size: 18px;
             color: #333;
             font-weight: 700;
+        }
+
+        .info-location-select {
+            font-size: 15px;
+            color: #333;
+            font-weight: 600;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 180px;
+            outline: none;
+        }
+
+        .info-location-select:hover {
+            border-color: #1976d2;
+            background: #f8f9fa;
+        }
+
+        .info-location-select:focus {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
         }
 
         .info-agenda {
@@ -715,7 +745,7 @@
             text-align: center;
             font-weight: 600;
             color: #666;
-            border-right: 1px solid #e0e0e0;
+            border-right: none; /* remove linha vertical no título da coluna de horas */
         }
 
         .day-header {
@@ -723,7 +753,7 @@
             text-align: center;
             font-weight: 600;
             color: #333;
-            border-right: 1px solid #e0e0e0;
+            border-right: none; /* remove linha vertical nos títulos dos dias */
             position: relative;
         }
 
@@ -731,19 +761,19 @@
             border-right: none;
         }
 
-        .day-header.today {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .day-header.today::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
+        .day-header.today { background: transparent; color: inherit; }
+        .day-header.today::after { display: none; }
+        .day-header.today .day-number {
             background: #1976d2;
+            color: #fff;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            font-weight: 700;
         }
 
         .day-name {
@@ -821,14 +851,25 @@
             position: relative;
             cursor: pointer;
             transition: background 0.2s ease;
+            /* Separação vertical entre dias */
+            border-left: 1px solid #e0e0e0;
         }
 
         .day-slot:hover {
             background: #f0f8ff;
         }
 
-        .day-slot.today {
-            background: #e3f2fd;
+        .day-slot.today { background: transparent; }
+
+        /* Badge para número do dia no modo mensal */
+        .day-badge {
+            position:absolute; top:4px; right:6px; font-size:11px; color:#666;
+        }
+        .day-badge.today-badge {
+            right: 6px; top: 6px;
+            background: #1976d2; color: #fff; border-radius: 50%;
+            width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 11px;
         }
 
         /* Eventos */
@@ -1308,22 +1349,19 @@
                 <div class="calendar-info-container">
                     <div class="info-left">
                         <div class="info-location">
-                            <div class="info-location-label">Você está em:</div>
-                            <div class="info-location-name">Paróquia São João Batista</div>
-                        </div>
-                        <div class="info-agenda">
-                            <div class="info-agenda-label">Agenda:</div>
-                            <div class="info-agenda-name">Padre João Silva - Pároco</div>
+                            <div class="info-location-container">
+                                <div class="info-location-label">Você está em:</div>
+                                <select id="communitySelector" class="info-location-select">
+                                    <option value="">Carregando comunidades...</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="info-right">
                         <div class="info-date">12 - 18 outubro de 2025</div>
                         <button class="info-today-btn" onclick="goToToday()">Hoje</button>
-                        <div class="info-online-toggle">
-                            <span>Exibir horário online</span>
-                            <div class="toggle-switch" id="infoOnlineToggle"></div>
-                        </div>
-                        <div class="info-view-selector">
+                        
+                        <div class="info-view-selector" id="viewSelector" style="position:relative; z-index: 10; overflow: visible;">
                             <span>Semana</span>
                             <i class="fas fa-chevron-down"></i>
                         </div>
@@ -1335,31 +1373,31 @@
                     <div class="calendar-header">
                         <div class="time-column-header">Hora</div>
                         <div class="day-header" id="day0">
-                            <div class="day-name">SEG</div>
+                            <div class="day-name">DOM</div>
                             <div class="day-number">24</div>
                     </div>
                         <div class="day-header" id="day1">
-                            <div class="day-name">TER</div>
+                            <div class="day-name">SEG</div>
                             <div class="day-number">25</div>
                     </div>
-                        <div class="day-header today" id="day2">
-                            <div class="day-name">QUA</div>
+                        <div class="day-header" id="day2">
+                            <div class="day-name">TER</div>
                             <div class="day-number">26</div>
                 </div>
-                        <div class="day-header" id="day3">
-                            <div class="day-name">QUI</div>
+                        <div class="day-header today" id="day3">
+                            <div class="day-name">QUA</div>
                             <div class="day-number">27</div>
                     </div>
                         <div class="day-header" id="day4">
-                            <div class="day-name">SEX</div>
+                            <div class="day-name">QUI</div>
                             <div class="day-number">28</div>
                     </div>
                         <div class="day-header" id="day5">
-                            <div class="day-name">SAB</div>
+                            <div class="day-name">SEX</div>
                             <div class="day-number">29</div>
                 </div>
                         <div class="day-header" id="day6">
-                            <div class="day-name">DOM</div>
+                            <div class="day-name">SAB</div>
                             <div class="day-number">30</div>
                     </div>
                 </div>
@@ -1473,12 +1511,16 @@
         // Variáveis globais
         let currentDate = new Date();
         let events = [];
+        let allEvents = []; // Todos os eventos (sem filtro)
         let editingEvent = null;
         let miniCalendarDate = new Date();
+        let currentView = 'semana'; // 'semana' | 'mês'
+        let selectedCommunityId = null; // ID da comunidade selecionada
 
         // Inicializar aplicação
         document.addEventListener('DOMContentLoaded', async function() {
             initializeApp();
+            await loadCommunities();
             await loadEventsFromApi();
             await loadAgendaLookups();
             setupEventListeners();
@@ -1486,16 +1528,21 @@
 
         function initializeApp() {
             updateMiniCalendar();
-            updateWeeklyCalendar();
+            renderCalendar();
             updateCurrentWeekRange();
             updateRecentAppointments();
         }
 
+        function renderCalendar() {
+            if (currentView === 'mês') {
+                updateMonthlyCalendar();
+            } else {
+                updateWeeklyCalendar();
+            }
+        }
+
         function setupEventListeners() {
-            // Toggle online do container de informações
-            document.getElementById('infoOnlineToggle').addEventListener('click', function() {
-                this.classList.toggle('active');
-            });
+            // Toggle online removido
 
             // Formulário de evento
             document.getElementById('eventForm').addEventListener('submit', handleEventSubmit);
@@ -1554,6 +1601,9 @@
                             </div>
                             <input type="hidden" class="recurrence-value" value="nenhuma">
                         </div>
+                        <div class="form-group" style="display:flex; align-items:flex-end;">
+                            <button type="button" class="btn btn-secondary remove-horario" title="Remover horário" style="background:#dc2626; color:#fff;">Remover</button>
+                        </div>
                     `;
                     container.insertBefore(row, addHorarioBtn.parentElement);
                 });
@@ -1589,8 +1639,24 @@
                 });
             });
 
-            // Recorrência por horário (toggle buttons)
+            // Recorrência por horário (toggle buttons) e remover linha
             document.getElementById('horariosContainer').addEventListener('click', function(e) {
+                const removeBtn = e.target.closest('.remove-horario');
+                if (removeBtn) {
+                    const container = document.getElementById('horariosContainer');
+                    const row = removeBtn.closest('.form-grid');
+                    if (row) row.remove();
+                    const anyRow = container.querySelector('[data-schedule-row]');
+                    if (!anyRow) {
+                        const ph = document.createElement('div');
+                        ph.className = 'form-group';
+                        ph.setAttribute('data-placeholder','horarios');
+                        ph.style.cssText = 'grid-column: 1 / -1; color:#6b7280; font-size:13px;';
+                        ph.textContent = 'Nenhum horário adicionado ainda.';
+                        container.insertBefore(ph, container.firstChild);
+                    }
+                    return;
+                }
                 const btn = e.target.closest('.recurrence-btn');
                 if (!btn) return;
                 const group = btn.closest('.form-group');
@@ -1602,18 +1668,26 @@
             });
 
             // View selector (Semana/Mês/Ano)
-            const viewSelector = document.querySelector('.info-view-selector');
-            if (viewSelector) {
+            const viewSelector = document.getElementById('viewSelector');
+            if (viewSelector && !viewSelector.dataset.bound) {
+                viewSelector.dataset.bound = 'true';
+                // Ensure selector can anchor an absolute child
+                viewSelector.style.position = 'relative';
+                viewSelector.style.userSelect = 'none';
+                viewSelector.style.cursor = 'pointer';
+
                 // Create dropdown menu for selecting a view (Semana/Mês/Ano)
                 const menu = document.createElement('div');
                 menu.className = 'dropdown-menu view-menu';
                 menu.style.position = 'absolute';
+                menu.style.right = '0';
+                menu.style.top = 'calc(100% + 6px)';
                 menu.style.background = '#fff';
                 menu.style.border = '1px solid #e0e0e0';
                 menu.style.borderRadius = '8px';
                 menu.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
                 menu.style.minWidth = '140px';
-                menu.style.zIndex = '2001';
+                menu.style.zIndex = '3000';
                 menu.style.padding = '6px 0';
                 menu.style.display = 'none';
                 menu.innerHTML = `
@@ -1621,14 +1695,9 @@
                     <a href="#" data-view="mês" class="dropdown-item">Mês</a>
                     <a href="#" data-view="ano" class="dropdown-item">Ano</a>
                 `;
-                document.body.appendChild(menu);
+                viewSelector.appendChild(menu);
 
-                function openMenu() {
-                    const rect = viewSelector.getBoundingClientRect();
-                    menu.style.left = `${rect.left + window.scrollX}px`;
-                    menu.style.top = `${rect.bottom + 6 + window.scrollY}px`;
-                    menu.style.display = 'block';
-                }
+                function openMenu() { menu.style.display = 'block'; }
                 function closeMenu() { menu.style.display = 'none'; }
 
                 viewSelector.addEventListener('click', function(e) {
@@ -1638,7 +1707,7 @@
                 });
 
                 document.addEventListener('click', function(e) {
-                    if (!menu.contains(e.target) && e.target !== viewSelector) closeMenu();
+                    if (!viewSelector.contains(e.target)) closeMenu();
                 });
 
                 menu.addEventListener('click', function(e) {
@@ -1648,6 +1717,8 @@
                     const chosen = a.getAttribute('data-view');
                     const span = viewSelector.querySelector('span');
                     if (span) span.textContent = chosen.charAt(0).toUpperCase() + chosen.slice(1);
+                    currentView = chosen;
+                    renderCalendar();
                     if (typeof showToast === 'function') showToast(`Visão alterada para ${span.textContent}`, 'info');
                     closeMenu();
                 });
@@ -1710,12 +1781,27 @@
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
 
-            // Calcular início da semana
+            // Reconstruir cabeçalhos dos dias (DOM-SAB) com IDs esperados
+            const header = document.querySelector('.calendar-header');
+            if (header) {
+                header.innerHTML = `
+                    <div class="time-column-header">Hora</div>
+                    <div class="day-header" id="day0"><div class="day-name">DOM</div><div class="day-number">-</div></div>
+                    <div class="day-header" id="day1"><div class="day-name">SEG</div><div class="day-number">-</div></div>
+                    <div class="day-header" id="day2"><div class="day-name">TER</div><div class="day-number">-</div></div>
+                    <div class="day-header" id="day3"><div class="day-name">QUA</div><div class="day-number">-</div></div>
+                    <div class="day-header" id="day4"><div class="day-name">QUI</div><div class="day-number">-</div></div>
+                    <div class="day-header" id="day5"><div class="day-name">SEX</div><div class="day-number">-</div></div>
+                    <div class="day-header" id="day6"><div class="day-name">SAB</div><div class="day-number">-</div></div>
+                `;
+            }
+
+            // Calcular início da semana (domingo = 0)
             const weekStart = new Date(currentDate);
             weekStart.setDate(currentDate.getDate() - currentDate.getDay());
 
             // Atualizar cabeçalhos dos dias
-            const dayNames = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
+            const dayNames = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
             for (let i = 0; i < 7; i++) {
                 const dayDate = new Date(weekStart);
                 dayDate.setDate(weekStart.getDate() + i);
@@ -1786,9 +1872,68 @@
             }
         }
 
+        function updateMonthlyCalendar() {
+            const calendarBody = document.getElementById('calendarBody');
+            calendarBody.innerHTML = '';
+
+            // Cabeçalhos dos dias (Dom-Sáb)
+            const dayNames = ['DOM','SEG','TER','QUA','QUI','SEX','SAB'];
+            const header = document.querySelector('.calendar-header');
+            if (header) {
+                header.innerHTML = '<div class="time-column-header">Dia</div>' + dayNames.map(n => `<div class="day-header"><div class="day-name">${n}</div></div>`).join('');
+            }
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const start = new Date(firstDay);
+            start.setDate(1 - firstDay.getDay()); // iniciar no domingo
+
+            // 6 semanas (máximo)
+            for (let week = 0; week < 6; week++) {
+                // Coluna "hora" vira coluna do número da semana (ou vazia)
+                const weekCell = document.createElement('div');
+                weekCell.className = 'time-slot';
+                weekCell.textContent = '';
+                calendarBody.appendChild(weekCell);
+
+                for (let day = 0; day < 7; day++) {
+                    const date = new Date(start);
+                    date.setDate(start.getDate() + week * 7 + day);
+
+                    const cell = document.createElement('div');
+                    cell.className = 'day-slot';
+                    if (date.getMonth() !== month) cell.style.background = '#f9fafb';
+                    if (isToday(date)) cell.classList.add('today');
+
+                    // Cabeçalho interno: número do dia
+                    const label = document.createElement('div');
+                    const isTodayFlag = isToday(date);
+                    label.className = isTodayFlag ? 'day-badge today-badge' : 'day-badge';
+                    label.textContent = date.getDate();
+                    cell.appendChild(label);
+
+                    // Eventos do dia (mostrar como chips no topo)
+                    const dayEvents = events.filter(ev => {
+                        const d = new Date(ev.startTime);
+                        return d.toDateString() === date.toDateString();
+                    });
+                    dayEvents.slice(0, 3).forEach(ev => {
+                        const chip = document.createElement('div');
+                        chip.style.cssText = 'margin:4px; padding:2px 6px; border-radius:10px; font-size:10px; color:#fff; display:inline-block; background:#1976d2;';
+                        chip.textContent = ev.title || 'Evento';
+                        cell.appendChild(chip);
+                    });
+
+                    cell.addEventListener('click', () => openEventModal(date));
+                    calendarBody.appendChild(cell);
+                }
+            }
+        }
+
         function updateCurrentWeekRange() {
             const weekStart = new Date(currentDate);
-            weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+            weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Domingo = 0
             const weekEnd = new Date(weekStart);
             weekEnd.setDate(weekStart.getDate() + 6);
 
@@ -1935,6 +2080,10 @@
                 anexo_base64: anexoBase64
             };
 
+            if (!horarios.length) {
+                showToast('Adicione pelo menos um horário antes de salvar.', 'error');
+                return;
+            }
             try {
                 const btn = document.getElementById('eventSubmitBtn');
                 const original = btn ? btn.innerHTML : '';
@@ -1950,9 +2099,7 @@
             }
 
                 await loadEventsFromApi();
-            updateWeeklyCalendar();
-            updateMiniCalendar();
-            updateRecentAppointments();
+            filterEventsByCommunity();
             closeEventModal();
             } catch (err) {
                 console.error('Erro ao salvar evento:', err);
@@ -1969,13 +2116,39 @@
                 const { error } = await window.api.delete(window.endpoints.agenda.delete(eventId));
                 if (error) throw error;
                 await loadEventsFromApi();
-                updateWeeklyCalendar();
-                updateMiniCalendar();
-                updateRecentAppointments();
+                filterEventsByCommunity();
                 showToast('Evento excluído com sucesso!', 'success');
             } catch (err) {
                 console.error('Erro ao excluir evento:', err);
                 showToast('Erro ao excluir evento', 'error');
+            }
+        }
+
+        async function loadCommunities() {
+            try {
+                const { data, error } = await window.api.get(window.endpoints.comunidades.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                
+                const select = document.getElementById('communitySelector');
+                if (select) {
+                    select.innerHTML = '<option value="">Todas as comunidades</option>' +
+                        lista.map(comunidade => 
+                            `<option value="${comunidade.id}">${comunidade.nome}</option>`
+                        ).join('');
+                    
+                    // Adicionar evento de mudança
+                    select.addEventListener('change', function() {
+                        selectedCommunityId = this.value ? parseInt(this.value) : null;
+                        filterEventsByCommunity();
+                    });
+                }
+            } catch (err) {
+                console.error('Erro ao carregar comunidades:', err);
+                const select = document.getElementById('communitySelector');
+                if (select) {
+                    select.innerHTML = '<option value="">Erro ao carregar comunidades</option>';
+                }
             }
         }
 
@@ -1985,16 +2158,43 @@
                 if (error) throw error;
                 const lista = Array.isArray(data) ? data : [];
                 // Normalizar objetos para uso no calendário
-                events = lista.map(ev => ({
+                allEvents = lista.map(ev => ({
                     ...ev,
                     // Garantir compatibilidade de tipos
                     startTime: ev.startTime || ev.start_time || ev.inicio || ev.data_inicio || ev.dataHoraInicio || ev.start || ev.startedAt || ev.inicio_iso || ev.inicioISO || ev.data_inicio_iso || ev.dataInicioISO || ev.data_inicio_iso || ev.start_iso || ev.startISO || ev.startDate || ev.start_date,
                     endTime: ev.endTime || ev.end_time || ev.fim || ev.data_fim || ev.dataHoraFim || ev.end || ev.endedAt || ev.fim_iso || ev.fimISO || ev.data_fim_iso || ev.dataFimISO || ev.data_fim_iso || ev.end_iso || ev.endISO || ev.endDate || ev.end_date
                 }));
+                
+                // Aplicar filtro inicial
+                filterEventsByCommunity();
             } catch (err) {
                 console.error('Erro ao carregar eventos da API:', err);
+                allEvents = [];
                 events = [];
             }
+        }
+
+        function filterEventsByCommunity() {
+            if (selectedCommunityId === null) {
+                // Mostrar todos os eventos
+                events = [...allEvents];
+            } else {
+                // Filtrar eventos por comunidade
+                events = allEvents.filter(event => {
+                    // Verificar se o evento tem vínculo com a comunidade selecionada
+                    if (event.vinculos && Array.isArray(event.vinculos)) {
+                        return event.vinculos.some(vinculo => 
+                            vinculo.comunidade_id === selectedCommunityId
+                        );
+                    }
+                    return false;
+                });
+            }
+            
+            // Atualizar calendário
+            updateWeeklyCalendar();
+            updateMiniCalendar();
+            updateRecentAppointments();
         }
 
         function updateRecentAppointments() {
