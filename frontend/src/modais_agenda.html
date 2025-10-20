@@ -1,0 +1,271 @@
+<!-- Modais da Agenda -->
+<!-- Modal de Evento -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">Novo Evento</h2>
+            <button class="modal-close" onclick="closeEventModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form id="eventForm" class="event-form">
+            <!-- Seção: Título -->
+            <div class="form-section">
+                <div class="section-title"><i class="fas fa-heading"></i> Título do evento</div>
+                <div class="form-grid">
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                <label class="form-label" for="eventTitle">Título do Evento</label>
+                <input type="text" id="eventTitle" class="form-input" required>
+            </div>
+            </div>
+            </div>
+            
+            <!-- Seção: Vínculos -->
+            <div class="form-section">
+                <div class="section-title"><i class="fas fa-link"></i> Vínculos</div>
+                <div id="comunidadesContainer" class="form-grid" style="grid-column: 1 / -1;">
+                    <div class="form-group" data-placeholder="comunidades" style="grid-column: 1 / -1; color:#6b7280; font-size:13px;">
+                        Nenhuma comunidade vinculada ainda.
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
+                        <button type="button" id="addComunidadeBtn" class="btn btn-secondary"><i class="fas fa-plus"></i> Adicionar comunidade</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Seção: Horários -->
+            <div class="form-section">
+                <div class="section-title"><i class="fas fa-clock"></i> Horários</div>
+                <div id="horariosContainer" class="form-grid" style="grid-column: 1 / -1;">
+                    <div class="form-group" data-placeholder="horarios" style="grid-column: 1 / -1; color:#6b7280; font-size:13px;">
+                        Nenhum horário adicionado ainda.
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
+                        <button type="button" id="addHorarioBtn" class="btn btn-secondary"><i class="fas fa-plus"></i> Adicionar horário</button>
+            </div>
+            
+                </div>
+            </div>
+            
+            <!-- Seção: Detalhes -->
+            <div class="form-section">
+                <div class="section-title"><i class="fas fa-align-left"></i> Detalhes</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="eventType">Tipo</label>
+                        <select id="eventType" class="form-input" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="missa">Missa</option>
+                            <option value="batismo">Batismo</option>
+                            <option value="casamento">Casamento</option>
+                            <option value="confissao">Confissão</option>
+                            <option value="reuniao">Reunião</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="eventDate">Data</label>
+                        <input type="date" id="eventDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="eventTime">Hora</label>
+                        <input type="time" id="eventTime" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="eventDuration">Duração (min)</label>
+                        <input type="number" id="eventDuration" class="form-input" value="60" min="15" step="15" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="eventLocation">Local</label>
+                        <input type="text" id="eventLocation" class="form-input" placeholder="Ex: Igreja Matriz">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="eventDescription">Descrição</label>
+                        <textarea id="eventDescription" class="form-textarea" rows="3" placeholder="Descrição do evento..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" onclick="closeEventModal()">Cancelar</button>
+                <button type="submit" id="eventSubmitBtn" class="btn btn-primary">Salvar Evento</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Multplus -->
+<div id="multplusModal" class="modal">
+    <div class="modal-content multplus-modal">
+        <div class="modal-header">
+            <h2 class="modal-title">
+                <i class="fas fa-layer-group"></i>
+                Multplus - Múltiplos Agendamentos
+            </h2>
+            <button class="modal-close" onclick="closeMultplusModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form id="multplusForm" class="multplus-form">
+            <!-- Seção: Configurações Gerais -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-cog"></i> Configurações Gerais
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="multplusTitle">Título Base</label>
+                        <input type="text" id="multplusTitle" class="form-input" placeholder="Ex: Missa Dominical" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="multplusCommunity">Comunidade</label>
+                        <select id="multplusCommunity" class="form-input" required>
+                            <option value="">Selecione uma comunidade</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="multplusType">Tipo de Evento</label>
+                        <select id="multplusType" class="form-input" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="missa">Missa</option>
+                            <option value="batismo">Batismo</option>
+                            <option value="casamento">Casamento</option>
+                            <option value="confissao">Confissão</option>
+                            <option value="reuniao">Reunião</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="multplusLocation">Local</label>
+                        <input type="text" id="multplusLocation" class="form-input" placeholder="Ex: Igreja Matriz">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Período e Frequência -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-calendar-alt"></i> Período e Frequência
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="multplusStartDate">Data Inicial</label>
+                        <input type="date" id="multplusStartDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="multplusEndDate">Data Final</label>
+                        <input type="date" id="multplusEndDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="multplusFrequency">Frequência</label>
+                        <select id="multplusFrequency" class="form-input" required>
+                            <option value="">Selecione a frequência</option>
+                            <option value="daily">Diário</option>
+                            <option value="weekly">Semanal</option>
+                            <option value="monthly">Mensal</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="multplusDaysContainer" style="display: none;">
+                        <label class="form-label">Dias da Semana</label>
+                        <div class="days-selector">
+                            <label class="day-option">
+                                <input type="checkbox" value="0" name="multplusDays">
+                                <span>Dom</span>
+                            </label>
+                            <label class="day-option">
+                                <input type="checkbox" value="1" name="multplusDays">
+                                <span>Seg</span>
+                            </label>
+                            <label class="day-option">
+                                <input type="checkbox" value="2" name="multplusDays">
+                                <span>Ter</span>
+                            </label>
+                            <label class="day-option">
+                                <input type="checkbox" value="3" name="multplusDays">
+                                <span>Qua</span>
+                            </label>
+                            <label class="day-option">
+                                <input type="checkbox" value="4" name="multplusDays">
+                                <span>Qui</span>
+                            </label>
+                            <label class="day-option">
+                                <input type="checkbox" value="5" name="multplusDays">
+                                <span>Sex</span>
+                            </label>
+                            <label class="day-option">
+                                <input type="checkbox" value="6" name="multplusDays">
+                                <span>Sáb</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Horários -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-clock"></i> Horários
+                </div>
+                <div id="multplusTimesContainer" class="times-container">
+                    <div class="time-item">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Horário</label>
+                                <input type="time" class="form-input multplus-time" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Duração (min)</label>
+                                <input type="number" class="form-input multplus-duration" value="60" min="15" step="15">
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-danger btn-sm remove-time" onclick="removeTimeItem(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addTimeItem()">
+                    <i class="fas fa-plus"></i> Adicionar Horário
+                </button>
+            </div>
+
+            <!-- Seção: Descrição -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-align-left"></i> Descrição
+                </div>
+                <div class="form-group">
+                    <textarea id="multplusDescription" class="form-textarea" rows="3" placeholder="Descrição dos eventos..."></textarea>
+                </div>
+            </div>
+
+            <!-- Preview dos Eventos -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-eye"></i> Preview dos Eventos
+                </div>
+                <div id="multplusPreview" class="preview-container">
+                    <div class="preview-placeholder">
+                        <i class="fas fa-calendar-plus"></i>
+                        <p>Configure os parâmetros acima para ver o preview dos eventos</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" onclick="closeMultplusModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="generatePreview()">
+                    <i class="fas fa-eye"></i> Gerar Preview
+                </button>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Criar Eventos
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
