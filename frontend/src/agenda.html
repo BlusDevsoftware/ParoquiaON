@@ -1546,12 +1546,13 @@
                         </div>
                         <div class="form-group" data-schedule-row>
                             <label class="form-label">Recorrência</label>
-                            <select class="form-input recurrence-select">
-                                <option value="nenhuma">Nenhuma</option>
-                                <option value="semanal">Semanal</option>
-                                <option value="mensal">Mensal</option>
-                                <option value="anual">Anual</option>
-                            </select>
+                            <div class="recurrence-group" style="display:flex; gap:6px; flex-wrap:wrap;">
+                                <button type="button" class="btn recurrence-btn" data-recurrence="nenhuma" style="background:#6b7280; color:#fff;">Nenhuma</button>
+                                <button type="button" class="btn recurrence-btn" data-recurrence="semanal" style="background:#0369a1; color:#fff;">Semanal</button>
+                                <button type="button" class="btn recurrence-btn" data-recurrence="mensal" style="background:#0f766e; color:#fff;">Mensal</button>
+                                <button type="button" class="btn recurrence-btn" data-recurrence="anual" style="background:#7c3aed; color:#fff;">Anual</button>
+                            </div>
+                            <input type="hidden" class="recurrence-value" value="nenhuma">
                         </div>
                     `;
                     container.insertBefore(row, addHorarioBtn.parentElement);
@@ -1587,6 +1588,70 @@
                     btn.style.boxShadow = '0 0 0 2px rgba(0,0,0,0.15) inset';
                 });
             });
+
+            // Recorrência por horário (toggle buttons)
+            document.getElementById('horariosContainer').addEventListener('click', function(e) {
+                const btn = e.target.closest('.recurrence-btn');
+                if (!btn) return;
+                const group = btn.closest('.form-group');
+                const hidden = group.querySelector('.recurrence-value');
+                const siblings = group.querySelectorAll('.recurrence-btn');
+                siblings.forEach(b => b.style.boxShadow = 'none');
+                btn.style.boxShadow = '0 0 0 2px rgba(0,0,0,0.15) inset';
+                if (hidden) hidden.value = btn.getAttribute('data-recurrence');
+            });
+
+            // View selector (Semana/Mês/Ano)
+            const viewSelector = document.querySelector('.info-view-selector');
+            if (viewSelector) {
+                // Create dropdown menu for selecting a view (Semana/Mês/Ano)
+                const menu = document.createElement('div');
+                menu.className = 'dropdown-menu view-menu';
+                menu.style.position = 'absolute';
+                menu.style.background = '#fff';
+                menu.style.border = '1px solid #e0e0e0';
+                menu.style.borderRadius = '8px';
+                menu.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                menu.style.minWidth = '140px';
+                menu.style.zIndex = '2001';
+                menu.style.padding = '6px 0';
+                menu.style.display = 'none';
+                menu.innerHTML = `
+                    <a href="#" data-view="semana" class="dropdown-item">Semana</a>
+                    <a href="#" data-view="mês" class="dropdown-item">Mês</a>
+                    <a href="#" data-view="ano" class="dropdown-item">Ano</a>
+                `;
+                document.body.appendChild(menu);
+
+                function openMenu() {
+                    const rect = viewSelector.getBoundingClientRect();
+                    menu.style.left = `${rect.left + window.scrollX}px`;
+                    menu.style.top = `${rect.bottom + 6 + window.scrollY}px`;
+                    menu.style.display = 'block';
+                }
+                function closeMenu() { menu.style.display = 'none'; }
+
+                viewSelector.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (menu.style.display === 'block') closeMenu(); else openMenu();
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!menu.contains(e.target) && e.target !== viewSelector) closeMenu();
+                });
+
+                menu.addEventListener('click', function(e) {
+                    const a = e.target.closest('a[data-view]');
+                    if (!a) return;
+                    e.preventDefault();
+                    const chosen = a.getAttribute('data-view');
+                    const span = viewSelector.querySelector('span');
+                    if (span) span.textContent = chosen.charAt(0).toUpperCase() + chosen.slice(1);
+                    if (typeof showToast === 'function') showToast(`Visão alterada para ${span.textContent}`, 'info');
+                    closeMenu();
+                });
+            }
         }
 
         function updateMiniCalendar() {
