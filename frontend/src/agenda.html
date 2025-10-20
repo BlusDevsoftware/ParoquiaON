@@ -1534,9 +1534,12 @@
         }
 
         function renderCalendar() {
+            console.log('renderCalendar chamada com currentView:', currentView);
             if (currentView === 'mês') {
+                console.log('Atualizando calendário mensal');
                 updateMonthlyCalendar();
             } else {
+                console.log('Atualizando calendário semanal');
                 updateWeeklyCalendar();
             }
         }
@@ -1715,6 +1718,7 @@
                     if (!a) return;
                     e.preventDefault();
                     const chosen = a.getAttribute('data-view');
+                    console.log('Visualização selecionada:', chosen);
                     const span = viewSelector.querySelector('span');
                     if (span) span.textContent = chosen.charAt(0).toUpperCase() + chosen.slice(1);
                     currentView = chosen;
@@ -1765,7 +1769,7 @@
                 dayElement.textContent = date.getDate();
                 dayElement.addEventListener('click', () => {
                     currentDate = new Date(date);
-                    updateWeeklyCalendar();
+                    renderCalendar();
                 });
                 
                 daysContainer.appendChild(dayElement);
@@ -1778,6 +1782,7 @@
         }
 
         function updateWeeklyCalendar() {
+            console.log('updateWeeklyCalendar chamada');
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
 
@@ -1873,6 +1878,7 @@
         }
 
         function updateMonthlyCalendar() {
+            console.log('updateMonthlyCalendar chamada');
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
 
@@ -1932,25 +1938,36 @@
         }
 
         function updateCurrentWeekRange() {
-            const weekStart = new Date(currentDate);
-            weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Domingo = 0
-            const weekEnd = new Date(weekStart);
-            weekEnd.setDate(weekStart.getDate() + 6);
-
             const rangeElement = document.getElementById('currentWeekRange');
             if (!rangeElement) return; // Evita erro se o elemento não existir no layout
-            rangeElement.textContent = `${weekStart.getDate()} - ${weekEnd.getDate()} ${weekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`;
+            
+            if (currentView === 'mês') {
+                rangeElement.textContent = currentDate.toLocaleDateString('pt-BR', { 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+            } else {
+                const weekStart = new Date(currentDate);
+                weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Domingo = 0
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                rangeElement.textContent = `${weekStart.getDate()} - ${weekEnd.getDate()} ${weekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`;
+            }
         }
 
         function navigateWeek(direction) {
-            currentDate.setDate(currentDate.getDate() + (direction * 7));
-            updateWeeklyCalendar();
+            if (currentView === 'mês') {
+                currentDate.setMonth(currentDate.getMonth() + direction);
+            } else {
+                currentDate.setDate(currentDate.getDate() + (direction * 7));
+            }
+            renderCalendar();
             updateCurrentWeekRange();
         }
 
         function goToToday() {
             currentDate = new Date();
-            updateWeeklyCalendar();
+            renderCalendar();
             updateCurrentWeekRange();
         }
 
@@ -2192,7 +2209,7 @@
             }
             
             // Atualizar calendário
-            updateWeeklyCalendar();
+            renderCalendar();
             updateMiniCalendar();
             updateRecentAppointments();
         }
