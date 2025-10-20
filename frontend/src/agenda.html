@@ -1727,6 +1727,7 @@
             weekEnd.setDate(weekStart.getDate() + 6);
 
             const rangeElement = document.getElementById('currentWeekRange');
+            if (!rangeElement) return; // Evita erro se o elemento não existir no layout
             rangeElement.textContent = `${weekStart.getDate()} - ${weekEnd.getDate()} ${weekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`;
         }
 
