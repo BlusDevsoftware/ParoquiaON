@@ -2441,12 +2441,54 @@
             
             form.reset();
             if (date) {
-                document.getElementById('eventDate').value = date.toISOString().split('T')[0];
-                document.getElementById('eventTime').value = date.toTimeString().slice(0, 5);
+                const eventDate = document.getElementById('eventDate');
+                if (eventDate) {
+                    eventDate.value = date.toISOString().split('T')[0];
+                }
+                const eventTimeStart = document.getElementById('eventTimeStart');
+                if (eventTimeStart) {
+                    eventTimeStart.value = date.toTimeString().slice(0, 5);
+                }
+            } else {
+                // Definir data inicial como hoje
+                const today = new Date().toISOString().split('T')[0];
+                const eventDate = document.getElementById('eventDate');
+                if (eventDate) {
+                    eventDate.value = today;
+                }
             }
             
             editingEvent = null;
             modal.classList.add('active');
+            
+            // Resetar steps
+            currentStep = 1;
+            updateStepDisplay();
+            
+            // Carregar comunidades
+            loadEventCommunities();
+        }
+
+        async function loadEventCommunities() {
+            try {
+                const { data, error } = await window.api.get(window.endpoints.comunidades.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                
+                const select = document.getElementById('eventCommunity');
+                if (select) {
+                    select.innerHTML = '<option value="">Selecione uma comunidade</option>' +
+                        lista.map(comunidade => 
+                            `<option value="${comunidade.id}">${comunidade.nome}</option>`
+                        ).join('');
+                }
+            } catch (err) {
+                console.error('Erro ao carregar comunidades:', err);
+                const select = document.getElementById('eventCommunity');
+                if (select) {
+                    select.innerHTML = '<option value="">Erro ao carregar</option>';
+                }
+            }
         }
 
         function closeEventModal() {
@@ -3085,6 +3127,46 @@
             prevBtn.style.display = currentStep > 1 ? 'flex' : 'none';
             nextBtn.style.display = currentStep < 3 ? 'flex' : 'none';
             submitBtn.style.display = currentStep === 3 ? 'flex' : 'none';
+
+            // Atualizar revisão se estiver no passo 3
+            if (currentStep === 3) {
+                updateReview();
+            }
+        }
+
+        function updateReview() {
+            // Atualizar informações do evento
+            const title = document.getElementById('eventTitle')?.value || '-';
+            const community = document.getElementById('eventCommunity')?.selectedOptions[0]?.text || '-';
+            const pastoral = document.getElementById('eventPastoral')?.selectedOptions[0]?.text || '-';
+            const pilares = document.getElementById('eventPilares')?.selectedOptions[0]?.text || '-';
+            const location = document.getElementById('eventLocation')?.value || '-';
+            const acao = document.getElementById('eventAcao')?.value || '-';
+            const objetivo = document.getElementById('eventObjetivo')?.value || '-';
+            const paroquial = document.getElementById('eventParoquial')?.checked ? 'Sim' : 'Não';
+
+            // Atualizar horários e status
+            const date = document.getElementById('eventDate')?.value || '-';
+            const timeStart = document.getElementById('eventTimeStart')?.value || '-';
+            const timeEnd = document.getElementById('eventTimeEnd')?.value || '-';
+            const repeticao = document.getElementById('eventRepeticao')?.selectedOptions[0]?.text || '-';
+            const status = document.getElementById('eventStatus')?.selectedOptions[0]?.text || '-';
+
+            // Aplicar valores na revisão
+            document.getElementById('reviewTitle').textContent = title;
+            document.getElementById('reviewCommunity').textContent = community;
+            document.getElementById('reviewPastoral').textContent = pastoral;
+            document.getElementById('reviewPilares').textContent = pilares;
+            document.getElementById('reviewLocation').textContent = location;
+            document.getElementById('reviewAcao').textContent = acao;
+            document.getElementById('reviewObjetivo').textContent = objetivo;
+            document.getElementById('reviewParoquial').textContent = paroquial;
+
+            document.getElementById('reviewDate').textContent = date;
+            document.getElementById('reviewTimeStart').textContent = timeStart;
+            document.getElementById('reviewTimeEnd').textContent = timeEnd;
+            document.getElementById('reviewRepeticao').textContent = repeticao;
+            document.getElementById('reviewStatus').textContent = status;
         }
 
         function validateCurrentStep() {

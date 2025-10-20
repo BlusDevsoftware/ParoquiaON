@@ -29,7 +29,7 @@
                     </div>
                     <div class="step" data-step="2">
                         <span class="step-number">2</span>
-                        <span class="step-label">Detalhes</span>
+                        <span class="step-label">Horários</span>
                     </div>
                     <div class="step" data-step="3">
                         <span class="step-number">3</span>
@@ -39,7 +39,7 @@
             </div>
 
             <div class="form-content">
-                <!-- Passo 1: Informações Básicas -->
+                <!-- Passo 1: Informações -->
                 <div class="form-step active" data-step="1">
                     <div class="form-section modern-section">
                         <div class="section-header">
@@ -47,7 +47,7 @@
                                 <i class="fas fa-info-circle"></i>
                             </div>
                             <div class="section-title">
-                                <h3>Informações Básicas</h3>
+                                <h3>Informações</h3>
                                 <p>Dados principais do evento</p>
                             </div>
                         </div>
@@ -67,19 +67,51 @@
                             </div>
                             
                             <div class="form-group modern-group">
-                                <label class="form-label modern-label" for="eventType">
-                                    <i class="fas fa-tag"></i>
-                                    Tipo de Evento
+                                <label class="form-label modern-label" for="eventCommunity">
+                                    <i class="fas fa-church"></i>
+                                    Comunidade
                                     <span class="required">*</span>
                                 </label>
                                 <div class="input-container">
-                                    <select id="eventType" class="form-input modern-input" required>
-                                        <option value="">Selecione o tipo</option>
-                                        <option value="missa">Missa</option>
-                                        <option value="batismo">Batismo</option>
-                                        <option value="casamento">Casamento</option>
-                                        <option value="confissao">Confissão</option>
-                                        <option value="reuniao">Reunião</option>
+                                    <select id="eventCommunity" class="form-input modern-input" required>
+                                        <option value="">Selecione uma comunidade</option>
+                                    </select>
+                                    <div class="input-feedback"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group modern-group">
+                                <label class="form-label modern-label" for="eventPastoral">
+                                    <i class="fas fa-users"></i>
+                                    Pastoral
+                                </label>
+                                <div class="input-container">
+                                    <select id="eventPastoral" class="form-input modern-input">
+                                        <option value="">Selecione a pastoral</option>
+                                        <option value="liturgica">Litúrgica</option>
+                                        <option value="catequese">Catequese</option>
+                                        <option value="caritas">Cáritas</option>
+                                        <option value="jovem">Pastoral da Juventude</option>
+                                        <option value="familia">Pastoral da Família</option>
+                                        <option value="social">Pastoral Social</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                    <div class="input-feedback"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group modern-group">
+                                <label class="form-label modern-label" for="eventPilares">
+                                    <i class="fas fa-columns"></i>
+                                    Pilares
+                                </label>
+                                <div class="input-container">
+                                    <select id="eventPilares" class="form-input modern-input">
+                                        <option value="">Selecione o pilar</option>
+                                        <option value="evangelizacao">Evangelização</option>
+                                        <option value="liturgia">Liturgia</option>
+                                        <option value="caridade">Caridade</option>
+                                        <option value="comunhao">Comunhão</option>
                                         <option value="outro">Outro</option>
                                     </select>
                                     <div class="input-feedback"></div>
@@ -97,11 +129,49 @@
                                     <div class="input-feedback"></div>
                                 </div>
                             </div>
+                            
+                            <div class="form-group modern-group">
+                                <label class="form-label modern-label" for="eventAcao">
+                                    <i class="fas fa-bullseye"></i>
+                                    Ação
+                                </label>
+                                <div class="input-container">
+                                    <input type="text" id="eventAcao" class="form-input modern-input" 
+                                           placeholder="Ex: Missa, Reunião, Formação">
+                                    <div class="input-feedback"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group modern-group" style="grid-column: 1 / -1;">
+                                <label class="form-label modern-label" for="eventObjetivo">
+                                    <i class="fas fa-target"></i>
+                                    Objetivo
+                                </label>
+                                <div class="input-container">
+                                    <textarea id="eventObjetivo" class="form-textarea modern-textarea" 
+                                              rows="3" placeholder="Descreva o objetivo do evento..."></textarea>
+                                    <div class="input-feedback"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group modern-group" style="grid-column: 1 / -1;">
+                                <label class="form-label modern-label">
+                                    <i class="fas fa-church"></i>
+                                    Evento Paroquial
+                                </label>
+                                <div class="checkbox-container">
+                                    <label class="checkbox-option">
+                                        <input type="checkbox" id="eventParoquial">
+                                        <span class="checkbox-custom"></span>
+                                        <span class="checkbox-label">Este é um evento paroquial</span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Passo 2: Data e Horário -->
+                <!-- Passo 2: Horários -->
                 <div class="form-step" data-step="2">
                     <div class="form-section modern-section">
                         <div class="section-header">
@@ -109,8 +179,8 @@
                                 <i class="fas fa-clock"></i>
                             </div>
                             <div class="section-title">
-                                <h3>Data e Horário</h3>
-                                <p>Quando o evento acontecerá</p>
+                                <h3>Horários</h3>
+                                <p>Configure data, horários e recorrência do evento</p>
                             </div>
                         </div>
                         
@@ -128,45 +198,60 @@
                             </div>
                             
                             <div class="form-group modern-group">
-                                <label class="form-label modern-label" for="eventTime">
+                                <label class="form-label modern-label" for="eventTimeStart">
                                     <i class="fas fa-clock"></i>
-                                    Horário
+                                    Hora de Início
                                     <span class="required">*</span>
                                 </label>
                                 <div class="input-container">
-                                    <input type="time" id="eventTime" class="form-input modern-input" required>
+                                    <input type="time" id="eventTimeStart" class="form-input modern-input" required>
                                     <div class="input-feedback"></div>
                                 </div>
                             </div>
                             
                             <div class="form-group modern-group">
-                                <label class="form-label modern-label" for="eventDuration">
-                                    <i class="fas fa-hourglass-half"></i>
-                                    Duração
+                                <label class="form-label modern-label" for="eventTimeEnd">
+                                    <i class="fas fa-clock"></i>
+                                    Hora de Fim
                                     <span class="required">*</span>
                                 </label>
                                 <div class="input-container">
-                                    <select id="eventDuration" class="form-input modern-input" required>
-                                        <option value="">Selecione</option>
-                                        <option value="30">30 minutos</option>
-                                        <option value="60" selected>1 hora</option>
-                                        <option value="90">1h 30min</option>
-                                        <option value="120">2 horas</option>
-                                        <option value="180">3 horas</option>
-                                        <option value="custom">Personalizado</option>
+                                    <input type="time" id="eventTimeEnd" class="form-input modern-input" required>
+                                    <div class="input-feedback"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group modern-group">
+                                <label class="form-label modern-label" for="eventRepeticao">
+                                    <i class="fas fa-repeat"></i>
+                                    Repetição
+                                </label>
+                                <div class="input-container">
+                                    <select id="eventRepeticao" class="form-input modern-input">
+                                        <option value="">Sem repetição</option>
+                                        <option value="diario">Diário</option>
+                                        <option value="semanal">Semanal</option>
+                                        <option value="mensal">Mensal</option>
+                                        <option value="anual">Anual</option>
                                     </select>
                                     <div class="input-feedback"></div>
                                 </div>
                             </div>
                             
-                            <div class="form-group modern-group" id="customDurationGroup" style="display: none;">
-                                <label class="form-label modern-label" for="eventCustomDuration">
-                                    <i class="fas fa-edit"></i>
-                                    Duração Personalizada (min)
+                            <div class="form-group modern-group">
+                                <label class="form-label modern-label" for="eventStatus">
+                                    <i class="fas fa-flag"></i>
+                                    Status
+                                    <span class="required">*</span>
                                 </label>
                                 <div class="input-container">
-                                    <input type="number" id="eventCustomDuration" class="form-input modern-input" 
-                                           min="15" step="15" placeholder="Ex: 45">
+                                    <select id="eventStatus" class="form-input modern-input" required>
+                                        <option value="">Selecione o status</option>
+                                        <option value="pendente">Pendente</option>
+                                        <option value="em_andamento">Em Andamento</option>
+                                        <option value="concluido">Concluído</option>
+                                        <option value="cancelado">Cancelado</option>
+                                    </select>
                                     <div class="input-feedback"></div>
                                 </div>
                             </div>
@@ -174,59 +259,87 @@
                     </div>
                 </div>
 
-                <!-- Passo 3: Detalhes e Descrição -->
+                <!-- Passo 3: Revisão -->
                 <div class="form-step" data-step="3">
                     <div class="form-section modern-section">
                         <div class="section-header">
                             <div class="section-icon">
-                                <i class="fas fa-align-left"></i>
+                                <i class="fas fa-eye"></i>
                             </div>
                             <div class="section-title">
-                                <h3>Detalhes e Descrição</h3>
-                                <p>Informações adicionais sobre o evento</p>
+                                <h3>Revisão</h3>
+                                <p>Revise todas as informações antes de salvar</p>
                             </div>
                         </div>
                         
-                        <div class="form-grid modern-grid">
-                            <div class="form-group modern-group" style="grid-column: 1 / -1;">
-                                <label class="form-label modern-label" for="eventDescription">
-                                    <i class="fas fa-file-text"></i>
-                                    Descrição
-                                </label>
-                                <div class="input-container">
-                                    <textarea id="eventDescription" class="form-textarea modern-textarea" 
-                                              rows="4" placeholder="Descreva os detalhes do evento..."></textarea>
-                                    <div class="input-feedback"></div>
+                        <div class="review-container">
+                            <div class="review-section">
+                                <h4 class="review-title">
+                                    <i class="fas fa-info-circle"></i>
+                                    Informações do Evento
+                                </h4>
+                                <div class="review-content">
+                                    <div class="review-item">
+                                        <span class="review-label">Título:</span>
+                                        <span class="review-value" id="reviewTitle">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-label">Comunidade:</span>
+                                        <span class="review-value" id="reviewCommunity">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-label">Pastoral:</span>
+                                        <span class="review-value" id="reviewPastoral">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-label">Pilares:</span>
+                                        <span class="review-value" id="reviewPilares">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-label">Local:</span>
+                                        <span class="review-value" id="reviewLocation">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-label">Ação:</span>
+                                        <span class="review-value" id="reviewAcao">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-label">Objetivo:</span>
+                                        <span class="review-value" id="reviewObjetivo">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-label">Evento Paroquial:</span>
+                                        <span class="review-value" id="reviewParoquial">-</span>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="form-group modern-group" style="grid-column: 1 / -1;">
-                                <label class="form-label modern-label" for="eventStatus">
-                                    <i class="fas fa-flag"></i>
-                                    Status do Evento
-                                </label>
-                                <div class="status-selector">
-                                    <label class="status-option">
-                                        <input type="radio" name="eventStatus" value="confirmado" checked>
-                                        <span class="status-badge confirmed">
-                                            <i class="fas fa-check"></i>
-                                            Confirmado
-                                        </span>
-                                    </label>
-                                    <label class="status-option">
-                                        <input type="radio" name="eventStatus" value="pendente">
-                                        <span class="status-badge pending">
-                                            <i class="fas fa-clock"></i>
-                                            Pendente
-                                        </span>
-                                    </label>
-                                    <label class="status-option">
-                                        <input type="radio" name="eventStatus" value="rascunho">
-                                        <span class="status-badge draft">
-                                            <i class="fas fa-edit"></i>
-                                            Rascunho
-                                        </span>
-                                    </label>
+                            <div class="review-section">
+                                <h4 class="review-title">
+                                    <i class="fas fa-clock"></i>
+                                    Horários e Status
+                                </h4>
+                                <div class="review-content">
+                                    <div class="review-item">
+                                        <span class="review-label">Data:</span>
+                                        <span class="review-value" id="reviewDate">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-label">Hora de Início:</span>
+                                        <span class="review-value" id="reviewTimeStart">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-label">Hora de Fim:</span>
+                                        <span class="review-value" id="reviewTimeEnd">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-label">Repetição:</span>
+                                        <span class="review-value" id="reviewRepeticao">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-label">Status:</span>
+                                        <span class="review-value" id="reviewStatus">-</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1282,5 +1395,144 @@
 
 .input-success .input-feedback {
     color: #10b981;
+}
+
+/* Checkbox Container */
+.checkbox-container {
+    margin-top: 8px;
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+}
+
+.checkbox-option:hover {
+    background: #f1f5f9;
+    border-color: #1e3a8a;
+}
+
+.checkbox-option input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #d1d5db;
+    border-radius: 4px;
+    background: white;
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkbox-option input[type="checkbox"]:checked + .checkbox-custom {
+    background: #1e3a8a;
+    border-color: #1e3a8a;
+}
+
+.checkbox-option input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '✓';
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.checkbox-label {
+    font-weight: 500;
+    color: #374151;
+    font-size: 14px;
+}
+
+/* Review Container */
+.review-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.review-section {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.review-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.review-title i {
+    color: #1e3a8a;
+}
+
+.review-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.review-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.review-label {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 14px;
+    min-width: 120px;
+}
+
+.review-value {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+    text-align: right;
+    flex: 1;
+    margin-left: 16px;
+}
+
+/* Responsividade para Review */
+@media (max-width: 768px) {
+    .review-container {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .review-item {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .review-value {
+        text-align: left;
+        margin-left: 0;
+    }
 }
 </style>
