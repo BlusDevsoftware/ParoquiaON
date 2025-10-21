@@ -1840,6 +1840,26 @@
                     const multplusModal = document.getElementById('multplusModal');
                     console.log('eventModal encontrado:', !!eventModal);
                     console.log('multplusModal encontrado:', !!multplusModal);
+                    
+                    // Verificar campos específicos do modal
+                    const eventTitle = document.getElementById('eventTitle');
+                    const eventCommunity = document.getElementById('eventCommunity');
+                    const eventPastoral = document.getElementById('eventPastoral');
+                    const eventPilares = document.getElementById('eventPilares');
+                    
+                    console.log('🔍 Verificando campos do modal:');
+                    console.log('- eventTitle:', !!eventTitle);
+                    console.log('- eventCommunity:', !!eventCommunity);
+                    console.log('- eventPastoral:', !!eventPastoral);
+                    console.log('- eventPilares:', !!eventPilares);
+                    
+                    // Verificar se os campos estão visíveis
+                    if (eventTitle) {
+                        console.log('🔍 Detalhes do eventTitle:');
+                        console.log('- display:', window.getComputedStyle(eventTitle).display);
+                        console.log('- visibility:', window.getComputedStyle(eventTitle).visibility);
+                        console.log('- opacity:', window.getComputedStyle(eventTitle).opacity);
+                    }
                 } else {
                     console.error('Container modals-container não encontrado');
                 }
@@ -2534,8 +2554,30 @@
             currentStep = 1;
             updateStepDisplay();
             
-            // Carregar comunidades
-            loadEventCommunities();
+            // Carregar dados nos selects
+            await loadEventModalData();
+        }
+
+        async function loadEventModalData() {
+            try {
+                console.log('🔄 Carregando dados do modal...');
+                
+                // Carregar comunidades
+                await loadEventCommunities();
+                
+                // Carregar pastorais
+                await loadEventPastorals();
+                
+                // Carregar pilares
+                await loadEventPilares();
+                
+                // Carregar ações
+                await loadEventAcoes();
+                
+                console.log('✅ Dados do modal carregados com sucesso!');
+            } catch (err) {
+                console.error('Erro ao carregar dados do modal:', err);
+            }
         }
 
         async function loadEventCommunities() {
@@ -2550,6 +2592,7 @@
                         lista.map(comunidade => 
                             `<option value="${comunidade.id}">${comunidade.nome}</option>`
                         ).join('');
+                    console.log('✅ Comunidades carregadas:', lista.length);
                 }
             } catch (err) {
                 console.error('Erro ao carregar comunidades:', err);
@@ -2557,6 +2600,63 @@
                 if (select) {
                     select.innerHTML = '<option value="">Erro ao carregar</option>';
                 }
+            }
+        }
+
+        async function loadEventPastorals() {
+            try {
+                const { data, error } = await window.api.get(window.endpoints.pastorais.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                
+                const select = document.getElementById('eventPastoral');
+                if (select) {
+                    select.innerHTML = '<option value="">Selecione a pastoral</option>' +
+                        lista.map(pastoral => 
+                            `<option value="${pastoral.id}">${pastoral.nome}</option>`
+                        ).join('');
+                    console.log('✅ Pastorais carregadas:', lista.length);
+                }
+            } catch (err) {
+                console.error('Erro ao carregar pastorais:', err);
+            }
+        }
+
+        async function loadEventPilares() {
+            try {
+                const { data, error } = await window.api.get(window.endpoints.pilares.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                
+                const select = document.getElementById('eventPilares');
+                if (select) {
+                    select.innerHTML = '<option value="">Selecione o pilar</option>' +
+                        lista.map(pilar => 
+                            `<option value="${pilar.id}">${pilar.nome}</option>`
+                        ).join('');
+                    console.log('✅ Pilares carregados:', lista.length);
+                }
+            } catch (err) {
+                console.error('Erro ao carregar pilares:', err);
+            }
+        }
+
+        async function loadEventAcoes() {
+            try {
+                const { data, error } = await window.api.get(window.endpoints.acoes.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                
+                const select = document.getElementById('eventAcao');
+                if (select) {
+                    select.innerHTML = '<option value="">Selecione a ação</option>' +
+                        lista.map(acao => 
+                            `<option value="${acao.id}">${acao.nome}</option>`
+                        ).join('');
+                    console.log('✅ Ações carregadas:', lista.length);
+                }
+            } catch (err) {
+                console.error('Erro ao carregar ações:', err);
             }
         }
 
