@@ -121,188 +121,16 @@
             box-shadow: 0 6px 20px rgba(30, 58, 138, 0.35);
         }
 
-        /* Modal Multplus */
-        .multplus-modal {
-            max-width: 900px;
-            width: 90vw;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+        /* CSS do Multplus removido - modal não disponível */
 
-        .multplus-form {
-            padding: 0;
-        }
 
-        .times-container {
-            margin-bottom: 15px;
-        }
 
-        .time-item {
-            background: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            position: relative;
-        }
 
-        .time-item:last-child {
-            margin-bottom: 0;
-        }
 
-        .remove-time {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-        }
 
-        .days-selector {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
 
-        .day-option {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            padding: 8px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-            background: white;
-        }
 
-        .day-option:hover {
-            border-color: #1e3a8a;
-            background: #f8f9fa;
-        }
 
-        .day-option input[type="checkbox"] {
-            margin: 0;
-        }
-
-        .day-option input[type="checkbox"]:checked + span {
-            color: #1e3a8a;
-            font-weight: 600;
-        }
-
-        .day-option:has(input[type="checkbox"]:checked) {
-            border-color: #1e3a8a;
-            background: #e6f2ff;
-        }
-
-        .preview-container {
-            background: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
-            min-height: 200px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .preview-placeholder {
-            text-align: center;
-            color: #666;
-            padding: 40px 20px;
-        }
-
-        .preview-placeholder i {
-            font-size: 48px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .preview-event {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
-
-        .preview-event:hover {
-            border-color: #1e3a8a;
-            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.1);
-        }
-
-        .preview-event-info {
-            flex: 1;
-        }
-
-        .preview-event-title {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        .preview-event-details {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .preview-event-date {
-            font-size: 12px;
-            color: #1e3a8a;
-            font-weight: 500;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
 
         /* Container lateral do calendário */
         .calendar-sidebar-container {
@@ -1294,85 +1122,7 @@
             opacity: 0.7;
         }
 
-        /* Modal de evento */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(6px);
-        }
-
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            max-width: 840px;
-            width: 96%;
-            max-height: 90vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-            border: 1px solid #f0f0f0;
-        }
-        .modal-body {
-            overflow-y: auto;
-            max-height: calc(90vh - 120px);
-            padding-right: 6px; /* evita sobrepor borda arredondada */
-        }
-
-        /* Layout refinado do formulário */
-        .form-section {
-            margin-bottom: 18px;
-        }
-        .section-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #374151;
-            margin: 8px 0 12px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .section-title i {
-            color: #1976d2;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .form-grid .form-group { margin-bottom: 0; }
-        @media (max-width: 600px) {
-            .form-grid { grid-template-columns: 1fr; }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .modal-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #333;
-            margin: 0;
-        }
+        /* CSS dos modais removido - modal não disponível */
 
         .close-btn {
             background: none;
@@ -1603,10 +1353,10 @@
             <div class="sidebar-content">
                 <!-- Container Lateral do Calendário -->
                 <div class="calendar-sidebar-container">
-                    <!-- Botão Criar -->
-                    <button class="create-button" onclick="openEventModal()">
+                    <!-- Botão Criar - Desabilitado -->
+                    <button class="create-button" disabled style="opacity: 0.5; cursor: not-allowed;">
                         <i class="fas fa-plus"></i>
-                        Criar
+                        Criar (Indisponível)
                     </button>
 
                     <button class="multplus-btn" onclick="openMultplusModal()">
@@ -1779,8 +1529,7 @@
         </div>
     </div>
 
-    <!-- Modais carregados dinamicamente -->
-    <div id="modals-container"></div>
+    <!-- Container de modais removido - modais não disponíveis -->
 
     <!-- Scripts -->
     <script src="scripts/auth-guard.js"></script>
@@ -1789,96 +1538,7 @@
     
     <!-- Carregar modais dinamicamente -->
     <script>
-        // Carregar modais quando a página carregar
-        document.addEventListener('DOMContentLoaded', function() {
-            loadModals();
-        });
-        
-        async function loadModals() {
-            try {
-                console.log('Carregando modais...');
-                
-                // Tentar diferentes caminhos possíveis
-                const possiblePaths = [
-                    'modais_agenda.html',
-                    './modais_agenda.html',
-                    'src/modais_agenda.html',
-                    './src/modais_agenda.html'
-                ];
-                
-                let html = '';
-                let loaded = false;
-                
-                for (const path of possiblePaths) {
-                    try {
-                        console.log(`Tentando carregar: ${path}`);
-                        const response = await fetch(path);
-                        if (response.ok) {
-                            html = await response.text();
-                            console.log(`Sucesso! HTML carregado de: ${path}`, html.length, 'caracteres');
-                            loaded = true;
-                            break;
-                        } else {
-                            console.log(`Falha ao carregar ${path}: ${response.status}`);
-                        }
-                    } catch (err) {
-                        console.log(`Erro ao carregar ${path}:`, err.message);
-                    }
-                }
-                
-                if (!loaded) {
-                    throw new Error('Não foi possível carregar o arquivo de modais em nenhum dos caminhos testados');
-                }
-                
-                const container = document.getElementById('modals-container');
-                if (container) {
-                    container.innerHTML = html;
-                    console.log('Modais inseridos no container');
-                    
-                    // Verificar se os elementos foram inseridos
-                    const eventModal = document.getElementById('eventModal');
-                    console.log('eventModal encontrado:', !!eventModal);
-                    
-                    // Verificar campos específicos do modal
-                    const eventTitle = document.getElementById('eventTitle');
-                    const eventCommunity = document.getElementById('eventCommunity');
-                    const eventPastoral = document.getElementById('eventPastoral');
-                    const eventPilares = document.getElementById('eventPilares');
-                    
-                    console.log('🔍 Verificando campos do modal:');
-                    console.log('- eventTitle:', !!eventTitle);
-                    console.log('- eventCommunity:', !!eventCommunity);
-                    console.log('- eventPastoral:', !!eventPastoral);
-                    console.log('- eventPilares:', !!eventPilares);
-                    
-                    // Verificar se os campos estão visíveis
-                    if (eventTitle) {
-                        console.log('🔍 Detalhes do eventTitle:');
-                        console.log('- display:', window.getComputedStyle(eventTitle).display);
-                        console.log('- visibility:', window.getComputedStyle(eventTitle).visibility);
-                        console.log('- opacity:', window.getComputedStyle(eventTitle).opacity);
-                    }
-                } else {
-                    console.error('Container modals-container não encontrado');
-                }
-            } catch (error) {
-                console.error('Erro ao carregar modais:', error);
-                // Fallback: inserir modais diretamente
-                const container = document.getElementById('modals-container');
-                if (container) {
-                    container.innerHTML = `
-                        <div style="padding: 20px; text-align: center; color: #ef4444;">
-                            <h3>Erro ao carregar modais</h3>
-                            <p>Os modais não puderam ser carregados. Verifique o console para mais detalhes.</p>
-                            <p>Erro: ${error.message}</p>
-                            <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                                Recarregar Página
-                            </button>
-                        </div>
-                    `;
-                }
-            }
-        }
+        // Carregamento de modais removido - modais não disponíveis
     </script>
     <script src="scripts/config/api.js"></script>
     
@@ -1948,131 +1608,15 @@
                 });
             });
 
-            // Formulário de evento
-            document.getElementById('eventForm').addEventListener('submit', handleEventSubmit);
+            // Formulário de evento - Removido (modal não disponível)
 
-            // Adicionar mais comunidade
-            const addComunidadeBtn = document.getElementById('addComunidadeBtn');
-            if (addComunidadeBtn) {
-                addComunidadeBtn.addEventListener('click', async function() {
-                    const container = document.getElementById('comunidadesContainer');
-                    if (!container) return;
-                    const placeholder = container.querySelector('[data-placeholder="comunidades"]');
-                    if (placeholder) placeholder.remove();
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'form-group';
-                    wrapper.setAttribute('data-comunidade-row', '');
-                    wrapper.innerHTML = `
-                        <label class="form-label">Comunidade</label>
-                        <select class="form-input comunidade-select"><option value="">Carregando...</option></select>
-                    `;
-                    container.insertBefore(wrapper, addComunidadeBtn.parentElement);
-                    // Popular select
-                    await loadSelectOptionsForElement(wrapper.querySelector('select'), window.endpoints.comunidades.list);
-                });
-            }
+            // Event listeners removidos - modais não disponíveis
 
-            // Adicionar horário extra
-            const addHorarioBtn = document.getElementById('addHorarioBtn');
-            if (addHorarioBtn) {
-                addHorarioBtn.addEventListener('click', function() {
-                    const container = document.getElementById('horariosContainer');
-                    if (!container) return;
-                    const placeholder = container.querySelector('[data-placeholder="horarios"]');
-                    if (placeholder) placeholder.remove();
-                    const row = document.createElement('div');
-                    row.className = 'form-grid';
-                    row.innerHTML = `
-                        <div class="form-group" data-schedule-row>
-                            <label class="form-label">Data</label>
-                            <input type="date" class="form-input" required>
-                        </div>
-                        <div class="form-group" data-schedule-row>
-                            <label class="form-label">Horário</label>
-                            <input type="time" class="form-input" required>
-                        </div>
-                        <div class="form-group" data-schedule-row>
-                            <label class="form-label">Duração (minutos)</label>
-                            <input type="number" class="form-input" value="60" min="15" max="480">
-                        </div>
-                        <div class="form-group" data-schedule-row>
-                            <label class="form-label">Recorrência</label>
-                            <div class="recurrence-group" style="display:flex; gap:6px; flex-wrap:wrap;">
-                                <button type="button" class="btn recurrence-btn" data-recurrence="nenhuma" style="background:#6b7280; color:#fff;">Nenhuma</button>
-                                <button type="button" class="btn recurrence-btn" data-recurrence="semanal" style="background:#0369a1; color:#fff;">Semanal</button>
-                                <button type="button" class="btn recurrence-btn" data-recurrence="mensal" style="background:#0f766e; color:#fff;">Mensal</button>
-                                <button type="button" class="btn recurrence-btn" data-recurrence="anual" style="background:#7c3aed; color:#fff;">Anual</button>
-                            </div>
-                            <input type="hidden" class="recurrence-value" value="nenhuma">
-                        </div>
-                        <div class="form-group" style="display:flex; align-items:flex-end;">
-                            <button type="button" class="btn btn-secondary remove-horario" title="Remover horário" style="background:#dc2626; color:#fff;">Remover</button>
-                        </div>
-                    `;
-                    container.insertBefore(row, addHorarioBtn.parentElement);
-                });
-            }
+            // Fechar modal ao clicar fora - Removido (modal não disponível)
 
-            // Fechar modal ao clicar fora
-            document.getElementById('eventModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeEventModal();
-                }
-            });
+            // Presets de duração removidos - modal não disponível
 
-            // Presets de duração
-            const durationButtons = document.querySelectorAll('[data-duration]');
-            durationButtons.forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const minutes = parseInt(btn.getAttribute('data-duration'));
-                    const input = document.getElementById('eventDuration');
-                    if (input && !Number.isNaN(minutes)) input.value = String(minutes);
-                });
-            });
-
-            // Status buttons (toggle selection)
-            const statusBtns = document.querySelectorAll('.status-btn');
-            statusBtns.forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const status = btn.getAttribute('data-status');
-                    document.getElementById('eventStatus').value = status;
-                    statusBtns.forEach(b => b.style.outline = 'none');
-                    // Visual selection by border
-                    statusBtns.forEach(b => b.style.boxShadow = 'none');
-                    btn.style.boxShadow = '0 0 0 2px rgba(0,0,0,0.15) inset';
-                });
-            });
-
-            // Recorrência por horário (toggle buttons) e remover linha
-            const horariosContainer = document.getElementById('horariosContainer');
-            if (horariosContainer) {
-                horariosContainer.addEventListener('click', function(e) {
-                const removeBtn = e.target.closest('.remove-horario');
-                if (removeBtn) {
-                    const container = document.getElementById('horariosContainer');
-                    const row = removeBtn.closest('.form-grid');
-                    if (row) row.remove();
-                    const anyRow = container.querySelector('[data-schedule-row]');
-                    if (!anyRow) {
-                        const ph = document.createElement('div');
-                        ph.className = 'form-group';
-                        ph.setAttribute('data-placeholder','horarios');
-                        ph.style.cssText = 'grid-column: 1 / -1; color:#6b7280; font-size:13px;';
-                        ph.textContent = 'Nenhum horário adicionado ainda.';
-                        container.insertBefore(ph, container.firstChild);
-                    }
-                    return;
-                }
-                const btn = e.target.closest('.recurrence-btn');
-                if (!btn) return;
-                const group = btn.closest('.form-group');
-                const hidden = group.querySelector('.recurrence-value');
-                const siblings = group.querySelectorAll('.recurrence-btn');
-                siblings.forEach(b => b.style.boxShadow = 'none');
-                btn.style.boxShadow = '0 0 0 2px rgba(0,0,0,0.15) inset';
-                if (hidden) hidden.value = btn.getAttribute('data-recurrence');
-                });
-            }
+            // Event listeners de status e horários removidos - modal não disponível
         }
 
         function updateMiniCalendar() {
@@ -2214,7 +1758,7 @@
                     
                     daySlot.addEventListener('click', () => {
                         dayDate.setHours(hour, 0, 0, 0);
-                        openEventModal(dayDate);
+                        console.log('Modal de novo agendamento não está disponível');
                     });
                     
                     calendarBody.appendChild(daySlot);
@@ -2275,7 +1819,7 @@
                         cell.appendChild(chip);
                     });
 
-                    cell.addEventListener('click', () => openEventModal(date));
+                    cell.addEventListener('click', () => console.log('Modal de novo agendamento não está disponível'));
                     calendarBody.appendChild(cell);
                 }
             }
@@ -2511,338 +2055,48 @@
             });
         }
 
-        async function openEventModal(date = null) {
-            console.log('🚀 Abrindo modal de evento...');
-            
-            // Verificar se os modais estão carregados
-            if (!areModalsLoaded()) {
-                console.log('Modais não carregados, aguardando...');
-                const loaded = await waitForModals();
-                if (!loaded) {
-                    console.error('Timeout aguardando carregamento dos modais');
-                    alert('Erro: Modais não carregados. Recarregue a página.');
-                    return;
-                }
-            }
-            
-            const modal = document.getElementById('eventModal');
-            const form = document.getElementById('eventForm');
-            
-            console.log('📋 Modal encontrado:', !!modal);
-            console.log('📝 Form encontrado:', !!form);
-            
-            form.reset();
-            if (date) {
-                const eventDate = document.getElementById('eventDate');
-                if (eventDate) {
-                    eventDate.value = date.toISOString().split('T')[0];
-                }
-                const eventTimeStart = document.getElementById('eventTimeStart');
-                if (eventTimeStart) {
-                    eventTimeStart.value = date.toTimeString().slice(0, 5);
-                }
-            } else {
-                // Definir data inicial como hoje
-                const today = new Date().toISOString().split('T')[0];
-                const eventDate = document.getElementById('eventDate');
-                if (eventDate) {
-                    eventDate.value = today;
-                }
-            }
-            
-            editingEvent = null;
-            modal.classList.add('active');
-            console.log('✅ Modal marcado como ativo');
-            
-            // Resetar steps
-            currentStep = 1;
-            console.log('🔄 Resetando para step 1');
-            updateStepDisplay();
-            
-            // Forçar exibição do primeiro step
-            setTimeout(() => {
-                const firstStep = document.querySelector('.form-step[data-step="1"]');
-                if (firstStep) {
-                    firstStep.classList.add('active');
-                    firstStep.style.cssText = 'display: block !important; opacity: 1 !important; visibility: visible !important;';
-                    console.log('🔧 Forçando exibição do primeiro step');
-                }
-                
-                // Garantir que todos os steps inativos estejam ocultos
-                document.querySelectorAll('.form-step:not(.active)').forEach(step => {
-                    step.style.cssText = 'display: none !important; opacity: 0 !important; visibility: hidden !important;';
-                });
-            }, 50);
-            
-            // Carregar dados nos selects
-            await loadEventModalData();
-            
-            // Debug: Verificar estado dos elementos
-            setTimeout(() => {
-                console.log('🔍 Debug - Estado dos elementos após carregamento:');
-                console.log('- Steps encontrados:', document.querySelectorAll('.step').length);
-                console.log('- Form steps encontrados:', document.querySelectorAll('.form-step').length);
-                console.log('- Step ativo:', document.querySelector('.step.active')?.getAttribute('data-step'));
-                console.log('- Form step ativo:', document.querySelector('.form-step.active')?.getAttribute('data-step'));
-                console.log('- Current step:', currentStep);
-                
-                // Verificar se o primeiro step está visível
-                const firstStep = document.querySelector('.form-step[data-step="1"]');
-                if (firstStep) {
-                    console.log('- Primeiro step display:', window.getComputedStyle(firstStep).display);
-                    console.log('- Primeiro step visibility:', window.getComputedStyle(firstStep).visibility);
-                    console.log('- Primeiro step opacity:', window.getComputedStyle(firstStep).opacity);
-                    console.log('- Primeiro step classes:', firstStep.className);
-                }
-            }, 100);
-            
-            console.log('✅ Modal aberto com sucesso');
+        function openEventModal(date = null) {
+            console.log('Modal de novo agendamento não está disponível');
+            alert('Modal de novo agendamento não está disponível no momento.');
         }
 
-        async function loadEventModalData() {
-            try {
-                console.log('🔄 Carregando dados do modal...');
-                
-                // Carregar comunidades
-                await loadEventCommunities();
-                
-                // Carregar pastorais
-                await loadEventPastorals();
-                
-                // Carregar pilares
-                await loadEventPilares();
-                
-                // Carregar ações
-                await loadEventAcoes();
-                
-                // Carregar locais
-                await loadEventLocais();
-                
-                console.log('✅ Dados do modal carregados com sucesso!');
-            } catch (err) {
-                console.error('Erro ao carregar dados do modal:', err);
-            }
+        function loadEventModalData() {
+            console.log('Modal de novo agendamento não está disponível');
         }
 
-        async function loadEventCommunities() {
-            try {
-                const { data, error } = await window.api.get(window.endpoints.comunidades.list);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-                
-                const select = document.getElementById('eventCommunity');
-                if (select) {
-                    select.innerHTML = '<option value="">Selecione uma comunidade</option>' +
-                        lista.map(comunidade => 
-                            `<option value="${comunidade.id}">${comunidade.nome}</option>`
-                        ).join('');
-                    console.log('✅ Comunidades carregadas:', lista.length);
-                }
-            } catch (err) {
-                console.error('Erro ao carregar comunidades:', err);
-                const select = document.getElementById('eventCommunity');
-                if (select) {
-                    select.innerHTML = '<option value="">Erro ao carregar</option>';
-                }
-            }
+        function loadEventCommunities() {
+            console.log('Modal de novo agendamento não está disponível');
         }
 
-        async function loadEventPastorals() {
-            try {
-                const { data, error } = await window.api.get(window.endpoints.pastorais.list);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-                
-                const select = document.getElementById('eventPastoral');
-                if (select) {
-                    select.innerHTML = '<option value="">Selecione a pastoral</option>' +
-                        lista.map(pastoral => 
-                            `<option value="${pastoral.id}">${pastoral.nome}</option>`
-                        ).join('');
-                    console.log('✅ Pastorais carregadas:', lista.length);
-                }
-            } catch (err) {
-                console.error('Erro ao carregar pastorais:', err);
-            }
+        function loadEventPastorals() {
+            console.log('Modal de novo agendamento não está disponível');
         }
 
-        async function loadEventPilares() {
-            try {
-                const { data, error } = await window.api.get(window.endpoints.pilares.list);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-                
-                const select = document.getElementById('eventPilares');
-                if (select) {
-                    select.innerHTML = '<option value="">Selecione o pilar</option>' +
-                        lista.map(pilar => 
-                            `<option value="${pilar.id}">${pilar.nome}</option>`
-                        ).join('');
-                    console.log('✅ Pilares carregados:', lista.length);
-                }
-            } catch (err) {
-                console.error('Erro ao carregar pilares:', err);
-            }
+        function loadEventPilares() {
+            console.log('Modal de novo agendamento não está disponível');
         }
 
-        async function loadEventAcoes() {
-            try {
-                const { data, error } = await window.api.get(window.endpoints.acoes.list);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-                
-                const select = document.getElementById('eventAcao');
-                if (select) {
-                    select.innerHTML = '<option value="">Selecione a ação</option>' +
-                        lista.map(acao => 
-                            `<option value="${acao.id}">${acao.nome}</option>`
-                        ).join('');
-                    console.log('✅ Ações carregadas:', lista.length);
-                }
-            } catch (err) {
-                console.error('Erro ao carregar ações:', err);
-            }
+        function loadEventAcoes() {
+            console.log('Modal de novo agendamento não está disponível');
         }
 
-        async function loadEventLocais() {
-            try {
-                const { data, error } = await window.api.get(window.endpoints.locais.list);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-                
-                const select = document.getElementById('eventLocation');
-                if (select) {
-                    select.innerHTML = '<option value="">Selecione um local</option>' +
-                        lista.map(local => 
-                            `<option value="${local.id}">${local.nome}</option>`
-                        ).join('');
-                    console.log('✅ Locais carregados:', lista.length);
-                }
-            } catch (err) {
-                console.error('Erro ao carregar locais:', err);
-            }
+        function loadEventLocais() {
+            console.log('Modal de novo agendamento não está disponível');
         }
 
         function closeEventModal() {
-            const modal = document.getElementById('eventModal');
-            modal.classList.remove('active');
-            editingEvent = null;
+            console.log('Modal de novo agendamento não está disponível');
         }
 
         function editEvent(event) {
-            editingEvent = event;
-            
-            document.getElementById('eventTitle').value = event.title;
-            document.getElementById('eventType').value = event.type;
-            document.getElementById('eventDate').value = event.date;
-            document.getElementById('eventTime').value = event.time;
-            document.getElementById('eventDuration').value = event.duration;
-            document.getElementById('eventLocation').value = event.location || '';
-            document.getElementById('eventDescription').value = event.description || '';
-            
-            document.getElementById('modalTitle').textContent = 'Editar Evento';
-            
-            const modal = document.getElementById('eventModal');
-            modal.classList.add('active');
+            console.log('Modal de edição não está disponível');
+            alert('Modal de edição de eventos não está disponível no momento.');
         }
 
-        async function handleEventSubmit(e) {
+        function handleEventSubmit(e) {
             e.preventDefault();
-            
-            // Coletar múltiplos horários
-            const horarios = Array.from(document.querySelectorAll('#horariosContainer [data-schedule-row]'))
-                .reduce((acc, el, idx, arr) => {
-                    // Agrupar a cada 4 (data/hora/duracao/recorrencia)
-                    if (idx % 4 === 0) {
-                        const dateEl = arr[idx].querySelector('input[type="date"]') || document.getElementById('eventDate');
-                        const timeEl = arr[idx + 1]?.querySelector('input[type="time"]') || document.getElementById('eventTime');
-                        const durEl = arr[idx + 2]?.querySelector('input[type="number"]') || document.getElementById('eventDuration');
-                        const recEl = arr[idx + 3]?.querySelector('select.recurrence-select');
-                        if (dateEl && timeEl && durEl && dateEl.value && timeEl.value) {
-                            const startLocal = new Date(`${dateEl.value}T${timeEl.value}`);
-                            const dur = parseInt(durEl.value || '60');
-                            acc.push({
-                                date: dateEl.value,
-                                time: timeEl.value,
-                                startTime: startLocal.toISOString(),
-                                endTime: new Date(startLocal.getTime() + dur * 60000).toISOString(),
-                                duration: dur,
-                                recurrence: recEl ? recEl.value : 'nenhuma'
-                            });
-                        }
-                    }
-                    return acc;
-                }, []);
-
-            const firstSchedule = horarios[0] || null;
-            const start = firstSchedule ? new Date(firstSchedule.startTime) : new Date(`${document.getElementById('eventDate').value}T${document.getElementById('eventTime').value}`);
-            const durationMin = firstSchedule ? firstSchedule.duration : parseInt(document.getElementById('eventDuration').value);
-            // Ler anexo (opcional)
-            async function readFileAsBase64(file) {
-                if (!file) return null;
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            }
-            const anexoFile = document.getElementById('eventAnexo')?.files?.[0] || null;
-            const anexoBase64 = anexoFile ? await readFileAsBase64(anexoFile) : null;
-            const formData = {
-                title: document.getElementById('eventTitle').value,
-                type: document.getElementById('eventType').value,
-                date: document.getElementById('eventDate').value,
-                time: document.getElementById('eventTime').value,
-                startTime: start.toISOString(),
-                endTime: new Date(start.getTime() + durationMin * 60000).toISOString(),
-                duration: durationMin,
-                location: document.getElementById('eventLocation').value,
-                description: document.getElementById('eventDescription').value,
-                status: document.getElementById('eventStatus').value,
-                vinculos: Array.from(document.querySelectorAll('#comunidadesContainer [data-comunidade-row]')).map(row => ({
-                    comunidade_id: (row.querySelector('.comunidade-select')?.value ? Number(row.querySelector('.comunidade-select').value) : null),
-                    pastoral_id: (document.getElementById('eventPastoral')?.value ? Number(document.getElementById('eventPastoral').value) : null),
-                    pilar_id: (document.getElementById('eventPilar')?.value ? Number(document.getElementById('eventPilar').value) : null),
-                    local_id: (document.getElementById('eventLocalSelect')?.value ? Number(document.getElementById('eventLocalSelect').value) : null),
-                    acao_id: (document.getElementById('eventAcao')?.value ? Number(document.getElementById('eventAcao').value) : null)
-                })).filter(v => v.comunidade_id || v.pastoral_id || v.pilar_id || v.local_id || v.acao_id),
-                horarios: horarios,
-                objetivo: document.getElementById('eventObjetivo').value || null,
-                paroquial: !!document.getElementById('eventParoquial').checked,
-                anexo_nome: anexoFile ? anexoFile.name : null,
-                anexo_tipo: anexoFile ? anexoFile.type : null,
-                anexo_base64: anexoBase64
-            };
-
-            if (!horarios.length) {
-                showToast('Adicione pelo menos um horário antes de salvar.', 'error');
-                return;
-            }
-            try {
-                const btn = document.getElementById('eventSubmitBtn');
-                const original = btn ? btn.innerHTML : '';
-                if (btn) { btn.disabled = true; btn.innerHTML = '<span style="width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .9s linear infinite"></span>&nbsp;&nbsp;Salvando...'; }
-                if (editingEvent && editingEvent.id != null) {
-                    const { error } = await window.api.put(window.endpoints.agenda.update(editingEvent.id), formData);
-                    if (error) throw error;
-                    showToast('Evento atualizado com sucesso!', 'success');
-            } else {
-                    const { data, error } = await window.api.post(window.endpoints.agenda.create, formData);
-                    if (error) throw error;
-                    showToast('Evento criado com sucesso!', 'success');
-            }
-
-                await loadEventsFromApi();
-            filterEventsByCommunity();
-            closeEventModal();
-            } catch (err) {
-                console.error('Erro ao salvar evento:', err);
-                showToast('Erro ao salvar evento', 'error');
-            } finally {
-                const btn = document.getElementById('eventSubmitBtn');
-                if (btn) { btn.disabled = false; btn.innerHTML = 'Salvar Evento'; }
-            }
+            console.log('Modal de novo agendamento não está disponível');
+            alert('Modal de novo agendamento não está disponível no momento.');
         }
 
         async function deleteEvent(eventId) {
@@ -3069,21 +2323,15 @@
             }
         }
 
-        async function loadAgendaLookups() {
-            await Promise.all([
-                loadSelectOptions('eventComunidade', window.endpoints.comunidades.list),
-                loadSelectOptions('eventPastoral', window.endpoints.pastorais.list),
-                loadSelectOptions('eventPilar', window.endpoints.pilares.list),
-                loadSelectOptions('eventLocalSelect', window.endpoints.locais.list),
-                loadSelectOptions('eventAcao', window.endpoints.acoes.list)
-            ]);
+        function loadAgendaLookups() {
+            console.log('Função removida - modais não disponíveis');
         }
 
 
         async function openMultplusModal() {
             console.log('Modal Multplus não está mais disponível');
             alert('Modal de múltiplos agendamentos não está disponível no momento.');
-            return;
+                    return;
             
             // Carregar comunidades no select
             loadMultplusCommunities();
@@ -3349,10 +2597,9 @@
             }
         });
 
-        // Função para verificar se os modais estão carregados
+        // Função para verificar se os modais estão carregados - Removida (modal não disponível)
         function areModalsLoaded() {
-            const eventModal = document.getElementById('eventModal');
-            return !!eventModal;
+            return false; // Modal não disponível
         }
 
         // Função para aguardar o carregamento dos modais
@@ -3368,135 +2615,10 @@
             return false;
         }
 
-        // Funções para os modais melhorados
-        let currentStep = 1;
+        // Variáveis dos modais removidas - modal não disponível
         let currentTab = 'config';
 
-        // Funções do Modal de Evento (Steps)
-        function nextStep() {
-            if (validateCurrentStep()) {
-                if (currentStep < 3) {
-                    currentStep++;
-                    updateStepDisplay();
-                }
-            }
-        }
-
-        function prevStep() {
-            if (currentStep > 1) {
-                currentStep--;
-                updateStepDisplay();
-            }
-        }
-
-        function updateStepDisplay() {
-            console.log('🔄 Atualizando display do step:', currentStep);
-            
-            // Atualizar steps
-            const steps = document.querySelectorAll('.step');
-            console.log('📊 Steps encontrados:', steps.length);
-            steps.forEach(step => {
-                step.classList.remove('active');
-            });
-            
-            const activeStep = document.querySelector(`[data-step="${currentStep}"]`);
-            console.log('🎯 Step ativo encontrado:', !!activeStep);
-            if (activeStep) {
-                activeStep.classList.add('active');
-            }
-
-            // Atualizar progress bar
-            const progressFill = document.getElementById('eventProgressFill');
-            if (progressFill) {
-                progressFill.style.width = `${(currentStep / 3) * 100}%`;
-                console.log('📈 Progress bar atualizada:', `${(currentStep / 3) * 100}%`);
-            }
-
-            // Mostrar/ocultar passos
-            const formSteps = document.querySelectorAll('.form-step');
-            console.log('📋 Form steps encontrados:', formSteps.length);
-            formSteps.forEach(step => {
-                step.classList.remove('active');
-                step.style.cssText = 'display: none !important; opacity: 0 !important; visibility: hidden !important;';
-                console.log('❌ Removendo active de:', step.getAttribute('data-step'));
-            });
-            
-            const activeFormStep = document.querySelector(`.form-step[data-step="${currentStep}"]`);
-            console.log('✅ Form step ativo encontrado:', !!activeFormStep);
-            if (activeFormStep) {
-                activeFormStep.classList.add('active');
-                activeFormStep.style.cssText = 'display: block !important; opacity: 1 !important; visibility: visible !important;';
-                console.log('✅ Adicionando active ao step:', currentStep);
-            }
-
-            // Atualizar botões
-            const prevBtn = document.getElementById('prevStepBtn');
-            const nextBtn = document.getElementById('nextStepBtn');
-            const submitBtn = document.getElementById('eventSubmitBtn');
-
-            if (prevBtn) prevBtn.style.display = currentStep > 1 ? 'flex' : 'none';
-            if (nextBtn) nextBtn.style.display = currentStep < 3 ? 'flex' : 'none';
-            if (submitBtn) submitBtn.style.display = currentStep === 3 ? 'flex' : 'none';
-
-            // Atualizar revisão se estiver no passo 3
-            if (currentStep === 3) {
-                updateReview();
-            }
-            
-            console.log('✅ UpdateStepDisplay concluído');
-        }
-
-        function updateReview() {
-            // Atualizar informações do evento
-            const title = document.getElementById('eventTitle')?.value || '-';
-            const community = document.getElementById('eventCommunity')?.selectedOptions[0]?.text || '-';
-            const pastoral = document.getElementById('eventPastoral')?.selectedOptions[0]?.text || '-';
-            const pilares = document.getElementById('eventPilares')?.selectedOptions[0]?.text || '-';
-            const location = document.getElementById('eventLocation')?.value || '-';
-            const acao = document.getElementById('eventAcao')?.value || '-';
-            const objetivo = document.getElementById('eventObjetivo')?.value || '-';
-            const paroquial = document.getElementById('eventParoquial')?.checked ? 'Sim' : 'Não';
-
-            // Atualizar horários e status
-            const date = document.getElementById('eventDate')?.value || '-';
-            const timeStart = document.getElementById('eventTimeStart')?.value || '-';
-            const timeEnd = document.getElementById('eventTimeEnd')?.value || '-';
-            const repeticao = document.getElementById('eventRepeticao')?.selectedOptions[0]?.text || '-';
-            const status = document.getElementById('eventStatus')?.selectedOptions[0]?.text || '-';
-
-            // Aplicar valores na revisão
-            document.getElementById('reviewTitle').textContent = title;
-            document.getElementById('reviewCommunity').textContent = community;
-            document.getElementById('reviewPastoral').textContent = pastoral;
-            document.getElementById('reviewPilares').textContent = pilares;
-            document.getElementById('reviewLocation').textContent = location;
-            document.getElementById('reviewAcao').textContent = acao;
-            document.getElementById('reviewObjetivo').textContent = objetivo;
-            document.getElementById('reviewParoquial').textContent = paroquial;
-
-            document.getElementById('reviewDate').textContent = date;
-            document.getElementById('reviewTimeStart').textContent = timeStart;
-            document.getElementById('reviewTimeEnd').textContent = timeEnd;
-            document.getElementById('reviewRepeticao').textContent = repeticao;
-            document.getElementById('reviewStatus').textContent = status;
-        }
-
-        function validateCurrentStep() {
-            const currentStepElement = document.querySelector(`[data-step="${currentStep}"]`);
-            const requiredInputs = currentStepElement.querySelectorAll('input[required], select[required]');
-            
-            let isValid = true;
-            requiredInputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    showInputError(input, 'Este campo é obrigatório');
-                } else {
-                    clearInputError(input);
-                }
-            });
-
-            return isValid;
-        }
+        // Funções do Modal de Evento removidas - modal não disponível
 
         // Funções do Modal Multplus (Tabs)
         function nextTab() {
@@ -3559,31 +2681,7 @@
             return isValid;
         }
 
-        // Funções de validação
-        function showInputError(input, message) {
-            const container = input.closest('.input-container');
-            const feedback = container.querySelector('.input-feedback');
-            
-            container.classList.add('input-error');
-            container.classList.remove('input-success');
-            
-            if (feedback) {
-                feedback.textContent = message;
-                feedback.classList.add('show');
-            }
-        }
-
-        function clearInputError(input) {
-            const container = input.closest('.input-container');
-            const feedback = container.querySelector('.input-feedback');
-            
-            container.classList.remove('input-error');
-            container.classList.add('input-success');
-            
-            if (feedback) {
-                feedback.classList.remove('show');
-            }
-        }
+        // Funções de validação removidas - modal não disponível
 
         // Event listeners para tabs
         document.addEventListener('DOMContentLoaded', function() {
@@ -3771,7 +2869,7 @@
                 // Adicionar click para criar evento
                 daySlot.addEventListener('click', (e) => {
                     if (e.target === daySlot) {
-                        openEventModal(currentDate, `${hour.toString().padStart(2, '0')}:00`);
+                        console.log('Modal de novo agendamento não está disponível');
                     }
                 });
 
