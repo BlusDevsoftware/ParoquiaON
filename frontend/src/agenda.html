@@ -2514,6 +2514,8 @@
         }
 
         async function openEventModal(date = null) {
+            console.log('🚀 Abrindo modal de evento...');
+            
             // Verificar se os modais estão carregados
             if (!areModalsLoaded()) {
                 console.log('Modais não carregados, aguardando...');
@@ -2527,6 +2529,9 @@
             
             const modal = document.getElementById('eventModal');
             const form = document.getElementById('eventForm');
+            
+            console.log('📋 Modal encontrado:', !!modal);
+            console.log('📝 Form encontrado:', !!form);
             
             form.reset();
             if (date) {
@@ -2549,13 +2554,51 @@
             
             editingEvent = null;
             modal.classList.add('active');
+            console.log('✅ Modal marcado como ativo');
             
             // Resetar steps
             currentStep = 1;
+            console.log('🔄 Resetando para step 1');
             updateStepDisplay();
+            
+            // Forçar exibição do primeiro step
+            setTimeout(() => {
+                const firstStep = document.querySelector('.form-step[data-step="1"]');
+                if (firstStep) {
+                    firstStep.classList.add('active');
+                    firstStep.style.cssText = 'display: block !important; opacity: 1 !important; visibility: visible !important;';
+                    console.log('🔧 Forçando exibição do primeiro step');
+                }
+                
+                // Garantir que todos os steps inativos estejam ocultos
+                document.querySelectorAll('.form-step:not(.active)').forEach(step => {
+                    step.style.cssText = 'display: none !important; opacity: 0 !important; visibility: hidden !important;';
+                });
+            }, 50);
             
             // Carregar dados nos selects
             await loadEventModalData();
+            
+            // Debug: Verificar estado dos elementos
+            setTimeout(() => {
+                console.log('🔍 Debug - Estado dos elementos após carregamento:');
+                console.log('- Steps encontrados:', document.querySelectorAll('.step').length);
+                console.log('- Form steps encontrados:', document.querySelectorAll('.form-step').length);
+                console.log('- Step ativo:', document.querySelector('.step.active')?.getAttribute('data-step'));
+                console.log('- Form step ativo:', document.querySelector('.form-step.active')?.getAttribute('data-step'));
+                console.log('- Current step:', currentStep);
+                
+                // Verificar se o primeiro step está visível
+                const firstStep = document.querySelector('.form-step[data-step="1"]');
+                if (firstStep) {
+                    console.log('- Primeiro step display:', window.getComputedStyle(firstStep).display);
+                    console.log('- Primeiro step visibility:', window.getComputedStyle(firstStep).visibility);
+                    console.log('- Primeiro step opacity:', window.getComputedStyle(firstStep).opacity);
+                    console.log('- Primeiro step classes:', firstStep.className);
+                }
+            }, 100);
+            
+            console.log('✅ Modal aberto com sucesso');
         }
 
         async function loadEventModalData() {
@@ -3313,35 +3356,60 @@
         }
 
         function updateStepDisplay() {
+            console.log('🔄 Atualizando display do step:', currentStep);
+            
             // Atualizar steps
-            document.querySelectorAll('.step').forEach(step => {
+            const steps = document.querySelectorAll('.step');
+            console.log('📊 Steps encontrados:', steps.length);
+            steps.forEach(step => {
                 step.classList.remove('active');
             });
-            document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+            
+            const activeStep = document.querySelector(`[data-step="${currentStep}"]`);
+            console.log('🎯 Step ativo encontrado:', !!activeStep);
+            if (activeStep) {
+                activeStep.classList.add('active');
+            }
 
             // Atualizar progress bar
             const progressFill = document.getElementById('eventProgressFill');
-            progressFill.style.width = `${(currentStep / 3) * 100}%`;
+            if (progressFill) {
+                progressFill.style.width = `${(currentStep / 3) * 100}%`;
+                console.log('📈 Progress bar atualizada:', `${(currentStep / 3) * 100}%`);
+            }
 
             // Mostrar/ocultar passos
-            document.querySelectorAll('.form-step').forEach(step => {
+            const formSteps = document.querySelectorAll('.form-step');
+            console.log('📋 Form steps encontrados:', formSteps.length);
+            formSteps.forEach(step => {
                 step.classList.remove('active');
+                step.style.cssText = 'display: none !important; opacity: 0 !important; visibility: hidden !important;';
+                console.log('❌ Removendo active de:', step.getAttribute('data-step'));
             });
-            document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+            
+            const activeFormStep = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            console.log('✅ Form step ativo encontrado:', !!activeFormStep);
+            if (activeFormStep) {
+                activeFormStep.classList.add('active');
+                activeFormStep.style.cssText = 'display: block !important; opacity: 1 !important; visibility: visible !important;';
+                console.log('✅ Adicionando active ao step:', currentStep);
+            }
 
             // Atualizar botões
             const prevBtn = document.getElementById('prevStepBtn');
             const nextBtn = document.getElementById('nextStepBtn');
             const submitBtn = document.getElementById('eventSubmitBtn');
 
-            prevBtn.style.display = currentStep > 1 ? 'flex' : 'none';
-            nextBtn.style.display = currentStep < 3 ? 'flex' : 'none';
-            submitBtn.style.display = currentStep === 3 ? 'flex' : 'none';
+            if (prevBtn) prevBtn.style.display = currentStep > 1 ? 'flex' : 'none';
+            if (nextBtn) nextBtn.style.display = currentStep < 3 ? 'flex' : 'none';
+            if (submitBtn) submitBtn.style.display = currentStep === 3 ? 'flex' : 'none';
 
             // Atualizar revisão se estiver no passo 3
             if (currentStep === 3) {
                 updateReview();
             }
+            
+            console.log('✅ UpdateStepDisplay concluído');
         }
 
         function updateReview() {

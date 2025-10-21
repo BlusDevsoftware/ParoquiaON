@@ -860,8 +860,8 @@
 }
 
 .step.active {
-    background: #1e3a8a;
-    color: white;
+    background: #1e3a8a !important;
+    color: white !important;
 }
 
 .step-number {
@@ -896,12 +896,43 @@
 }
 
 .form-step {
-    display: none;
+    display: none !important;
     animation: fadeIn 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
 }
 
 .form-step.active {
-    display: block;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Garantir que os steps sejam visíveis */
+#eventModal .form-step[data-step="1"] {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+#eventModal .form-step.active {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* CSS adicional para garantir funcionamento */
+.modern-modal .form-step {
+    display: none !important;
+}
+
+.modern-modal .form-step.active {
+    display: block !important;
+}
+
+/* Forçar exibição do primeiro step por padrão */
+.modern-modal .form-step[data-step="1"] {
+    display: block !important;
 }
 
 @keyframes fadeIn {
