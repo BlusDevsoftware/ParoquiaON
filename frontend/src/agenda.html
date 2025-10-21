@@ -1837,9 +1837,7 @@
                     
                     // Verificar se os elementos foram inseridos
                     const eventModal = document.getElementById('eventModal');
-                    const multplusModal = document.getElementById('multplusModal');
                     console.log('eventModal encontrado:', !!eventModal);
-                    console.log('multplusModal encontrado:', !!multplusModal);
                     
                     // Verificar campos específicos do modal
                     const eventTitle = document.getElementById('eventTitle');
@@ -3083,19 +3081,9 @@
 
 
         async function openMultplusModal() {
-            // Verificar se os modais estão carregados
-            if (!areModalsLoaded()) {
-                console.log('Modais não carregados, aguardando...');
-                const loaded = await waitForModals();
-                if (!loaded) {
-                    console.error('Timeout aguardando carregamento dos modais');
-                    alert('Erro: Modais não carregados. Recarregue a página.');
-                    return;
-                }
-            }
-            
-            const modal = document.getElementById('multplusModal');
-            modal.classList.add('active');
+            console.log('Modal Multplus não está mais disponível');
+            alert('Modal de múltiplos agendamentos não está disponível no momento.');
+            return;
             
             // Carregar comunidades no select
             loadMultplusCommunities();
@@ -3127,8 +3115,7 @@
         }
 
         function closeMultplusModal() {
-            const modal = document.getElementById('multplusModal');
-            modal.classList.remove('active');
+            console.log('Modal Multplus não está mais disponível');
         }
 
         async function loadMultplusCommunities() {
@@ -3365,8 +3352,7 @@
         // Função para verificar se os modais estão carregados
         function areModalsLoaded() {
             const eventModal = document.getElementById('eventModal');
-            const multplusModal = document.getElementById('multplusModal');
-            return !!(eventModal && multplusModal);
+            return !!eventModal;
         }
 
         // Função para aguardar o carregamento dos modais
