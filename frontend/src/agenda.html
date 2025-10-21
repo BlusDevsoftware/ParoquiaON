@@ -2617,6 +2617,9 @@
                 // Carregar ações
                 await loadEventAcoes();
                 
+                // Carregar locais
+                await loadEventLocais();
+                
                 console.log('✅ Dados do modal carregados com sucesso!');
             } catch (err) {
                 console.error('Erro ao carregar dados do modal:', err);
@@ -2700,6 +2703,25 @@
                 }
             } catch (err) {
                 console.error('Erro ao carregar ações:', err);
+            }
+        }
+
+        async function loadEventLocais() {
+            try {
+                const { data, error } = await window.api.get(window.endpoints.locais.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                
+                const select = document.getElementById('eventLocation');
+                if (select) {
+                    select.innerHTML = '<option value="">Selecione um local</option>' +
+                        lista.map(local => 
+                            `<option value="${local.id}">${local.nome}</option>`
+                        ).join('');
+                    console.log('✅ Locais carregados:', lista.length);
+                }
+            } catch (err) {
+                console.error('Erro ao carregar locais:', err);
             }
         }
 
@@ -3078,6 +3100,9 @@
             // Carregar comunidades no select
             loadMultplusCommunities();
             
+            // Carregar locais no select
+            loadMultplusLocais();
+            
             // Definir data inicial como hoje
             const today = new Date().toISOString().split('T')[0];
             const startDate = document.getElementById('multplusStartDate');
@@ -3122,6 +3147,29 @@
             } catch (err) {
                 console.error('Erro ao carregar comunidades:', err);
                 const select = document.getElementById('multplusCommunity');
+                if (select) {
+                    select.innerHTML = '<option value="">Erro ao carregar</option>';
+                }
+            }
+        }
+
+        async function loadMultplusLocais() {
+            try {
+                const { data, error } = await window.api.get(window.endpoints.locais.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                
+                const select = document.getElementById('multplusLocation');
+                if (select) {
+                    select.innerHTML = '<option value="">Selecione um local</option>' +
+                        lista.map(local => 
+                            `<option value="${local.id}">${local.nome}</option>`
+                        ).join('');
+                    console.log('✅ Locais carregados no Multplus:', lista.length);
+                }
+            } catch (err) {
+                console.error('Erro ao carregar locais no Multplus:', err);
+                const select = document.getElementById('multplusLocation');
                 if (select) {
                     select.innerHTML = '<option value="">Erro ao carregar</option>';
                 }
