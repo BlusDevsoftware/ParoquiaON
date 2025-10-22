@@ -405,49 +405,43 @@
 
         /* Estilos específicos para selects */
         .form-group select {
-            max-height: 220px !important; /* altura maior para aparecer o scroll */
+            max-height: 200px !important;
             overflow-y: auto !important;
             background-color: white;
             cursor: pointer;
             height: auto !important;
-            border-radius: 10px; /* cantos arredondados */
-            scrollbar-width: thin; /* Firefox */
-            scrollbar-color: #9ca3af #e6e6e6; /* Firefox: polegar e trilha */
         }
 
         /* Forçar altura máxima para todos os selects do modal */
         #eventModal select {
-            max-height: 220px !important; /* altura maior para aparecer o scroll */
+            max-height: 200px !important;
             overflow-y: auto !important;
             height: auto !important;
-            border-radius: 10px; /* cantos arredondados no modal */
-            scrollbar-width: thin; /* Firefox */
-            scrollbar-color: #9ca3af #e6e6e6; /* Firefox: polegar e trilha */
         }
 
         /* Estilo específico para selects com muitas opções */
         select[size] {
-            max-height: 220px !important;
+            max-height: 200px !important;
             overflow-y: auto !important;
         }
 
         /* Scrollbar personalizado para selects */
         .form-group select::-webkit-scrollbar {
-            width: 10px; /* mais visível */
+            width: 8px;
         }
 
         .form-group select::-webkit-scrollbar-track {
-            background: #e6e6e6; /* trilha mais destacada */
-            border-radius: 8px;
+            background: #f1f1f1;
+            border-radius: 4px;
         }
 
         .form-group select::-webkit-scrollbar-thumb {
-            background: #9ca3af; /* polegar mais escuro */
-            border-radius: 8px;
+            background: #c1c1c1;
+            border-radius: 4px;
         }
 
         .form-group select::-webkit-scrollbar-thumb:hover {
-            background: #6b7280; /* hover ainda mais visível */
+            background: #a8a8a8;
         }
 
         /* Limitar altura das opções do select */
@@ -481,11 +475,87 @@
             min-height: 40px !important;
         }
 
+        /* Select customizado com busca (apenas dentro do modal) */
+        #eventModal .custom-select {
+            position: relative;
+        }
+
+        #eventModal .custom-select.is-hidden-original select {
+            display: none;
+        }
+
+        #eventModal .custom-select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            color: #333;
+        }
+
+        #eventModal .custom-select-trigger:hover {
+            border-color: #1e3a8a;
+        }
+
+        #eventModal .custom-select-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 10;
+            display: none;
+        }
+
+        #eventModal .custom-select.open .custom-select-menu {
+            display: block;
+        }
+
+        #eventModal .custom-select-search {
+            padding: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        #eventModal .custom-select-search input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        #eventModal .custom-select-list {
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        #eventModal .custom-select-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f8f8;
+        }
+
+        #eventModal .custom-select-item:hover {
+            background: #f8f9fa;
+        }
+
+        #eventModal .custom-select-item.is-selected {
+            background: #eff6ff;
+            color: #1e3a8a;
+        }
+
         /* Responsivo para selects */
         @media (max-width: 768px) {
             .form-group select,
             #eventModal select {
-                max-height: 180px !important; /* altura mobile ajustada */
+                max-height: 150px !important;
             }
         }
 
@@ -2909,11 +2979,137 @@
                     select.style.overflowY = 'auto';
                     select.style.height = 'auto';
                 });
+
+                // Inicializar selects customizados com busca
+                initializeCustomSelects('#eventModal');
             }).catch(error => {
                 console.error('❌ Erro ao carregar dados dos selects:', error);
             });
             
             console.log('✅ Modal de novo agendamento criado e exibido');
+        }
+
+        // Utilitário: inicializa selects customizados com busca no container
+        function initializeCustomSelects(containerSelector) {
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+
+            const nativeSelects = container.querySelectorAll('select');
+            nativeSelects.forEach(select => makeCustomSelect(select));
+        }
+
+        // Cria um dropdown customizado sincronizado com o select nativo
+        function makeCustomSelect(nativeSelect) {
+            if (!nativeSelect || nativeSelect.dataset.enhanced === 'true') return;
+
+            // Wrapper
+            const wrapper = document.createElement('div');
+            wrapper.className = 'custom-select is-hidden-original';
+
+            // Trigger (mostra o valor selecionado)
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'custom-select-trigger';
+            trigger.innerHTML = `<span class="label">${getSelectedOptionText(nativeSelect) || 'Selecione'}</span><i class="fas fa-chevron-down"></i>`;
+
+            // Menu
+            const menu = document.createElement('div');
+            menu.className = 'custom-select-menu';
+
+            // Campo de busca
+            const searchBox = document.createElement('div');
+            searchBox.className = 'custom-select-search';
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Buscar...';
+            searchBox.appendChild(searchInput);
+
+            // Lista de itens
+            const list = document.createElement('div');
+            list.className = 'custom-select-list';
+
+            // Monta itens iniciais
+            const buildItems = () => {
+                list.innerHTML = '';
+                Array.from(nativeSelect.options).forEach((opt, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'custom-select-item' + (opt.selected ? ' is-selected' : '');
+                    item.dataset.value = opt.value;
+                    item.textContent = opt.textContent;
+                    item.addEventListener('click', () => {
+                        // Atualiza select nativo
+                        nativeSelect.value = opt.value;
+                        nativeSelect.dispatchEvent(new Event('change'));
+                        // Atualiza UI
+                        list.querySelectorAll('.custom-select-item').forEach(el => el.classList.remove('is-selected'));
+                        item.classList.add('is-selected');
+                        trigger.querySelector('.label').textContent = opt.textContent || 'Selecione';
+                        wrapper.classList.remove('open');
+                    });
+                    // Oculta opção placeholder no menu, mas mantém no select
+                    if (index === 0 && opt.value === '') {
+                        item.style.display = 'none';
+                    }
+                    list.appendChild(item);
+                });
+            };
+            buildItems();
+
+            // Filtragem
+            searchInput.addEventListener('input', () => {
+                const term = searchInput.value.trim().toLowerCase();
+                list.querySelectorAll('.custom-select-item').forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    const match = text.includes(term);
+                    item.style.display = match ? '' : 'none';
+                });
+            });
+
+            // Abrir/fechar
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Fecha outros
+                document.querySelectorAll('#eventModal .custom-select.open').forEach(cs => {
+                    if (cs !== wrapper) cs.classList.remove('open');
+                });
+                wrapper.classList.toggle('open');
+                if (wrapper.classList.contains('open')) {
+                    // Foco no campo de busca
+                    setTimeout(() => searchInput.focus(), 0);
+                }
+            });
+
+            // Fechar ao clicar fora
+            document.addEventListener('click', (e) => {
+                if (!wrapper.contains(e.target)) {
+                    wrapper.classList.remove('open');
+                }
+            });
+
+            // Sincronizar quando o select mudar por script
+            nativeSelect.addEventListener('change', () => {
+                const selectedText = getSelectedOptionText(nativeSelect) || 'Selecione';
+                trigger.querySelector('.label').textContent = selectedText;
+                list.querySelectorAll('.custom-select-item').forEach(el => {
+                    el.classList.toggle('is-selected', el.dataset.value === nativeSelect.value);
+                });
+            });
+
+            // Inserir na DOM: envolve o select com o wrapper
+            nativeSelect.parentNode.insertBefore(wrapper, nativeSelect);
+            wrapper.appendChild(nativeSelect);
+            wrapper.appendChild(trigger);
+            menu.appendChild(searchBox);
+            menu.appendChild(list);
+            wrapper.appendChild(menu);
+
+            // Marcar como melhorado
+            nativeSelect.dataset.enhanced = 'true';
+        }
+
+        function getSelectedOptionText(selectEl) {
+            const opt = selectEl.selectedOptions && selectEl.selectedOptions[0];
+            return opt ? opt.textContent : '';
         }
 
         function loadEventModalData() {
