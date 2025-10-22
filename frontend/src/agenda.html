@@ -499,12 +499,14 @@
             border: 1px solid #e5e7eb;
             border-radius: 6px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            z-index: 10;
+            z-index: 1000;
             display: none;
         }
 
         #eventModal .search-select-field.open .search-select-menu {
-            display: block;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         #eventModal .search-select-list {
@@ -3092,7 +3094,10 @@
             // Monta itens iniciais
             const buildItems = () => {
                 list.innerHTML = '';
-                Array.from(nativeSelect.options).forEach((opt) => {
+                const options = Array.from(nativeSelect.options);
+                console.log('🔍 Opções encontradas no select:', options.length, options.map(o => o.textContent));
+                
+                options.forEach((opt) => {
                     const text = (opt.textContent || '').trim();
                     const isPlaceholder = opt.value === '' || /^\s*selecione/i.test(text);
                     if (isPlaceholder) return;
@@ -3113,6 +3118,18 @@
                     });
                     list.appendChild(item);
                 });
+                
+                console.log('📋 Itens criados na lista:', list.children.length);
+                
+                // Se não há itens, mostrar mensagem de erro
+                if (list.children.length === 0) {
+                    const errorItem = document.createElement('div');
+                    errorItem.className = 'search-select-item';
+                    errorItem.textContent = 'Nenhuma opção disponível';
+                    errorItem.style.color = '#666';
+                    errorItem.style.fontStyle = 'italic';
+                    list.appendChild(errorItem);
+                }
             };
             buildItems();
 
