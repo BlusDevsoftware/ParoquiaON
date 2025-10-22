@@ -33,12 +33,7 @@ async function listarEventos(req, res) {
                 acoes (
                     id,
                     nome,
-                    descricao,
-                    pilares (
-                        id,
-                        nome,
-                        cor
-                    )
+                    descricao
                 ),
                 pessoas!responsavel_id (
                     id,
@@ -99,12 +94,7 @@ async function buscarEvento(req, res) {
                 acoes (
                     id,
                     nome,
-                    descricao,
-                    pilares (
-                        id,
-                        nome,
-                        cor
-                    )
+                    descricao
                 ),
                 pessoas!responsavel_id (
                     id,
@@ -175,12 +165,7 @@ async function criarEvento(req, res) {
                 acoes (
                     id,
                     nome,
-                    descricao,
-                    pilares (
-                        id,
-                        nome,
-                        cor
-                    )
+                    descricao
                 ),
                 pessoas!responsavel_id (
                     id,
@@ -238,12 +223,7 @@ async function atualizarEvento(req, res) {
                 acoes (
                     id,
                     nome,
-                    descricao,
-                    pilares (
-                        id,
-                        nome,
-                        cor
-                    )
+                    descricao
                 ),
                 pessoas!responsavel_id (
                     id,
