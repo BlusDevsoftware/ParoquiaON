@@ -476,32 +476,33 @@
         }
 
         /* Select customizado com busca (apenas dentro do modal) */
-        #eventModal .custom-select {
+        /* Campo de busca/seleção direto (substitui o select) */
+        #eventModal .search-select-field {
             position: relative;
+            width: 100%;
         }
 
-        #eventModal .custom-select.is-hidden-original select {
-            display: none;
-        }
-
-        #eventModal .custom-select-trigger {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        #eventModal .search-select-field input {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
             background: #fff;
-            cursor: pointer;
             color: #333;
+            font-size: 14px;
         }
 
-        #eventModal .custom-select-trigger:hover {
+        #eventModal .search-select-field input:hover {
             border-color: #1e3a8a;
         }
 
-        #eventModal .custom-select-menu {
+        #eventModal .search-select-field input:focus {
+            border-color: #1e3a8a;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
+        }
+
+        #eventModal .search-select-menu {
             position: absolute;
             top: calc(100% + 6px);
             left: 0;
@@ -514,41 +515,113 @@
             display: none;
         }
 
-        #eventModal .custom-select.open .custom-select-menu {
+        #eventModal .search-select-field.open .search-select-menu {
             display: block;
         }
 
-        #eventModal .custom-select-search {
-            padding: 8px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        #eventModal .custom-select-search input {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        #eventModal .custom-select-list {
+        #eventModal .search-select-list {
             max-height: 220px;
             overflow-y: auto;
         }
 
-        #eventModal .custom-select-item {
+        #eventModal .search-select-item {
             padding: 10px 12px;
             cursor: pointer;
             border-bottom: 1px solid #f8f8f8;
         }
 
-        #eventModal .custom-select-item:hover {
+        #eventModal .search-select-item:hover {
             background: #f8f9fa;
         }
 
-        #eventModal .custom-select-item.is-selected {
+        #eventModal .search-select-item.is-selected {
             background: #eff6ff;
             color: #1e3a8a;
+        }
+
+        /* Mini-calendário */
+        #eventModal .mini-calendar {
+            padding: 16px;
+            font-size: 14px;
+        }
+
+        #eventModal .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        #eventModal .calendar-nav {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        #eventModal .calendar-nav:hover {
+            background: #f0f0f0;
+        }
+
+        #eventModal .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #666;
+            text-align: center;
+        }
+
+        #eventModal .calendar-weekdays > div {
+            padding: 8px 4px;
+            font-size: 12px;
+        }
+
+        #eventModal .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        #eventModal .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+
+        #eventModal .calendar-day:hover {
+            background: #f0f0f0;
+        }
+
+        #eventModal .calendar-day.today {
+            background: #1e3a8a;
+            color: white;
+            font-weight: 600;
+        }
+
+        #eventModal .calendar-day.selected {
+            background: #1e3a8a;
+            color: white;
+            font-weight: 600;
+        }
+
+        #eventModal .calendar-day.other-month {
+            color: #ccc;
+            cursor: default;
+        }
+
+        #eventModal .calendar-day.other-month:hover {
+            background: transparent;
         }
 
         /* Responsivo para selects */
@@ -2994,123 +3067,667 @@
             const container = document.querySelector(containerSelector);
             if (!container) return;
 
+            // Aplicar aos selects
             const nativeSelects = container.querySelectorAll('select');
             nativeSelects.forEach(select => makeCustomSelect(select));
+            
+            // Aplicar aos campos de data
+            const dateInputs = container.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(input => makeCustomDateField(input));
+            
+            // Aplicar aos campos de hora
+            const timeInputs = container.querySelectorAll('input[type="time"]');
+            timeInputs.forEach(input => makeCustomTimeField(input));
         }
 
-        // Cria um dropdown customizado sincronizado com o select nativo
+        // Cria um campo de busca/seleção direto (substitui o select)
         function makeCustomSelect(nativeSelect) {
             if (!nativeSelect || nativeSelect.dataset.enhanced === 'true') return;
 
-            // Wrapper
-            const wrapper = document.createElement('div');
-            wrapper.className = 'custom-select is-hidden-original';
+            // Campo de busca direto
+            const field = document.createElement('div');
+            field.className = 'search-select-field';
 
-            // Trigger (mostra o valor selecionado)
-            const trigger = document.createElement('button');
-            trigger.type = 'button';
-            trigger.className = 'custom-select-trigger';
-            trigger.innerHTML = `<span class="label">${getSelectedOptionText(nativeSelect) || 'Selecione'}</span><i class="fas fa-chevron-down"></i>`;
+            const input = document.createElement('input');
+            input.type = 'text';
+            const firstOptionText = (nativeSelect.options && nativeSelect.options[0] && nativeSelect.options[0].textContent) || 'Selecione';
+            input.placeholder = firstOptionText;
+            const selectedOpt = nativeSelect.selectedOptions && nativeSelect.selectedOptions[0];
+            input.value = selectedOpt && selectedOpt.value !== '' ? (selectedOpt.textContent || '') : '';
 
-            // Menu
+            // Menu de opções
             const menu = document.createElement('div');
-            menu.className = 'custom-select-menu';
+            menu.className = 'search-select-menu';
 
-            // Campo de busca
-            const searchBox = document.createElement('div');
-            searchBox.className = 'custom-select-search';
-            const searchInput = document.createElement('input');
-            searchInput.type = 'text';
-            searchInput.placeholder = 'Buscar...';
-            searchBox.appendChild(searchInput);
-
-            // Lista de itens
             const list = document.createElement('div');
-            list.className = 'custom-select-list';
+            list.className = 'search-select-list';
 
             // Monta itens iniciais
             const buildItems = () => {
                 list.innerHTML = '';
-                Array.from(nativeSelect.options).forEach((opt, index) => {
+                Array.from(nativeSelect.options).forEach((opt) => {
+                    const text = (opt.textContent || '').trim();
+                    const isPlaceholder = opt.value === '' || /^\s*selecione/i.test(text);
+                    if (isPlaceholder) return;
+
                     const item = document.createElement('div');
-                    item.className = 'custom-select-item' + (opt.selected ? ' is-selected' : '');
+                    item.className = 'search-select-item' + (opt.selected ? ' is-selected' : '');
                     item.dataset.value = opt.value;
-                    item.textContent = opt.textContent;
+                    item.textContent = text;
                     item.addEventListener('click', () => {
                         // Atualiza select nativo
                         nativeSelect.value = opt.value;
                         nativeSelect.dispatchEvent(new Event('change'));
                         // Atualiza UI
-                        list.querySelectorAll('.custom-select-item').forEach(el => el.classList.remove('is-selected'));
+                        list.querySelectorAll('.search-select-item').forEach(el => el.classList.remove('is-selected'));
                         item.classList.add('is-selected');
-                        trigger.querySelector('.label').textContent = opt.textContent || 'Selecione';
-                        wrapper.classList.remove('open');
+                        input.value = opt.textContent || '';
+                        field.classList.remove('open');
                     });
-                    // Oculta opção placeholder no menu, mas mantém no select
-                    if (index === 0 && opt.value === '') {
-                        item.style.display = 'none';
-                    }
                     list.appendChild(item);
                 });
             };
             buildItems();
 
-            // Filtragem
-            searchInput.addEventListener('input', () => {
-                const term = searchInput.value.trim().toLowerCase();
-                list.querySelectorAll('.custom-select-item').forEach(item => {
+            // Máscara de formatação e filtragem
+            input.addEventListener('input', (e) => {
+                let value = e.target.value;
+                
+                // Aplicar máscara HH:MM apenas se estiver digitando números
+                if (value.length > 0 && /^\d/.test(value)) {
+                    // Remover caracteres não numéricos
+                    value = value.replace(/\D/g, '');
+                    
+                    // Aplicar máscara HH:MM
+                    if (value.length >= 2) {
+                        value = value.substring(0, 2) + ':' + value.substring(2, 4);
+                    }
+                    
+                    // Limitar a 5 caracteres (HH:MM)
+                    if (value.length > 5) {
+                        value = value.substring(0, 5);
+                    }
+                    
+                    e.target.value = value;
+                }
+                
+                // Filtragem por texto para a lista de horários
+                const term = value.trim().toLowerCase();
+                list.querySelectorAll('.search-select-item').forEach(item => {
                     const text = item.textContent.toLowerCase();
                     const match = text.includes(term);
                     item.style.display = match ? '' : 'none';
                 });
             });
 
-            // Abrir/fechar
-            trigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Fecha outros
-                document.querySelectorAll('#eventModal .custom-select.open').forEach(cs => {
-                    if (cs !== wrapper) cs.classList.remove('open');
+            // Abrir menu
+            const openMenu = () => {
+                document.querySelectorAll('#eventModal .search-select-field.open').forEach(f => {
+                    if (f !== field) f.classList.remove('open');
                 });
-                wrapper.classList.toggle('open');
-                if (wrapper.classList.contains('open')) {
-                    // Foco no campo de busca
-                    setTimeout(() => searchInput.focus(), 0);
+                if (!field.classList.contains('open')) {
+                    field.classList.add('open');
+                    list.querySelectorAll('.search-select-item').forEach(item => { item.style.display = ''; });
+                    setTimeout(() => input.focus(), 0);
                 }
+            };
+
+            input.addEventListener('focus', openMenu);
+            input.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openMenu();
             });
 
             // Fechar ao clicar fora
             document.addEventListener('click', (e) => {
-                if (!wrapper.contains(e.target)) {
-                    wrapper.classList.remove('open');
+                if (!field.contains(e.target)) {
+                    field.classList.remove('open');
                 }
             });
 
-            // Sincronizar quando o select mudar por script
+            // Sincronizar mudanças
             nativeSelect.addEventListener('change', () => {
-                const selectedText = getSelectedOptionText(nativeSelect) || 'Selecione';
-                trigger.querySelector('.label').textContent = selectedText;
-                list.querySelectorAll('.custom-select-item').forEach(el => {
+                const selectedText = getSelectedOptionText(nativeSelect) || '';
+                input.value = selectedText;
+                list.querySelectorAll('.search-select-item').forEach(el => {
                     el.classList.toggle('is-selected', el.dataset.value === nativeSelect.value);
                 });
             });
 
-            // Inserir na DOM: envolve o select com o wrapper
-            nativeSelect.parentNode.insertBefore(wrapper, nativeSelect);
-            wrapper.appendChild(nativeSelect);
-            wrapper.appendChild(trigger);
-            menu.appendChild(searchBox);
+            // Substituir o select na DOM
+            nativeSelect.parentNode.insertBefore(field, nativeSelect);
+            field.appendChild(input);
             menu.appendChild(list);
-            wrapper.appendChild(menu);
-
-            // Marcar como melhorado
+            field.appendChild(menu);
+            
+            // Ocultar select original
+            nativeSelect.style.display = 'none';
             nativeSelect.dataset.enhanced = 'true';
+        }
+
+        // Cria um campo de data customizado com calendário
+        function makeCustomDateField(dateInput) {
+            if (!dateInput || dateInput.dataset.enhanced === 'true') return;
+
+            // Campo de busca direto
+            const field = document.createElement('div');
+            field.className = 'search-select-field';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'Selecione uma data';
+            input.value = dateInput.value ? formatDateForDisplay(dateInput.value) : '';
+
+            // Menu com calendário
+            const menu = document.createElement('div');
+            menu.className = 'search-select-menu';
+            menu.style.width = '320px';
+
+            const calendar = document.createElement('div');
+            calendar.className = 'mini-calendar';
+
+            // Gerar calendário
+            const buildCalendar = () => {
+                calendar.innerHTML = '';
+                const today = new Date();
+                const currentMonth = today.getMonth();
+                const currentYear = today.getFullYear();
+                
+                // Cabeçalho do calendário
+                const header = document.createElement('div');
+                header.className = 'calendar-header';
+                
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'calendar-nav';
+                prevBtn.type = 'button';
+                prevBtn.innerHTML = '‹';
+                
+                const title = document.createElement('span');
+                title.className = 'calendar-title';
+                title.textContent = `${getMonthName(currentMonth)} ${currentYear}`;
+                
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'calendar-nav';
+                nextBtn.type = 'button';
+                nextBtn.innerHTML = '›';
+                
+                // Navegação de mês
+                let currentDisplayMonth = currentMonth;
+                let currentDisplayYear = currentYear;
+                
+                const updateCalendar = () => {
+                    title.textContent = `${getMonthName(currentDisplayMonth)} ${currentDisplayYear}`;
+                    // Recriar os dias do calendário
+                    const daysContainer = calendar.querySelector('.calendar-days');
+                    if (daysContainer) {
+                        daysContainer.innerHTML = '';
+                        
+                        const firstDay = new Date(currentDisplayYear, currentDisplayMonth, 1);
+                        const startDate = new Date(firstDay);
+                        startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+                        for (let i = 0; i < 42; i++) {
+                            const day = new Date(startDate);
+                            day.setDate(startDate.getDate() + i);
+                            
+                            const dayElement = document.createElement('div');
+                            dayElement.className = 'calendar-day';
+                            
+                            if (day.getMonth() === currentDisplayMonth) {
+                                dayElement.textContent = day.getDate();
+                                dayElement.dataset.date = day.toISOString().split('T')[0];
+                                
+                                // Marcar hoje
+                                if (day.toDateString() === today.toDateString()) {
+                                    dayElement.classList.add('today');
+                                }
+                                
+                                // Marcar selecionado
+                                if (day.toISOString().split('T')[0] === dateInput.value) {
+                                    dayElement.classList.add('selected');
+                                }
+                                
+                                // Adicionar evento de clique
+                                dayElement.addEventListener('click', () => {
+                                    const selectedDate = dayElement.dataset.date;
+                                    dateInput.value = selectedDate;
+                                    dateInput.dispatchEvent(new Event('change'));
+                                    input.value = formatDateForDisplay(selectedDate);
+                                    field.classList.remove('open');
+                                });
+                            } else {
+                                dayElement.classList.add('other-month');
+                            }
+                            
+                            daysContainer.appendChild(dayElement);
+                        }
+                    }
+                };
+                
+                prevBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    currentDisplayMonth--;
+                    if (currentDisplayMonth < 0) {
+                        currentDisplayMonth = 11;
+                        currentDisplayYear--;
+                    }
+                    updateCalendar();
+                });
+                
+                nextBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    currentDisplayMonth++;
+                    if (currentDisplayMonth > 11) {
+                        currentDisplayMonth = 0;
+                        currentDisplayYear++;
+                    }
+                    updateCalendar();
+                });
+                
+                header.appendChild(prevBtn);
+                header.appendChild(title);
+                header.appendChild(nextBtn);
+                calendar.appendChild(header);
+
+                // Dias da semana
+                const weekdays = document.createElement('div');
+                weekdays.className = 'calendar-weekdays';
+                weekdays.innerHTML = `
+                    <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div>
+                    <div>Qui</div><div>Sex</div><div>Sáb</div>
+                `;
+                calendar.appendChild(weekdays);
+
+                // Dias do mês
+                const daysContainer = document.createElement('div');
+                daysContainer.className = 'calendar-days';
+                
+                const firstDay = new Date(currentYear, currentMonth, 1);
+                const lastDay = new Date(currentYear, currentMonth + 1, 0);
+                const startDate = new Date(firstDay);
+                startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+                for (let i = 0; i < 42; i++) {
+                    const day = new Date(startDate);
+                    day.setDate(startDate.getDate() + i);
+                    
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    
+                    if (day.getMonth() === currentMonth) {
+                        dayElement.textContent = day.getDate();
+                        dayElement.dataset.date = day.toISOString().split('T')[0];
+                        
+                        // Marcar hoje
+                        if (day.toDateString() === today.toDateString()) {
+                            dayElement.classList.add('today');
+                        }
+                        
+                        // Marcar selecionado
+                        if (day.toISOString().split('T')[0] === dateInput.value) {
+                            dayElement.classList.add('selected');
+                        }
+                        
+                        // Adicionar evento de clique
+                        dayElement.addEventListener('click', () => {
+                            const selectedDate = dayElement.dataset.date;
+                            dateInput.value = selectedDate;
+                            dateInput.dispatchEvent(new Event('change'));
+                            input.value = formatDateForDisplay(selectedDate);
+                            field.classList.remove('open');
+                        });
+                    } else {
+                        dayElement.classList.add('other-month');
+                    }
+                    
+                    daysContainer.appendChild(dayElement);
+                }
+                
+                calendar.appendChild(daysContainer);
+            };
+            buildCalendar();
+
+            // Máscara de formatação e navegação do calendário
+            input.addEventListener('input', (e) => {
+                let value = e.target.value;
+                
+                // Aplicar máscara DD/MM/AAAA apenas se estiver digitando números
+                if (value.length > 0 && /^\d/.test(value)) {
+                    // Remover caracteres não numéricos
+                    value = value.replace(/\D/g, '');
+                    
+                    // Aplicar máscara DD/MM/AAAA
+                    if (value.length >= 2) {
+                        value = value.substring(0, 2) + '/' + value.substring(2);
+                    }
+                    if (value.length >= 5) {
+                        value = value.substring(0, 5) + '/' + value.substring(5, 9);
+                    }
+                    
+                    // Limitar a 10 caracteres (DD/MM/AAAA)
+                    if (value.length > 10) {
+                        value = value.substring(0, 10);
+                    }
+                    
+                    e.target.value = value;
+                }
+                
+                // Se for uma data completa, navegar para ela no calendário
+                if (value.length === 10 && /^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+                    const [day, month, year] = value.split('/');
+                    const dayNum = parseInt(day);
+                    const monthNum = parseInt(month);
+                    const yearNum = parseInt(year);
+                    
+                    // Verificar se é uma data válida
+                    if (dayNum >= 1 && dayNum <= 31 && monthNum >= 1 && monthNum <= 12 && yearNum >= 1900 && yearNum <= 2100) {
+                        const dateObj = new Date(yearNum, monthNum - 1, dayNum);
+                        
+                        // Verificar se a data é realmente válida
+                        if (dateObj.getDate() === dayNum && dateObj.getMonth() === monthNum - 1 && dateObj.getFullYear() === yearNum) {
+                            // Navegar para a data no calendário
+                            navigateToDate(calendar, yearNum, monthNum - 1);
+                            
+                            // Atualizar o input de data original
+                            const isoDate = dateObj.toISOString().split('T')[0];
+                            dateInput.value = isoDate;
+                            dateInput.dispatchEvent(new Event('change'));
+                            
+                            // Atualizar seleção no calendário
+                            calendar.querySelectorAll('.calendar-day').forEach(day => {
+                                day.classList.toggle('selected', day.dataset.date === isoDate);
+                            });
+                            
+                            return;
+                        }
+                    }
+                }
+                
+                // Filtragem por texto para o calendário
+                const term = value.trim().toLowerCase();
+                const days = calendar.querySelectorAll('.calendar-day');
+                days.forEach(day => {
+                    if (day.dataset.date) {
+                        const dayText = formatDateForDisplay(day.dataset.date).toLowerCase();
+                        const match = dayText.includes(term);
+                        day.style.display = match ? '' : 'none';
+                    }
+                });
+            });
+
+            // Abrir menu
+            const openMenu = () => {
+                document.querySelectorAll('#eventModal .search-select-field.open').forEach(f => {
+                    if (f !== field) f.classList.remove('open');
+                });
+                if (!field.classList.contains('open')) {
+                    field.classList.add('open');
+                    // Mostrar todos os dias ao abrir
+                    calendar.querySelectorAll('.calendar-day').forEach(day => { day.style.display = ''; });
+                    setTimeout(() => input.focus(), 0);
+                }
+            };
+
+            input.addEventListener('focus', openMenu);
+            input.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openMenu();
+            });
+
+            // Fechar ao clicar fora
+            document.addEventListener('click', (e) => {
+                if (!field.contains(e.target)) {
+                    field.classList.remove('open');
+                }
+            });
+
+            // Sincronizar mudanças simples
+            dateInput.addEventListener('change', () => {
+                const displayValue = dateInput.value ? formatDateForDisplay(dateInput.value) : '';
+                input.value = displayValue;
+                // Atualizar seleção no calendário
+                calendar.querySelectorAll('.calendar-day').forEach(day => {
+                    day.classList.toggle('selected', day.dataset.date === dateInput.value);
+                });
+            });
+
+            // Substituir o input de data na DOM
+            dateInput.parentNode.insertBefore(field, dateInput);
+            field.appendChild(input);
+            menu.appendChild(calendar);
+            field.appendChild(menu);
+            
+            // Ocultar input original
+            dateInput.style.display = 'none';
+            dateInput.dataset.enhanced = 'true';
+        }
+
+        function formatDateForDisplay(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
         }
 
         function getSelectedOptionText(selectEl) {
             const opt = selectEl.selectedOptions && selectEl.selectedOptions[0];
             return opt ? opt.textContent : '';
         }
+
+        // Cria um campo de hora customizado com busca/seleção
+        function makeCustomTimeField(timeInput) {
+            if (!timeInput || timeInput.dataset.enhanced === 'true') return;
+
+            // Campo de busca direto
+            const field = document.createElement('div');
+            field.className = 'search-select-field';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'Selecione um horário';
+            input.value = timeInput.value ? formatTimeForDisplay(timeInput.value) : '';
+
+            // Menu de opções (horários sugeridos)
+            const menu = document.createElement('div');
+            menu.className = 'search-select-menu';
+
+            const list = document.createElement('div');
+            list.className = 'search-select-list';
+
+            // Gerar opções de horário
+            const buildTimeOptions = () => {
+                list.innerHTML = '';
+                const options = [];
+                
+                // Gerar horários de 06:00 às 22:00 em intervalos de 30 minutos
+                for (let hour = 6; hour <= 22; hour++) {
+                    for (let minute = 0; minute < 60; minute += 30) {
+                        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                        options.push({
+                            value: timeString,
+                            text: formatTimeForDisplay(timeString)
+                        });
+                    }
+                }
+
+                options.forEach(opt => {
+                    const item = document.createElement('div');
+                    item.className = 'search-select-item' + (opt.value === timeInput.value ? ' is-selected' : '');
+                    item.dataset.value = opt.value;
+                    item.textContent = opt.text;
+                    item.addEventListener('click', () => {
+                        // Atualiza input de hora original
+                        timeInput.value = opt.value;
+                        timeInput.dispatchEvent(new Event('change'));
+                        // Atualiza UI
+                        list.querySelectorAll('.search-select-item').forEach(el => el.classList.remove('is-selected'));
+                        item.classList.add('is-selected');
+                        input.value = opt.text;
+                        field.classList.remove('open');
+                    });
+                    list.appendChild(item);
+                });
+            };
+            buildTimeOptions();
+
+            // Máscara de formatação e filtragem
+            input.addEventListener('input', (e) => {
+                let value = e.target.value;
+                
+                // Aplicar máscara HH:MM apenas se estiver digitando números
+                if (value.length > 0 && /^\d/.test(value)) {
+                    // Remover caracteres não numéricos
+                    value = value.replace(/\D/g, '');
+                    
+                    // Aplicar máscara HH:MM
+                    if (value.length >= 2) {
+                        value = value.substring(0, 2) + ':' + value.substring(2, 4);
+                    }
+                    
+                    // Limitar a 5 caracteres (HH:MM)
+                    if (value.length > 5) {
+                        value = value.substring(0, 5);
+                    }
+                    
+                    e.target.value = value;
+                }
+                
+                // Filtragem por texto para a lista de horários
+                const term = value.trim().toLowerCase();
+                list.querySelectorAll('.search-select-item').forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    const match = text.includes(term);
+                    item.style.display = match ? '' : 'none';
+                });
+            });
+
+            // Abrir menu
+            const openMenu = () => {
+                document.querySelectorAll('#eventModal .search-select-field.open').forEach(f => {
+                    if (f !== field) f.classList.remove('open');
+                });
+                if (!field.classList.contains('open')) {
+                    field.classList.add('open');
+                    list.querySelectorAll('.search-select-item').forEach(item => { item.style.display = ''; });
+                    setTimeout(() => input.focus(), 0);
+                }
+            };
+
+            input.addEventListener('focus', openMenu);
+            input.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openMenu();
+            });
+
+            // Fechar ao clicar fora
+            document.addEventListener('click', (e) => {
+                if (!field.contains(e.target)) {
+                    field.classList.remove('open');
+                }
+            });
+
+            // Sincronizar mudanças
+            timeInput.addEventListener('change', () => {
+                const displayValue = timeInput.value ? formatTimeForDisplay(timeInput.value) : '';
+                input.value = displayValue;
+                list.querySelectorAll('.search-select-item').forEach(el => {
+                    el.classList.toggle('is-selected', el.dataset.value === timeInput.value);
+                });
+            });
+
+            // Substituir o input de hora na DOM
+            timeInput.parentNode.insertBefore(field, timeInput);
+            field.appendChild(input);
+            menu.appendChild(list);
+            field.appendChild(menu);
+            
+            // Ocultar input original
+            timeInput.style.display = 'none';
+            timeInput.dataset.enhanced = 'true';
+        }
+
+        function formatTimeForDisplay(timeString) {
+            if (!timeString) return '';
+            const [hours, minutes] = timeString.split(':');
+            const hour = parseInt(hours);
+            const minute = parseInt(minutes);
+            
+            if (hour === 0 && minute === 0) return 'Meia-noite';
+            if (hour === 12 && minute === 0) return 'Meio-dia';
+            
+            const period = hour < 12 ? 'AM' : 'PM';
+            const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+            const displayMinute = minute === 0 ? '' : `:${minutes}`;
+            
+            return `${displayHour}${displayMinute} ${period}`;
+        }
+
+        function getMonthName(monthIndex) {
+            const months = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            return months[monthIndex];
+        }
+
+        // Navegar para uma data específica no calendário
+        function navigateToDate(calendar, year, month) {
+            const header = calendar.querySelector('.calendar-header');
+            const title = header.querySelector('.calendar-title');
+            const daysContainer = calendar.querySelector('.calendar-days');
+            
+            if (!header || !title || !daysContainer) return;
+            
+            // Atualizar título
+            title.textContent = `${getMonthName(month)} ${year}`;
+            
+            // Recriar os dias do calendário
+            daysContainer.innerHTML = '';
+            
+            const firstDay = new Date(year, month, 1);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            for (let i = 0; i < 42; i++) {
+                const day = new Date(startDate);
+                day.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                if (day.getMonth() === month) {
+                    dayElement.textContent = day.getDate();
+                    dayElement.dataset.date = day.toISOString().split('T')[0];
+                    
+                    // Marcar hoje
+                    const today = new Date();
+                    if (day.toDateString() === today.toDateString()) {
+                        dayElement.classList.add('today');
+                    }
+                    
+                    // Adicionar evento de clique
+                    dayElement.addEventListener('click', () => {
+                        const selectedDate = dayElement.dataset.date;
+                        const dateInput = calendar.closest('.search-select-field').querySelector('input[type="date"]');
+                        if (dateInput) {
+                            dateInput.value = selectedDate;
+                            dateInput.dispatchEvent(new Event('change'));
+                        }
+                        calendar.closest('.search-select-field').classList.remove('open');
+                    });
+                } else {
+                    dayElement.classList.add('other-month');
+                }
+                
+                daysContainer.appendChild(dayElement);
+            }
+        }
+
 
         function loadEventModalData() {
             console.log('Modal de novo agendamento não está disponível');
