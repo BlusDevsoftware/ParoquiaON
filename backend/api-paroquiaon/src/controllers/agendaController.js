@@ -2,6 +2,24 @@ const { supabase } = require('../config/supabase');
 
 async function listarEventos(req, res) {
     try {
+        console.log('🔄 Iniciando listagem de agendamentos...');
+        
+        // Primeiro, tentar uma consulta simples para verificar se a tabela existe
+        const { data: testData, error: testError } = await supabase
+            .from('agendamentos')
+            .select('id, titulo')
+            .limit(1);
+            
+        if (testError) {
+            console.error('❌ Erro ao acessar tabela agendamentos:', testError);
+            return res.status(500).json({ 
+                error: 'Erro ao acessar tabela agendamentos',
+                details: testError.message 
+            });
+        }
+        
+        console.log('✅ Tabela agendamentos acessível, fazendo consulta completa...');
+        
         const { data, error } = await supabase
             .from('agendamentos')
             .select(`
@@ -49,11 +67,19 @@ async function listarEventos(req, res) {
             `)
             .order('data_inicio', { ascending: true });
             
-        if (error) throw error;
-        res.json(data);
+        if (error) {
+            console.error('❌ Erro na consulta completa:', error);
+            throw error;
+        }
+        
+        console.log(`✅ ${data?.length || 0} agendamentos encontrados`);
+        res.json(data || []);
     } catch (error) {
-        console.error('Erro ao listar agendamentos:', error);
-        res.status(500).json({ error: 'Erro ao listar agendamentos' });
+        console.error('❌ Erro ao listar agendamentos:', error);
+        res.status(500).json({ 
+            error: 'Erro ao listar agendamentos',
+            details: error.message 
+        });
     }
 }
 
