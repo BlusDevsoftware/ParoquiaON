@@ -3014,7 +3014,7 @@
                 });
             }
             
-            // Carregar dados dos selects
+            // Carregar dados dos selects ANTES de inicializar os customizados
             console.log('🔄 Carregando dados dos selects...');
             Promise.all([
                 loadEventCommunities(),
@@ -3033,10 +3033,16 @@
                     select.style.height = 'auto';
                 });
 
-                // Inicializar selects customizados com busca
-                initializeCustomSelects('#eventModal');
+                // Inicializar selects customizados com busca APÓS carregar dados
+                setTimeout(() => {
+                    initializeCustomSelects('#eventModal');
+                }, 100);
             }).catch(error => {
                 console.error('❌ Erro ao carregar dados dos selects:', error);
+                // Mesmo com erro, inicializar os customizados
+                setTimeout(() => {
+                    initializeCustomSelects('#eventModal');
+                }, 100);
             });
             
             console.log('✅ Modal de novo agendamento criado e exibido');
@@ -3738,6 +3744,10 @@
                 }
             } catch (error) {
                 console.error('❌ Erro ao carregar comunidades:', error);
+                const select = document.getElementById('eventCommunity');
+                if (select) {
+                    select.innerHTML = '<option value="">Erro ao carregar comunidades</option>';
+                }
             }
         }
 
@@ -3766,6 +3776,10 @@
                 }
             } catch (error) {
                 console.error('❌ Erro ao carregar pastorais:', error);
+                const select = document.getElementById('eventPastoral');
+                if (select) {
+                    select.innerHTML = '<option value="">Erro ao carregar pastorais</option>';
+                }
             }
         }
 
@@ -3794,6 +3808,10 @@
                 }
             } catch (error) {
                 console.error('❌ Erro ao carregar pilares:', error);
+                const select = document.getElementById('eventPilares');
+                if (select) {
+                    select.innerHTML = '<option value="">Erro ao carregar pilares</option>';
+                }
             }
         }
 
@@ -3822,6 +3840,10 @@
                 }
             } catch (error) {
                 console.error('❌ Erro ao carregar ações:', error);
+                const select = document.getElementById('eventAcao');
+                if (select) {
+                    select.innerHTML = '<option value="">Erro ao carregar ações</option>';
+                }
             }
         }
 
@@ -3850,6 +3872,10 @@
                 }
             } catch (error) {
                 console.error('❌ Erro ao carregar locais:', error);
+                const select = document.getElementById('eventLocation');
+                if (select) {
+                    select.innerHTML = '<option value="">Erro ao carregar locais</option>';
+                }
             }
         }
 
