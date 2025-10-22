@@ -3018,30 +3018,23 @@
                 });
             }
             
-            // Carregar dados dos selects ANTES de inicializar os customizados
-            console.log('🔄 Carregando dados dos selects...');
-            try {
-                await Promise.all([
-                    loadEventCommunities(),
-                    loadEventPastorals(),
-                    loadEventPilares(),
-                    loadEventAcoes(),
-                    loadEventLocais()
-                ]);
+            // Inicializar selects customizados IMEDIATAMENTE (campos aparecem instantaneamente)
+            console.log('🔄 Inicializando dropdowns customizados...');
+            initializeCustomSelects('#eventModal');
+            
+            // Carregar dados dos selects em background (sem bloquear a UI)
+            console.log('🔄 Carregando dados dos selects em background...');
+            Promise.all([
+                loadEventCommunities(),
+                loadEventPastorals(),
+                loadEventPilares(),
+                loadEventAcoes(),
+                loadEventLocais()
+            ]).then(() => {
                 console.log('✅ Todos os dados dos selects foram carregados');
-                
-                // Inicializar selects customizados APÓS carregar dados
-                setTimeout(() => {
-                    console.log('🔄 Inicializando dropdowns customizados...');
-                    initializeCustomSelects('#eventModal');
-                }, 100);
-            } catch (error) {
+            }).catch(error => {
                 console.error('❌ Erro ao carregar dados dos selects:', error);
-                // Mesmo com erro, inicializar os customizados
-                setTimeout(() => {
-                    initializeCustomSelects('#eventModal');
-                }, 100);
-            }
+            });
             
             console.log('✅ Modal de novo agendamento criado e exibido');
         }
@@ -3125,14 +3118,14 @@
                 
                 console.log('📋 Itens criados na lista:', list.children.length);
                 
-                // Se não há itens, mostrar mensagem de erro
+                // Se não há itens, mostrar mensagem de carregamento
                 if (list.children.length === 0) {
-                    const errorItem = document.createElement('div');
-                    errorItem.className = 'search-select-item';
-                    errorItem.textContent = 'Nenhuma opção disponível';
-                    errorItem.style.color = '#666';
-                    errorItem.style.fontStyle = 'italic';
-                    list.appendChild(errorItem);
+                    const loadingItem = document.createElement('div');
+                    loadingItem.className = 'search-select-item';
+                    loadingItem.textContent = 'Carregando opções...';
+                    loadingItem.style.color = '#666';
+                    loadingItem.style.fontStyle = 'italic';
+                    list.appendChild(loadingItem);
                 }
             };
             buildItems();
