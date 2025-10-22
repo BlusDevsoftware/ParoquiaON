@@ -2301,20 +2301,8 @@
             await loadEventsFromApi();
             await loadAgendaLookups();
             
-            // Carregar dados dos selects do modal ANTECIPADAMENTE
-            console.log('🔄 Carregando dados dos selects do modal...');
-            try {
-                await Promise.all([
-                    loadEventCommunities(),
-                    loadEventPastorals(),
-                    loadEventPilares(),
-                    loadEventAcoes(),
-                    loadEventLocais()
-                ]);
-                console.log('✅ Todos os dados dos selects foram carregados antecipadamente');
-            } catch (error) {
-                console.error('❌ Erro ao carregar dados dos selects:', error);
-            }
+            // Dados dos selects serão carregados quando o modal for aberto
+            console.log('✅ Aplicação inicializada - dados dos selects serão carregados no modal');
             
             setupEventListeners();
         });
@@ -3030,14 +3018,30 @@
                 });
             }
             
-            // Dados já foram carregados antecipadamente
-            console.log('✅ Dados dos selects já carregados previamente');
-            
-            // Selects do modal usam layout customizado - estilos nativos removidos
-
-            // Inicializar selects customizados IMEDIATAMENTE (dados já carregados)
-            console.log('🔄 Inicializando dropdowns customizados...');
-            initializeCustomSelects('#eventModal');
+            // Carregar dados dos selects ANTES de inicializar os customizados
+            console.log('🔄 Carregando dados dos selects...');
+            try {
+                await Promise.all([
+                    loadEventCommunities(),
+                    loadEventPastorals(),
+                    loadEventPilares(),
+                    loadEventAcoes(),
+                    loadEventLocais()
+                ]);
+                console.log('✅ Todos os dados dos selects foram carregados');
+                
+                // Inicializar selects customizados APÓS carregar dados
+                setTimeout(() => {
+                    console.log('🔄 Inicializando dropdowns customizados...');
+                    initializeCustomSelects('#eventModal');
+                }, 100);
+            } catch (error) {
+                console.error('❌ Erro ao carregar dados dos selects:', error);
+                // Mesmo com erro, inicializar os customizados
+                setTimeout(() => {
+                    initializeCustomSelects('#eventModal');
+                }, 100);
+            }
             
             console.log('✅ Modal de novo agendamento criado e exibido');
         }
