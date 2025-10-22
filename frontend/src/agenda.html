@@ -405,10 +405,24 @@
 
         /* Estilos específicos para selects */
         .form-group select {
-            max-height: 200px;
-            overflow-y: auto;
+            max-height: 200px !important;
+            overflow-y: auto !important;
             background-color: white;
             cursor: pointer;
+            height: auto !important;
+        }
+
+        /* Forçar altura máxima para todos os selects do modal */
+        #eventModal select {
+            max-height: 200px !important;
+            overflow-y: auto !important;
+            height: auto !important;
+        }
+
+        /* Estilo específico para selects com muitas opções */
+        select[size] {
+            max-height: 200px !important;
+            overflow-y: auto !important;
         }
 
         /* Scrollbar personalizado para selects */
@@ -452,11 +466,27 @@
             overflow-y: auto;
         }
 
+        /* Forçar estilos para selects do modal de evento */
+        #eventModal .form-group select,
+        #eventModal select {
+            max-height: 200px !important;
+            overflow-y: auto !important;
+            height: auto !important;
+            min-height: 40px !important;
+        }
+
         /* Responsivo para selects */
         @media (max-width: 768px) {
-            .form-group select {
-                max-height: 150px;
+            .form-group select,
+            #eventModal select {
+                max-height: 150px !important;
             }
+        }
+
+        /* Estilo adicional para garantir scroll */
+        select {
+            max-height: 200px !important;
+            overflow-y: auto !important;
         }
 
         .form-group input:focus,
@@ -2656,7 +2686,7 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label><i class="fas fa-church"></i> Comunidade</label>
-                                            <select id="eventCommunity" name="comunidade" required>
+                                            <select id="eventCommunity" name="comunidade" required style="max-height: 200px; overflow-y: auto;">
                                                 <option value="">Selecione a comunidade</option>
                                                 <option value="1">Comunidade São José</option>
                                                 <option value="2">Comunidade Nossa Senhora</option>
@@ -2666,7 +2696,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label><i class="fas fa-cross"></i> Pastoral</label>
-                                            <select id="eventPastoral" name="pastoral" required>
+                                            <select id="eventPastoral" name="pastoral" required style="max-height: 200px; overflow-y: auto;">
                                                 <option value="">Selecione a pastoral</option>
                                                 <option value="1">Pastoral da Criança</option>
                                                 <option value="2">Pastoral da Juventude</option>
@@ -2679,7 +2709,7 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label><i class="fas fa-layer-group"></i> Pilares</label>
-                                            <select id="eventPilares" name="pilares" required>
+                                            <select id="eventPilares" name="pilares" required style="max-height: 200px; overflow-y: auto;">
                                                 <option value="">Selecione o pilar</option>
                                                 <option value="1">Pilar da Fé</option>
                                                 <option value="2">Pilar da Esperança</option>
@@ -2689,7 +2719,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label><i class="fas fa-map-marker-alt"></i> Local</label>
-                                            <select id="eventLocation" name="local" required>
+                                            <select id="eventLocation" name="local" required style="max-height: 200px; overflow-y: auto;">
                                                 <option value="">Selecione o local</option>
                                                 <option value="1">Igreja Matriz</option>
                                                 <option value="2">Capela São José</option>
@@ -2702,7 +2732,7 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label><i class="fas fa-tasks"></i> Ação</label>
-                                            <select id="eventAcao" name="acao" required>
+                                            <select id="eventAcao" name="acao" required style="max-height: 200px; overflow-y: auto;">
                                                 <option value="">Selecione a ação</option>
                                                 <option value="1">Celebração Eucarística</option>
                                                 <option value="2">Catequese</option>
@@ -2865,6 +2895,14 @@
                 loadEventLocais()
             ]).then(() => {
                 console.log('✅ Todos os dados dos selects foram carregados');
+                
+                // Aplicar estilos de altura máxima aos selects após carregamento
+                const selects = document.querySelectorAll('#eventModal select');
+                selects.forEach(select => {
+                    select.style.maxHeight = '200px';
+                    select.style.overflowY = 'auto';
+                    select.style.height = 'auto';
+                });
             }).catch(error => {
                 console.error('❌ Erro ao carregar dados dos selects:', error);
             });
