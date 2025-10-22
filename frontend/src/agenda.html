@@ -2301,8 +2301,20 @@
             await loadEventsFromApi();
             await loadAgendaLookups();
             
-            // Dados dos selects serão carregados quando o modal for aberto
-            console.log('✅ Aplicação inicializada - dados dos selects serão carregados no modal');
+            // Carregar dados dos selects do modal ANTECIPADAMENTE
+            console.log('🔄 Carregando dados dos selects do modal...');
+            try {
+                await Promise.all([
+                    loadEventCommunities(),
+                    loadEventPastorals(),
+                    loadEventPilares(),
+                    loadEventAcoes(),
+                    loadEventLocais()
+                ]);
+                console.log('✅ Todos os dados dos selects foram carregados antecipadamente');
+            } catch (error) {
+                console.error('❌ Erro ao carregar dados dos selects:', error);
+            }
             
             setupEventListeners();
         });
@@ -3018,23 +3030,12 @@
                 });
             }
             
-            // Inicializar selects customizados IMEDIATAMENTE (campos aparecem instantaneamente)
+            // Dados já foram carregados antecipadamente
+            console.log('✅ Dados dos selects já carregados previamente');
+            
+            // Inicializar selects customizados IMEDIATAMENTE (dados já disponíveis)
             console.log('🔄 Inicializando dropdowns customizados...');
             initializeCustomSelects('#eventModal');
-            
-            // Carregar dados dos selects em background (sem bloquear a UI)
-            console.log('🔄 Carregando dados dos selects em background...');
-            Promise.all([
-                loadEventCommunities(),
-                loadEventPastorals(),
-                loadEventPilares(),
-                loadEventAcoes(),
-                loadEventLocais()
-            ]).then(() => {
-                console.log('✅ Todos os dados dos selects foram carregados');
-            }).catch(error => {
-                console.error('❌ Erro ao carregar dados dos selects:', error);
-            });
             
             console.log('✅ Modal de novo agendamento criado e exibido');
         }
@@ -3118,14 +3119,14 @@
                 
                 console.log('📋 Itens criados na lista:', list.children.length);
                 
-                // Se não há itens, mostrar mensagem de carregamento
+                // Se não há itens, mostrar mensagem de erro
                 if (list.children.length === 0) {
-                    const loadingItem = document.createElement('div');
-                    loadingItem.className = 'search-select-item';
-                    loadingItem.textContent = 'Carregando opções...';
-                    loadingItem.style.color = '#666';
-                    loadingItem.style.fontStyle = 'italic';
-                    list.appendChild(loadingItem);
+                    const errorItem = document.createElement('div');
+                    errorItem.className = 'search-select-item';
+                    errorItem.textContent = 'Nenhuma opção disponível';
+                    errorItem.style.color = '#666';
+                    errorItem.style.fontStyle = 'italic';
+                    list.appendChild(errorItem);
                 }
             };
             buildItems();
