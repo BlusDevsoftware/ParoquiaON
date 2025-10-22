@@ -403,8 +403,63 @@
             box-sizing: border-box;
         }
 
+        /* Estilos específicos para selects */
+        .form-group select {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        /* Scrollbar personalizado para selects */
+        .form-group select::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .form-group select::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .form-group select::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .form-group select::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Limitar altura das opções do select */
+        .form-group select option {
+            padding: 8px 12px;
+            max-height: 40px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Melhorar aparência do select quando focado */
+        .form-group select:focus {
+            border-color: #1e3a8a;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
+        }
+
+        /* Estilo para select quando tem muitas opções */
+        .form-group select[size] {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* Responsivo para selects */
+        @media (max-width: 768px) {
+            .form-group select {
+                max-height: 150px;
+            }
+        }
+
         .form-group input:focus,
-        .form-group select:focus,
         .form-group textarea:focus {
             border-color: #1e3a8a;
             outline: none;
@@ -2601,7 +2656,7 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label><i class="fas fa-church"></i> Comunidade</label>
-                                            <select id="eventCommunity" name="comunidade" required size="6">
+                                            <select id="eventCommunity" name="comunidade" required>
                                                 <option value="">Selecione a comunidade</option>
                                                 <option value="1">Comunidade São José</option>
                                                 <option value="2">Comunidade Nossa Senhora</option>
@@ -2611,7 +2666,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label><i class="fas fa-cross"></i> Pastoral</label>
-                                            <select id="eventPastoral" name="pastoral" required size="6">
+                                            <select id="eventPastoral" name="pastoral" required>
                                                 <option value="">Selecione a pastoral</option>
                                                 <option value="1">Pastoral da Criança</option>
                                                 <option value="2">Pastoral da Juventude</option>
@@ -2624,7 +2679,7 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label><i class="fas fa-layer-group"></i> Pilares</label>
-                                            <select id="eventPilares" name="pilares" required size="6">
+                                            <select id="eventPilares" name="pilares" required>
                                                 <option value="">Selecione o pilar</option>
                                                 <option value="1">Pilar da Fé</option>
                                                 <option value="2">Pilar da Esperança</option>
@@ -2634,7 +2689,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label><i class="fas fa-map-marker-alt"></i> Local</label>
-                                            <select id="eventLocation" name="local" required size="6">
+                                            <select id="eventLocation" name="local" required>
                                                 <option value="">Selecione o local</option>
                                                 <option value="1">Igreja Matriz</option>
                                                 <option value="2">Capela São José</option>
@@ -2647,7 +2702,7 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label><i class="fas fa-tasks"></i> Ação</label>
-                                            <select id="eventAcao" name="acao" required size="6">
+                                            <select id="eventAcao" name="acao" required>
                                                 <option value="">Selecione a ação</option>
                                                 <option value="1">Celebração Eucarística</option>
                                                 <option value="2">Catequese</option>
