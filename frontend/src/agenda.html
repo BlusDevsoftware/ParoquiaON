@@ -3989,12 +3989,20 @@
                 const eventData = {
                     titulo: formData.titulo,
                     descricao: formData.objetivo || '',
+                    objetivo: formData.objetivo || '',
                     data_inicio: new Date(formData.dataInicio + ' ' + formData.horaInicio).toISOString(),
                     data_fim: new Date(formData.dataFim + ' ' + formData.horaFim).toISOString(),
                     local_id: parseInt(formData.local),
                     acao_id: parseInt(formData.acao),
                     responsavel_id: null, // Pode ser implementado depois
-                    status: formData.status || 'Agendado'
+                    comunidade_id: parseInt(formData.comunidade),
+                    pastoral_id: parseInt(formData.pastoral),
+                    pilar_id: parseInt(formData.pilares),
+                    status: formData.ativo ? 'Ativo' : 'Inativo',
+                    evento_paroquial: formData.eventoParoquial || false,
+                    visibilidade: formData.visibilidade || 'Publico',
+                    lembrete: formData.lembrete || 'Nenhum',
+                    capacidade: formData.capacidade ? parseInt(formData.capacidade) : null
                 };
                 
                 console.log('🚀 Enviando evento para API:', eventData);
@@ -4106,6 +4114,10 @@
                     const localNome = ev.locais?.nome || ev.local_nome || 'Local não informado';
                     const acaoNome = ev.acoes?.nome || ev.acao_nome || 'Ação não informada';
                     const responsavelNome = ev.pessoas?.nome || ev.responsavel_nome || 'Responsável não informado';
+                    const comunidadeNome = ev.comunidades?.nome || ev.comunidade_nome || 'Comunidade não informada';
+                    const pastoralNome = ev.pastorais?.nome || ev.pastoral_nome || 'Pastoral não informada';
+                    const pilarNome = ev.pilares?.nome || ev.pilar_nome || 'Pilar não informado';
+                    const usuarioLancamento = ev.usuarios?.nome || ev.usuario_lancamento_nome || 'Sistema';
                     
                     return {
                         ...ev,
@@ -4116,10 +4128,14 @@
                         local_nome: localNome,
                         acao_nome: acaoNome,
                         responsavel_nome: responsavelNome,
+                        comunidade_nome: comunidadeNome,
+                        pastoral_nome: pastoralNome,
+                        pilar_nome: pilarNome,
+                        usuario_lancamento_nome: usuarioLancamento,
                         // Garantir título
-                        title: ev.titulo || ev.title || 'Evento sem título',
+                        title: ev.titulo || ev.title || 'Agendamento sem título',
                         // Garantir cor baseada no pilar da ação
-                        color: ev.acoes?.pilares?.cor || ev.cor || '#1e3a8a'
+                        color: ev.acoes?.pilares?.cor || ev.pilares?.cor || ev.cor || '#1e3a8a'
                     };
                 });
                 

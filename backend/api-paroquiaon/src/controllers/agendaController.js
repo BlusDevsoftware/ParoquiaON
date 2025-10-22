@@ -3,7 +3,7 @@ const { supabase } = require('../config/supabase');
 async function listarEventos(req, res) {
     try {
         const { data, error } = await supabase
-            .from('eventos')
+            .from('agendamentos')
             .select(`
                 *,
                 locais (
@@ -26,6 +26,24 @@ async function listarEventos(req, res) {
                     id,
                     nome,
                     telefone,
+                    email
+                ),
+                comunidades (
+                    id,
+                    nome
+                ),
+                pastorais (
+                    id,
+                    nome
+                ),
+                pilares (
+                    id,
+                    nome,
+                    cor
+                ),
+                usuarios!usuario_lancamento_id (
+                    id,
+                    nome,
                     email
                 )
             `)
@@ -34,8 +52,8 @@ async function listarEventos(req, res) {
         if (error) throw error;
         res.json(data);
     } catch (error) {
-        console.error('Erro ao listar eventos:', error);
-        res.status(500).json({ error: 'Erro ao listar eventos' });
+        console.error('Erro ao listar agendamentos:', error);
+        res.status(500).json({ error: 'Erro ao listar agendamentos' });
     }
 }
 
@@ -43,7 +61,7 @@ async function buscarEvento(req, res) {
     try {
         const { id } = req.params;
         const { data, error } = await supabase
-            .from('eventos')
+            .from('agendamentos')
             .select(`
                 *,
                 locais (
@@ -67,17 +85,35 @@ async function buscarEvento(req, res) {
                     nome,
                     telefone,
                     email
+                ),
+                comunidades (
+                    id,
+                    nome
+                ),
+                pastorais (
+                    id,
+                    nome
+                ),
+                pilares (
+                    id,
+                    nome,
+                    cor
+                ),
+                usuarios!usuario_lancamento_id (
+                    id,
+                    nome,
+                    email
                 )
             `)
             .eq('id', id)
             .single();
             
         if (error) throw error;
-        if (!data) return res.status(404).json({ error: 'Evento não encontrado' });
+        if (!data) return res.status(404).json({ error: 'Agendamento não encontrado' });
         res.json(data);
     } catch (error) {
-        console.error('Erro ao buscar evento:', error);
-        res.status(500).json({ error: 'Erro ao buscar evento' });
+        console.error('Erro ao buscar agendamento:', error);
+        res.status(500).json({ error: 'Erro ao buscar agendamento' });
     }
 }
 
@@ -90,10 +126,18 @@ async function criarEvento(req, res) {
             return res.status(400).json({ error: 'Título e data de início são obrigatórios' });
         }
         
-        // Inserir evento
+        // Adicionar dados do usuário de lançamento
+        const dadosCompletos = {
+            ...dados,
+            usuario_lancamento_id: req.user?.id || null,
+            usuario_lancamento_nome: req.user?.nome || 'Sistema',
+            status: dados.status || 'Ativo'
+        };
+        
+        // Inserir agendamento
         const { data, error } = await supabase
-            .from('eventos')
-            .insert([dados])
+            .from('agendamentos')
+            .insert([dadosCompletos])
             .select(`
                 *,
                 locais (
@@ -117,6 +161,24 @@ async function criarEvento(req, res) {
                     nome,
                     telefone,
                     email
+                ),
+                comunidades (
+                    id,
+                    nome
+                ),
+                pastorais (
+                    id,
+                    nome
+                ),
+                pilares (
+                    id,
+                    nome,
+                    cor
+                ),
+                usuarios!usuario_lancamento_id (
+                    id,
+                    nome,
+                    email
                 )
             `)
             .single();
@@ -124,8 +186,8 @@ async function criarEvento(req, res) {
         if (error) throw error;
         res.status(201).json(data);
     } catch (error) {
-        console.error('Erro ao criar evento:', error);
-        res.status(500).json({ error: 'Erro ao criar evento' });
+        console.error('Erro ao criar agendamento:', error);
+        res.status(500).json({ error: 'Erro ao criar agendamento' });
     }
 }
 
@@ -134,9 +196,9 @@ async function atualizarEvento(req, res) {
         const { id } = req.params;
         const dados = req.body;
         
-        // Atualizar evento
+        // Atualizar agendamento
         const { data, error } = await supabase
-            .from('eventos')
+            .from('agendamentos')
             .update(dados)
             .eq('id', id)
             .select(`
@@ -162,29 +224,47 @@ async function atualizarEvento(req, res) {
                     nome,
                     telefone,
                     email
+                ),
+                comunidades (
+                    id,
+                    nome
+                ),
+                pastorais (
+                    id,
+                    nome
+                ),
+                pilares (
+                    id,
+                    nome,
+                    cor
+                ),
+                usuarios!usuario_lancamento_id (
+                    id,
+                    nome,
+                    email
                 )
             `)
             .single();
             
         if (error) throw error;
-        if (!data) return res.status(404).json({ error: 'Evento não encontrado' });
+        if (!data) return res.status(404).json({ error: 'Agendamento não encontrado' });
         res.json(data);
     } catch (error) {
-        console.error('Erro ao atualizar evento:', error);
-        res.status(500).json({ error: 'Erro ao atualizar evento' });
+        console.error('Erro ao atualizar agendamento:', error);
+        res.status(500).json({ error: 'Erro ao atualizar agendamento' });
     }
 }
 
 async function excluirEvento(req, res) {
     try {
         const { id } = req.params;
-        const { data, error } = await supabase.from('eventos').delete().eq('id', id).select();
+        const { data, error } = await supabase.from('agendamentos').delete().eq('id', id).select();
         if (error) throw error;
-        if (!data || data.length === 0) return res.status(404).json({ error: 'Evento não encontrado' });
-        res.json({ message: 'Evento excluído com sucesso', data });
+        if (!data || data.length === 0) return res.status(404).json({ error: 'Agendamento não encontrado' });
+        res.json({ message: 'Agendamento excluído com sucesso', data });
     } catch (error) {
-        console.error('Erro ao excluir evento:', error);
-        res.status(500).json({ error: 'Erro ao excluir evento' });
+        console.error('Erro ao excluir agendamento:', error);
+        res.status(500).json({ error: 'Erro ao excluir agendamento' });
     }
 }
 
