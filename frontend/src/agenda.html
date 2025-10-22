@@ -848,6 +848,17 @@
             box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
         }
 
+        /* Esconder selects nativos imediatamente no modal */
+        #eventModal select {
+            display: none !important;
+            visibility: hidden !important;
+            position: absolute !important;
+            left: -9999px !important;
+            pointer-events: none !important;
+            tabindex: -1 !important;
+            aria-hidden: true !important;
+        }
+
         /* Responsivo para formulário */
         @media (max-width: 768px) {
             .form-row {
@@ -2300,6 +2311,22 @@
             await loadCommunities();
             await loadEventsFromApi();
             await loadAgendaLookups();
+            
+            // Carregar dados dos selects do modal ANTECIPADAMENTE
+            console.log('🔄 Carregando dados dos selects do modal...');
+            try {
+                await Promise.all([
+                    loadEventCommunities(),
+                    loadEventPastorals(),
+                    loadEventPilares(),
+                    loadEventAcoes(),
+                    loadEventLocais()
+                ]);
+                console.log('✅ Todos os dados dos selects foram carregados antecipadamente');
+            } catch (error) {
+                console.error('❌ Erro ao carregar dados dos selects:', error);
+            }
+            
             setupEventListeners();
         });
 
@@ -3014,36 +3041,20 @@
                 });
             }
             
-            // Carregar dados dos selects ANTES de inicializar os customizados
-            console.log('🔄 Carregando dados dos selects...');
-            Promise.all([
-                loadEventCommunities(),
-                loadEventPastorals(),
-                loadEventPilares(),
-                loadEventAcoes(),
-                loadEventLocais()
-            ]).then(() => {
-                console.log('✅ Todos os dados dos selects foram carregados');
-                
-                // Aplicar estilos de altura máxima aos selects após carregamento
-                const selects = document.querySelectorAll('#eventModal select');
-                selects.forEach(select => {
-                    select.style.maxHeight = '200px';
-                    select.style.overflowY = 'auto';
-                    select.style.height = 'auto';
-                });
-
-                // Inicializar selects customizados com busca APÓS carregar dados
-                setTimeout(() => {
-                    initializeCustomSelects('#eventModal');
-                }, 100);
-            }).catch(error => {
-                console.error('❌ Erro ao carregar dados dos selects:', error);
-                // Mesmo com erro, inicializar os customizados
-                setTimeout(() => {
-                    initializeCustomSelects('#eventModal');
-                }, 100);
+            // Dados já foram carregados antecipadamente
+            console.log('✅ Dados dos selects já carregados previamente');
+            
+            // Aplicar estilos de altura máxima aos selects
+            const selects = document.querySelectorAll('#eventModal select');
+            selects.forEach(select => {
+                select.style.maxHeight = '200px';
+                select.style.overflowY = 'auto';
+                select.style.height = 'auto';
             });
+
+            // Inicializar selects customizados IMEDIATAMENTE (dados já carregados)
+            console.log('🔄 Inicializando dropdowns customizados...');
+            initializeCustomSelects('#eventModal');
             
             console.log('✅ Modal de novo agendamento criado e exibido');
         }
@@ -3069,6 +3080,15 @@
         // Cria um campo de busca/seleção direto (substitui o select)
         function makeCustomSelect(nativeSelect) {
             if (!nativeSelect || nativeSelect.dataset.enhanced === 'true') return;
+
+            // Esconder select nativo IMEDIATAMENTE
+            nativeSelect.style.display = 'none';
+            nativeSelect.style.visibility = 'hidden';
+            nativeSelect.style.position = 'absolute';
+            nativeSelect.style.left = '-9999px';
+            nativeSelect.style.pointerEvents = 'none';
+            nativeSelect.tabIndex = -1;
+            nativeSelect.setAttribute('aria-hidden', 'true');
 
             // Campo de busca direto
             const field = document.createElement('div');
