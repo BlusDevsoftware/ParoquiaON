@@ -2800,6 +2800,20 @@
                 });
             }
             
+            // Carregar dados dos selects
+            console.log('🔄 Carregando dados dos selects...');
+            Promise.all([
+                loadEventCommunities(),
+                loadEventPastorals(),
+                loadEventPilares(),
+                loadEventAcoes(),
+                loadEventLocais()
+            ]).then(() => {
+                console.log('✅ Todos os dados dos selects foram carregados');
+            }).catch(error => {
+                console.error('❌ Erro ao carregar dados dos selects:', error);
+            });
+            
             console.log('✅ Modal de novo agendamento criado e exibido');
         }
 
@@ -2807,24 +2821,144 @@
             console.log('Modal de novo agendamento não está disponível');
         }
 
-        function loadEventCommunities() {
-            console.log('Modal de novo agendamento não está disponível');
+        // Função para carregar comunidades
+        async function loadEventCommunities() {
+            try {
+                console.log('🔄 Carregando comunidades...');
+                const { data, error } = await window.api.get(window.endpoints.comunidades.list);
+                if (error) throw error;
+                
+                const comunidades = Array.isArray(data) ? data : [];
+                const select = document.getElementById('eventCommunity');
+                if (select) {
+                    // Limpar opções existentes (exceto a primeira)
+                    select.innerHTML = '<option value="">Selecione a comunidade</option>';
+                    
+                    // Adicionar opções das comunidades
+                    comunidades.forEach(comunidade => {
+                        const option = document.createElement('option');
+                        option.value = comunidade.id;
+                        option.textContent = comunidade.nome;
+                        select.appendChild(option);
+                    });
+                    
+                    console.log('✅ Comunidades carregadas:', comunidades.length);
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar comunidades:', error);
+            }
         }
 
-        function loadEventPastorals() {
-            console.log('Modal de novo agendamento não está disponível');
+        // Função para carregar pastorais
+        async function loadEventPastorals() {
+            try {
+                console.log('🔄 Carregando pastorais...');
+                const { data, error } = await window.api.get(window.endpoints.pastorais.list);
+                if (error) throw error;
+                
+                const pastorais = Array.isArray(data) ? data : [];
+                const select = document.getElementById('eventPastoral');
+                if (select) {
+                    // Limpar opções existentes (exceto a primeira)
+                    select.innerHTML = '<option value="">Selecione a pastoral</option>';
+                    
+                    // Adicionar opções das pastorais
+                    pastorais.forEach(pastoral => {
+                        const option = document.createElement('option');
+                        option.value = pastoral.id;
+                        option.textContent = pastoral.nome;
+                        select.appendChild(option);
+                    });
+                    
+                    console.log('✅ Pastorais carregadas:', pastorais.length);
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar pastorais:', error);
+            }
         }
 
-        function loadEventPilares() {
-            console.log('Modal de novo agendamento não está disponível');
+        // Função para carregar pilares
+        async function loadEventPilares() {
+            try {
+                console.log('🔄 Carregando pilares...');
+                const { data, error } = await window.api.get(window.endpoints.pilares.list);
+                if (error) throw error;
+                
+                const pilares = Array.isArray(data) ? data : [];
+                const select = document.getElementById('eventPilares');
+                if (select) {
+                    // Limpar opções existentes (exceto a primeira)
+                    select.innerHTML = '<option value="">Selecione o pilar</option>';
+                    
+                    // Adicionar opções dos pilares
+                    pilares.forEach(pilar => {
+                        const option = document.createElement('option');
+                        option.value = pilar.id;
+                        option.textContent = pilar.nome;
+                        select.appendChild(option);
+                    });
+                    
+                    console.log('✅ Pilares carregados:', pilares.length);
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar pilares:', error);
+            }
         }
 
-        function loadEventAcoes() {
-            console.log('Modal de novo agendamento não está disponível');
+        // Função para carregar ações
+        async function loadEventAcoes() {
+            try {
+                console.log('🔄 Carregando ações...');
+                const { data, error } = await window.api.get(window.endpoints.acoes.list);
+                if (error) throw error;
+                
+                const acoes = Array.isArray(data) ? data : [];
+                const select = document.getElementById('eventAcao');
+                if (select) {
+                    // Limpar opções existentes (exceto a primeira)
+                    select.innerHTML = '<option value="">Selecione a ação</option>';
+                    
+                    // Adicionar opções das ações
+                    acoes.forEach(acao => {
+                        const option = document.createElement('option');
+                        option.value = acao.id;
+                        option.textContent = acao.nome;
+                        select.appendChild(option);
+                    });
+                    
+                    console.log('✅ Ações carregadas:', acoes.length);
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar ações:', error);
+            }
         }
 
-        function loadEventLocais() {
-            console.log('Modal de novo agendamento não está disponível');
+        // Função para carregar locais
+        async function loadEventLocais() {
+            try {
+                console.log('🔄 Carregando locais...');
+                const { data, error } = await window.api.get(window.endpoints.locais.list);
+                if (error) throw error;
+                
+                const locais = Array.isArray(data) ? data : [];
+                const select = document.getElementById('eventLocation');
+                if (select) {
+                    // Limpar opções existentes (exceto a primeira)
+                    select.innerHTML = '<option value="">Selecione o local</option>';
+                    
+                    // Adicionar opções dos locais
+                    locais.forEach(local => {
+                        const option = document.createElement('option');
+                        option.value = local.id;
+                        option.textContent = local.nome;
+                        select.appendChild(option);
+                    });
+                    
+                    console.log('✅ Locais carregados:', locais.length);
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar locais:', error);
+            }
         }
 
         function closeEventModal() {
@@ -2920,6 +3054,13 @@ Evento criado com sucesso!
 • Lembrete: ${formData.lembrete}
 • Capacidade: ${formData.capacidade || 'Ilimitada'}
 • Ativo: ${formData.ativo ? 'Sim' : 'Não'}
+
+🔗 IDs DOS REGISTROS:
+• Comunidade ID: ${formData.comunidade}
+• Pastoral ID: ${formData.pastoral}
+• Pilar ID: ${formData.pilares}
+• Local ID: ${formData.local}
+• Ação ID: ${formData.acao}
             `;
             
             alert(dadosResumo);
