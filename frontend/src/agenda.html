@@ -412,12 +412,7 @@
             height: auto !important;
         }
 
-        /* Forçar altura máxima para todos os selects do modal */
-        #eventModal select {
-            max-height: 200px !important;
-            overflow-y: auto !important;
-            height: auto !important;
-        }
+        /* Selects do modal usam layout customizado - estilos nativos removidos */
 
         /* Estilo específico para selects com muitas opções */
         select[size] {
@@ -466,14 +461,7 @@
             overflow-y: auto;
         }
 
-        /* Forçar estilos para selects do modal de evento */
-        #eventModal .form-group select,
-        #eventModal select {
-            max-height: 200px !important;
-            overflow-y: auto !important;
-            height: auto !important;
-            min-height: 40px !important;
-        }
+        /* Selects do modal usam layout customizado - estilos nativos removidos */
 
         /* Select customizado com busca (apenas dentro do modal) */
         /* Campo de busca/seleção direto (substitui o select) */
@@ -624,10 +612,9 @@
             background: transparent;
         }
 
-        /* Responsivo para selects */
+        /* Responsivo para selects (apenas fora do modal) */
         @media (max-width: 768px) {
-            .form-group select,
-            #eventModal select {
+            .form-group select:not(#eventModal select) {
                 max-height: 150px !important;
             }
         }
@@ -3044,13 +3031,7 @@
             // Dados já foram carregados antecipadamente
             console.log('✅ Dados dos selects já carregados previamente');
             
-            // Aplicar estilos de altura máxima aos selects
-            const selects = document.querySelectorAll('#eventModal select');
-            selects.forEach(select => {
-                select.style.maxHeight = '200px';
-                select.style.overflowY = 'auto';
-                select.style.height = 'auto';
-            });
+            // Selects do modal usam layout customizado - estilos nativos removidos
 
             // Inicializar selects customizados IMEDIATAMENTE (dados já carregados)
             console.log('🔄 Inicializando dropdowns customizados...');
