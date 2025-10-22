@@ -2,7 +2,35 @@ const { supabase } = require('../config/supabase');
 
 async function listarEventos(req, res) {
     try {
-        const { data, error } = await supabase.from('eventos').select('*').order('id', { ascending: true });
+        const { data, error } = await supabase
+            .from('eventos')
+            .select(`
+                *,
+                locais (
+                    id,
+                    nome,
+                    endereco,
+                    capacidade
+                ),
+                acoes (
+                    id,
+                    nome,
+                    descricao,
+                    pilares (
+                        id,
+                        nome,
+                        cor
+                    )
+                ),
+                pessoas!responsavel_id (
+                    id,
+                    nome,
+                    telefone,
+                    email
+                )
+            `)
+            .order('data_inicio', { ascending: true });
+            
         if (error) throw error;
         res.json(data);
     } catch (error) {
@@ -14,7 +42,36 @@ async function listarEventos(req, res) {
 async function buscarEvento(req, res) {
     try {
         const { id } = req.params;
-        const { data, error } = await supabase.from('eventos').select('*').eq('id', id).single();
+        const { data, error } = await supabase
+            .from('eventos')
+            .select(`
+                *,
+                locais (
+                    id,
+                    nome,
+                    endereco,
+                    capacidade
+                ),
+                acoes (
+                    id,
+                    nome,
+                    descricao,
+                    pilares (
+                        id,
+                        nome,
+                        cor
+                    )
+                ),
+                pessoas!responsavel_id (
+                    id,
+                    nome,
+                    telefone,
+                    email
+                )
+            `)
+            .eq('id', id)
+            .single();
+            
         if (error) throw error;
         if (!data) return res.status(404).json({ error: 'Evento não encontrado' });
         res.json(data);
@@ -27,7 +84,43 @@ async function buscarEvento(req, res) {
 async function criarEvento(req, res) {
     try {
         const dados = req.body;
-        const { data, error } = await supabase.from('eventos').insert([dados]).select().single();
+        
+        // Validação básica
+        if (!dados.titulo || !dados.data_inicio) {
+            return res.status(400).json({ error: 'Título e data de início são obrigatórios' });
+        }
+        
+        // Inserir evento
+        const { data, error } = await supabase
+            .from('eventos')
+            .insert([dados])
+            .select(`
+                *,
+                locais (
+                    id,
+                    nome,
+                    endereco,
+                    capacidade
+                ),
+                acoes (
+                    id,
+                    nome,
+                    descricao,
+                    pilares (
+                        id,
+                        nome,
+                        cor
+                    )
+                ),
+                pessoas!responsavel_id (
+                    id,
+                    nome,
+                    telefone,
+                    email
+                )
+            `)
+            .single();
+            
         if (error) throw error;
         res.status(201).json(data);
     } catch (error) {
@@ -40,7 +133,39 @@ async function atualizarEvento(req, res) {
     try {
         const { id } = req.params;
         const dados = req.body;
-        const { data, error } = await supabase.from('eventos').update(dados).eq('id', id).select().single();
+        
+        // Atualizar evento
+        const { data, error } = await supabase
+            .from('eventos')
+            .update(dados)
+            .eq('id', id)
+            .select(`
+                *,
+                locais (
+                    id,
+                    nome,
+                    endereco,
+                    capacidade
+                ),
+                acoes (
+                    id,
+                    nome,
+                    descricao,
+                    pilares (
+                        id,
+                        nome,
+                        cor
+                    )
+                ),
+                pessoas!responsavel_id (
+                    id,
+                    nome,
+                    telefone,
+                    email
+                )
+            `)
+            .single();
+            
         if (error) throw error;
         if (!data) return res.status(404).json({ error: 'Evento não encontrado' });
         res.json(data);

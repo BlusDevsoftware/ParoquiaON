@@ -412,7 +412,12 @@
             height: auto !important;
         }
 
-        /* Selects do modal usam layout customizado - estilos nativos removidos */
+        /* Forçar altura máxima para todos os selects do modal */
+        #eventModal select {
+            max-height: 200px !important;
+            overflow-y: auto !important;
+            height: auto !important;
+        }
 
         /* Estilo específico para selects com muitas opções */
         select[size] {
@@ -461,7 +466,14 @@
             overflow-y: auto;
         }
 
-        /* Selects do modal usam layout customizado - estilos nativos removidos */
+        /* Forçar estilos para selects do modal de evento */
+        #eventModal .form-group select,
+        #eventModal select {
+            max-height: 200px !important;
+            overflow-y: auto !important;
+            height: auto !important;
+            min-height: 40px !important;
+        }
 
         /* Select customizado com busca (apenas dentro do modal) */
         /* Campo de busca/seleção direto (substitui o select) */
@@ -499,14 +511,12 @@
             border: 1px solid #e5e7eb;
             border-radius: 6px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            z-index: 1000;
+            z-index: 10;
             display: none;
         }
 
         #eventModal .search-select-field.open .search-select-menu {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+            display: block;
         }
 
         #eventModal .search-select-list {
@@ -614,9 +624,10 @@
             background: transparent;
         }
 
-        /* Responsivo para selects (apenas fora do modal) */
+        /* Responsivo para selects */
         @media (max-width: 768px) {
-            .form-group select:not(#eventModal select) {
+            .form-group select,
+            #eventModal select {
                 max-height: 150px !important;
             }
         }
@@ -835,17 +846,6 @@
             outline: none;
             border-color: #1e3a8a;
             box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
-        }
-
-        /* Esconder selects nativos imediatamente no modal */
-        #eventModal select {
-            display: none !important;
-            visibility: hidden !important;
-            position: absolute !important;
-            left: -9999px !important;
-            pointer-events: none !important;
-            tabindex: -1 !important;
-            aria-hidden: true !important;
         }
 
         /* Responsivo para formulário */
@@ -2813,7 +2813,7 @@
             });
         }
 
-        async function openEventModal(date = null) {
+        function openEventModal(date = null) {
             console.log('🚀 Abrindo modal de novo agendamento...');
             
             // Criar modal dinamicamente baseado no modal de comunidade
@@ -3033,9 +3033,19 @@
             // Dados já foram carregados antecipadamente
             console.log('✅ Dados dos selects já carregados previamente');
             
-            // Inicializar selects customizados IMEDIATAMENTE (dados já disponíveis)
-            console.log('🔄 Inicializando dropdowns customizados...');
-            initializeCustomSelects('#eventModal');
+            // Aplicar estilos de altura máxima aos selects
+            const selects = document.querySelectorAll('#eventModal select');
+            selects.forEach(select => {
+                select.style.maxHeight = '200px';
+                select.style.overflowY = 'auto';
+                select.style.height = 'auto';
+            });
+
+            // Inicializar selects customizados IMEDIATAMENTE (dados já carregados)
+            setTimeout(() => {
+                console.log('🔄 Inicializando dropdowns customizados...');
+                initializeCustomSelects('#eventModal');
+            }, 100);
             
             console.log('✅ Modal de novo agendamento criado e exibido');
         }
@@ -3062,15 +3072,6 @@
         function makeCustomSelect(nativeSelect) {
             if (!nativeSelect || nativeSelect.dataset.enhanced === 'true') return;
 
-            // Esconder select nativo IMEDIATAMENTE
-            nativeSelect.style.display = 'none';
-            nativeSelect.style.visibility = 'hidden';
-            nativeSelect.style.position = 'absolute';
-            nativeSelect.style.left = '-9999px';
-            nativeSelect.style.pointerEvents = 'none';
-            nativeSelect.tabIndex = -1;
-            nativeSelect.setAttribute('aria-hidden', 'true');
-
             // Campo de busca direto
             const field = document.createElement('div');
             field.className = 'search-select-field';
@@ -3092,10 +3093,7 @@
             // Monta itens iniciais
             const buildItems = () => {
                 list.innerHTML = '';
-                const options = Array.from(nativeSelect.options);
-                console.log('🔍 Opções encontradas no select:', options.length, options.map(o => o.textContent));
-                
-                options.forEach((opt) => {
+                Array.from(nativeSelect.options).forEach((opt) => {
                     const text = (opt.textContent || '').trim();
                     const isPlaceholder = opt.value === '' || /^\s*selecione/i.test(text);
                     if (isPlaceholder) return;
@@ -3116,18 +3114,6 @@
                     });
                     list.appendChild(item);
                 });
-                
-                console.log('📋 Itens criados na lista:', list.children.length);
-                
-                // Se não há itens, mostrar mensagem de erro
-                if (list.children.length === 0) {
-                    const errorItem = document.createElement('div');
-                    errorItem.className = 'search-select-item';
-                    errorItem.textContent = 'Nenhuma opção disponível';
-                    errorItem.style.color = '#666';
-                    errorItem.style.fontStyle = 'italic';
-                    list.appendChild(errorItem);
-                }
             };
             buildItems();
 
@@ -3907,12 +3893,47 @@
             }
         }
 
+        function clearEventForm() {
+            // Limpar todos os campos do formulário
+            const form = document.getElementById('eventForm');
+            if (form) {
+                form.reset();
+                
+                // Limpar campos específicos
+                const fields = [
+                    'eventTitle', 'eventCommunity', 'eventPastoral', 'eventPilares',
+                    'eventLocation', 'eventAcao', 'eventObjetivo', 'eventDateStart',
+                    'eventTimeStart', 'eventDateEnd', 'eventTimeEnd', 'eventStatus',
+                    'eventVisibility', 'eventReminder', 'eventCapacity'
+                ];
+                
+                fields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.value = '';
+                    }
+                });
+                
+                // Limpar checkbox
+                const checkbox = document.getElementById('eventParoquial');
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+                
+                // Limpar toggle de status
+                const toggle = document.querySelector('.status-toggle');
+                if (toggle) {
+                    toggle.checked = true;
+                }
+            }
+        }
+
         function editEvent(event) {
             console.log('Modal de edição não está disponível');
             alert('Modal de edição de eventos não está disponível no momento.');
         }
 
-        function handleEventSubmit(e) {
+        async function handleEventSubmit(e) {
             e.preventDefault();
             console.log('💾 Processando formulário de novo agendamento...');
             
@@ -3942,7 +3963,7 @@
             if (!formData.titulo || !formData.comunidade || !formData.pastoral || !formData.pilares || 
                 !formData.local || !formData.acao || !formData.dataInicio || !formData.horaInicio || 
                 !formData.dataFim || !formData.horaFim || !formData.status) {
-                alert('Por favor, preencha todos os campos obrigatórios.');
+                showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
                 return;
             }
             
@@ -3950,63 +3971,58 @@
             const dataInicio = new Date(formData.dataInicio + ' ' + formData.horaInicio);
             const dataFim = new Date(formData.dataFim + ' ' + formData.horaFim);
             if (dataFim <= dataInicio) {
-                alert('A data e hora de fim devem ser posteriores à data e hora de início.');
+                showToast('A data e hora de fim devem ser posteriores à data e hora de início.', 'error');
                 return;
             }
             
             // Validar se a data não é no passado
             const now = new Date();
             if (dataInicio < now) {
-                alert('A data e hora de início do evento não podem ser no passado.');
+                showToast('A data e hora de início do evento não podem ser no passado.', 'error');
                 return;
             }
             
             console.log('📋 Dados do evento:', formData);
             
-            // Mostrar dados coletados
-            const dadosResumo = `
-Evento criado com sucesso!
-
-📋 INFORMAÇÕES BÁSICAS:
-• Título: ${formData.titulo}
-• Comunidade: ${document.getElementById('eventCommunity').selectedOptions[0]?.text || 'Não selecionada'}
-• Pastoral: ${document.getElementById('eventPastoral').selectedOptions[0]?.text || 'Não selecionada'}
-• Pilares: ${document.getElementById('eventPilares').selectedOptions[0]?.text || 'Não selecionado'}
-• Local: ${document.getElementById('eventLocation').selectedOptions[0]?.text || 'Não selecionado'}
-• Ação: ${document.getElementById('eventAcao').selectedOptions[0]?.text || 'Não selecionada'}
-• Objetivo: ${formData.objetivo || 'Não informado'}
-
-📅 DATA E HORÁRIO:
-• Data de Início: ${formData.dataInicio} às ${formData.horaInicio}
-• Data de Fim: ${formData.dataFim} às ${formData.horaFim}
-
-⚙️ CONFIGURAÇÕES:
-• Evento Paroquial: ${formData.eventoParoquial ? 'Sim' : 'Não'}
-• Anexos: ${formData.anexos.length} arquivo(s) selecionado(s)
-• Status: ${formData.status}
-• Visibilidade: ${formData.visibilidade}
-• Lembrete: ${formData.lembrete}
-• Capacidade: ${formData.capacidade || 'Ilimitada'}
-• Ativo: ${formData.ativo ? 'Sim' : 'Não'}
-
-🔗 IDs DOS REGISTROS:
-• Comunidade ID: ${formData.comunidade}
-• Pastoral ID: ${formData.pastoral}
-• Pilar ID: ${formData.pilares}
-• Local ID: ${formData.local}
-• Ação ID: ${formData.acao}
-            `;
-            
-            alert(dadosResumo);
-            
-            // Fechar o modal
-            closeEventModal();
-            
-            // Aqui você pode adicionar a lógica para salvar o evento na API
-            // saveEventToAPI(formData);
-            
-            // Recarregar eventos (se necessário)
-            // loadEventsFromApi();
+            try {
+                // Preparar dados para a API
+                const eventData = {
+                    titulo: formData.titulo,
+                    descricao: formData.objetivo || '',
+                    data_inicio: new Date(formData.dataInicio + ' ' + formData.horaInicio).toISOString(),
+                    data_fim: new Date(formData.dataFim + ' ' + formData.horaFim).toISOString(),
+                    local_id: parseInt(formData.local),
+                    acao_id: parseInt(formData.acao),
+                    responsavel_id: null, // Pode ser implementado depois
+                    status: formData.status || 'Agendado'
+                };
+                
+                console.log('🚀 Enviando evento para API:', eventData);
+                
+                // Salvar evento na API
+                const { data, error } = await window.api.post(window.endpoints.agenda.create, eventData);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('✅ Evento criado com sucesso:', data);
+                showToast('Evento criado com sucesso!', 'success');
+                
+                // Limpar formulário
+                clearEventForm();
+                
+                // Fechar o modal
+                closeEventModal();
+                
+                // Recarregar eventos
+                await loadEventsFromApi();
+                filterEventsByCommunity();
+                
+            } catch (error) {
+                console.error('❌ Erro ao criar evento:', error);
+                showToast('Erro ao criar evento: ' + (error.message || 'Erro desconhecido'), 'error');
+            }
         }
 
         async function deleteEvent(eventId) {
@@ -4077,21 +4093,43 @@ Evento criado com sucesso!
 
         async function loadEventsFromApi() {
             try {
+                console.log('🔄 Carregando eventos da API...');
                 const { data, error } = await window.api.get(window.endpoints.agenda.list);
                 if (error) throw error;
+                
                 const lista = Array.isArray(data) ? data : [];
+                console.log('📋 Eventos recebidos da API:', lista.length);
+                
                 // Normalizar objetos para uso no calendário
-                allEvents = lista.map(ev => ({
-                    ...ev,
-                    // Garantir compatibilidade de tipos
-                    startTime: ev.startTime || ev.start_time || ev.inicio || ev.data_inicio || ev.dataHoraInicio || ev.start || ev.startedAt || ev.inicio_iso || ev.inicioISO || ev.data_inicio_iso || ev.dataInicioISO || ev.data_inicio_iso || ev.start_iso || ev.startISO || ev.startDate || ev.start_date,
-                    endTime: ev.endTime || ev.end_time || ev.fim || ev.data_fim || ev.dataHoraFim || ev.end || ev.endedAt || ev.fim_iso || ev.fimISO || ev.data_fim_iso || ev.dataFimISO || ev.data_fim_iso || ev.end_iso || ev.endISO || ev.endDate || ev.end_date
-                }));
+                allEvents = lista.map(ev => {
+                    // Buscar informações relacionadas
+                    const localNome = ev.locais?.nome || ev.local_nome || 'Local não informado';
+                    const acaoNome = ev.acoes?.nome || ev.acao_nome || 'Ação não informada';
+                    const responsavelNome = ev.pessoas?.nome || ev.responsavel_nome || 'Responsável não informado';
+                    
+                    return {
+                        ...ev,
+                        // Garantir compatibilidade de tipos
+                        startTime: ev.startTime || ev.start_time || ev.inicio || ev.data_inicio || ev.dataHoraInicio || ev.start || ev.startedAt || ev.inicio_iso || ev.inicioISO || ev.data_inicio_iso || ev.dataInicioISO || ev.data_inicio_iso || ev.start_iso || ev.startISO || ev.startDate || ev.start_date,
+                        endTime: ev.endTime || ev.end_time || ev.fim || ev.data_fim || ev.dataHoraFim || ev.end || ev.endedAt || ev.fim_iso || ev.fimISO || ev.data_fim_iso || ev.dataFimISO || ev.data_fim_iso || ev.end_iso || ev.endISO || ev.endDate || ev.end_date,
+                        // Adicionar informações relacionadas
+                        local_nome: localNome,
+                        acao_nome: acaoNome,
+                        responsavel_nome: responsavelNome,
+                        // Garantir título
+                        title: ev.titulo || ev.title || 'Evento sem título',
+                        // Garantir cor baseada no pilar da ação
+                        color: ev.acoes?.pilares?.cor || ev.cor || '#1e3a8a'
+                    };
+                });
+                
+                console.log('✅ Eventos processados:', allEvents.length);
                 
                 // Aplicar filtro inicial
                 filterEventsByCommunity();
             } catch (err) {
-                console.error('Erro ao carregar eventos da API:', err);
+                console.error('❌ Erro ao carregar eventos da API:', err);
+                showToast('Erro ao carregar eventos: ' + (err.message || 'Erro desconhecido'), 'error');
                 allEvents = [];
                 events = [];
             }
