@@ -123,6 +123,514 @@
 
         /* CSS do Multplus removido - modal não disponível */
 
+        /* Modal de Evento */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: scale(0.95) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-title i {
+            color: #1e3a8a;
+        }
+
+        /* CSS mais específico para o título do modal */
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e3a8a !important;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-header h2 i {
+            color: #1e3a8a !important;
+        }
+
+        #modalTitle {
+            color: #1e3a8a !important;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 10px;
+        }
+
+        /* Scrollbar personalizado para o modal */
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.35);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            transform: translateY(-1px);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 20px;
+                max-width: calc(100% - 40px);
+            padding: 20px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Estilos das Seções do Formulário */
+        .form-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .section-title {
+            margin: 0 0 20px 0;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1e3a8a;
+        }
+
+        .section-title i {
+            color: #1e3a8a;
+            font-size: 1.1em;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group label i {
+            margin-right: 5px;
+            color: #1e3a8a;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #1e3a8a;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
+        }
+
+        .form-group input[readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            flex-shrink: 0;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.35);
+        }
+
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Toggle de Status */
+        .status-toggle-modal {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .status-label-modal {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Modal Header Actions */
+        .modal-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        /* Checkbox personalizado */
+        .checkbox-group {
+            margin-top: 8px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkmark {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-label input[type="checkbox"]:checked + .checkmark {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            border-color: #1e3a8a;
+        }
+
+        .checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Estilos para campos de arquivo */
+        .file-info {
+            margin-top: 5px;
+        }
+
+        .file-info small {
+            color: #666;
+            font-size: 12px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="file"]:hover {
+            border-color: #1e3a8a;
+            background-color: #f0f8ff;
+        }
+
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
+        }
+
+        /* Responsivo para formulário */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .form-section {
+                padding: 15px;
+            }
+            
+            .modal-header-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
 
 
 
@@ -1353,10 +1861,10 @@
             <div class="sidebar-content">
                 <!-- Container Lateral do Calendário -->
                 <div class="calendar-sidebar-container">
-                    <!-- Botão Criar - Desabilitado -->
-                    <button class="create-button" disabled style="opacity: 0.5; cursor: not-allowed;">
+                    <!-- Botão Criar -->
+                    <button class="create-button" onclick="openEventModal()">
                         <i class="fas fa-plus"></i>
-                        Criar (Indisponível)
+                        Criar
                     </button>
 
                     <button class="multplus-btn" onclick="openMultplusModal()">
@@ -2056,8 +2564,243 @@
         }
 
         function openEventModal(date = null) {
-            console.log('Modal de novo agendamento não está disponível');
-            alert('Modal de novo agendamento não está disponível no momento.');
+            console.log('🚀 Abrindo modal de novo agendamento...');
+            
+            // Criar modal dinamicamente baseado no modal de comunidade
+            const modalHTML = `
+                <div id="eventModal" class="modal active">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2><i class="fas fa-calendar-plus"></i> <span id="modalTitle">Novo Agendamento</span></h2>
+                            <div class="modal-header-actions">
+                                <div class="status-toggle-modal">
+                                    <label class="switch">
+                                        <input type="checkbox" class="status-toggle" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="status-label-modal">Ativo</span>
+                                </div>
+                                <button class="close-modal" onclick="closeEventModal()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <form id="eventForm">
+                                <!-- Seção: Informações Básicas do Evento -->
+                                <div class="form-section">
+                                    <h3 class="section-title"><i class="fas fa-info-circle"></i> Informações Básicas do Evento</h3>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fas fa-heading"></i> Título do Evento</label>
+                                            <input type="text" id="eventTitle" name="titulo" required placeholder="Digite o título do evento">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fas fa-church"></i> Comunidade</label>
+                                            <select id="eventCommunity" name="comunidade" required>
+                                                <option value="">Selecione a comunidade</option>
+                                                <option value="1">Comunidade São José</option>
+                                                <option value="2">Comunidade Nossa Senhora</option>
+                                                <option value="3">Comunidade Santo Antônio</option>
+                                                <option value="4">Comunidade São Pedro</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><i class="fas fa-cross"></i> Pastoral</label>
+                                            <select id="eventPastoral" name="pastoral" required>
+                                                <option value="">Selecione a pastoral</option>
+                                                <option value="1">Pastoral da Criança</option>
+                                                <option value="2">Pastoral da Juventude</option>
+                                                <option value="3">Pastoral da Família</option>
+                                                <option value="4">Pastoral Litúrgica</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fas fa-layer-group"></i> Pilares</label>
+                                            <select id="eventPilares" name="pilares" required>
+                                                <option value="">Selecione o pilar</option>
+                                                <option value="1">Pilar da Fé</option>
+                                                <option value="2">Pilar da Esperança</option>
+                                                <option value="3">Pilar da Caridade</option>
+                                                <option value="4">Pilar da Comunhão</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><i class="fas fa-map-marker-alt"></i> Local</label>
+                                            <select id="eventLocation" name="local" required>
+                                                <option value="">Selecione o local</option>
+                                                <option value="1">Igreja Matriz</option>
+                                                <option value="2">Capela São José</option>
+                                                <option value="3">Salão Paroquial</option>
+                                                <option value="4">Centro Comunitário</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fas fa-tasks"></i> Ação</label>
+                                            <select id="eventAcao" name="acao" required>
+                                                <option value="">Selecione a ação</option>
+                                                <option value="1">Celebração Eucarística</option>
+                                                <option value="2">Catequese</option>
+                                                <option value="3">Reunião de Pastoral</option>
+                                                <option value="4">Formação</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><i class="fas fa-bullseye"></i> Objetivo</label>
+                                            <input type="text" id="eventObjetivo" name="objetivo" placeholder="Digite o objetivo do evento">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fas fa-calendar-alt"></i> Data de Início</label>
+                                            <input type="date" id="eventDateStart" name="data_inicio" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><i class="fas fa-clock"></i> Hora de Início</label>
+                                            <input type="time" id="eventTimeStart" name="hora_inicio" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fas fa-calendar-alt"></i> Data de Fim</label>
+                                            <input type="date" id="eventDateEnd" name="data_fim" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><i class="fas fa-clock"></i> Hora de Fim</label>
+                                            <input type="time" id="eventTimeEnd" name="hora_fim" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fas fa-church"></i> Evento Paroquial</label>
+                                            <div class="checkbox-group">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="eventParoquial" name="evento_paroquial">
+                                                    <span class="checkmark"></span>
+                                                    Marcar como evento paroquial
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fas fa-paperclip"></i> Anexos de Documento</label>
+                                            <input type="file" id="eventAttachments" name="anexos" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                            <div class="file-info">
+                                                <small>Formatos aceitos: PDF, DOC, DOCX, JPG, PNG (máx. 10MB cada)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- Seção: Configurações Adicionais -->
+                                <div class="form-section">
+                                    <h3 class="section-title"><i class="fas fa-cog"></i> Configurações Adicionais</h3>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fas fa-exclamation-circle"></i> Status</label>
+                                            <select id="eventStatus" name="status" required>
+                                                <option value="agendado">Agendado</option>
+                                                <option value="confirmado">Confirmado</option>
+                                                <option value="pendente">Pendente</option>
+                                                <option value="cancelado">Cancelado</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><i class="fas fa-eye"></i> Visibilidade</label>
+                                            <select id="eventVisibility" name="visibilidade">
+                                                <option value="publico">Público</option>
+                                                <option value="privado">Privado</option>
+                                                <option value="interno">Interno</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fas fa-bell"></i> Lembrete</label>
+                                            <select id="eventReminder" name="lembrete">
+                                                <option value="nenhum">Nenhum</option>
+                                                <option value="15min">15 minutos antes</option>
+                                                <option value="30min">30 minutos antes</option>
+                                                <option value="1hora">1 hora antes</option>
+                                                <option value="1dia">1 dia antes</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><i class="fas fa-users"></i> Capacidade Máxima</label>
+                                            <input type="number" id="eventCapacity" name="capacidade" placeholder="Número de pessoas" min="1">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="button" class="btn-secondary" onclick="closeEventModal()">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </button>
+                                    <button type="submit" class="btn-primary">
+                                        <i class="fas fa-save"></i> Salvar Evento
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Inserir modal no body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Configurar data se fornecida
+            if (date) {
+                const dateInput = document.getElementById('eventDateStart');
+                if (dateInput) {
+                    dateInput.value = date;
+                }
+            }
+            
+            // Adicionar event listener para o formulário
+            const form = document.getElementById('eventForm');
+            if (form) {
+                form.addEventListener('submit', handleEventSubmit);
+            }
+            
+            // Adicionar event listener para fechar ao clicar fora
+            const modal = document.getElementById('eventModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeEventModal();
+                    }
+                });
+            }
+            
+            // Adicionar event listener para o toggle de status
+            const statusToggle = document.querySelector('.status-toggle');
+            const statusLabel = document.querySelector('.status-label-modal');
+            if (statusToggle && statusLabel) {
+                statusToggle.addEventListener('change', function() {
+                    statusLabel.textContent = this.checked ? 'Ativo' : 'Inativo';
+                });
+            }
+            
+            console.log('✅ Modal de novo agendamento criado e exibido');
         }
 
         function loadEventModalData() {
@@ -2085,7 +2828,15 @@
         }
 
         function closeEventModal() {
-            console.log('Modal de novo agendamento não está disponível');
+            console.log('🔒 Fechando modal de novo agendamento...');
+            
+            const modal = document.getElementById('eventModal');
+            if (modal) {
+                modal.remove();
+                console.log('✅ Modal removido com sucesso');
+            } else {
+                console.log('⚠️ Modal não encontrado');
+            }
         }
 
         function editEvent(event) {
@@ -2095,8 +2846,92 @@
 
         function handleEventSubmit(e) {
             e.preventDefault();
-            console.log('Modal de novo agendamento não está disponível');
-            alert('Modal de novo agendamento não está disponível no momento.');
+            console.log('💾 Processando formulário de novo agendamento...');
+            
+            // Coletar dados do formulário
+            const formData = {
+                titulo: document.getElementById('eventTitle').value,
+                comunidade: document.getElementById('eventCommunity').value,
+                pastoral: document.getElementById('eventPastoral').value,
+                pilares: document.getElementById('eventPilares').value,
+                local: document.getElementById('eventLocation').value,
+                acao: document.getElementById('eventAcao').value,
+                objetivo: document.getElementById('eventObjetivo').value,
+                dataInicio: document.getElementById('eventDateStart').value,
+                horaInicio: document.getElementById('eventTimeStart').value,
+                dataFim: document.getElementById('eventDateEnd').value,
+                horaFim: document.getElementById('eventTimeEnd').value,
+                eventoParoquial: document.getElementById('eventParoquial').checked,
+                anexos: document.getElementById('eventAttachments').files,
+                status: document.getElementById('eventStatus').value,
+                visibilidade: document.getElementById('eventVisibility').value,
+                lembrete: document.getElementById('eventReminder').value,
+                capacidade: document.getElementById('eventCapacity').value,
+                ativo: document.querySelector('.status-toggle').checked
+            };
+            
+            // Validação básica
+            if (!formData.titulo || !formData.comunidade || !formData.pastoral || !formData.pilares || 
+                !formData.local || !formData.acao || !formData.dataInicio || !formData.horaInicio || 
+                !formData.dataFim || !formData.horaFim || !formData.status) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+            
+            // Validar se data de fim é posterior à data de início
+            const dataInicio = new Date(formData.dataInicio + ' ' + formData.horaInicio);
+            const dataFim = new Date(formData.dataFim + ' ' + formData.horaFim);
+            if (dataFim <= dataInicio) {
+                alert('A data e hora de fim devem ser posteriores à data e hora de início.');
+                return;
+            }
+            
+            // Validar se a data não é no passado
+            const now = new Date();
+            if (dataInicio < now) {
+                alert('A data e hora de início do evento não podem ser no passado.');
+                return;
+            }
+            
+            console.log('📋 Dados do evento:', formData);
+            
+            // Mostrar dados coletados
+            const dadosResumo = `
+Evento criado com sucesso!
+
+📋 INFORMAÇÕES BÁSICAS:
+• Título: ${formData.titulo}
+• Comunidade: ${document.getElementById('eventCommunity').selectedOptions[0]?.text || 'Não selecionada'}
+• Pastoral: ${document.getElementById('eventPastoral').selectedOptions[0]?.text || 'Não selecionada'}
+• Pilares: ${document.getElementById('eventPilares').selectedOptions[0]?.text || 'Não selecionado'}
+• Local: ${document.getElementById('eventLocation').selectedOptions[0]?.text || 'Não selecionado'}
+• Ação: ${document.getElementById('eventAcao').selectedOptions[0]?.text || 'Não selecionada'}
+• Objetivo: ${formData.objetivo || 'Não informado'}
+
+📅 DATA E HORÁRIO:
+• Data de Início: ${formData.dataInicio} às ${formData.horaInicio}
+• Data de Fim: ${formData.dataFim} às ${formData.horaFim}
+
+⚙️ CONFIGURAÇÕES:
+• Evento Paroquial: ${formData.eventoParoquial ? 'Sim' : 'Não'}
+• Anexos: ${formData.anexos.length} arquivo(s) selecionado(s)
+• Status: ${formData.status}
+• Visibilidade: ${formData.visibilidade}
+• Lembrete: ${formData.lembrete}
+• Capacidade: ${formData.capacidade || 'Ilimitada'}
+• Ativo: ${formData.ativo ? 'Sim' : 'Não'}
+            `;
+            
+            alert(dadosResumo);
+            
+            // Fechar o modal
+            closeEventModal();
+            
+            // Aqui você pode adicionar a lógica para salvar o evento na API
+            // saveEventToAPI(formData);
+            
+            // Recarregar eventos (se necessário)
+            // loadEventsFromApi();
         }
 
         async function deleteEvent(eventId) {
