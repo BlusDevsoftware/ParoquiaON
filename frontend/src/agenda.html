@@ -212,6 +212,12 @@
             padding-right: 10px;
         }
 
+        /* Garantir que o modal-body não corte o checkbox */
+        .modal-body .form-group:has(.checkbox-group) {
+            overflow: visible !important;
+            max-height: none !important;
+        }
+
         /* Scrollbar personalizado para o modal */
         .modal-body::-webkit-scrollbar {
             width: 6px;
@@ -480,6 +486,56 @@
             max-height: none !important;
             overflow: visible !important;
             height: auto !important;
+            width: 100% !important;
+            position: relative !important;
+        }
+
+        /* Garantir que o form-group do checkbox não tenha limitações */
+        #eventModal .form-group:has(.checkbox-group) {
+            overflow: visible !important;
+            max-height: none !important;
+            height: auto !important;
+            width: 100% !important;
+        }
+
+        /* Garantir que o form-row do checkbox não tenha limitações */
+        #eventModal .form-row:has(.checkbox-group) {
+            overflow: visible !important;
+            max-height: none !important;
+            height: auto !important;
+        }
+
+        /* CSS específico para o checkbox do evento paroquial */
+        #eventModal #eventParoquial {
+            position: relative !important;
+            z-index: 10 !important;
+        }
+
+        /* Garantir que o texto do checkbox não seja cortado */
+        #eventModal .checkbox-label {
+            white-space: nowrap !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
+        }
+
+        /* CSS específico para checkbox de largura completa */
+        .checkbox-full-width {
+            width: 100% !important;
+            flex: 1 1 100% !important;
+            min-width: 0 !important;
+            overflow: visible !important;
+        }
+
+        .checkbox-full-width .checkbox-group {
+            width: 100% !important;
+            overflow: visible !important;
+        }
+
+        .checkbox-full-width .checkbox-label {
+            width: 100% !important;
+            overflow: visible !important;
+            display: flex !important;
+            align-items: center !important;
         }
 
         /* Select customizado com busca (apenas dentro do modal) */
@@ -784,10 +840,12 @@
         /* Checkbox personalizado */
         .checkbox-group {
             margin-top: 8px;
-            padding: 8px 0;
-            min-height: 40px;
+            padding: 12px 0;
+            min-height: 50px;
             display: flex;
             align-items: center;
+            width: 100%;
+            overflow: visible;
         }
 
         .checkbox-label {
@@ -796,8 +854,10 @@
             cursor: pointer;
             font-size: 14px;
             color: #555;
-            padding: 4px 0;
-            min-height: 32px;
+            padding: 8px 0;
+            min-height: 40px;
+            width: 100%;
+            overflow: visible;
         }
 
         .checkbox-label input[type="checkbox"] {
@@ -812,6 +872,7 @@
             margin-right: 10px;
             position: relative;
             transition: all 0.3s ease;
+            flex-shrink: 0;
         }
 
         .checkbox-label input[type="checkbox"]:checked + .checkmark {
@@ -1879,7 +1940,7 @@
             opacity: 0.7;
         }
 
-        /* CSS dos modais removido - modal não disponível */
+
 
         /* Spinner de carregamento - cobre área de conteúdo mas não o menu superior */
         .loader-overlay-main {
@@ -2995,11 +3056,11 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="form-row">
-                                        <div class="form-group">
+                                    <div class="form-row checkbox-full-width">
+                                        <div class="form-group checkbox-full-width">
                                             <label><i class="fas fa-church"></i> Evento Paroquial</label>
-                                            <div class="checkbox-group">
-                                                <label class="checkbox-label">
+                                            <div class="checkbox-group checkbox-full-width">
+                                                <label class="checkbox-label checkbox-full-width">
                                                     <input type="checkbox" id="eventParoquial" name="evento_paroquial">
                                                     <span class="checkmark"></span>
                                                     Marcar como evento paroquial
