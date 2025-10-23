@@ -50,8 +50,7 @@ async function listarEventos(req, res) {
                 ),
                 pilares (
                     id,
-                    nome,
-                    cor
+                    nome
                 ),
                 usuarios!usuario_lancamento_id (
                     id,
@@ -110,8 +109,7 @@ async function buscarEvento(req, res) {
                 ),
                 pilares (
                     id,
-                    nome,
-                    cor
+                    nome
                 ),
                 usuarios!usuario_lancamento_id (
                     id,
@@ -180,8 +178,7 @@ async function criarEvento(req, res) {
                 ),
                 pilares (
                     id,
-                    nome,
-                    cor
+                    nome
                 ),
                 usuarios!usuario_lancamento_id (
                     id,
@@ -237,8 +234,7 @@ async function atualizarEvento(req, res) {
                 ),
                 pilares (
                     id,
-                    nome,
-                    cor
+                    nome
                 ),
                 usuarios!usuario_lancamento_id (
                     id,
