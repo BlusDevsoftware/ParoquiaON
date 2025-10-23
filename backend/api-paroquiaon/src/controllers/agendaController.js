@@ -2,7 +2,7 @@ const { supabase } = require('../config/supabase');
 
 async function listarEventos(req, res) {
     try {
-        console.log('🔄 Iniciando listagem de agendamentos...');
+        console.log('🔄 Iniciando listagem de eventos...');
         
         // Primeiro, tentar uma consulta simples para verificar se a tabela existe
         const { data: testData, error: testError } = await supabase
@@ -64,12 +64,12 @@ async function listarEventos(req, res) {
             throw error;
         }
         
-        console.log(`✅ ${data?.length || 0} agendamentos encontrados`);
+        console.log(`✅ ${data?.length || 0} eventos encontrados`);
         res.json(data || []);
     } catch (error) {
-        console.error('❌ Erro ao listar agendamentos:', error);
+        console.error('❌ Erro ao listar eventos:', error);
         res.status(500).json({ 
-            error: 'Erro ao listar agendamentos',
+            error: 'Erro ao listar eventos',
             details: error.message 
         });
     }
@@ -149,7 +149,7 @@ async function criarEvento(req, res) {
         
         console.log('🔧 Dados completos para inserção:', JSON.stringify(dadosCompletos, null, 2));
         
-        // Inserir agendamento
+        // Inserir evento
         const { data, error } = await supabase
             .from('agendamentos')
             .insert([dadosCompletos])
@@ -208,7 +208,7 @@ async function atualizarEvento(req, res) {
         const { id } = req.params;
         const dados = req.body;
         
-        // Atualizar agendamento
+        // Atualizar evento
         const { data, error } = await supabase
             .from('agendamentos')
             .update(dados)
@@ -264,7 +264,7 @@ async function excluirEvento(req, res) {
         const { id } = req.params;
         const { data, error } = await supabase.from('agendamentos').delete().eq('id', id).select();
         if (error) throw error;
-        if (!data || data.length === 0) return res.status(404).json({ error: 'Agendamento não encontrado' });
+        if (!data || data.length === 0) return res.status(404).json({ error: 'Evento não encontrado' });
         res.json({ message: 'Agendamento excluído com sucesso', data });
     } catch (error) {
         console.error('Erro ao excluir agendamento:', error);
@@ -276,16 +276,16 @@ async function excluirEvento(req, res) {
 async function estatisticasEventos(req, res) {
     try {
         const { data: total, error: totalError } = await supabase
-            .from('agendamentos')
+            .from('eventos')
             .select('*', { count: 'exact', head: true });
 
         const { data: ativos, error: ativosError } = await supabase
-            .from('agendamentos')
+            .from('eventos')
             .select('*', { count: 'exact', head: true })
             .eq('status', 'Ativo');
 
         const { data: concluidos, error: concluidosError } = await supabase
-            .from('agendamentos')
+            .from('eventos')
             .select('*', { count: 'exact', head: true })
             .eq('status', 'Concluído');
 
@@ -309,7 +309,7 @@ async function dadosGraficosEventos(req, res) {
     try {
         // Buscar todos os eventos
         const { data: eventos, error: eventosError } = await supabase
-            .from('agendamentos')
+            .from('eventos')
             .select(`
                 id,
                 titulo,
