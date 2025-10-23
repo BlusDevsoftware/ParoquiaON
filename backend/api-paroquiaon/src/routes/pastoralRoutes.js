@@ -4,6 +4,8 @@ const pastoralController = require('../controllers/pastoralController');
 
 // Rotas para pastorais
 router.get('/', pastoralController.listarPastorais);
+router.get('/estatisticas', pastoralController.estatisticasPastorais);
+router.get('/graficos', pastoralController.dadosGraficosPastorais);
 router.get('/:id', pastoralController.buscarPastoral);
 router.post('/', pastoralController.criarPastoral);
 router.put('/:id', pastoralController.atualizarPastoral);

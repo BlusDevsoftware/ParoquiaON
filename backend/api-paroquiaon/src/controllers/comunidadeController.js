@@ -160,4 +160,168 @@ async function excluirComunidade(req, res) {
     }
 }
 
-module.exports = { listarComunidades, buscarComunidade, criarComunidade, atualizarComunidade, excluirComunidade };
+// Estatísticas das comunidades
+async function estatisticasComunidades(req, res) {
+    try {
+        const { data: total, error: totalError } = await supabase
+            .from('comunidades')
+            .select('*', { count: 'exact', head: true });
+
+        const { data: ativas, error: ativasError } = await supabase
+            .from('comunidades')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'Ativo');
+
+        const { data: inativas, error: inativasError } = await supabase
+            .from('comunidades')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'Inativo');
+
+        if (totalError || ativasError || inativasError) {
+            throw new Error('Erro ao buscar estatísticas');
+        }
+
+        res.json({
+            total: total?.length || 0,
+            ativas: ativas?.length || 0,
+            inativas: inativas?.length || 0
+        });
+    } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error);
+        res.status(500).json({ error: 'Erro ao buscar estatísticas' });
+    }
+}
+
+// Dados para gráficos de comunidades
+async function dadosGraficosComunidades(req, res) {
+    try {
+        // Buscar todas as comunidades com dados relacionados
+        const { data: comunidades, error: comunidadesError } = await supabase
+            .from('comunidades')
+            .select(`
+                id,
+                nome,
+                status,
+                data_fundacao,
+                created_at
+            `)
+            .order('created_at', { ascending: true });
+
+        if (comunidadesError) throw comunidadesError;
+
+        // Buscar pessoas por comunidade
+        const { data: pessoas, error: pessoasError } = await supabase
+            .from('pessoas')
+            .select('id, comunidade_id, created_at');
+
+        if (pessoasError) throw pessoasError;
+
+        // Calcular evolução de comunidades por mês (últimos 6 meses)
+        const evolucaoComunidades = calcularEvolucaoComunidades(comunidades);
+        
+        // Calcular distribuição por status
+        const distribuicaoStatus = calcularDistribuicaoStatus(comunidades);
+
+        // Calcular top comunidades por número de pessoas
+        const topComunidades = calcularTopComunidades(comunidades, pessoas);
+
+        res.json({
+            evolucao: evolucaoComunidades,
+            distribuicao: distribuicaoStatus,
+            topComunidades: topComunidades,
+            totalComunidades: comunidades?.length || 0
+        });
+
+    } catch (error) {
+        console.error('Erro ao buscar dados dos gráficos:', error);
+        res.status(500).json({ error: 'Erro ao buscar dados dos gráficos' });
+    }
+}
+
+// Função auxiliar para calcular evolução de comunidades
+function calcularEvolucaoComunidades(comunidades) {
+    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const dados = new Array(6).fill(0);
+    const labels = [];
+
+    const hoje = new Date();
+    for (let i = 5; i >= 0; i--) {
+        const mes = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+        labels.push(meses[mes.getMonth()]);
+        
+        const comunidadesMes = (comunidades || []).filter(c => {
+            if (!c || !c.created_at) return false;
+            const dataComunidade = new Date(c.created_at);
+            if (isNaN(dataComunidade.getTime())) return false;
+            return dataComunidade.getMonth() === mes.getMonth() && 
+                   dataComunidade.getFullYear() === mes.getFullYear();
+        });
+
+        dados[5 - i] = comunidadesMes.length;
+    }
+
+    return { labels, dados };
+}
+
+// Função auxiliar para calcular distribuição por status
+function calcularDistribuicaoStatus(comunidades) {
+    const status = {
+        ativo: 0,
+        inativo: 0
+    };
+
+    (comunidades || []).forEach(comunidade => {
+        const statusComunidade = (comunidade.status || '').toString().trim().toLowerCase();
+        if (statusComunidade === 'ativo') {
+            status.ativo++;
+        } else {
+            status.inativo++;
+        }
+    });
+
+    return {
+        labels: ['Ativo', 'Inativo'],
+        dados: [status.ativo, status.inativo]
+    };
+}
+
+// Função auxiliar para calcular top comunidades
+function calcularTopComunidades(comunidades, pessoas) {
+    const pessoasPorComunidade = {};
+    
+    pessoas.forEach(pessoa => {
+        if (pessoa.comunidade_id) {
+            pessoasPorComunidade[pessoa.comunidade_id] = (pessoasPorComunidade[pessoa.comunidade_id] || 0) + 1;
+        }
+    });
+
+    const nomesComunidades = {};
+    comunidades.forEach(comunidade => {
+        if (comunidade.id) {
+            nomesComunidades[comunidade.id] = comunidade.nome || 'Comunidade';
+        }
+    });
+
+    const topComunidades = Object.entries(pessoasPorComunidade)
+        .map(([id, count]) => ({
+            nome: nomesComunidades[id] || `Comunidade ${id}`,
+            count: count
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+    return {
+        labels: topComunidades.map(c => c.nome),
+        dados: topComunidades.map(c => c.count)
+    };
+}
+
+module.exports = { 
+    listarComunidades, 
+    buscarComunidade, 
+    criarComunidade, 
+    atualizarComunidade, 
+    excluirComunidade,
+    estatisticasComunidades,
+    dadosGraficosComunidades
+};

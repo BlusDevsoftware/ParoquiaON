@@ -177,4 +177,125 @@ async function excluirPessoa(req, res) {
     }
 }
 
-module.exports = { listarPessoas, buscarPessoa, criarPessoa, atualizarPessoa, excluirPessoa };
+// Estatísticas das pessoas
+async function estatisticasPessoas(req, res) {
+    try {
+        const { data: total, error: totalError } = await supabase
+            .from('pessoas')
+            .select('*', { count: 'exact', head: true });
+
+        const { data: ativas, error: ativasError } = await supabase
+            .from('pessoas')
+            .select('*', { count: 'exact', head: true })
+            .eq('ativo', true);
+
+        const { data: inativas, error: inativasError } = await supabase
+            .from('pessoas')
+            .select('*', { count: 'exact', head: true })
+            .eq('ativo', false);
+
+        if (totalError || ativasError || inativasError) {
+            throw new Error('Erro ao buscar estatísticas');
+        }
+
+        res.json({
+            total: total?.length || 0,
+            ativas: ativas?.length || 0,
+            inativas: inativas?.length || 0
+        });
+    } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error);
+        res.status(500).json({ error: 'Erro ao buscar estatísticas' });
+    }
+}
+
+// Dados para gráficos de pessoas
+async function dadosGraficosPessoas(req, res) {
+    try {
+        // Buscar todas as pessoas
+        const { data: pessoas, error: pessoasError } = await supabase
+            .from('pessoas')
+            .select(`
+                id,
+                nome,
+                ativo,
+                created_at,
+                comunidade_id
+            `)
+            .order('created_at', { ascending: true });
+
+        if (pessoasError) throw pessoasError;
+
+        // Calcular evolução de pessoas por mês (últimos 6 meses)
+        const evolucaoPessoas = calcularEvolucaoPessoas(pessoas);
+        
+        // Calcular distribuição por status
+        const distribuicaoStatus = calcularDistribuicaoStatusPessoas(pessoas);
+
+        res.json({
+            evolucao: evolucaoPessoas,
+            distribuicao: distribuicaoStatus,
+            totalPessoas: pessoas?.length || 0
+        });
+
+    } catch (error) {
+        console.error('Erro ao buscar dados dos gráficos:', error);
+        res.status(500).json({ error: 'Erro ao buscar dados dos gráficos' });
+    }
+}
+
+// Função auxiliar para calcular evolução de pessoas
+function calcularEvolucaoPessoas(pessoas) {
+    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const dados = new Array(6).fill(0);
+    const labels = [];
+
+    const hoje = new Date();
+    for (let i = 5; i >= 0; i--) {
+        const mes = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+        labels.push(meses[mes.getMonth()]);
+        
+        const pessoasMes = (pessoas || []).filter(p => {
+            if (!p || !p.created_at) return false;
+            const dataPessoa = new Date(p.created_at);
+            if (isNaN(dataPessoa.getTime())) return false;
+            return dataPessoa.getMonth() === mes.getMonth() && 
+                   dataPessoa.getFullYear() === mes.getFullYear();
+        });
+
+        dados[5 - i] = pessoasMes.length;
+    }
+
+    return { labels, dados };
+}
+
+// Função auxiliar para calcular distribuição por status das pessoas
+function calcularDistribuicaoStatusPessoas(pessoas) {
+    const status = {
+        ativo: 0,
+        inativo: 0
+    };
+
+    (pessoas || []).forEach(pessoa => {
+        if (pessoa.ativo === true) {
+            status.ativo++;
+        } else {
+            status.inativo++;
+        }
+    });
+
+    return {
+        labels: ['Ativo', 'Inativo'],
+        dados: [status.ativo, status.inativo]
+    };
+}
+
+module.exports = { 
+    listarPessoas, 
+    buscarPessoa, 
+    criarPessoa, 
+    atualizarPessoa, 
+    excluirPessoa,
+    estatisticasPessoas,
+    dadosGraficosPessoas
+};

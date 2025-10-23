@@ -18,6 +18,7 @@ const localRoutes = require('./routes/localRoutes');
 const acaoRoutes = require('./routes/acaoRoutes');
 const agendaRoutes = require('./routes/agendaRoutes');
 const relatorioRoutes = require('./routes/relatorioRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.use('/api/locais', localRoutes);
 app.use('/api/acoes', acaoRoutes);
 app.use('/api/agenda', agendaRoutes);
 app.use('/api/relatorios', relatorioRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

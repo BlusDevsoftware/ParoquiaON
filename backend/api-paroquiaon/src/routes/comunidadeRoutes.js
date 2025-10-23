@@ -4,6 +4,8 @@ const comunidadeController = require('../controllers/comunidadeController');
 
 // Rotas para comunidades
 router.get('/', comunidadeController.listarComunidades);
+router.get('/estatisticas', comunidadeController.estatisticasComunidades);
+router.get('/graficos', comunidadeController.dadosGraficosComunidades);
 router.get('/:id', comunidadeController.buscarComunidade);
 router.post('/', comunidadeController.criarComunidade);
 router.put('/:id', comunidadeController.atualizarComunidade);
