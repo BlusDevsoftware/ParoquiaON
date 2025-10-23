@@ -2297,23 +2297,22 @@
         // Inicializar aplicação
         document.addEventListener('DOMContentLoaded', async function() {
             initializeApp();
-            await loadCommunities();
-            await loadEventsFromApi();
-            await loadAgendaLookups();
             
-            // Carregar dados dos selects do modal ANTECIPADAMENTE
-            console.log('🔄 Carregando dados dos selects do modal...');
+            // Carregar dados em paralelo para otimizar performance
+            console.log('🔄 Carregando dados da agenda em paralelo...');
             try {
                 await Promise.all([
+                    loadCommunities(),
+                    loadEventsFromApi(),
                     loadEventCommunities(),
                     loadEventPastorals(),
                     loadEventPilares(),
                     loadEventAcoes(),
                     loadEventLocais()
                 ]);
-                console.log('✅ Todos os dados dos selects foram carregados antecipadamente');
+                console.log('✅ Todos os dados foram carregados em paralelo');
             } catch (error) {
-                console.error('❌ Erro ao carregar dados dos selects:', error);
+                console.error('❌ Erro ao carregar dados:', error);
             }
             
             setupEventListeners();
@@ -3044,17 +3043,13 @@
                 select.style.height = 'auto';
             });
 
-            // Inicializar selects customizados IMEDIATAMENTE
-            setTimeout(() => {
-                console.log('🔄 Inicializando dropdowns customizados...');
-                initializeCustomSelects('#eventModal');
-                
-                // Recarregar selects após um pequeno delay
-                setTimeout(() => {
-                    console.log('🔄 Recarregando selects após carregamento de dados...');
-                    reloadCustomSelects('#eventModal');
-                }, 300);
-            }, 100);
+            // Inicializar selects customizados IMEDIATAMENTE (sem delays)
+            console.log('🔄 Inicializando dropdowns customizados...');
+            initializeCustomSelects('#eventModal');
+            
+            // Recarregar selects imediatamente após inicialização
+            console.log('🔄 Recarregando selects após carregamento de dados...');
+            reloadCustomSelects('#eventModal');
             
             console.log('✅ Modal de novo agendamento criado e exibido');
         }
@@ -3860,8 +3855,14 @@
             locais: []
         };
 
-        // Função para carregar comunidades
+        // Função para carregar comunidades (com cache)
         async function loadEventCommunities() {
+            // Verificar se já temos dados no cache
+            if (modalDataCache.comunidades.length > 0) {
+                console.log('✅ Comunidades já carregadas do cache:', modalDataCache.comunidades.length);
+                return;
+            }
+            
             try {
                 console.log('🔄 Carregando comunidades...');
                 const { data, error } = await window.api.get(window.endpoints.comunidades.list);
@@ -3898,8 +3899,14 @@
             }
         }
 
-        // Função para carregar pastorais
+        // Função para carregar pastorais (com cache)
         async function loadEventPastorals() {
+            // Verificar se já temos dados no cache
+            if (modalDataCache.pastorais.length > 0) {
+                console.log('✅ Pastorais já carregadas do cache:', modalDataCache.pastorais.length);
+                return;
+            }
+            
             try {
                 console.log('🔄 Carregando pastorais...');
                 const { data, error } = await window.api.get(window.endpoints.pastorais.list);
@@ -3933,8 +3940,14 @@
             }
         }
 
-        // Função para carregar pilares
+        // Função para carregar pilares (com cache)
         async function loadEventPilares() {
+            // Verificar se já temos dados no cache
+            if (modalDataCache.pilares.length > 0) {
+                console.log('✅ Pilares já carregados do cache:', modalDataCache.pilares.length);
+                return;
+            }
+            
             try {
                 console.log('🔄 Carregando pilares...');
                 const { data, error } = await window.api.get(window.endpoints.pilares.list);
@@ -3965,8 +3978,14 @@
             }
         }
 
-        // Função para carregar ações
+        // Função para carregar ações (com cache)
         async function loadEventAcoes() {
+            // Verificar se já temos dados no cache
+            if (modalDataCache.acoes.length > 0) {
+                console.log('✅ Ações já carregadas do cache:', modalDataCache.acoes.length);
+                return;
+            }
+            
             try {
                 console.log('🔄 Carregando ações...');
                 const { data, error } = await window.api.get(window.endpoints.acoes.list);
@@ -3997,8 +4016,14 @@
             }
         }
 
-        // Função para carregar locais
+        // Função para carregar locais (com cache)
         async function loadEventLocais() {
+            // Verificar se já temos dados no cache
+            if (modalDataCache.locais.length > 0) {
+                console.log('✅ Locais já carregados do cache:', modalDataCache.locais.length);
+                return;
+            }
+            
             try {
                 console.log('🔄 Carregando locais...');
                 const { data, error } = await window.api.get(window.endpoints.locais.list);
