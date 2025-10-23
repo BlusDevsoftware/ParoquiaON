@@ -1868,11 +1868,11 @@
 
         /* CSS dos modais removido - modal não disponível */
 
-        /* Spinner de carregamento - cobre toda a tela incluindo sidebar */
+        /* Spinner de carregamento - cobre área de conteúdo mas não o menu superior */
         .loader-overlay-main {
             display: none;
             position: fixed;
-            top: 0;
+            top: 80px; /* Deixar espaço para o menu superior (80px) */
             left: 0;
             right: 0;
             bottom: 0;
