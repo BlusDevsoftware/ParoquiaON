@@ -458,7 +458,7 @@
                 mostrarSpinner();
                 
                 // Destruir gráficos existentes apenas se já existirem
-                if (comissoesChart || statusChart || vendasProdutoChart || topColaboradoresChart) {
+                if (pessoasChart || pastoraisChart || eventosChart || comunidadesChart) {
                     destruirGraficos();
                 }
                 
@@ -513,30 +513,49 @@
         // Função para buscar dados reais das APIs do ParoquiaON
         async function buscarDadosReais() {
             try {
-                // Buscar dados consolidados do dashboard
-                const dashboardData = await window.api.get('/dashboard');
+                // Buscar dados das APIs individuais (que já funcionam nas outras abas)
+                const [comunidades, pastorais, pessoas, agenda] = await Promise.all([
+                    window.api.get('/comunidades'),
+                    window.api.get('/pastorais'),
+                    window.api.get('/pessoas'),
+                    window.api.get('/agenda')
+                ]);
 
-                // Calcular crescimento baseado nos dados reais
+                // Calcular dados das comunidades
+                const totalComunidades = comunidades.length;
+                const comunidadesAtivas = comunidades.filter(c => c.status === 'Ativo').length;
                 const crescimentoComunidades = '+12% este mês'; // Pode ser calculado baseado em dados históricos
+
+                // Calcular dados das pastorais
+                const pastoraisAtivas = pastorais.filter(p => p.ativo === true).length;
+                const totalPastorais = pastorais.length;
                 const crescimentoPastorais = '+8% este mês';
+
+                // Calcular dados das pessoas
+                const pessoasAtivas = pessoas.filter(p => p.ativo === true).length;
+                const totalPessoas = pessoas.length;
                 const crescimentoPessoas = '+15% este mês';
+
+                // Calcular eventos ativos
+                const eventosAtivos = agenda.filter(e => e.status === 'Ativo').length;
+                const totalEventos = agenda.length;
 
                 return {
                     comunidades: {
-                        total: dashboardData.estatisticas.comunidades.total || 0,
+                        total: totalComunidades,
                         crescimento: crescimentoComunidades
                     },
                     pastorais: {
-                        total: dashboardData.estatisticas.pastorais.total || 0,
+                        total: totalPastorais,
                         crescimento: crescimentoPastorais
                     },
                     pessoas: {
-                        total: dashboardData.estatisticas.pessoas.total || 0,
+                        total: totalPessoas,
                         crescimento: crescimentoPessoas
                     },
                     eventos: {
-                        total: dashboardData.estatisticas.eventos.total || 0,
-                        detalhes: `${dashboardData.estatisticas.eventos.ativos || 0} eventos ativos`
+                        total: totalEventos,
+                        detalhes: `${eventosAtivos} eventos ativos`
                     }
                 };
 
@@ -740,14 +759,31 @@
         // Função para buscar dados dos gráficos do ParoquiaON
         async function buscarDadosGraficos() {
             try {
-                // Buscar dados consolidados do dashboard
-                const dashboardData = await window.api.get('/dashboard');
+                // Buscar dados das APIs individuais (que já funcionam nas outras abas)
+                const [pessoas, pastorais, agenda, comunidades] = await Promise.all([
+                    window.api.get('/pessoas'),
+                    window.api.get('/pastorais'),
+                    window.api.get('/agenda'),
+                    window.api.get('/comunidades')
+                ]);
+
+                // Calcular evolução de pessoas (últimos 6 meses)
+                const evolucaoPessoas = calcularEvolucaoPessoas(pessoas);
+                
+                // Calcular distribuição por pastorais
+                const distribuicaoPastorais = calcularDistribuicaoPastorais(pastorais);
+
+                // Calcular eventos por mês (últimos 6 meses)
+                const eventosPorMes = calcularEventosPorMes(agenda);
+
+                // Calcular top comunidades por número de pessoas
+                const topComunidades = calcularTopComunidades(comunidades, pessoas);
 
                 return { 
-                    pessoas: dashboardData.graficos.pessoas.evolucao, 
-                    pastorais: dashboardData.graficos.pastorais.distribuicao,
-                    eventos: dashboardData.graficos.eventos.eventosPorMes,
-                    comunidades: dashboardData.graficos.comunidades.topComunidades
+                    pessoas: evolucaoPessoas, 
+                    pastorais: distribuicaoPastorais,
+                    eventos: eventosPorMes,
+                    comunidades: topComunidades
                 };
 
             } catch (error) {
@@ -775,8 +811,8 @@
                 
                 // Filtrar pessoas do mês
                 const pessoasMes = (pessoas || []).filter(p => {
-                    if (!p || !p.data_cadastro) return false;
-                    const dataPessoa = new Date(p.data_cadastro);
+                    if (!p || !p.created_at) return false;
+                    const dataPessoa = new Date(p.created_at);
                     if (isNaN(dataPessoa.getTime())) return false;
                     return dataPessoa.getMonth() === mes.getMonth() && 
                            dataPessoa.getFullYear() === mes.getFullYear();
@@ -830,8 +866,8 @@
                 
                 // Filtrar eventos do mês
                 const eventosMes = (agenda || []).filter(evento => {
-                    if (!evento || !evento.data_evento && !evento.data) return false;
-                    const dataEvento = new Date(evento.data_evento || evento.data);
+                    if (!evento || !evento.data_inicio) return false;
+                    const dataEvento = new Date(evento.data_inicio);
                     if (isNaN(dataEvento.getTime())) return false;
                     return dataEvento.getMonth() === mes.getMonth() && 
                            dataEvento.getFullYear() === mes.getFullYear();
