@@ -26,8 +26,7 @@ async function listarEventos(req, res) {
                 *,
                 locais (
                     id,
-                    nome,
-                    endereco
+                    nome
                 ),
                 acoes (
                     id,
@@ -35,9 +34,7 @@ async function listarEventos(req, res) {
                 ),
                 pessoas!responsavel_id (
                     id,
-                    nome,
-                    telefone,
-                    email
+                    nome
                 ),
                 comunidades (
                     id,
@@ -83,8 +80,7 @@ async function buscarEvento(req, res) {
                 *,
                 locais (
                     id,
-                    nome,
-                    endereco
+                    nome
                 ),
                 acoes (
                     id,
@@ -92,9 +88,7 @@ async function buscarEvento(req, res) {
                 ),
                 pessoas!responsavel_id (
                     id,
-                    nome,
-                    telefone,
-                    email
+                    nome
                 ),
                 comunidades (
                     id,
@@ -219,8 +213,7 @@ async function criarEvento(req, res) {
                 *,
                 locais (
                     id,
-                    nome,
-                    endereco
+                    nome
                 ),
                 acoes (
                     id,
@@ -228,9 +221,7 @@ async function criarEvento(req, res) {
                 ),
                 pessoas!responsavel_id (
                     id,
-                    nome,
-                    telefone,
-                    email
+                    nome
                 ),
                 comunidades (
                     id,
@@ -278,8 +269,7 @@ async function atualizarEvento(req, res) {
                 *,
                 locais (
                     id,
-                    nome,
-                    endereco
+                    nome
                 ),
                 acoes (
                     id,
@@ -287,9 +277,7 @@ async function atualizarEvento(req, res) {
                 ),
                 pessoas!responsavel_id (
                     id,
-                    nome,
-                    telefone,
-                    email
+                    nome
                 ),
                 comunidades (
                     id,
