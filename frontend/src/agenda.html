@@ -4027,27 +4027,14 @@
                 if (error) throw error;
                 
                 const pilares = Array.isArray(data) ? data : [];
-                const select = document.getElementById('eventPilares');
-                if (select) {
-                    // Limpar opções existentes (exceto a primeira)
-                    select.innerHTML = '<option value="">Selecione o pilar</option>';
-                    
-                    // Adicionar opções dos pilares
-                    pilares.forEach(pilar => {
-                        const option = document.createElement('option');
-                        option.value = pilar.id;
-                        option.textContent = pilar.nome;
-                        select.appendChild(option);
-                    });
-                    
-                    console.log('✅ Pilares carregados:', pilares.length);
-                }
+                
+                // Armazenar no cache
+                modalDataCache.pilares = pilares;
+                console.log('✅ Pilares carregados e armazenados no cache:', pilares.length);
+                
             } catch (error) {
                 console.error('❌ Erro ao carregar pilares:', error);
-                const select = document.getElementById('eventPilares');
-                if (select) {
-                    select.innerHTML = '<option value="">Erro ao carregar pilares</option>';
-                }
+                modalDataCache.pilares = [];
             }
         }
 
@@ -4065,27 +4052,14 @@
                 if (error) throw error;
                 
                 const acoes = Array.isArray(data) ? data : [];
-                const select = document.getElementById('eventAcao');
-                if (select) {
-                    // Limpar opções existentes (exceto a primeira)
-                    select.innerHTML = '<option value="">Selecione a ação</option>';
-                    
-                    // Adicionar opções das ações
-                    acoes.forEach(acao => {
-                        const option = document.createElement('option');
-                        option.value = acao.id;
-                        option.textContent = acao.nome;
-                        select.appendChild(option);
-                    });
-                    
-                    console.log('✅ Ações carregadas:', acoes.length);
-                }
+                
+                // Armazenar no cache
+                modalDataCache.acoes = acoes;
+                console.log('✅ Ações carregadas e armazenadas no cache:', acoes.length);
+                
             } catch (error) {
                 console.error('❌ Erro ao carregar ações:', error);
-                const select = document.getElementById('eventAcao');
-                if (select) {
-                    select.innerHTML = '<option value="">Erro ao carregar ações</option>';
-                }
+                modalDataCache.acoes = [];
             }
         }
 
@@ -4103,27 +4077,14 @@
                 if (error) throw error;
                 
                 const locais = Array.isArray(data) ? data : [];
-                const select = document.getElementById('eventLocation');
-                if (select) {
-                    // Limpar opções existentes (exceto a primeira)
-                    select.innerHTML = '<option value="">Selecione o local</option>';
-                    
-                    // Adicionar opções dos locais
-                    locais.forEach(local => {
-                        const option = document.createElement('option');
-                        option.value = local.id;
-                        option.textContent = local.nome;
-                        select.appendChild(option);
-                    });
-                    
-                    console.log('✅ Locais carregados:', locais.length);
-                }
+                
+                // Armazenar no cache
+                modalDataCache.locais = locais;
+                console.log('✅ Locais carregados e armazenados no cache:', locais.length);
+                
             } catch (error) {
                 console.error('❌ Erro ao carregar locais:', error);
-                const select = document.getElementById('eventLocation');
-                if (select) {
-                    select.innerHTML = '<option value="">Erro ao carregar locais</option>';
-                }
+                modalDataCache.locais = [];
             }
         }
 
