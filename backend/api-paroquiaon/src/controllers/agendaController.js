@@ -51,6 +51,11 @@ async function listarEventos(req, res) {
                 usuarios!usuario_lancamento_id (
                     id,
                     email
+                ),
+                status_agendamento (
+                    id,
+                    nome,
+                    descricao
                 )
             `)
             .order('data_inicio', { ascending: true });
@@ -105,6 +110,11 @@ async function buscarEvento(req, res) {
                 usuarios!usuario_lancamento_id (
                     id,
                     email
+                ),
+                status_agendamento (
+                    id,
+                    nome,
+                    descricao
                 )
             `)
             .eq('id', id)
@@ -131,12 +141,22 @@ async function criarEvento(req, res) {
             return res.status(400).json({ error: 'Título e data de início são obrigatórios' });
         }
         
+        // Mapear status para status_id
+        const statusMapping = {
+            'agendado': 1,
+            'confirmado': 2, 
+            'pendente': 3,
+            'cancelado': 4
+        };
+        
+        const statusId = statusMapping[dados.status] || 1; // Padrão: agendado
+        
         // Adicionar dados do usuário de lançamento
         const dadosCompletos = {
             ...dados,
+            status_id: statusId,
             usuario_lancamento_id: req.user?.id || null,
-            usuario_lancamento_nome: req.user?.nome || 'Sistema',
-            status: dados.status || 'Ativo'
+            usuario_lancamento_nome: req.user?.nome || 'Sistema'
         };
         
         console.log('🔧 Dados completos para inserção:', JSON.stringify(dadosCompletos, null, 2));
@@ -237,6 +257,11 @@ async function criarEvento(req, res) {
                 usuarios!usuario_lancamento_id (
                     id,
                     email
+                ),
+                status_agendamento (
+                    id,
+                    nome,
+                    descricao
                 )
             `)
             .single();
@@ -307,6 +332,11 @@ async function atualizarEvento(req, res) {
                 usuarios!usuario_lancamento_id (
                     id,
                     email
+                ),
+                status_agendamento (
+                    id,
+                    nome,
+                    descricao
                 )
             `)
             .single();
