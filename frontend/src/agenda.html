@@ -2293,15 +2293,6 @@
         let miniCalendarDate = new Date();
         let currentView = 'semana'; // 'semana' | 'mês'
         let selectedCommunityId = null; // ID da comunidade selecionada
-        
-        // Cache global para dados já carregados
-        let globalDataCache = {
-            comunidades: [],
-            pastorais: [],
-            pilares: [],
-            acoes: [],
-            locais: []
-        };
 
         // Inicializar aplicação
         document.addEventListener('DOMContentLoaded', async function() {
@@ -3050,16 +3041,32 @@
                 select.style.height = 'auto';
             });
 
-            // Inicializar selects customizados IMEDIATAMENTE (dados já carregados)
+            // Verificar se os dados estão carregados antes de inicializar
+            const checkDataLoaded = () => {
+                const communitySelect = document.getElementById('eventCommunity');
+                const hasData = communitySelect && communitySelect.options.length > 1;
+                console.log(`🔍 Verificando dados: ${hasData ? 'Dados carregados' : 'Dados não carregados'}`);
+                return hasData;
+            };
+            
+            // Inicializar selects customizados
             setTimeout(() => {
                 console.log('🔄 Inicializando dropdowns customizados...');
                 initializeCustomSelects('#eventModal');
                 
-                // Aguardar um pouco mais e recarregar para garantir que os dados estão disponíveis
-                setTimeout(() => {
-                    console.log('🔄 Recarregando selects após carregamento de dados...');
-                    reloadCustomSelects('#eventModal');
-                }, 500);
+                // Se os dados não estão carregados, aguardar mais um pouco
+                if (!checkDataLoaded()) {
+                    console.log('⏳ Dados ainda não carregados, aguardando...');
+                    setTimeout(() => {
+                        console.log('🔄 Recarregando selects após carregamento de dados...');
+                        reloadCustomSelects('#eventModal');
+                    }, 1000);
+                } else {
+                    console.log('✅ Dados já carregados, recarregando selects...');
+                    setTimeout(() => {
+                        reloadCustomSelects('#eventModal');
+                    }, 200);
+                }
             }, 100);
             
             console.log('✅ Modal de novo agendamento criado e exibido');
@@ -3791,24 +3798,28 @@
         async function loadEventCommunities() {
             try {
                 console.log('🔄 Carregando comunidades...');
-                
-                // Verificar se já temos dados no cache
-                if (globalDataCache.comunidades.length > 0) {
-                    console.log(`📋 Usando ${globalDataCache.comunidades.length} comunidades do cache`);
-                    populateSelectFromCache('eventCommunity', globalDataCache.comunidades, 'Selecione a comunidade');
-                    return;
-                }
-                
-                // Se não há cache, carregar da API
                 const { data, error } = await window.api.get(window.endpoints.comunidades.list);
                 if (error) throw error;
                 
                 const comunidades = Array.isArray(data) ? data : [];
-                globalDataCache.comunidades = comunidades; // Armazenar no cache
-                console.log(`📋 ${comunidades.length} comunidades carregadas da API e armazenadas no cache`);
+                console.log(`📋 ${comunidades.length} comunidades carregadas da API`);
                 
-                populateSelectFromCache('eventCommunity', comunidades, 'Selecione a comunidade');
-                
+                const select = document.getElementById('eventCommunity');
+                if (select) {
+                    // Limpar opções existentes (exceto a primeira)
+                    select.innerHTML = '<option value="">Selecione a comunidade</option>';
+                    
+                    // Adicionar opções das comunidades
+                    comunidades.forEach(comunidade => {
+                        const option = document.createElement('option');
+                        option.value = comunidade.id;
+                        option.textContent = comunidade.nome;
+                        select.appendChild(option);
+                    });
+                    
+                    console.log(`✅ ${comunidades.length} opções adicionadas ao select eventCommunity`);
+                    console.log('🔍 Opções do select:', Array.from(select.options).map(opt => opt.textContent));
+                }
             } catch (error) {
                 console.error('❌ Erro ao carregar comunidades:', error);
                 const select = document.getElementById('eventCommunity');
@@ -3817,46 +3828,30 @@
                 }
             }
         }
-        
-        // Função auxiliar para popular select com dados do cache
-        function populateSelectFromCache(selectId, data, placeholder) {
-            const select = document.getElementById(selectId);
-            if (select) {
-                select.innerHTML = `<option value="">${placeholder}</option>`;
-                
-                data.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id;
-                    option.textContent = item.nome;
-                    select.appendChild(option);
-                });
-                
-                console.log(`✅ ${data.length} opções adicionadas ao select ${selectId}`);
-            }
-        }
 
         // Função para carregar pastorais
         async function loadEventPastorals() {
             try {
                 console.log('🔄 Carregando pastorais...');
-                
-                // Verificar se já temos dados no cache
-                if (globalDataCache.pastorais.length > 0) {
-                    console.log(`📋 Usando ${globalDataCache.pastorais.length} pastorais do cache`);
-                    populateSelectFromCache('eventPastoral', globalDataCache.pastorais, 'Selecione a pastoral');
-                    return;
-                }
-                
-                // Se não há cache, carregar da API
                 const { data, error } = await window.api.get(window.endpoints.pastorais.list);
                 if (error) throw error;
                 
                 const pastorais = Array.isArray(data) ? data : [];
-                globalDataCache.pastorais = pastorais; // Armazenar no cache
-                console.log(`📋 ${pastorais.length} pastorais carregadas da API e armazenadas no cache`);
-                
-                populateSelectFromCache('eventPastoral', pastorais, 'Selecione a pastoral');
-                
+                const select = document.getElementById('eventPastoral');
+                if (select) {
+                    // Limpar opções existentes (exceto a primeira)
+                    select.innerHTML = '<option value="">Selecione a pastoral</option>';
+                    
+                    // Adicionar opções das pastorais
+                    pastorais.forEach(pastoral => {
+                        const option = document.createElement('option');
+                        option.value = pastoral.id;
+                        option.textContent = pastoral.nome;
+                        select.appendChild(option);
+                    });
+                    
+                    console.log('✅ Pastorais carregadas:', pastorais.length);
+                }
             } catch (error) {
                 console.error('❌ Erro ao carregar pastorais:', error);
                 const select = document.getElementById('eventPastoral');
@@ -3870,24 +3865,25 @@
         async function loadEventPilares() {
             try {
                 console.log('🔄 Carregando pilares...');
-                
-                // Verificar se já temos dados no cache
-                if (globalDataCache.pilares.length > 0) {
-                    console.log(`📋 Usando ${globalDataCache.pilares.length} pilares do cache`);
-                    populateSelectFromCache('eventPilares', globalDataCache.pilares, 'Selecione o pilar');
-                    return;
-                }
-                
-                // Se não há cache, carregar da API
                 const { data, error } = await window.api.get(window.endpoints.pilares.list);
                 if (error) throw error;
                 
                 const pilares = Array.isArray(data) ? data : [];
-                globalDataCache.pilares = pilares; // Armazenar no cache
-                console.log(`📋 ${pilares.length} pilares carregados da API e armazenados no cache`);
-                
-                populateSelectFromCache('eventPilares', pilares, 'Selecione o pilar');
-                
+                const select = document.getElementById('eventPilares');
+                if (select) {
+                    // Limpar opções existentes (exceto a primeira)
+                    select.innerHTML = '<option value="">Selecione o pilar</option>';
+                    
+                    // Adicionar opções dos pilares
+                    pilares.forEach(pilar => {
+                        const option = document.createElement('option');
+                        option.value = pilar.id;
+                        option.textContent = pilar.nome;
+                        select.appendChild(option);
+                    });
+                    
+                    console.log('✅ Pilares carregados:', pilares.length);
+                }
             } catch (error) {
                 console.error('❌ Erro ao carregar pilares:', error);
                 const select = document.getElementById('eventPilares');
@@ -3901,24 +3897,25 @@
         async function loadEventAcoes() {
             try {
                 console.log('🔄 Carregando ações...');
-                
-                // Verificar se já temos dados no cache
-                if (globalDataCache.acoes.length > 0) {
-                    console.log(`📋 Usando ${globalDataCache.acoes.length} ações do cache`);
-                    populateSelectFromCache('eventAcao', globalDataCache.acoes, 'Selecione a ação');
-                    return;
-                }
-                
-                // Se não há cache, carregar da API
                 const { data, error } = await window.api.get(window.endpoints.acoes.list);
                 if (error) throw error;
                 
                 const acoes = Array.isArray(data) ? data : [];
-                globalDataCache.acoes = acoes; // Armazenar no cache
-                console.log(`📋 ${acoes.length} ações carregadas da API e armazenadas no cache`);
-                
-                populateSelectFromCache('eventAcao', acoes, 'Selecione a ação');
-                
+                const select = document.getElementById('eventAcao');
+                if (select) {
+                    // Limpar opções existentes (exceto a primeira)
+                    select.innerHTML = '<option value="">Selecione a ação</option>';
+                    
+                    // Adicionar opções das ações
+                    acoes.forEach(acao => {
+                        const option = document.createElement('option');
+                        option.value = acao.id;
+                        option.textContent = acao.nome;
+                        select.appendChild(option);
+                    });
+                    
+                    console.log('✅ Ações carregadas:', acoes.length);
+                }
             } catch (error) {
                 console.error('❌ Erro ao carregar ações:', error);
                 const select = document.getElementById('eventAcao');
@@ -3932,24 +3929,25 @@
         async function loadEventLocais() {
             try {
                 console.log('🔄 Carregando locais...');
-                
-                // Verificar se já temos dados no cache
-                if (globalDataCache.locais.length > 0) {
-                    console.log(`📋 Usando ${globalDataCache.locais.length} locais do cache`);
-                    populateSelectFromCache('eventLocation', globalDataCache.locais, 'Selecione o local');
-                    return;
-                }
-                
-                // Se não há cache, carregar da API
                 const { data, error } = await window.api.get(window.endpoints.locais.list);
                 if (error) throw error;
                 
                 const locais = Array.isArray(data) ? data : [];
-                globalDataCache.locais = locais; // Armazenar no cache
-                console.log(`📋 ${locais.length} locais carregados da API e armazenados no cache`);
-                
-                populateSelectFromCache('eventLocation', locais, 'Selecione o local');
-                
+                const select = document.getElementById('eventLocation');
+                if (select) {
+                    // Limpar opções existentes (exceto a primeira)
+                    select.innerHTML = '<option value="">Selecione o local</option>';
+                    
+                    // Adicionar opções dos locais
+                    locais.forEach(local => {
+                        const option = document.createElement('option');
+                        option.value = local.id;
+                        option.textContent = local.nome;
+                        select.appendChild(option);
+                    });
+                    
+                    console.log('✅ Locais carregados:', locais.length);
+                }
             } catch (error) {
                 console.error('❌ Erro ao carregar locais:', error);
                 const select = document.getElementById('eventLocation');
