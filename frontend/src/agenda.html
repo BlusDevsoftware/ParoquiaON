@@ -3786,6 +3786,8 @@
                 if (error) throw error;
                 
                 const comunidades = Array.isArray(data) ? data : [];
+                console.log(`📋 ${comunidades.length} comunidades carregadas da API`);
+                
                 const select = document.getElementById('eventCommunity');
                 if (select) {
                     // Limpar opções existentes (exceto a primeira)
@@ -3799,7 +3801,8 @@
                         select.appendChild(option);
                     });
                     
-                    console.log('✅ Comunidades carregadas:', comunidades.length);
+                    console.log(`✅ ${comunidades.length} opções adicionadas ao select eventCommunity`);
+                    console.log('🔍 Opções do select:', Array.from(select.options).map(opt => opt.textContent));
                 }
             } catch (error) {
                 console.error('❌ Erro ao carregar comunidades:', error);
