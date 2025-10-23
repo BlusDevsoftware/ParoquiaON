@@ -54,7 +54,6 @@ async function listarEventos(req, res) {
                 ),
                 usuarios!usuario_lancamento_id (
                     id,
-                    nome,
                     email
                 )
             `)
@@ -113,7 +112,6 @@ async function buscarEvento(req, res) {
                 ),
                 usuarios!usuario_lancamento_id (
                     id,
-                    nome,
                     email
                 )
             `)
@@ -182,7 +180,6 @@ async function criarEvento(req, res) {
                 ),
                 usuarios!usuario_lancamento_id (
                     id,
-                    nome,
                     email
                 )
             `)
@@ -238,7 +235,6 @@ async function atualizarEvento(req, res) {
                 ),
                 usuarios!usuario_lancamento_id (
                     id,
-                    nome,
                     email
                 )
             `)
