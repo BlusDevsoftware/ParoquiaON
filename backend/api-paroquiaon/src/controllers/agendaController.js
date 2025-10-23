@@ -242,15 +242,29 @@ async function criarEvento(req, res) {
             .single();
             
         if (error) {
-            console.error('❌ Erro do Supabase ao inserir agendamento:', error);
+            console.error('❌ Erro do Supabase ao inserir agendamento:', {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code
+            });
             throw error;
         }
         
         console.log('✅ Agendamento criado com sucesso:', data);
         res.status(201).json(data);
     } catch (error) {
-        console.error('Erro ao criar agendamento:', error);
-        res.status(500).json({ error: 'Erro ao criar agendamento' });
+        console.error('❌ Erro ao criar agendamento:', {
+            message: error?.message,
+            details: error?.details,
+            hint: error?.hint,
+            code: error?.code
+        });
+        res.status(500).json({ 
+            error: 'Erro ao criar agendamento',
+            details: error?.message || null,
+            code: error?.code || null
+        });
     }
 }
 
