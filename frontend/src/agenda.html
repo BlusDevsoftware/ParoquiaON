@@ -1331,6 +1331,7 @@
             background: white;
             border-radius: 12px;
             padding: 25px 30px;
+            position: relative;
             margin: 20px 20px 15px 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             display: flex;
@@ -1866,7 +1867,7 @@
 
         /* CSS dos modais removido - modal não disponível */
 
-        /* Spinner de carregamento - mesmo padrão das outras abas */
+        /* Spinner de carregamento - mesmo padrão da aba comunidades */
         .loader-overlay-agenda {
             display: none;
             position: absolute;
@@ -1874,33 +1875,12 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 1000;
-            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 10;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            border-radius: 10px;
-        }
-
-        /* Spinner apenas na área de conteúdo (sem barra de menu) */
-        .calendar-info-container {
-            position: relative;
-        }
-
-        .calendar-info-container .loader-overlay-agenda {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            border-radius: 10px;
+            border-radius: 8px;
         }
 
         .spinner-agenda {
