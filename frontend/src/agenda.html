@@ -3045,6 +3045,12 @@
             setTimeout(() => {
                 console.log('🔄 Inicializando dropdowns customizados...');
                 initializeCustomSelects('#eventModal');
+                
+                // Aguardar um pouco mais e recarregar para garantir que os dados estão disponíveis
+                setTimeout(() => {
+                    console.log('🔄 Recarregando selects após carregamento de dados...');
+                    reloadCustomSelects('#eventModal');
+                }, 500);
             }, 100);
             
             console.log('✅ Modal de novo agendamento criado e exibido');
@@ -3066,6 +3072,22 @@
             // Aplicar aos campos de hora
             const timeInputs = container.querySelectorAll('input[type="time"]');
             timeInputs.forEach(input => makeCustomTimeField(input));
+        }
+
+        // Função para recarregar todos os selects customizados
+        function reloadCustomSelects(containerSelector) {
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+            
+            console.log('🔄 Recarregando todos os selects customizados...');
+            
+            // Recarregar todos os campos customizados
+            const customFields = container.querySelectorAll('.search-select-field');
+            customFields.forEach(field => {
+                if (field.reloadItems) {
+                    field.reloadItems();
+                }
+            });
         }
 
         // Cria um campo de busca/seleção direto (substitui o select)
@@ -3093,7 +3115,19 @@
             // Monta itens iniciais
             const buildItems = () => {
                 list.innerHTML = '';
-                Array.from(nativeSelect.options).forEach((opt) => {
+                const options = Array.from(nativeSelect.options);
+                console.log(`🔍 BuildItems para ${nativeSelect.id}: ${options.length} opções encontradas`);
+                
+                if (options.length <= 1) {
+                    // Se não há opções além do placeholder, mostrar mensagem
+                    const item = document.createElement('div');
+                    item.className = 'search-select-item no-options';
+                    item.textContent = 'Nenhuma opção disponível';
+                    list.appendChild(item);
+                    return;
+                }
+                
+                options.forEach((opt) => {
                     const text = (opt.textContent || '').trim();
                     const isPlaceholder = opt.value === '' || /^\s*selecione/i.test(text);
                     if (isPlaceholder) return;
@@ -3115,7 +3149,20 @@
                     list.appendChild(item);
                 });
             };
-            buildItems();
+            
+            // Aguardar um pouco para garantir que os dados foram carregados
+            setTimeout(() => {
+                buildItems();
+            }, 200);
+            
+            // Função para recarregar itens (chamada quando dados são carregados)
+            const reloadItems = () => {
+                console.log(`🔄 Recarregando itens para ${nativeSelect.id}`);
+                buildItems();
+            };
+            
+            // Expor função para recarregamento externo
+            field.reloadItems = reloadItems;
 
             // Máscara de formatação e filtragem
             input.addEventListener('input', (e) => {
