@@ -134,7 +134,6 @@ async function criarEvento(req, res) {
         // Adicionar dados do usuário de lançamento
         const dadosCompletos = {
             ...dados,
-            descricao: dados.descricao || '', // Campo obrigatório com valor padrão
             usuario_lancamento_id: req.user?.id || null,
             usuario_lancamento_nome: req.user?.nome || 'Sistema',
             status: dados.status || 'Ativo'
