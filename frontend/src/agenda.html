@@ -475,6 +475,13 @@
             min-height: 40px !important;
         }
 
+        /* Excluir checkbox-group das regras de altura */
+        #eventModal .checkbox-group {
+            max-height: none !important;
+            overflow: visible !important;
+            height: auto !important;
+        }
+
         /* Select customizado com busca (apenas dentro do modal) */
         /* Campo de busca/seleção direto (substitui o select) */
         #eventModal .search-select-field {
@@ -777,6 +784,10 @@
         /* Checkbox personalizado */
         .checkbox-group {
             margin-top: 8px;
+            padding: 8px 0;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
         }
 
         .checkbox-label {
@@ -785,6 +796,8 @@
             cursor: pointer;
             font-size: 14px;
             color: #555;
+            padding: 4px 0;
+            min-height: 32px;
         }
 
         .checkbox-label input[type="checkbox"] {
