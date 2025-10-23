@@ -4300,7 +4300,17 @@
                     capacidade: formData.capacidade ? parseInt(formData.capacidade) : null
                 };
                 
+                // Validar se os IDs são válidos
+                console.log('🔍 Validação dos IDs:', {
+                    local_id: eventData.local_id,
+                    acao_id: eventData.acao_id,
+                    comunidade_id: eventData.comunidade_id,
+                    pastoral_id: eventData.pastoral_id,
+                    pilar_id: eventData.pilar_id
+                });
+                
                 console.log('🚀 Enviando evento para API:', eventData);
+                console.log('🔍 Dados detalhados:', JSON.stringify(eventData, null, 2));
                 
                 // Salvar evento na API
                 const { data, error } = await window.api.post(window.endpoints.agenda.create, eventData);

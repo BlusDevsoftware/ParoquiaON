@@ -131,8 +131,11 @@ async function criarEvento(req, res) {
     try {
         const dados = req.body;
         
+        console.log('📋 Dados recebidos para criar evento:', JSON.stringify(dados, null, 2));
+        
         // Validação básica
         if (!dados.titulo || !dados.data_inicio) {
+            console.log('❌ Validação falhou - campos obrigatórios:', { titulo: dados.titulo, data_inicio: dados.data_inicio });
             return res.status(400).json({ error: 'Título e data de início são obrigatórios' });
         }
         
@@ -143,6 +146,8 @@ async function criarEvento(req, res) {
             usuario_lancamento_nome: req.user?.nome || 'Sistema',
             status: dados.status || 'Ativo'
         };
+        
+        console.log('🔧 Dados completos para inserção:', JSON.stringify(dadosCompletos, null, 2));
         
         // Inserir agendamento
         const { data, error } = await supabase
@@ -185,7 +190,12 @@ async function criarEvento(req, res) {
             `)
             .single();
             
-        if (error) throw error;
+        if (error) {
+            console.error('❌ Erro do Supabase ao inserir agendamento:', error);
+            throw error;
+        }
+        
+        console.log('✅ Agendamento criado com sucesso:', data);
         res.status(201).json(data);
     } catch (error) {
         console.error('Erro ao criar agendamento:', error);

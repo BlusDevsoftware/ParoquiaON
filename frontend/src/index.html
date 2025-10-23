@@ -548,13 +548,6 @@
                 const eventosAtivos = agenda.filter(e => e.status === 'Ativo').length;
                 const totalEventos = agenda.length;
 
-                console.log('Estatísticas calculadas:', {
-                    comunidades: { total: totalComunidades, ativas: comunidadesAtivas },
-                    pastorais: { total: totalPastorais, ativas: pastoraisAtivas },
-                    pessoas: { total: totalPessoas, ativas: pessoasAtivas },
-                    eventos: { total: totalEventos, ativos: eventosAtivos }
-                });
-
                 return {
                     comunidades: {
                         total: totalComunidades,
@@ -792,19 +785,15 @@
 
                 // Calcular evolução de pessoas (últimos 6 meses)
                 const evolucaoPessoas = calcularEvolucaoPessoas(pessoas);
-                console.log('Evolução pessoas:', evolucaoPessoas);
                 
                 // Calcular distribuição por pastorais
                 const distribuicaoPastorais = calcularDistribuicaoPastorais(pastorais);
-                console.log('Distribuição pastorais:', distribuicaoPastorais);
 
                 // Calcular eventos por mês (últimos 6 meses)
                 const eventosPorMes = calcularEventosPorMes(agenda);
-                console.log('Eventos por mês:', eventosPorMes);
 
                 // Calcular top comunidades por número de pessoas
                 const topComunidades = calcularTopComunidades(comunidades, pessoas);
-                console.log('Top comunidades:', topComunidades);
 
                 return { 
                     pessoas: evolucaoPessoas, 
