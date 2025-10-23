@@ -3231,9 +3231,9 @@
                 makeCustomSelect(select);
             });
             
-            // Aplicar aos campos de data
-            const dateInputs = container.querySelectorAll('input[type="date"]');
-            dateInputs.forEach(input => makeCustomDateField(input));
+            // NÃO aplicar aos campos de data - deixar como inputs nativos
+            // const dateInputs = container.querySelectorAll('input[type="date"]');
+            // dateInputs.forEach(input => makeCustomDateField(input));
             
             // NÃO aplicar aos campos de hora - deixar como inputs nativos
             // const timeInputs = container.querySelectorAll('input[type="time"]');
