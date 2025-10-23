@@ -538,6 +538,20 @@
             align-items: center !important;
         }
 
+        /* Garantir que campos de hora sejam visíveis */
+        #eventModal input[type="time"] {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        /* Garantir que campos de data sejam visíveis */
+        #eventModal input[type="date"] {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
         /* Select customizado com busca (apenas dentro do modal) */
         /* Campo de busca/seleção direto (substitui o select) */
         #eventModal .search-select-field {
@@ -3221,9 +3235,9 @@
             const dateInputs = container.querySelectorAll('input[type="date"]');
             dateInputs.forEach(input => makeCustomDateField(input));
             
-            // Aplicar aos campos de hora
-            const timeInputs = container.querySelectorAll('input[type="time"]');
-            timeInputs.forEach(input => makeCustomTimeField(input));
+            // NÃO aplicar aos campos de hora - deixar como inputs nativos
+            // const timeInputs = container.querySelectorAll('input[type="time"]');
+            // timeInputs.forEach(input => makeCustomTimeField(input));
         }
 
         // Função para recarregar todos os selects customizados
