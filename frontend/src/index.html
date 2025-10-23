@@ -316,13 +316,13 @@
     <div class="main-content">
 
         <!-- Spinner Centralizado de Carregamento -->
-        <div id="loader-dashboard" class="loader-overlay-main">
+        <div id="loader-minha-comunidade" class="loader-overlay-main">
             <div class="spinner-main"></div>
             <div class="loading-text">Carregando dados...</div>
         </div>
 
-        <!-- Dashboard Cards -->
-        <div class="dashboard-cards" id="dashboard-cards">
+        <!-- Cards da Minha Comunidade -->
+        <div class="dashboard-cards" id="minha-comunidade-cards">
             <div class="card" draggable="true">
                 <div class="card-header">
                     <h3>Total de Comunidades</h3>
@@ -387,9 +387,9 @@
     <script>
         // Variáveis globais
         let pessoasChart, pastoraisChart, eventosChart, comunidadesChart;
-        let dashboardData = {};
+        let minhaComunidadeData = {};
 
-        // Inicializar dashboard
+        // Inicializar Minha Comunidade
         document.addEventListener('DOMContentLoaded', async function() {
             // Logout handler será gerenciado pelo apply-auth-protection.js
 
@@ -400,11 +400,11 @@
 
         // Funções para controlar o spinner centralizado
         function mostrarSpinner() {
-            document.getElementById('loader-dashboard').style.display = 'flex';
+            document.getElementById('loader-minha-comunidade').style.display = 'flex';
         }
         
         function ocultarSpinner() {
-            document.getElementById('loader-dashboard').style.display = 'none';
+            document.getElementById('loader-minha-comunidade').style.display = 'none';
         }
 
         // Função para debug dos gráficos
@@ -451,8 +451,8 @@
             }
         }
 
-        // Função para inicializar o dashboard
-        async function inicializarDashboard() {
+        // Função para inicializar a aba Minha Comunidade
+        async function inicializarMinhaComunidade() {
             try {
                 // Mostrar spinner centralizado ao iniciar
                 mostrarSpinner();
@@ -471,18 +471,18 @@
                 ocultarSpinner();
                 
             } catch (error) {
-                console.error('Erro ao inicializar dashboard:', error);
-                mostrarToast('Erro ao carregar dados do dashboard', 'error');
+                console.error('Erro ao inicializar Minha Comunidade:', error);
+                mostrarToast('Erro ao carregar dados da Minha Comunidade', 'error');
                 // Ocultar spinner mesmo em caso de erro
                 ocultarSpinner();
             }
         }
 
         // Chamar inicialização
-        inicializarDashboard();
+        inicializarMinhaComunidade();
         });
 
-        // Função para carregar dados dos cards
+        // Função para carregar dados dos cards da Minha Comunidade
         async function carregarDadosCards() {
             try {
                 // Buscar dados reais das APIs do ParoquiaON
@@ -505,8 +505,8 @@
                 aplicarClassesCrescimento();
                 
             } catch (error) {
-                console.error('Erro ao carregar dados dos cards:', error);
-                mostrarToast('Erro ao carregar dados do dashboard', 'error');
+                console.error('Erro ao carregar dados dos cards da Minha Comunidade:', error);
+                mostrarToast('Erro ao carregar dados da Minha Comunidade', 'error');
             }
         }
 
@@ -621,7 +621,7 @@
         }
 
 
-        // Função para inicializar gráficos
+        // Função para inicializar gráficos da Minha Comunidade
         async function inicializarGraficos() {
             try {
                 // Buscar dados reais para os gráficos
@@ -750,7 +750,7 @@
                 });
 
             } catch (error) {
-                console.error('Erro ao inicializar gráficos:', error);
+                console.error('Erro ao inicializar gráficos da Minha Comunidade:', error);
                 // Criar gráficos com dados padrão em caso de erro
                 criarGraficosPadrao();
             }
@@ -1043,7 +1043,7 @@
 
         // Função para inicializar drag and drop
         function inicializarDragAndDrop() {
-            const container = document.getElementById('dashboard-cards');
+            const container = document.getElementById('minha-comunidade-cards');
             new Sortable(container, {
                 animation: 150,
                 ghostClass: 'card-ghost',
@@ -1057,13 +1057,13 @@
 
         // Função para salvar ordem dos cards
         function salvarOrdemCards() {
-            const cards = document.querySelectorAll('#dashboard-cards .card');
+            const cards = document.querySelectorAll('#minha-comunidade-cards .card');
             const ordem = Array.from(cards).map(card => {
                 const titulo = card.querySelector('h3').textContent;
                 return titulo;
             });
             
-            localStorage.setItem('dashboardCardsOrder', JSON.stringify(ordem));
+            localStorage.setItem('minhaComunidadeCardsOrder', JSON.stringify(ordem));
         }
 
         // Funções de ação das comissões (removidas - não aplicáveis ao sistema paroquial)
