@@ -149,6 +149,69 @@ async function criarEvento(req, res) {
         
         console.log('🔧 Dados completos para inserção:', JSON.stringify(dadosCompletos, null, 2));
         
+        // Validar se os IDs existem nas tabelas relacionadas
+        if (dadosCompletos.local_id) {
+            const { data: local, error: localError } = await supabase
+                .from('locais')
+                .select('id')
+                .eq('id', dadosCompletos.local_id)
+                .single();
+            if (localError || !local) {
+                console.error('❌ Local não encontrado:', dadosCompletos.local_id);
+                return res.status(400).json({ error: 'Local não encontrado' });
+            }
+        }
+        
+        if (dadosCompletos.acao_id) {
+            const { data: acao, error: acaoError } = await supabase
+                .from('acoes')
+                .select('id')
+                .eq('id', dadosCompletos.acao_id)
+                .single();
+            if (acaoError || !acao) {
+                console.error('❌ Ação não encontrada:', dadosCompletos.acao_id);
+                return res.status(400).json({ error: 'Ação não encontrada' });
+            }
+        }
+        
+        if (dadosCompletos.comunidade_id) {
+            const { data: comunidade, error: comunidadeError } = await supabase
+                .from('comunidades')
+                .select('id')
+                .eq('id', dadosCompletos.comunidade_id)
+                .single();
+            if (comunidadeError || !comunidade) {
+                console.error('❌ Comunidade não encontrada:', dadosCompletos.comunidade_id);
+                return res.status(400).json({ error: 'Comunidade não encontrada' });
+            }
+        }
+        
+        if (dadosCompletos.pastoral_id) {
+            const { data: pastoral, error: pastoralError } = await supabase
+                .from('pastorais')
+                .select('id')
+                .eq('id', dadosCompletos.pastoral_id)
+                .single();
+            if (pastoralError || !pastoral) {
+                console.error('❌ Pastoral não encontrada:', dadosCompletos.pastoral_id);
+                return res.status(400).json({ error: 'Pastoral não encontrada' });
+            }
+        }
+        
+        if (dadosCompletos.pilar_id) {
+            const { data: pilar, error: pilarError } = await supabase
+                .from('pilares')
+                .select('id')
+                .eq('id', dadosCompletos.pilar_id)
+                .single();
+            if (pilarError || !pilar) {
+                console.error('❌ Pilar não encontrado:', dadosCompletos.pilar_id);
+                return res.status(400).json({ error: 'Pilar não encontrado' });
+            }
+        }
+        
+        console.log('✅ Todas as validações de foreign keys passaram');
+        
         // Inserir evento
         const { data, error } = await supabase
             .from('agendamentos')
