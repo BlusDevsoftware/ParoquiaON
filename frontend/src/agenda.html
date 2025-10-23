@@ -4283,6 +4283,7 @@
                 // Preparar dados para a API
                 const eventData = {
                     titulo: formData.titulo,
+                    descricao: formData.descricao || '',
                     objetivo: formData.objetivo || '',
                     data_inicio: new Date(formData.dataInicio + ' ' + formData.horaInicio).toISOString(),
                     data_fim: new Date(formData.dataFim + ' ' + formData.horaFim).toISOString(),
