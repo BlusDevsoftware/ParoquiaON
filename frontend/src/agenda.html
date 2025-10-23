@@ -1322,6 +1322,7 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            position: relative;
             background: transparent;
         }
 
@@ -1867,23 +1868,22 @@
 
         /* CSS dos modais removido - modal não disponível */
 
-        /* Spinner de carregamento - mesmo padrão da aba comunidades */
-        .loader-overlay-agenda {
+        /* Spinner de carregamento - exatamente igual à aba Minha Comunidade */
+        .loader-overlay-main {
             display: none;
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.95);
-            z-index: 10;
+            background: rgba(255,255,255,0.95);
+            z-index: 9999;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            border-radius: 8px;
         }
 
-        .spinner-agenda {
+        .spinner-main {
             border: 8px solid #e3f2fd;
             border-top: 8px solid #1976D2;
             border-radius: 50%;
@@ -1892,13 +1892,14 @@
             animation: spin 1s linear infinite;
         }
 
-        .loading-text-agenda {
+        .loading-text {
             margin-top: 20px;
             color: #1976D2;
             font-size: 1.1rem;
             font-weight: 500;
             text-align: center;
         }
+
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -2232,13 +2233,14 @@
 
             <!-- Área de Conteúdo -->
             <div class="content-area">
+                <!-- Spinner Centralizado de Carregamento -->
+                <div id="loader-agenda" class="loader-overlay-main">
+                    <div class="spinner-main"></div>
+                    <div class="loading-text">Carregando agenda...</div>
+                </div>
+
                 <!-- Container de Informações -->
                 <div class="calendar-info-container">
-                    <!-- Spinner de Carregamento -->
-                    <div id="loader-agenda" class="loader-overlay-agenda">
-                        <div class="spinner-agenda"></div>
-                        <div class="loading-text-agenda">Carregando agenda...</div>
-                    </div>
                     <div class="info-left">
                         <div class="info-location">
                             <div class="info-location-container">
