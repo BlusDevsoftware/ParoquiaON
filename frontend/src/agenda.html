@@ -3059,11 +3059,18 @@
         // Utilitário: inicializa selects customizados com busca no container
         function initializeCustomSelects(containerSelector) {
             const container = document.querySelector(containerSelector);
-            if (!container) return;
+            if (!container) {
+                console.log('❌ Container não encontrado:', containerSelector);
+                return;
+            }
 
             // Aplicar aos selects
             const nativeSelects = container.querySelectorAll('select');
-            nativeSelects.forEach(select => makeCustomSelect(select));
+            console.log(`🔍 Encontrados ${nativeSelects.length} selects no container`);
+            nativeSelects.forEach(select => {
+                console.log(`📋 Processando select: ${select.id}`);
+                makeCustomSelect(select);
+            });
             
             // Aplicar aos campos de data
             const dateInputs = container.querySelectorAll('input[type="date"]');
@@ -3093,6 +3100,8 @@
         // Cria um campo de busca/seleção direto (substitui o select)
         function makeCustomSelect(nativeSelect) {
             if (!nativeSelect || nativeSelect.dataset.enhanced === 'true') return;
+            
+            console.log(`🔧 Criando select customizado para: ${nativeSelect.id}`);
 
             // Campo de busca direto
             const field = document.createElement('div');
@@ -3152,6 +3161,7 @@
             
             // Aguardar um pouco para garantir que os dados foram carregados
             setTimeout(() => {
+                console.log(`🔄 Executando buildItems para ${nativeSelect.id}`);
                 buildItems();
             }, 200);
             
