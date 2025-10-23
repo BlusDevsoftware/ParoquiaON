@@ -514,12 +514,20 @@
         async function buscarDadosReais() {
             try {
                 // Buscar dados das APIs individuais (que já funcionam nas outras abas)
-                const [comunidades, pastorais, pessoas, agenda] = await Promise.all([
+                const [comunidadesRes, pastoraisRes, pessoasRes, agendaRes] = await Promise.all([
                     window.api.get('/comunidades'),
                     window.api.get('/pastorais'),
                     window.api.get('/pessoas'),
                     window.api.get('/agenda')
                 ]);
+
+                // Extrair dados dos arrays (a API pode retornar {data: [...]} ou array direto)
+                const comunidades = Array.isArray(comunidadesRes) ? comunidadesRes : (comunidadesRes.data || []);
+                const pastorais = Array.isArray(pastoraisRes) ? pastoraisRes : (pastoraisRes.data || []);
+                const pessoas = Array.isArray(pessoasRes) ? pessoasRes : (pessoasRes.data || []);
+                const agenda = Array.isArray(agendaRes) ? agendaRes : (agendaRes.data || []);
+
+                console.log('Dados recebidos:', { comunidades, pastorais, pessoas, agenda });
 
                 // Calcular dados das comunidades
                 const totalComunidades = comunidades.length;
@@ -760,12 +768,20 @@
         async function buscarDadosGraficos() {
             try {
                 // Buscar dados das APIs individuais (que já funcionam nas outras abas)
-                const [pessoas, pastorais, agenda, comunidades] = await Promise.all([
+                const [pessoasRes, pastoraisRes, agendaRes, comunidadesRes] = await Promise.all([
                     window.api.get('/pessoas'),
                     window.api.get('/pastorais'),
                     window.api.get('/agenda'),
                     window.api.get('/comunidades')
                 ]);
+
+                // Extrair dados dos arrays (a API pode retornar {data: [...]} ou array direto)
+                const pessoas = Array.isArray(pessoasRes) ? pessoasRes : (pessoasRes.data || []);
+                const pastorais = Array.isArray(pastoraisRes) ? pastoraisRes : (pastoraisRes.data || []);
+                const agenda = Array.isArray(agendaRes) ? agendaRes : (agendaRes.data || []);
+                const comunidades = Array.isArray(comunidadesRes) ? comunidadesRes : (comunidadesRes.data || []);
+
+                console.log('Dados dos gráficos recebidos:', { pessoas, pastorais, agenda, comunidades });
 
                 // Calcular evolução de pessoas (últimos 6 meses)
                 const evolucaoPessoas = calcularEvolucaoPessoas(pessoas);
