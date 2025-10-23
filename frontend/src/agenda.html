@@ -2460,7 +2460,8 @@
                     loadEventPastorals(),
                     loadEventPilares(),
                     loadEventAcoes(),
-                    loadEventLocais()
+                    loadEventLocais(),
+                    loadEventStatus()
                 ]);
                 console.log('✅ Todos os dados foram carregados em paralelo');
             } catch (error) {
@@ -3324,6 +3325,19 @@
                 });
                 console.log(`✅ ${modalDataCache.locais.length} locais adicionados do cache`);
             }
+            
+            // Popular select de status
+            const statusSelect = document.getElementById('eventStatus');
+            if (statusSelect && modalDataCache.status && modalDataCache.status.length > 0) {
+                statusSelect.innerHTML = '<option value="">Selecione o status</option>';
+                modalDataCache.status.forEach(status => {
+                    const option = document.createElement('option');
+                    option.value = status.nome; // Usar nome em vez de id
+                    option.textContent = status.nome.charAt(0).toUpperCase() + status.nome.slice(1);
+                    statusSelect.appendChild(option);
+                });
+                console.log(`✅ ${modalDataCache.status.length} status adicionados do cache`);
+            }
         }
 
         // Cria um campo de busca/seleção direto (substitui o select)
@@ -4123,6 +4137,36 @@
             } catch (error) {
                 console.error('❌ Erro ao carregar pilares:', error);
                 modalDataCache.pilares = [];
+            }
+        }
+
+        // Função para carregar status (com cache)
+        async function loadEventStatus() {
+            if (modalDataCache.status && modalDataCache.status.length > 0) {
+                console.log('✅ Status já carregados do cache:', modalDataCache.status.length);
+                return;
+            }
+            
+            try {
+                console.log('🔄 Carregando status...');
+                const { data, error } = await window.api.get('/api/status-agendamento');
+                if (error) throw error;
+                
+                const status = Array.isArray(data) ? data : [];
+                
+                // Armazenar no cache
+                modalDataCache.status = status;
+                console.log('✅ Status carregados e armazenados no cache:', status.length);
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar status:', error);
+                // Fallback para status padrão
+                modalDataCache.status = [
+                    { id: 1, nome: 'agendado', descricao: 'Evento agendado' },
+                    { id: 2, nome: 'confirmado', descricao: 'Evento confirmado' },
+                    { id: 3, nome: 'pendente', descricao: 'Evento pendente' },
+                    { id: 4, nome: 'cancelado', descricao: 'Evento cancelado' }
+                ];
             }
         }
 

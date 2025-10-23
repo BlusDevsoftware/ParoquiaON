@@ -17,6 +17,7 @@ const pilarRoutes = require('./routes/pilarRoutes');
 const localRoutes = require('./routes/localRoutes');
 const acaoRoutes = require('./routes/acaoRoutes');
 const agendaRoutes = require('./routes/agendaRoutes');
+const statusRoutes = require('./routes/statusRoutes');
 const relatorioRoutes = require('./routes/relatorioRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
@@ -73,6 +74,7 @@ app.use('/api/pilares', pilarRoutes);
 app.use('/api/locais', localRoutes);
 app.use('/api/acoes', acaoRoutes);
 app.use('/api/agenda', agendaRoutes);
+app.use('/api/status-agendamento', statusRoutes);
 app.use('/api/relatorios', relatorioRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
