@@ -1866,6 +1866,45 @@
 
         /* CSS dos modais removido - modal não disponível */
 
+        /* Spinner de carregamento - mesmo padrão das outras abas */
+        .loader-overlay-agenda {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border-radius: 10px;
+        }
+
+        .spinner-agenda {
+            border: 8px solid #e3f2fd;
+            border-top: 8px solid #1976D2;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text-agenda {
+            margin-top: 20px;
+            color: #1976D2;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .close-btn {
             background: none;
             border: none;
@@ -2193,6 +2232,12 @@
 
             <!-- Área de Conteúdo -->
             <div class="content-area">
+                <!-- Spinner de Carregamento -->
+                <div id="loader-agenda" class="loader-overlay-agenda">
+                    <div class="spinner-agenda"></div>
+                    <div class="loading-text-agenda">Carregando agenda...</div>
+                </div>
+
                 <!-- Container de Informações -->
                 <div class="calendar-info-container">
                     <div class="info-left">
@@ -2294,8 +2339,26 @@
         let currentView = 'semana'; // 'semana' | 'mês'
         let selectedCommunityId = null; // ID da comunidade selecionada
 
+        // Funções para controlar o spinner da agenda
+        function mostrarSpinnerAgenda() {
+            const spinner = document.getElementById('loader-agenda');
+            if (spinner) {
+                spinner.style.display = 'flex';
+            }
+        }
+        
+        function ocultarSpinnerAgenda() {
+            const spinner = document.getElementById('loader-agenda');
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+        }
+
         // Inicializar aplicação
         document.addEventListener('DOMContentLoaded', async function() {
+            // Mostrar spinner ao iniciar carregamento
+            mostrarSpinnerAgenda();
+            
             initializeApp();
             
             // Carregar dados em paralelo para otimizar performance
@@ -2313,6 +2376,9 @@
                 console.log('✅ Todos os dados foram carregados em paralelo');
             } catch (error) {
                 console.error('❌ Erro ao carregar dados:', error);
+            } finally {
+                // Ocultar spinner após carregamento (sucesso ou erro)
+                ocultarSpinnerAgenda();
             }
             
             setupEventListeners();
@@ -2815,6 +2881,9 @@
         function openEventModal(date = null) {
             console.log('🚀 Abrindo modal de novo agendamento...');
             
+            // Mostrar spinner durante criação do modal
+            mostrarSpinnerAgenda();
+            
             // Criar modal dinamicamente baseado no modal de comunidade
             const modalHTML = `
                 <div id="eventModal" class="modal active">
@@ -3050,6 +3119,9 @@
             // Recarregar selects imediatamente após inicialização
             console.log('🔄 Recarregando selects após carregamento de dados...');
             reloadCustomSelects('#eventModal');
+            
+            // Ocultar spinner quando modal estiver pronto
+            ocultarSpinnerAgenda();
             
             console.log('✅ Modal de novo agendamento criado e exibido');
         }
