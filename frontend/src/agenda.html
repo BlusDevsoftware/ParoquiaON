@@ -1868,10 +1868,10 @@
 
         /* CSS dos modais removido - modal não disponível */
 
-        /* Spinner de carregamento - exatamente igual à aba Minha Comunidade */
+        /* Spinner de carregamento - cobre toda a tela incluindo sidebar */
         .loader-overlay-main {
             display: none;
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
@@ -2130,6 +2130,12 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Spinner Centralizado de Carregamento -->
+        <div id="loader-agenda" class="loader-overlay-main">
+            <div class="spinner-main"></div>
+            <div class="loading-text">Carregando agenda...</div>
+        </div>
+
         <!-- Sidebar Esquerda -->
         <div class="left-sidebar">
             <div class="sidebar-content">
@@ -2233,12 +2239,6 @@
 
             <!-- Área de Conteúdo -->
             <div class="content-area">
-                <!-- Spinner Centralizado de Carregamento -->
-                <div id="loader-agenda" class="loader-overlay-main">
-                    <div class="spinner-main"></div>
-                    <div class="loading-text">Carregando agenda...</div>
-                </div>
-
                 <!-- Container de Informações -->
                 <div class="calendar-info-container">
                     <div class="info-left">
