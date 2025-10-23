@@ -1883,6 +1883,26 @@
             border-radius: 10px;
         }
 
+        /* Spinner apenas na área de conteúdo (sem barra de menu) */
+        .calendar-info-container {
+            position: relative;
+        }
+
+        .calendar-info-container .loader-overlay-agenda {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border-radius: 10px;
+        }
+
         .spinner-agenda {
             border: 8px solid #e3f2fd;
             border-top: 8px solid #1976D2;
@@ -2232,14 +2252,13 @@
 
             <!-- Área de Conteúdo -->
             <div class="content-area">
-                <!-- Spinner de Carregamento -->
-                <div id="loader-agenda" class="loader-overlay-agenda">
-                    <div class="spinner-agenda"></div>
-                    <div class="loading-text-agenda">Carregando agenda...</div>
-                </div>
-
                 <!-- Container de Informações -->
                 <div class="calendar-info-container">
+                    <!-- Spinner de Carregamento -->
+                    <div id="loader-agenda" class="loader-overlay-agenda">
+                        <div class="spinner-agenda"></div>
+                        <div class="loading-text-agenda">Carregando agenda...</div>
+                    </div>
                     <div class="info-left">
                         <div class="info-location">
                             <div class="info-location-container">
