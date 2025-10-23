@@ -27,8 +27,7 @@ async function listarEventos(req, res) {
                 locais (
                     id,
                     nome,
-                    endereco,
-                    capacidade
+                    endereco
                 ),
                 acoes (
                     id,
@@ -88,8 +87,7 @@ async function buscarEvento(req, res) {
                 locais (
                     id,
                     nome,
-                    endereco,
-                    capacidade
+                    endereco
                 ),
                 acoes (
                     id,
@@ -159,8 +157,7 @@ async function criarEvento(req, res) {
                 locais (
                     id,
                     nome,
-                    endereco,
-                    capacidade
+                    endereco
                 ),
                 acoes (
                     id,
@@ -217,8 +214,7 @@ async function atualizarEvento(req, res) {
                 locais (
                     id,
                     nome,
-                    endereco,
-                    capacidade
+                    endereco
                 ),
                 acoes (
                     id,
