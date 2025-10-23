@@ -3033,6 +3033,9 @@
             // Dados já foram carregados antecipadamente
             console.log('✅ Dados dos selects já carregados previamente');
             
+            // Popular selects com dados do cache
+            populateSelectsFromCache();
+            
             // Aplicar estilos de altura máxima aos selects
             const selects = document.querySelectorAll('#eventModal select');
             selects.forEach(select => {
@@ -3041,32 +3044,16 @@
                 select.style.height = 'auto';
             });
 
-            // Verificar se os dados estão carregados antes de inicializar
-            const checkDataLoaded = () => {
-                const communitySelect = document.getElementById('eventCommunity');
-                const hasData = communitySelect && communitySelect.options.length > 1;
-                console.log(`🔍 Verificando dados: ${hasData ? 'Dados carregados' : 'Dados não carregados'}`);
-                return hasData;
-            };
-            
-            // Inicializar selects customizados
+            // Inicializar selects customizados IMEDIATAMENTE
             setTimeout(() => {
                 console.log('🔄 Inicializando dropdowns customizados...');
                 initializeCustomSelects('#eventModal');
                 
-                // Se os dados não estão carregados, aguardar mais um pouco
-                if (!checkDataLoaded()) {
-                    console.log('⏳ Dados ainda não carregados, aguardando...');
-                    setTimeout(() => {
-                        console.log('🔄 Recarregando selects após carregamento de dados...');
-                        reloadCustomSelects('#eventModal');
-                    }, 1000);
-                } else {
-                    console.log('✅ Dados já carregados, recarregando selects...');
-                    setTimeout(() => {
-                        reloadCustomSelects('#eventModal');
-                    }, 200);
-                }
+                // Recarregar selects após um pequeno delay
+                setTimeout(() => {
+                    console.log('🔄 Recarregando selects após carregamento de dados...');
+                    reloadCustomSelects('#eventModal');
+                }, 300);
             }, 100);
             
             console.log('✅ Modal de novo agendamento criado e exibido');
@@ -3111,6 +3098,76 @@
                     field.reloadItems();
                 }
             });
+        }
+
+        // Função para popular selects do modal usando dados do cache
+        function populateSelectsFromCache() {
+            console.log('🔄 Populando selects do modal com dados do cache...');
+            
+            // Popular select de comunidades
+            const communitySelect = document.getElementById('eventCommunity');
+            if (communitySelect && modalDataCache.comunidades.length > 0) {
+                communitySelect.innerHTML = '<option value="">Selecione a comunidade</option>';
+                modalDataCache.comunidades.forEach(comunidade => {
+                    const option = document.createElement('option');
+                    option.value = comunidade.id;
+                    option.textContent = comunidade.nome;
+                    communitySelect.appendChild(option);
+                });
+                console.log(`✅ ${modalDataCache.comunidades.length} comunidades adicionadas do cache`);
+            }
+            
+            // Popular select de pastorais
+            const pastoralSelect = document.getElementById('eventPastoral');
+            if (pastoralSelect && modalDataCache.pastorais.length > 0) {
+                pastoralSelect.innerHTML = '<option value="">Selecione a pastoral</option>';
+                modalDataCache.pastorais.forEach(pastoral => {
+                    const option = document.createElement('option');
+                    option.value = pastoral.id;
+                    option.textContent = pastoral.nome;
+                    pastoralSelect.appendChild(option);
+                });
+                console.log(`✅ ${modalDataCache.pastorais.length} pastorais adicionadas do cache`);
+            }
+            
+            // Popular select de pilares
+            const pilarSelect = document.getElementById('eventPilares');
+            if (pilarSelect && modalDataCache.pilares.length > 0) {
+                pilarSelect.innerHTML = '<option value="">Selecione o pilar</option>';
+                modalDataCache.pilares.forEach(pilar => {
+                    const option = document.createElement('option');
+                    option.value = pilar.id;
+                    option.textContent = pilar.nome;
+                    pilarSelect.appendChild(option);
+                });
+                console.log(`✅ ${modalDataCache.pilares.length} pilares adicionados do cache`);
+            }
+            
+            // Popular select de ações
+            const acaoSelect = document.getElementById('eventAcao');
+            if (acaoSelect && modalDataCache.acoes.length > 0) {
+                acaoSelect.innerHTML = '<option value="">Selecione a ação</option>';
+                modalDataCache.acoes.forEach(acao => {
+                    const option = document.createElement('option');
+                    option.value = acao.id;
+                    option.textContent = acao.nome;
+                    acaoSelect.appendChild(option);
+                });
+                console.log(`✅ ${modalDataCache.acoes.length} ações adicionadas do cache`);
+            }
+            
+            // Popular select de locais
+            const localSelect = document.getElementById('eventLocation');
+            if (localSelect && modalDataCache.locais.length > 0) {
+                localSelect.innerHTML = '<option value="">Selecione o local</option>';
+                modalDataCache.locais.forEach(local => {
+                    const option = document.createElement('option');
+                    option.value = local.id;
+                    option.textContent = local.nome;
+                    localSelect.appendChild(option);
+                });
+                console.log(`✅ ${modalDataCache.locais.length} locais adicionados do cache`);
+            }
         }
 
         // Cria um campo de busca/seleção direto (substitui o select)
@@ -3794,6 +3851,15 @@
             console.log('Modal de novo agendamento não está disponível');
         }
 
+        // Cache para dados dos selects
+        let modalDataCache = {
+            comunidades: [],
+            pastorais: [],
+            pilares: [],
+            acoes: [],
+            locais: []
+        };
+
         // Função para carregar comunidades
         async function loadEventCommunities() {
             try {
@@ -3803,6 +3869,9 @@
                 
                 const comunidades = Array.isArray(data) ? data : [];
                 console.log(`📋 ${comunidades.length} comunidades carregadas da API`);
+                
+                // Armazenar no cache
+                modalDataCache.comunidades = comunidades;
                 
                 const select = document.getElementById('eventCommunity');
                 if (select) {
@@ -3837,6 +3906,9 @@
                 if (error) throw error;
                 
                 const pastorais = Array.isArray(data) ? data : [];
+                // Armazenar no cache
+                modalDataCache.pastorais = pastorais;
+                
                 const select = document.getElementById('eventPastoral');
                 if (select) {
                     // Limpar opções existentes (exceto a primeira)
