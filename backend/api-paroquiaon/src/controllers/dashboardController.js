@@ -146,28 +146,28 @@ async function estatisticasEventos() {
             .from('agendamentos')
             .select('*', { count: 'exact', head: true });
 
-        const { data: ativos, error: ativosError } = await supabase
+        const { data: agendados, error: agendadosError } = await supabase
             .from('agendamentos')
             .select('*', { count: 'exact', head: true })
-            .eq('status', 'Ativo');
+            .eq('status_id', 1);
 
-        const { data: concluidos, error: concluidosError } = await supabase
+        const { data: confirmados, error: confirmadosError } = await supabase
             .from('agendamentos')
             .select('*', { count: 'exact', head: true })
-            .eq('status', 'Concluído');
+            .eq('status_id', 2);
 
-        if (totalError || ativosError || concluidosError) {
+        if (totalError || agendadosError || confirmadosError) {
             throw new Error('Erro ao buscar estatísticas de eventos');
         }
 
         return {
             total: total?.length || 0,
-            ativos: ativos?.length || 0,
-            concluidos: concluidos?.length || 0
+            agendados: agendados?.length || 0,
+            confirmados: confirmados?.length || 0
         };
     } catch (error) {
         console.error('Erro ao buscar estatísticas de eventos:', error);
-        return { total: 0, ativos: 0, concluidos: 0 };
+        return { total: 0, agendados: 0, confirmados: 0 };
     }
 }
 

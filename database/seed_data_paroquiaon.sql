@@ -67,13 +67,13 @@ ON CONFLICT DO NOTHING;
 -- ==============================================
 -- DADOS DE EXEMPLO PARA EVENTOS
 -- ==============================================
-INSERT INTO eventos (titulo, descricao, data_inicio, data_fim, local_id, acao_id, responsavel_id, status) VALUES
-('Catequese Infantil - Aula 1', 'Primeira aula de catequese para crianças', '2024-02-15 14:00:00', '2024-02-15 15:30:00', 2, 1, 2, 'Agendado'),
-('Grupo de Oração', 'Encontro semanal do grupo de oração', '2024-02-16 19:00:00', '2024-02-16 21:00:00', 1, 3, 3, 'Agendado'),
-('Coral Paroquial - Ensaio', 'Ensaio semanal do coral', '2024-02-17 15:00:00', '2024-02-17 17:00:00', 6, 5, 4, 'Agendado'),
-('Pastoral da Caridade - Reunião', 'Reunião mensal da pastoral', '2024-02-18 14:00:00', '2024-02-18 16:00:00', 1, 4, 3, 'Agendado'),
-('Grupo de Jovens', 'Encontro do grupo de jovens', '2024-02-19 19:30:00', '2024-02-19 22:00:00', 1, 7, 5, 'Agendado'),
-('Pastoral Familiar - Encontro', 'Encontro mensal das famílias', '2024-02-20 15:00:00', '2024-02-20 17:30:00', 1, 8, 6, 'Agendado')
+INSERT INTO agendamentos (titulo, descricao, data_inicio, data_fim, local_id, acao_id, responsavel_id, status_id, comunidade_id, pastoral_id, pilar_id, evento_paroquial, visibilidade, lembrete, capacidade) VALUES
+('Catequese Infantil - Aula 1', 'Primeira aula de catequese para crianças', '2024-02-15 14:00:00', '2024-02-15 15:30:00', 2, 1, 2, 1, 1, 1, 1, true, 'Publico', '1h', 30),
+('Grupo de Oração', 'Encontro semanal do grupo de oração', '2024-02-16 19:00:00', '2024-02-16 21:00:00', 1, 3, 3, 1, 2, 2, 2, false, 'Publico', '30min', 50),
+('Coral Paroquial - Ensaio', 'Ensaio semanal do coral', '2024-02-17 15:00:00', '2024-02-17 17:00:00', 6, 5, 4, 1, 3, 3, 3, true, 'Publico', 'Nenhum', 25),
+('Pastoral da Caridade - Reunião', 'Reunião mensal da pastoral', '2024-02-18 14:00:00', '2024-02-18 16:00:00', 1, 4, 3, 1, 4, 4, 4, false, 'Publico', '15min', 20),
+('Grupo de Jovens', 'Encontro do grupo de jovens', '2024-02-19 19:30:00', '2024-02-19 22:00:00', 1, 7, 5, 1, 5, 5, 5, true, 'Publico', '1h', 40),
+('Pastoral Familiar - Encontro', 'Encontro mensal das famílias', '2024-02-20 15:00:00', '2024-02-20 17:30:00', 1, 8, 6, 1, 6, 6, 6, false, 'Publico', '30min', 35)
 ON CONFLICT DO NOTHING;
 
 -- ==============================================
@@ -111,7 +111,7 @@ BEGIN
     RAISE NOTICE '- 7 locais';
     RAISE NOTICE '- 10 ações';
     RAISE NOTICE '- 6 pastorais';
-    RAISE NOTICE '- 6 eventos';
+    RAISE NOTICE '- 6 agendamentos';
     RAISE NOTICE '- 6 recebimentos';
     RAISE NOTICE '- 3 conferências';
     RAISE NOTICE '';

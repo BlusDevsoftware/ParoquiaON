@@ -123,21 +123,10 @@ CREATE TABLE IF NOT EXISTS acoes (
 );
 
 -- ==============================================
--- TABELA DE EVENTOS DA AGENDA
+-- TABELA DE EVENTOS DA AGENDA (REMOVIDA)
 -- ==============================================
-CREATE TABLE IF NOT EXISTS eventos (
-    id SERIAL PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    descricao TEXT,
-    data_inicio TIMESTAMP NOT NULL,
-    data_fim TIMESTAMP,
-    local_id INTEGER REFERENCES locais(id),
-    acao_id INTEGER REFERENCES acoes(id),
-    responsavel_id INTEGER REFERENCES pessoas(id),
-    status VARCHAR(20) DEFAULT 'Agendado' CHECK (status IN ('Agendado', 'Confirmado', 'Cancelado', 'Realizado')),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- A tabela 'eventos' foi removida em favor da tabela 'agendamentos'
+-- que possui mais campos e relacionamentos
 
 -- ==============================================
 -- TABELA DE RELATÓRIOS
@@ -226,11 +215,11 @@ CREATE INDEX IF NOT EXISTS idx_pastorais_nome ON pastorais(nome);
 CREATE INDEX IF NOT EXISTS idx_pastorais_responsavel_id ON pastorais(responsavel_id);
 CREATE INDEX IF NOT EXISTS idx_pastorais_comunidade_id ON pastorais(comunidade_id);
 
--- Índices para eventos
-CREATE INDEX IF NOT EXISTS idx_eventos_data_inicio ON eventos(data_inicio);
-CREATE INDEX IF NOT EXISTS idx_eventos_status ON eventos(status);
-CREATE INDEX IF NOT EXISTS idx_eventos_local_id ON eventos(local_id);
-CREATE INDEX IF NOT EXISTS idx_eventos_acao_id ON eventos(acao_id);
+-- Índices para agendamentos (substitui eventos)
+CREATE INDEX IF NOT EXISTS idx_agendamentos_data_inicio ON agendamentos(data_inicio);
+CREATE INDEX IF NOT EXISTS idx_agendamentos_status_id ON agendamentos(status_id);
+CREATE INDEX IF NOT EXISTS idx_agendamentos_local_id ON agendamentos(local_id);
+CREATE INDEX IF NOT EXISTS idx_agendamentos_acao_id ON agendamentos(acao_id);
 
 -- Índices para recebimentos
 CREATE INDEX IF NOT EXISTS idx_recebimentos_data ON recebimentos(data_recebimento);
@@ -257,7 +246,7 @@ DROP TRIGGER IF EXISTS update_pastorais_updated_at ON pastorais;
 DROP TRIGGER IF EXISTS update_pilares_updated_at ON pilares;
 DROP TRIGGER IF EXISTS update_locais_updated_at ON locais;
 DROP TRIGGER IF EXISTS update_acoes_updated_at ON acoes;
-DROP TRIGGER IF EXISTS update_eventos_updated_at ON eventos;
+-- Trigger para eventos removido (tabela eventos foi removida)
 DROP TRIGGER IF EXISTS update_recebimentos_updated_at ON recebimentos;
 DROP TRIGGER IF EXISTS update_conferencias_updated_at ON conferencias;
 DROP TRIGGER IF EXISTS update_sincronizacoes_updated_at ON sincronizacoes;
@@ -270,7 +259,7 @@ CREATE TRIGGER update_pastorais_updated_at BEFORE UPDATE ON pastorais FOR EACH R
 CREATE TRIGGER update_pilares_updated_at BEFORE UPDATE ON pilares FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_locais_updated_at BEFORE UPDATE ON locais FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_acoes_updated_at BEFORE UPDATE ON acoes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_eventos_updated_at BEFORE UPDATE ON eventos FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- Trigger para eventos removido (tabela eventos foi removida)
 CREATE TRIGGER update_recebimentos_updated_at BEFORE UPDATE ON recebimentos FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_conferencias_updated_at BEFORE UPDATE ON conferencias FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_sincronizacoes_updated_at BEFORE UPDATE ON sincronizacoes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -367,7 +356,7 @@ COMMENT ON TABLE pastorais IS 'Tabela para armazenar dados das pastorais';
 COMMENT ON TABLE pilares IS 'Tabela para armazenar os pilares da paróquia';
 COMMENT ON TABLE locais IS 'Tabela para armazenar locais e espaços físicos da paróquia';
 COMMENT ON TABLE acoes IS 'Tabela para armazenar ações e atividades';
-COMMENT ON TABLE eventos IS 'Tabela para armazenar eventos da agenda';
+-- Comentário da tabela eventos removido (tabela foi removida)
 COMMENT ON TABLE relatorios IS 'Tabela para armazenar relatórios gerados';
 COMMENT ON TABLE recebimentos IS 'Tabela para armazenar recebimentos financeiros';
 COMMENT ON TABLE conferencias IS 'Tabela para armazenar conferências e eventos especiais';
@@ -390,7 +379,7 @@ BEGIN
     RAISE NOTICE '- pilares (pilares da paróquia)';
     RAISE NOTICE '- locais (locais e espaços)';
     RAISE NOTICE '- acoes (ações e atividades)';
-    RAISE NOTICE '- eventos (agenda de eventos)';
+    RAISE NOTICE '- agendamentos (agenda de eventos)';
     RAISE NOTICE '- relatorios (relatórios)';
     RAISE NOTICE '- recebimentos (recebimentos financeiros)';
     RAISE NOTICE '- conferencias (conferências)';

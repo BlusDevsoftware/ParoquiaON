@@ -52,7 +52,7 @@ async function listarEventos(req, res) {
                     id,
                     email
                 ),
-                status_agendamento (
+                status_agendamento!status_id (
                     id,
                     nome,
                     descricao
@@ -111,7 +111,7 @@ async function buscarEvento(req, res) {
                     id,
                     email
                 ),
-                status_agendamento (
+                status_agendamento!status_id (
                     id,
                     nome,
                     descricao
@@ -258,7 +258,7 @@ async function criarEvento(req, res) {
                     id,
                     email
                 ),
-                status_agendamento (
+                status_agendamento!status_id (
                     id,
                     nome,
                     descricao
@@ -333,7 +333,7 @@ async function atualizarEvento(req, res) {
                     id,
                     email
                 ),
-                status_agendamento (
+                status_agendamento!status_id (
                     id,
                     nome,
                     descricao
@@ -363,31 +363,37 @@ async function excluirEvento(req, res) {
     }
 }
 
-// Estatísticas dos eventos
+// Estatísticas dos agendamentos
 async function estatisticasEventos(req, res) {
     try {
         const { data: total, error: totalError } = await supabase
-            .from('eventos')
+            .from('agendamentos')
             .select('*', { count: 'exact', head: true });
 
-        const { data: ativos, error: ativosError } = await supabase
-            .from('eventos')
+        const { data: agendados, error: agendadosError } = await supabase
+            .from('agendamentos')
             .select('*', { count: 'exact', head: true })
-            .eq('status', 'Ativo');
+            .eq('status_id', 1);
 
-        const { data: concluidos, error: concluidosError } = await supabase
-            .from('eventos')
+        const { data: confirmados, error: confirmadosError } = await supabase
+            .from('agendamentos')
             .select('*', { count: 'exact', head: true })
-            .eq('status', 'Concluído');
+            .eq('status_id', 2);
 
-        if (totalError || ativosError || concluidosError) {
+        const { data: cancelados, error: canceladosError } = await supabase
+            .from('agendamentos')
+            .select('*', { count: 'exact', head: true })
+            .eq('status_id', 4);
+
+        if (totalError || agendadosError || confirmadosError || canceladosError) {
             throw new Error('Erro ao buscar estatísticas');
         }
 
         res.json({
             total: total?.length || 0,
-            ativos: ativos?.length || 0,
-            concluidos: concluidos?.length || 0
+            agendados: agendados?.length || 0,
+            confirmados: confirmados?.length || 0,
+            cancelados: cancelados?.length || 0
         });
     } catch (error) {
         console.error('Erro ao buscar estatísticas:', error);
@@ -395,37 +401,37 @@ async function estatisticasEventos(req, res) {
     }
 }
 
-// Dados para gráficos de eventos
+// Dados para gráficos de agendamentos
 async function dadosGraficosEventos(req, res) {
     try {
-        // Buscar todos os eventos
-        const { data: eventos, error: eventosError } = await supabase
-            .from('eventos')
+        // Buscar todos os agendamentos
+        const { data: agendamentos, error: agendamentosError } = await supabase
+            .from('agendamentos')
             .select(`
                 id,
                 titulo,
                 data_inicio,
-                status,
+                status_id,
                 created_at
             `)
             .order('created_at', { ascending: true });
 
-        if (eventosError) throw eventosError;
+        if (agendamentosError) throw agendamentosError;
 
-        // Calcular evolução de eventos por mês (últimos 6 meses)
-        const evolucaoEventos = calcularEvolucaoEventos(eventos);
+        // Calcular evolução de agendamentos por mês (últimos 6 meses)
+        const evolucaoAgendamentos = calcularEvolucaoEventos(agendamentos);
         
         // Calcular distribuição por status
-        const distribuicaoStatus = calcularDistribuicaoStatusEventos(eventos);
+        const distribuicaoStatus = calcularDistribuicaoStatusEventos(agendamentos);
 
-        // Calcular eventos por mês (próximos 6 meses)
-        const eventosPorMes = calcularEventosPorMes(eventos);
+        // Calcular agendamentos por mês (próximos 6 meses)
+        const agendamentosPorMes = calcularEventosPorMes(agendamentos);
 
         res.json({
-            evolucao: evolucaoEventos,
+            evolucao: evolucaoAgendamentos,
             distribuicao: distribuicaoStatus,
-            eventosPorMes: eventosPorMes,
-            totalEventos: eventos?.length || 0
+            eventosPorMes: agendamentosPorMes,
+            totalEventos: agendamentos?.length || 0
         });
 
     } catch (error) {
@@ -459,28 +465,31 @@ function calcularEvolucaoEventos(eventos) {
     return { labels, dados };
 }
 
-// Função auxiliar para calcular distribuição por status dos eventos
-function calcularDistribuicaoStatusEventos(eventos) {
+// Função auxiliar para calcular distribuição por status dos agendamentos
+function calcularDistribuicaoStatusEventos(agendamentos) {
     const status = {
-        ativo: 0,
-        concluido: 0,
+        agendado: 0,
+        confirmado: 0,
+        pendente: 0,
         cancelado: 0
     };
 
-    (eventos || []).forEach(evento => {
-        const statusEvento = (evento.status || '').toString().trim().toLowerCase();
-        if (statusEvento === 'ativo') {
-            status.ativo++;
-        } else if (statusEvento === 'concluído' || statusEvento === 'concluido') {
-            status.concluido++;
-        } else {
+    (agendamentos || []).forEach(agendamento => {
+        const statusId = agendamento.status_id;
+        if (statusId === 1) {
+            status.agendado++;
+        } else if (statusId === 2) {
+            status.confirmado++;
+        } else if (statusId === 3) {
+            status.pendente++;
+        } else if (statusId === 4) {
             status.cancelado++;
         }
     });
 
     return {
-        labels: ['Ativo', 'Concluído', 'Cancelado'],
-        dados: [status.ativo, status.concluido, status.cancelado]
+        labels: ['Agendado', 'Confirmado', 'Pendente', 'Cancelado'],
+        dados: [status.agendado, status.confirmado, status.pendente, status.cancelado]
     };
 }
 

@@ -12,7 +12,7 @@ WHERE table_schema = 'public'
     AND table_name IN (
         'perfis', 'pessoas', 'usuarios', 'comunidades', 
         'pastorais', 'pilares', 'locais', 'acoes', 
-        'eventos', 'relatorios', 'recebimentos', 
+        'agendamentos', 'relatorios', 'recebimentos', 
         'conferencias', 'sincronizacoes'
     )
 ORDER BY table_name;
@@ -73,7 +73,7 @@ WHERE schemaname = 'public'
     AND tablename IN (
         'perfis', 'pessoas', 'usuarios', 'comunidades', 
         'pastorais', 'pilares', 'locais', 'acoes', 
-        'eventos', 'relatorios', 'recebimentos', 
+        'agendamentos', 'relatorios', 'recebimentos', 
         'conferencias', 'sincronizacoes'
     )
 ORDER BY tablename, indexname;
@@ -112,7 +112,7 @@ SELECT 'locais' as tabela, COUNT(*) as total FROM locais
 UNION ALL
 SELECT 'acoes' as tabela, COUNT(*) as total FROM acoes
 UNION ALL
-SELECT 'eventos' as tabela, COUNT(*) as total FROM eventos
+SELECT 'agendamentos' as tabela, COUNT(*) as total FROM agendamentos
 UNION ALL
 SELECT 'relatorios' as tabela, COUNT(*) as total FROM relatorios
 UNION ALL
@@ -145,7 +145,7 @@ WHERE tc.constraint_type = 'FOREIGN KEY'
     AND tc.table_name IN (
         'perfis', 'pessoas', 'usuarios', 'comunidades', 
         'pastorais', 'pilares', 'locais', 'acoes', 
-        'eventos', 'relatorios', 'recebimentos', 
+        'agendamentos', 'relatorios', 'recebimentos', 
         'conferencias', 'sincronizacoes'
     )
 ORDER BY tc.table_name, kcu.column_name;

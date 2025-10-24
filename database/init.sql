@@ -106,20 +106,8 @@ CREATE TABLE IF NOT EXISTS acoes (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de eventos da agenda
-CREATE TABLE IF NOT EXISTS eventos (
-    id SERIAL PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    descricao TEXT,
-    data_inicio TIMESTAMP NOT NULL,
-    data_fim TIMESTAMP,
-    local_id INTEGER REFERENCES locais(id),
-    acao_id INTEGER REFERENCES acoes(id),
-    responsavel_id INTEGER REFERENCES pessoas(id),
-    status VARCHAR(20) DEFAULT 'Agendado' CHECK (status IN ('Agendado', 'Confirmado', 'Cancelado', 'Realizado')),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Tabela de eventos da agenda (REMOVIDA - usar agendamentos)
+-- A tabela 'eventos' foi removida em favor da tabela 'agendamentos'
 
 -- Tabela de relatórios
 CREATE TABLE IF NOT EXISTS relatorios (
@@ -137,8 +125,9 @@ CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
 CREATE INDEX IF NOT EXISTS idx_usuarios_login ON usuarios(login);
 CREATE INDEX IF NOT EXISTS idx_comunidades_codigo ON comunidades(codigo);
 CREATE INDEX IF NOT EXISTS idx_comunidades_nome ON comunidades(nome);
-CREATE INDEX IF NOT EXISTS idx_eventos_data_inicio ON eventos(data_inicio);
-CREATE INDEX IF NOT EXISTS idx_eventos_status ON eventos(status);
+-- Índices para agendamentos (substitui eventos)
+CREATE INDEX IF NOT EXISTS idx_agendamentos_data_inicio ON agendamentos(data_inicio);
+CREATE INDEX IF NOT EXISTS idx_agendamentos_status_id ON agendamentos(status_id);
 CREATE INDEX IF NOT EXISTS idx_pessoas_nome ON pessoas(nome);
 CREATE INDEX IF NOT EXISTS idx_pastorais_nome ON pastorais(nome);
 
@@ -160,7 +149,7 @@ CREATE TRIGGER update_pastorais_updated_at BEFORE UPDATE ON pastorais FOR EACH R
 CREATE TRIGGER update_pilares_updated_at BEFORE UPDATE ON pilares FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_locais_updated_at BEFORE UPDATE ON locais FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_acoes_updated_at BEFORE UPDATE ON acoes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_eventos_updated_at BEFORE UPDATE ON eventos FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- Trigger para eventos removido (tabela eventos foi removida)
 
 -- Inserir dados iniciais
 INSERT INTO perfis (nome, descricao, permissoes) VALUES
@@ -187,7 +176,7 @@ COMMENT ON TABLE pastorais IS 'Tabela para armazenar dados das pastorais';
 COMMENT ON TABLE pilares IS 'Tabela para armazenar os pilares da paróquia';
 COMMENT ON TABLE locais IS 'Tabela para armazenar locais da paróquia';
 COMMENT ON TABLE acoes IS 'Tabela para armazenar ações e atividades';
-COMMENT ON TABLE eventos IS 'Tabela para armazenar eventos da agenda';
+-- Comentário da tabela eventos removido (tabela foi removida)
 COMMENT ON TABLE relatorios IS 'Tabela para armazenar relatórios gerados';
 
 -- Mensagem de sucesso
