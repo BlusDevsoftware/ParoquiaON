@@ -20,45 +20,64 @@ async function listarEventos(req, res) {
         
         console.log('✅ Tabela agendamentos acessível, fazendo consulta completa...');
         
-        const { data, error } = await supabase
+        // Primeiro buscar os agendamentos sem relacionamentos complexos
+        const { data: agendamentos, error: agendamentosError } = await supabase
             .from('agendamentos')
-            .select(`
-                *,
-                locais (
-                    id,
-                    nome
-                ),
-                acoes (
-                    id,
-                    nome
-                ),
-                pessoas!responsavel_id (
-                    id,
-                    nome
-                ),
-                comunidades (
-                    id,
-                    nome
-                ),
-                pastorais (
-                    id,
-                    nome
-                ),
-                pilares (
-                    id,
-                    nome
-                ),
-                usuarios!usuario_lancamento_id (
-                    id,
-                    email
-                ),
-                status_agendamento!status_id (
-                    id,
-                    nome,
-                    descricao
-                )
-            `)
+            .select('*')
             .order('data_inicio', { ascending: true });
+            
+        if (agendamentosError) {
+            console.error('❌ Erro ao buscar agendamentos:', agendamentosError);
+            throw agendamentosError;
+        }
+        
+        // Buscar dados relacionados separadamente
+        const relacionamentos = {};
+        
+        // Buscar locais
+        const { data: locais } = await supabase.from('locais').select('id, nome');
+        if (locais) relacionamentos.locais = locais;
+        
+        // Buscar ações
+        const { data: acoes } = await supabase.from('acoes').select('id, nome');
+        if (acoes) relacionamentos.acoes = acoes;
+        
+        // Buscar pessoas
+        const { data: pessoas } = await supabase.from('pessoas').select('id, nome');
+        if (pessoas) relacionamentos.pessoas = pessoas;
+        
+        // Buscar comunidades
+        const { data: comunidades } = await supabase.from('comunidades').select('id, nome');
+        if (comunidades) relacionamentos.comunidades = comunidades;
+        
+        // Buscar pastorais
+        const { data: pastorais } = await supabase.from('pastorais').select('id, nome');
+        if (pastorais) relacionamentos.pastorais = pastorais;
+        
+        // Buscar pilares
+        const { data: pilares } = await supabase.from('pilares').select('id, nome');
+        if (pilares) relacionamentos.pilares = pilares;
+        
+        // Buscar usuários
+        const { data: usuarios } = await supabase.from('usuarios').select('id, email');
+        if (usuarios) relacionamentos.usuarios = usuarios;
+        
+        // Buscar status
+        const { data: status } = await supabase.from('status_agendamento').select('id, nome, descricao');
+        if (status) relacionamentos.status = status;
+        
+        // Combinar os dados
+        const data = agendamentos?.map(agendamento => ({
+            ...agendamento,
+            locais: relacionamentos.locais?.find(l => l.id === agendamento.local_id),
+            acoes: relacionamentos.acoes?.find(a => a.id === agendamento.acao_id),
+            pessoas: relacionamentos.pessoas?.find(p => p.id === agendamento.responsavel_id),
+            comunidades: relacionamentos.comunidades?.find(c => c.id === agendamento.comunidade_id),
+            pastorais: relacionamentos.pastorais?.find(p => p.id === agendamento.pastoral_id),
+            pilares: relacionamentos.pilares?.find(p => p.id === agendamento.pilar_id),
+            usuarios: relacionamentos.usuarios?.find(u => u.id === agendamento.usuario_lancamento_id),
+            status_agendamento: relacionamentos.status?.find(s => s.id === agendamento.status_id)
+        })) || [];
             
         if (error) {
             console.error('❌ Erro na consulta completa:', error);
@@ -79,49 +98,66 @@ async function listarEventos(req, res) {
 async function buscarEvento(req, res) {
     try {
         const { id } = req.params;
-        const { data, error } = await supabase
+        
+        // Buscar o agendamento
+        const { data: agendamento, error: agendamentoError } = await supabase
             .from('agendamentos')
-            .select(`
-                *,
-                locais (
-                    id,
-                    nome
-                ),
-                acoes (
-                    id,
-                    nome
-                ),
-                pessoas!responsavel_id (
-                    id,
-                    nome
-                ),
-                comunidades (
-                    id,
-                    nome
-                ),
-                pastorais (
-                    id,
-                    nome
-                ),
-                pilares (
-                    id,
-                    nome
-                ),
-                usuarios!usuario_lancamento_id (
-                    id,
-                    email
-                ),
-                status_agendamento!status_id (
-                    id,
-                    nome,
-                    descricao
-                )
-            `)
+            .select('*')
             .eq('id', id)
             .single();
             
-        if (error) throw error;
-        if (!data) return res.status(404).json({ error: 'Agendamento não encontrado' });
+        if (agendamentoError) throw agendamentoError;
+        if (!agendamento) return res.status(404).json({ error: 'Agendamento não encontrado' });
+        
+        // Buscar dados relacionados
+        const relacionamentos = {};
+        
+        if (agendamento.local_id) {
+            const { data: local } = await supabase.from('locais').select('id, nome').eq('id', agendamento.local_id).single();
+            relacionamentos.locais = local;
+        }
+        
+        if (agendamento.acao_id) {
+            const { data: acao } = await supabase.from('acoes').select('id, nome').eq('id', agendamento.acao_id).single();
+            relacionamentos.acoes = acao;
+        }
+        
+        if (agendamento.responsavel_id) {
+            const { data: pessoa } = await supabase.from('pessoas').select('id, nome').eq('id', agendamento.responsavel_id).single();
+            relacionamentos.pessoas = pessoa;
+        }
+        
+        if (agendamento.comunidade_id) {
+            const { data: comunidade } = await supabase.from('comunidades').select('id, nome').eq('id', agendamento.comunidade_id).single();
+            relacionamentos.comunidades = comunidade;
+        }
+        
+        if (agendamento.pastoral_id) {
+            const { data: pastoral } = await supabase.from('pastorais').select('id, nome').eq('id', agendamento.pastoral_id).single();
+            relacionamentos.pastorais = pastoral;
+        }
+        
+        if (agendamento.pilar_id) {
+            const { data: pilar } = await supabase.from('pilares').select('id, nome').eq('id', agendamento.pilar_id).single();
+            relacionamentos.pilares = pilar;
+        }
+        
+        if (agendamento.usuario_lancamento_id) {
+            const { data: usuario } = await supabase.from('usuarios').select('id, email').eq('id', agendamento.usuario_lancamento_id).single();
+            relacionamentos.usuarios = usuario;
+        }
+        
+        if (agendamento.status_id) {
+            const { data: status } = await supabase.from('status_agendamento').select('id, nome, descricao').eq('id', agendamento.status_id).single();
+            relacionamentos.status_agendamento = status;
+        }
+        
+        // Combinar os dados
+        const data = {
+            ...agendamento,
+            ...relacionamentos
+        };
+        
         res.json(data);
     } catch (error) {
         console.error('Erro ao buscar agendamento:', error);
@@ -225,46 +261,70 @@ async function criarEvento(req, res) {
         console.log('✅ Todas as validações de foreign keys passaram');
         
         // Inserir evento
-        const { data, error } = await supabase
+        const { data: insertedData, error } = await supabase
             .from('agendamentos')
             .insert([dadosCompletos])
-            .select(`
-                *,
-                locais (
-                    id,
-                    nome
-                ),
-                acoes (
-                    id,
-                    nome
-                ),
-                pessoas!responsavel_id (
-                    id,
-                    nome
-                ),
-                comunidades (
-                    id,
-                    nome
-                ),
-                pastorais (
-                    id,
-                    nome
-                ),
-                pilares (
-                    id,
-                    nome
-                ),
-                usuarios!usuario_lancamento_id (
-                    id,
-                    email
-                ),
-                status_agendamento!status_id (
-                    id,
-                    nome,
-                    descricao
-                )
-            `)
+            .select('*')
             .single();
+            
+        if (error) {
+            console.error('❌ Erro do Supabase ao inserir agendamento:', {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code
+            });
+            throw error;
+        }
+        
+        // Buscar dados relacionados para o evento criado
+        const relacionamentos = {};
+        
+        if (insertedData.local_id) {
+            const { data: local } = await supabase.from('locais').select('id, nome').eq('id', insertedData.local_id).single();
+            relacionamentos.locais = local;
+        }
+        
+        if (insertedData.acao_id) {
+            const { data: acao } = await supabase.from('acoes').select('id, nome').eq('id', insertedData.acao_id).single();
+            relacionamentos.acoes = acao;
+        }
+        
+        if (insertedData.responsavel_id) {
+            const { data: pessoa } = await supabase.from('pessoas').select('id, nome').eq('id', insertedData.responsavel_id).single();
+            relacionamentos.pessoas = pessoa;
+        }
+        
+        if (insertedData.comunidade_id) {
+            const { data: comunidade } = await supabase.from('comunidades').select('id, nome').eq('id', insertedData.comunidade_id).single();
+            relacionamentos.comunidades = comunidade;
+        }
+        
+        if (insertedData.pastoral_id) {
+            const { data: pastoral } = await supabase.from('pastorais').select('id, nome').eq('id', insertedData.pastoral_id).single();
+            relacionamentos.pastorais = pastoral;
+        }
+        
+        if (insertedData.pilar_id) {
+            const { data: pilar } = await supabase.from('pilares').select('id, nome').eq('id', insertedData.pilar_id).single();
+            relacionamentos.pilares = pilar;
+        }
+        
+        if (insertedData.usuario_lancamento_id) {
+            const { data: usuario } = await supabase.from('usuarios').select('id, email').eq('id', insertedData.usuario_lancamento_id).single();
+            relacionamentos.usuarios = usuario;
+        }
+        
+        if (insertedData.status_id) {
+            const { data: status } = await supabase.from('status_agendamento').select('id, nome, descricao').eq('id', insertedData.status_id).single();
+            relacionamentos.status_agendamento = status;
+        }
+        
+        // Combinar os dados
+        const data = {
+            ...insertedData,
+            ...relacionamentos
+        };
             
         if (error) {
             console.error('❌ Erro do Supabase ao inserir agendamento:', {
@@ -299,50 +359,65 @@ async function atualizarEvento(req, res) {
         const dados = req.body;
         
         // Atualizar evento
-        const { data, error } = await supabase
+        const { data: updatedData, error } = await supabase
             .from('agendamentos')
             .update(dados)
             .eq('id', id)
-            .select(`
-                *,
-                locais (
-                    id,
-                    nome
-                ),
-                acoes (
-                    id,
-                    nome
-                ),
-                pessoas!responsavel_id (
-                    id,
-                    nome
-                ),
-                comunidades (
-                    id,
-                    nome
-                ),
-                pastorais (
-                    id,
-                    nome
-                ),
-                pilares (
-                    id,
-                    nome
-                ),
-                usuarios!usuario_lancamento_id (
-                    id,
-                    email
-                ),
-                status_agendamento!status_id (
-                    id,
-                    nome,
-                    descricao
-                )
-            `)
+            .select('*')
             .single();
             
         if (error) throw error;
-        if (!data) return res.status(404).json({ error: 'Agendamento não encontrado' });
+        if (!updatedData) return res.status(404).json({ error: 'Agendamento não encontrado' });
+        
+        // Buscar dados relacionados
+        const relacionamentos = {};
+        
+        if (updatedData.local_id) {
+            const { data: local } = await supabase.from('locais').select('id, nome').eq('id', updatedData.local_id).single();
+            relacionamentos.locais = local;
+        }
+        
+        if (updatedData.acao_id) {
+            const { data: acao } = await supabase.from('acoes').select('id, nome').eq('id', updatedData.acao_id).single();
+            relacionamentos.acoes = acao;
+        }
+        
+        if (updatedData.responsavel_id) {
+            const { data: pessoa } = await supabase.from('pessoas').select('id, nome').eq('id', updatedData.responsavel_id).single();
+            relacionamentos.pessoas = pessoa;
+        }
+        
+        if (updatedData.comunidade_id) {
+            const { data: comunidade } = await supabase.from('comunidades').select('id, nome').eq('id', updatedData.comunidade_id).single();
+            relacionamentos.comunidades = comunidade;
+        }
+        
+        if (updatedData.pastoral_id) {
+            const { data: pastoral } = await supabase.from('pastorais').select('id, nome').eq('id', updatedData.pastoral_id).single();
+            relacionamentos.pastorais = pastoral;
+        }
+        
+        if (updatedData.pilar_id) {
+            const { data: pilar } = await supabase.from('pilares').select('id, nome').eq('id', updatedData.pilar_id).single();
+            relacionamentos.pilares = pilar;
+        }
+        
+        if (updatedData.usuario_lancamento_id) {
+            const { data: usuario } = await supabase.from('usuarios').select('id, email').eq('id', updatedData.usuario_lancamento_id).single();
+            relacionamentos.usuarios = usuario;
+        }
+        
+        if (updatedData.status_id) {
+            const { data: status } = await supabase.from('status_agendamento').select('id, nome, descricao').eq('id', updatedData.status_id).single();
+            relacionamentos.status_agendamento = status;
+        }
+        
+        // Combinar os dados
+        const data = {
+            ...updatedData,
+            ...relacionamentos
+        };
+        
         res.json(data);
     } catch (error) {
         console.error('Erro ao atualizar agendamento:', error);
