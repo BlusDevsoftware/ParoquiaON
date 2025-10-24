@@ -1940,6 +1940,50 @@
             background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
         }
 
+        .event-agendamento {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+
+        /* Estilos para modal de edição */
+        .event-details {
+            margin-bottom: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-row label {
+            font-weight: 600;
+            color: #1e3a8a;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-row span {
+            color: #333;
+            flex: 1;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
         /* Status dos eventos */
         .event-confirmado {
             border-left: 4px solid #4caf50;
@@ -4278,8 +4322,79 @@
         }
 
         function editEvent(event) {
-            console.log('Modal de edição não está disponível');
-            alert('Modal de edição de eventos não está disponível no momento.');
+            console.log('🔄 Abrindo modal de edição para evento:', event);
+            
+            // Criar modal de edição
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">
+                            <i class="fas fa-edit"></i>
+                            Editar Agendamento
+                        </h2>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="event-details">
+                            <div class="detail-row">
+                                <label><i class="fas fa-calendar"></i> Título:</label>
+                                <span>${event.title || 'Sem título'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <label><i class="fas fa-clock"></i> Data/Hora:</label>
+                                <span>${event.startTime ? new Date(event.startTime).toLocaleString('pt-BR') : 'Não informado'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <label><i class="fas fa-map-marker-alt"></i> Local:</label>
+                                <span>${event.local_nome || 'Não informado'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <label><i class="fas fa-tasks"></i> Ação:</label>
+                                <span>${event.acao_nome || 'Não informado'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <label><i class="fas fa-users"></i> Comunidade:</label>
+                                <span>${event.comunidade_nome || 'Não informado'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <label><i class="fas fa-church"></i> Pastoral:</label>
+                                <span>${event.pastoral_nome || 'Não informado'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <label><i class="fas fa-layer-group"></i> Pilar:</label>
+                                <span>${event.pilar_nome || 'Não informado'}</span>
+                            </div>
+                            ${event.objetivo ? `
+                            <div class="detail-row">
+                                <label><i class="fas fa-bullseye"></i> Objetivo:</label>
+                                <span>${event.objetivo}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-danger" onclick="deleteEvent(${event.id}); this.closest('.modal-overlay').remove();">
+                                <i class="fas fa-trash"></i> Excluir
+                            </button>
+                            <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
+                                <i class="fas fa-times"></i> Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Fechar modal ao clicar fora
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
         }
 
         async function handleEventSubmit(e) {
@@ -4503,6 +4618,8 @@
                         usuario_lancamento_nome: usuarioLancamento,
                         // Garantir título
                         title: ev.titulo || ev.title || 'Agendamento sem título',
+                        // Garantir tipo para CSS
+                        type: ev.acoes?.nome?.toLowerCase() || 'agendamento',
                         // Garantir cor baseada no pilar da ação
                         color: ev.acoes?.pilares?.cor || ev.pilares?.cor || ev.cor || '#1e3a8a'
                     };
