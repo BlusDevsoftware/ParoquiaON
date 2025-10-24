@@ -2692,9 +2692,14 @@
                     // Adicionar eventos para este horário
                     const hourEvents = getEventsForHour(dayDate, hour);
                     hourEvents.forEach(event => {
+                        console.log('🎯 Criando elemento para evento:', event);
+                        
                         const eventElement = document.createElement('div');
                         eventElement.className = `event-block event-${event.type}`;
                         eventElement.textContent = event.title;
+                        
+                        // Debug: verificar se o tipo está correto
+                        console.log(`🎨 Classe CSS aplicada: event-block event-${event.type}`);
                         
                         // Calcular posição e altura baseada no horário
                         const startTime = new Date(event.startTime);
@@ -3005,11 +3010,18 @@
         }
 
         function getEventsForHour(date, hour) {
-            return events.filter(event => {
+            const filteredEvents = events.filter(event => {
                 const eventDate = new Date(event.startTime);
                 return eventDate.toDateString() === date.toDateString() && 
                        eventDate.getHours() === hour;
             });
+            
+            // Debug: log dos eventos encontrados
+            if (filteredEvents.length > 0) {
+                console.log(`🔍 Eventos encontrados para ${date.toDateString()} às ${hour}:00:`, filteredEvents);
+            }
+            
+            return filteredEvents;
         }
 
         function openEventModal(date = null) {
@@ -4641,6 +4653,7 @@
             if (selectedCommunityId === null) {
                 // Mostrar todos os eventos
                 events = [...allEvents];
+                console.log('📋 Mostrando todos os eventos:', events.length);
             } else {
                 // Filtrar eventos por comunidade
                 events = allEvents.filter(event => {
@@ -4650,9 +4663,17 @@
                             vinculo.comunidade_id === selectedCommunityId
                         );
                     }
+                    // Se não tem vinculos, verificar se tem comunidade_id diretamente
+                    if (event.comunidade_id) {
+                        return event.comunidade_id === selectedCommunityId;
+                    }
                     return false;
                 });
+                console.log(`📋 Eventos filtrados para comunidade ${selectedCommunityId}:`, events.length);
             }
+            
+            // Debug: log dos eventos após filtro
+            console.log('🎯 Eventos disponíveis para exibição:', events);
             
             // Atualizar calendário
             renderCalendar();
