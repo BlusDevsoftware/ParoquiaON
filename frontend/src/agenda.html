@@ -4385,6 +4385,11 @@
                 await loadEventsFromApi();
                 filterEventsByCommunity();
                 
+                // Atualizar visualização do calendário
+                renderCalendar();
+                updateMiniCalendar();
+                updateRecentAppointments();
+                
             } catch (error) {
                 console.error('❌ Erro ao criar evento:', error);
                 showToast('Erro ao criar evento: ' + (error.message || 'Erro desconhecido'), 'error');
@@ -4398,6 +4403,12 @@
                 if (error) throw error;
                 await loadEventsFromApi();
                 filterEventsByCommunity();
+                
+                // Atualizar visualização do calendário
+                renderCalendar();
+                updateMiniCalendar();
+                updateRecentAppointments();
+                
                 showToast('Evento excluído com sucesso!', 'success');
             } catch (err) {
                 console.error('Erro ao excluir evento:', err);
@@ -5092,6 +5103,11 @@
                 // Recarregar eventos
                 await loadEventsFromApi();
                 filterEventsByCommunity();
+                
+                // Atualizar visualização do calendário
+                renderCalendar();
+                updateMiniCalendar();
+                updateRecentAppointments();
                 
             } catch (err) {
                 console.error('Erro ao criar eventos:', err);
