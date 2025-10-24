@@ -47,7 +47,7 @@ async function listarEventos(req, res) {
         if (pessoas) relacionamentos.pessoas = pessoas;
         
         // Buscar comunidades
-        const { data: comunidades } = await supabase.from('comunidades').select('id, nome');
+        const { data: comunidades } = await supabase.from('comunidades').select('id, nome, foto');
         if (comunidades) relacionamentos.comunidades = comunidades;
         
         // Buscar pastorais
@@ -123,7 +123,7 @@ async function buscarEvento(req, res) {
         }
         
         if (agendamento.comunidade_id) {
-            const { data: comunidade } = await supabase.from('comunidades').select('id, nome').eq('id', agendamento.comunidade_id).single();
+            const { data: comunidade } = await supabase.from('comunidades').select('id, nome, foto').eq('id', agendamento.comunidade_id).single();
             relacionamentos.comunidades = comunidade;
         }
         
@@ -301,7 +301,7 @@ async function criarEvento(req, res) {
         }
         
         if (insertedData.comunidade_id) {
-            const { data: comunidade } = await supabase.from('comunidades').select('id, nome').eq('id', insertedData.comunidade_id).single();
+            const { data: comunidade } = await supabase.from('comunidades').select('id, nome, foto').eq('id', insertedData.comunidade_id).single();
             relacionamentos.comunidades = comunidade;
         }
         
@@ -393,7 +393,7 @@ async function atualizarEvento(req, res) {
         }
         
         if (updatedData.comunidade_id) {
-            const { data: comunidade } = await supabase.from('comunidades').select('id, nome').eq('id', updatedData.comunidade_id).single();
+            const { data: comunidade } = await supabase.from('comunidades').select('id, nome, foto').eq('id', updatedData.comunidade_id).single();
             relacionamentos.comunidades = comunidade;
         }
         
