@@ -78,11 +78,6 @@ async function listarEventos(req, res) {
             usuarios: relacionamentos.usuarios?.find(u => u.id === agendamento.usuario_lancamento_id),
             status_agendamento: relacionamentos.status?.find(s => s.id === agendamento.status_id)
         })) || [];
-            
-        if (error) {
-            console.error('❌ Erro na consulta completa:', error);
-            throw error;
-        }
         
         console.log(`✅ ${data?.length || 0} eventos encontrados`);
         res.json(data || []);
@@ -187,10 +182,20 @@ async function criarEvento(req, res) {
         
         const statusId = statusMapping[dados.status] || 1; // Padrão: agendado
         
+        // Mapear visibilidade para valores corretos do banco
+        const visibilidadeMapping = {
+            'publico': 'Publico',
+            'privado': 'Privado',
+            'restrito': 'Restrito'
+        };
+        
+        const visibilidadeCorreta = visibilidadeMapping[dados.visibilidade] || 'Publico';
+        
         // Adicionar dados do usuário de lançamento
         const dadosCompletos = {
             ...dados,
             status_id: statusId,
+            visibilidade: visibilidadeCorreta,
             usuario_lancamento_id: req.user?.id || null,
             usuario_lancamento_nome: req.user?.nome || 'Sistema'
         };
