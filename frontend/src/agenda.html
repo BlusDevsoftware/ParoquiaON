@@ -1947,6 +1947,9 @@
             font-size: 8px;
             font-weight: 600;
             flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         /* Estilos para modal de edição */
@@ -2708,11 +2711,19 @@
                         const communityElement = document.createElement('div');
                         communityElement.className = 'event-community';
                         
-                        // Avatar da comunidade (primeira letra do nome)
+                        // Avatar da comunidade (foto real ou primeira letra)
                         const avatarElement = document.createElement('div');
                         avatarElement.className = 'event-avatar';
                         const communityName = event.comunidade_nome || 'Comunidade';
-                        avatarElement.textContent = communityName.charAt(0).toUpperCase();
+                        
+                        // Verificar se a comunidade tem foto
+                        if (event.comunidades?.foto) {
+                            avatarElement.style.backgroundImage = `url(${event.comunidades.foto})`;
+                            avatarElement.textContent = ''; // Remove texto quando tem foto
+                        } else {
+                            // Fallback para primeira letra se não tiver foto
+                            avatarElement.textContent = communityName.charAt(0).toUpperCase();
+                        }
                         
                         // Nome da comunidade
                         const communityNameElement = document.createElement('span');
