@@ -3104,10 +3104,7 @@
                                         <div class="form-group">
                                             <label><i class="fas fa-exclamation-circle"></i> Status</label>
                                             <select id="eventStatus" name="status" required>
-                                                <option value="agendado">Agendado</option>
-                                                <option value="confirmado">Confirmado</option>
-                                                <option value="pendente">Pendente</option>
-                                                <option value="cancelado">Cancelado</option>
+                                                <option value="">Carregando status...</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
@@ -4140,6 +4137,18 @@
             }
         }
 
+        // Função para obter ID do status pelo nome
+        function getStatusIdByName(statusName) {
+            if (!modalDataCache.status || !statusName) {
+                console.log('⚠️ Status não encontrado, usando padrão (1)');
+                return 1; // Padrão: agendado
+            }
+            
+            const status = modalDataCache.status.find(s => s.nome === statusName);
+            console.log(`🔍 Buscando status: "${statusName}", encontrado:`, status);
+            return status ? status.id : 1;
+        }
+
         // Função para carregar status (com cache)
         async function loadEventStatus() {
             if (modalDataCache.status && modalDataCache.status.length > 0) {
@@ -4149,7 +4158,7 @@
             
             try {
                 console.log('🔄 Carregando status...');
-                const { data, error } = await window.api.get('/api/status-agendamento');
+                const { data, error } = await window.api.get(window.endpoints.statusAgendamento.list);
                 if (error) throw error;
                 
                 const status = Array.isArray(data) ? data : [];
@@ -4157,6 +4166,7 @@
                 // Armazenar no cache
                 modalDataCache.status = status;
                 console.log('✅ Status carregados e armazenados no cache:', status.length);
+                console.log('📋 Status disponíveis:', status.map(s => `${s.id}: ${s.nome}`));
                 
             } catch (error) {
                 console.error('❌ Erro ao carregar status:', error);
@@ -4336,7 +4346,7 @@
                     comunidade_id: parseInt(formData.comunidade),
                     pastoral_id: parseInt(formData.pastoral),
                     pilar_id: parseInt(formData.pilares),
-                    status: formData.status || 'agendado',
+                    status_id: getStatusIdByName(formData.status) || 1,
                     evento_paroquial: formData.eventoParoquial || false,
                     visibilidade: formData.visibilidade || 'Publico',
                     lembrete: formData.lembrete || 'Nenhum',

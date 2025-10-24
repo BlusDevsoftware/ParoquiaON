@@ -193,6 +193,12 @@ const endpoints = {
     delete: (id) => `/agenda/${id}`,
     byDate: (date) => `/agenda/date/${date}`,
     byMonth: (month, year) => `/agenda/month/${year}/${month}`
+  },
+
+  // Status de Agendamento
+  statusAgendamento: {
+    list: '/status-agendamento',
+    get: (id) => `/status-agendamento/${id}`
   }
 }
 
