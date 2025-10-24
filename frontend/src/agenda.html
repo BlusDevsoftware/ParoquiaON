@@ -1907,41 +1907,11 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
 
-        /* Cores dos eventos */
-        .event-missa {
-            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
-        }
-
-        .event-batizado {
-            background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
-        }
-
-        .event-casamento {
-            background: linear-gradient(135deg, #e91e63 0%, #f06292 100%);
-        }
-
-        .event-comunhao {
-            background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
-        }
-
-        .event-crisma {
-            background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
-        }
-
-        .event-funeral {
-            background: linear-gradient(135deg, #607d8b 0%, #90a4ae 100%);
-        }
-
-        .event-reuniao {
-            background: linear-gradient(135deg, #795548 0%, #a1887f 100%);
-        }
-
-        .event-outro {
-            background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
-        }
-
-        .event-agendamento {
+        /* Estilo padrão para todos os eventos */
+        .event-block {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            font-weight: 500;
         }
 
         /* Estilos para modal de edição */
@@ -2692,14 +2662,9 @@
                     // Adicionar eventos para este horário
                     const hourEvents = getEventsForHour(dayDate, hour);
                     hourEvents.forEach(event => {
-                        console.log('🎯 Criando elemento para evento:', event);
-                        
                         const eventElement = document.createElement('div');
-                        eventElement.className = `event-block event-${event.type}`;
+                        eventElement.className = 'event-block';
                         eventElement.textContent = event.title;
-                        
-                        // Debug: verificar se o tipo está correto
-                        console.log(`🎨 Classe CSS aplicada: event-block event-${event.type}`);
                         
                         // Calcular posição e altura baseada no horário
                         const startTime = new Date(event.startTime);
@@ -3010,18 +2975,11 @@
         }
 
         function getEventsForHour(date, hour) {
-            const filteredEvents = events.filter(event => {
+            return events.filter(event => {
                 const eventDate = new Date(event.startTime);
                 return eventDate.toDateString() === date.toDateString() && 
                        eventDate.getHours() === hour;
             });
-            
-            // Debug: log dos eventos encontrados
-            if (filteredEvents.length > 0) {
-                console.log(`🔍 Eventos encontrados para ${date.toDateString()} às ${hour}:00:`, filteredEvents);
-            }
-            
-            return filteredEvents;
         }
 
         function openEventModal(date = null) {
@@ -4630,8 +4588,7 @@
                         usuario_lancamento_nome: usuarioLancamento,
                         // Garantir título
                         title: ev.titulo || ev.title || 'Agendamento sem título',
-                        // Garantir tipo para CSS
-                        type: ev.acoes?.nome?.toLowerCase() || 'agendamento',
+                        // Remover campo type - não temos mais separação por tipo
                         // Garantir cor baseada no pilar da ação
                         color: ev.acoes?.pilares?.cor || ev.pilares?.cor || ev.cor || '#1e3a8a'
                     };
@@ -4653,7 +4610,6 @@
             if (selectedCommunityId === null) {
                 // Mostrar todos os eventos
                 events = [...allEvents];
-                console.log('📋 Mostrando todos os eventos:', events.length);
             } else {
                 // Filtrar eventos por comunidade
                 events = allEvents.filter(event => {
@@ -4669,11 +4625,7 @@
                     }
                     return false;
                 });
-                console.log(`📋 Eventos filtrados para comunidade ${selectedCommunityId}:`, events.length);
             }
-            
-            // Debug: log dos eventos após filtro
-            console.log('🎯 Eventos disponíveis para exibição:', events);
             
             // Atualizar calendário
             renderCalendar();
@@ -4731,7 +4683,7 @@
                     <div class="appointment-time">${timeString}</div>
                     <div class="appointment-details">
                         <div class="appointment-title">${event.title}</div>
-                        <div class="appointment-type">${getEventTypeLabel(event.type)} • ${dateString}</div>
+                        <div class="appointment-type">Agendamento • ${dateString}</div>
                     </div>
                     <div class="appointment-status ${statusClass}"></div>
                 `;
@@ -4742,20 +4694,6 @@
                 
                 appointmentsList.appendChild(appointmentItem);
             });
-        }
-
-        function getEventTypeLabel(type) {
-            const labels = {
-                'missa': 'Missa',
-                'batizado': 'Batizado',
-                'casamento': 'Casamento',
-                'comunhao': 'Comunhão',
-                'crisma': 'Crisma',
-                'funeral': 'Funeral',
-                'reuniao': 'Reunião',
-                'outro': 'Outro'
-            };
-            return labels[type] || 'Evento';
         }
 
 
@@ -5217,7 +5155,6 @@
                 const promises = events.map(event => {
                     const formData = new FormData();
                     formData.append('titulo', event.title);
-                    formData.append('tipo', event.type);
                     formData.append('data', event.date);
                     formData.append('hora', event.time);
                     formData.append('duracao', event.duration);
