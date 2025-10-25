@@ -87,13 +87,6 @@
             transform: scale(1.1);
         }
 
-        .sidebar-content {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            padding: 0;
-            overflow: hidden;
-        }
 
 
         .create-button {
@@ -946,9 +939,9 @@
 
         /* Container lateral do calendário */
         .calendar-sidebar-container {
-            margin: 5px;
-            background: transparent;
-            border-radius: 12px;
+            margin: 0;
+            background: #ffffff;
+            border-radius: 0;
             overflow: hidden;
             box-shadow: none;
             border: none;
@@ -958,14 +951,11 @@
             display: flex;
             flex-direction: column;
             min-height: 0;
-            max-height: calc(100vh - 90px);
+            height: 100%;
             transition: all 0.3s ease;
         }
 
-        .calendar-sidebar-container:hover {
-            box-shadow: none;
-            transform: none;
-        }
+        /* Efeito hover removido para manter consistência com o layout */
 
         .calendar-sidebar-header {
             background: #ffffff;
@@ -977,8 +967,54 @@
             border-bottom: none;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             gap: 12px;
+        }
+
+        .calendar-sidebar-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .calendar-collapse-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .calendar-collapse-btn:hover {
+            background: #f8f9fa;
+            color: #1e3a8a;
+        }
+
+        .calendar-sidebar-container.collapsed {
+            width: 60px;
+            overflow: hidden;
+        }
+
+        .left-sidebar.calendar-collapsed {
+            width: 60px;
+        }
+
+        .calendar-sidebar-container.collapsed .calendar-sidebar-header {
+            padding: 20px 15px;
+            justify-content: center;
+        }
+
+        .calendar-sidebar-container.collapsed .calendar-sidebar-title {
+            display: none;
+        }
+
+        .calendar-sidebar-container.collapsed .mini-calendar,
+        .calendar-sidebar-container.collapsed .create-button,
+        .calendar-sidebar-container.collapsed .recent-appointments {
+            display: none;
         }
 
         .calendar-sidebar-header i {
@@ -1047,7 +1083,7 @@
         /* Mini calendário */
         .mini-calendar {
             margin: 0;
-            background: transparent;
+            background: #ffffff;
             border-radius: 0;
             overflow: hidden;
             box-shadow: none;
@@ -1060,7 +1096,7 @@
         }
 
         .mini-calendar-header {
-            background: transparent;
+            background: #ffffff;
             color: #333;
             padding: 10px 15px;
             display: flex;
@@ -1104,7 +1140,7 @@
         .mini-calendar-weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            background: transparent;
+            background: #ffffff;
             border-bottom: none;
         }
 
@@ -1120,13 +1156,13 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 0;
-            background: transparent;
+            background: #ffffff;
             flex: 0 0 auto;
             min-height: 0;
         }
 
         .mini-day {
-            background: transparent;
+            background: #ffffff;
             padding: 6px 4px;
             text-align: center;
             font-size: 12px;
@@ -1156,7 +1192,7 @@
         }
 
         .mini-day.has-events {
-            background: transparent;
+            background: #ffffff;
             position: relative;
         }
 
@@ -1179,22 +1215,22 @@
         /* Seção de Últimos Agendamentos */
         .recent-appointments {
             margin: 20px;
-            background: transparent;
+            background: #ffffff;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: none;
-            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f0f0f0;
             flex: 0 0 auto;
         }
 
         .recent-appointments-header {
-            background: transparent;
+            background: #ffffff;
             color: #333;
             padding: 15px 20px;
             text-align: center;
             font-weight: 600;
             font-size: 14px;
-            border-bottom: none;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .appointments-list {
@@ -1280,6 +1316,12 @@
             margin-left: 350px;
             width: calc(100vw - 350px);
             min-height: calc(100vh - 80px);
+            transition: all 0.3s ease;
+        }
+
+        .main-area.calendar-collapsed {
+            margin-left: 60px;
+            width: calc(100vw - 60px);
         }
 
 
@@ -1469,6 +1511,7 @@
             flex-direction: column;
             position: relative;
             background: transparent;
+            width: 100%;
         }
 
 
@@ -1489,6 +1532,8 @@
             min-height: 70px;
             position: relative;
             z-index: 10;
+            width: calc(100% - 30px);
+            transition: all 0.3s ease;
         }
 
         .info-left {
@@ -1802,6 +1847,8 @@
             overflow-y: auto;
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
+            width: calc(100% - 30px);
+            transition: all 0.3s ease;
         }
 
         .weekly-calendar::-webkit-scrollbar {
@@ -2600,9 +2647,18 @@
                 width: 320px;
             }
             
+            .left-sidebar.calendar-collapsed {
+                width: 60px;
+            }
+            
             .main-area {
                 width: calc(100vw - 320px);
                 margin-left: 320px;
+            }
+            
+            .main-area.calendar-collapsed {
+                width: calc(100vw - 60px);
+                margin-left: 60px;
             }
             
             .nav-links {
@@ -2696,9 +2752,9 @@
             }
             
             .calendar-sidebar-container {
-                margin: 5px;
-                min-width: 200px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                margin: 0;
+                min-width: auto;
+                box-shadow: none;
             }
             
             .content-header {
@@ -2778,7 +2834,7 @@
             <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="sidebar-content">
+            <div>
                 <!-- Container Lateral do Calendário -->
                 <div class="calendar-sidebar-container">
                     <!-- Botão Criar -->
@@ -2789,7 +2845,12 @@
 
 
                     <div class="calendar-sidebar-header">
-                        <i class="fas fa-calendar-alt"></i> Calendário
+                        <div class="calendar-sidebar-title">
+                            <i class="fas fa-calendar-alt"></i> Calendário
+                        </div>
+                        <button class="calendar-collapse-btn" onclick="toggleCalendarSidebar()" title="Recolher/Expandir">
+                            <i class="fas fa-chevron-left" id="calendarCollapseIcon"></i>
+                        </button>
                     </div>
                     
                     <!-- Mini Calendário -->
@@ -5332,6 +5393,26 @@
             } else {
                 sidebar.classList.add('open');
                 toggle.innerHTML = '<i class="fas fa-times"></i>';
+            }
+        }
+
+        // Função para toggle do calendário sidebar
+        function toggleCalendarSidebar() {
+            const calendarContainer = document.querySelector('.calendar-sidebar-container');
+            const leftSidebar = document.getElementById('leftSidebar');
+            const mainArea = document.querySelector('.main-area');
+            const collapseIcon = document.getElementById('calendarCollapseIcon');
+            
+            if (calendarContainer.classList.contains('collapsed')) {
+                calendarContainer.classList.remove('collapsed');
+                leftSidebar.classList.remove('calendar-collapsed');
+                if (mainArea) mainArea.classList.remove('calendar-collapsed');
+                collapseIcon.className = 'fas fa-chevron-left';
+            } else {
+                calendarContainer.classList.add('collapsed');
+                leftSidebar.classList.add('calendar-collapsed');
+                if (mainArea) mainArea.classList.add('calendar-collapsed');
+                collapseIcon.className = 'fas fa-chevron-right';
             }
         }
 
