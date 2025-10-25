@@ -2262,7 +2262,7 @@
             color: #333;
             padding: 20px;
             border-radius: 8px 8px 0 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: none;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -2271,7 +2271,7 @@
         .new-appointment-header .modal-title {
             margin: 0;
             font-size: 1.5em;
-            color: #333;
+            color: #1e3a8a;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -2327,6 +2327,26 @@
             max-height: 70vh !important;
             border: none !important;
             outline: none !important;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 #f7fafc;
+        }
+
+        .new-appointment-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .new-appointment-body::-webkit-scrollbar-track {
+            background: #f7fafc;
+            border-radius: 4px;
+        }
+
+        .new-appointment-body::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+
+        .new-appointment-body::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
         }
 
         /* Override do estilo geral do modal-body para o novo modal */
@@ -2881,6 +2901,9 @@
     </style>
 </head>
 <body>
+    <!-- Include dos modais da agenda -->
+    <div id="modais-agenda-container"></div>
+    
     <div class="app-container">
         <!-- Header Superior -->
         <div class="top-header">
@@ -3425,7 +3448,7 @@
                         
                         eventElement.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            editEvent(event);
+                            editEventModal(event);
                         });
                         
                         daySlot.appendChild(eventElement);
@@ -3833,325 +3856,9 @@
             openEventModalWithTime(eventDate, endDate);
         }
 
-        function openEventModalWithTime(startTime, endTime) {
-            // Mostrar spinner durante criação do modal
-            mostrarSpinnerAgenda();
-            
-            // Criar modal baseado no design da imagem
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="new-appointment-header">
-                        <div class="header-icon">
-                            <i class="fas fa-calendar-plus"></i>
-                        </div>
-                        <div class="header-text">
-                            <h2>Novo Agendamento</h2>
-                            <p>Criar novo evento no calendário</p>
-                        </div>
-                        <button class="close-btn" onclick="closeEventModal()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    
-                    <form id="eventForm" class="event-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="eventTitle">Título do Evento *</label>
-                                <input type="text" id="eventTitle" name="title" required 
-                                       placeholder="Digite o título do evento">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="eventCommunity">Comunidade *</label>
-                                <select id="eventCommunity" name="community" required>
-                                    <option value="">Selecione uma comunidade</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="eventStartTime">Data e Hora de Início *</label>
-                                <input type="datetime-local" id="eventStartTime" name="startTime" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="eventEndTime">Data e Hora de Fim *</label>
-                                <input type="datetime-local" id="eventEndTime" name="endTime" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="eventLocation">Local</label>
-                                <select id="eventLocation" name="location">
-                                    <option value="">Selecione um local</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="eventStatus">Status</label>
-                                <select id="eventStatus" name="status">
-                                    <option value="">Selecione um status</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="eventDescription">Descrição</label>
-                            <textarea id="eventDescription" name="description" 
-                                      placeholder="Descrição do evento (opcional)"></textarea>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" class="btn-cancel" onclick="closeEventModal()">
-                                Cancelar
-                            </button>
-                            <button type="submit" class="btn-save">
-                                <i class="fas fa-save"></i>
-                                Salvar Evento
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Preencher os campos de data e hora
-            const startTimeInput = document.getElementById('eventStartTime');
-            const endTimeInput = document.getElementById('eventEndTime');
-            
-            // Formatar data para input datetime-local
-            const formatDateTimeLocal = (date) => {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                return `${year}-${month}-${day}T${hours}:${minutes}`;
-            };
-            
-            startTimeInput.value = formatDateTimeLocal(startTime);
-            endTimeInput.value = formatDateTimeLocal(endTime);
-            
-            // Carregar dados dos selects
-            loadEventFormData();
-            
-            // Adicionar evento de submit
-            document.getElementById('eventForm').addEventListener('submit', handleEventSubmit);
-            
-            // Esconder spinner
-            esconderSpinnerAgenda();
-            
-            // Focar no campo título
-            setTimeout(() => {
-                document.getElementById('eventTitle').focus();
-            }, 100);
-        }
+        // Função movida para modais_agenda.html
 
-        function openEventModal(date = null) {
-            
-            // Mostrar spinner durante criação do modal
-            mostrarSpinnerAgenda();
-            
-            // Criar modal baseado no design da imagem
-            const modalHTML = `
-                <div id="eventModal" class="modal active">
-                    <div class="modal-content new-appointment-modal">
-                        <div class="modal-header new-appointment-header">
-                            <h2 class="modal-title"><i class="fas fa-calendar-plus"></i> Novo Agendamento</h2>
-                            <button class="close-modal" onclick="closeEventModal()">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="modal-body new-appointment-body">
-                            <form id="eventForm">
-                                <!-- Seção: Informações da Comunidade -->
-                                <div class="form-section patient-section">
-                                    <h3 class="section-title">Informações da Comunidade</h3>
-                                    
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label>Título do Evento *</label>
-                                            <input type="text" id="eventTitle" name="titulo" required placeholder="Digite o título do evento">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Comunidade *</label>
-                                            <select id="eventCommunity" name="comunidade" required>
-                                                <option value="">Selecione a comunidade</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label>Pastoral *</label>
-                                            <select id="eventPastoral" name="pastoral" required>
-                                                <option value="">Selecione a pastoral</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Pilar *</label>
-                                            <select id="eventPilares" name="pilares" required>
-                                                <option value="">Selecione o pilar</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label>Local *</label>
-                                            <select id="eventLocation" name="local" required>
-                                                <option value="">Selecione o local</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Ação *</label>
-                                            <select id="eventAcao" name="acao" required>
-                                                <option value="">Selecione a ação</option>
-                                            </select>
-                                        </div>
-                                        </div>
-                                    </div>
-                                    
-                                <!-- Seção: Informações do agendamento -->
-                                <div class="form-section appointment-section">
-                                    <h3 class="section-title">Informações do agendamento</h3>
-                                    
-                                    <!-- Toggles -->
-                                    <div class="form-row toggles-row">
-                                        <div class="toggle-group">
-                                            <label>Evento Paroquial:</label>
-                                            <label class="switch">
-                                                    <input type="checkbox" id="eventParoquial" name="evento_paroquial">
-                                                <span class="slider"></span>
-                                                </label>
-                                            </div>
-                                        <div class="toggle-group">
-                                            <label>Evento Público:</label>
-                                            <label class="switch">
-                                                <input type="checkbox" id="eventPublico" name="evento_publico">
-                                                <span class="slider"></span>
-                                            </label>
-                                        </div>
-                                        <div class="toggle-group">
-                                            <label>Requer Confirmação:</label>
-                                            <label class="switch">
-                                                <input type="checkbox" id="eventConfirmacao" name="requer_confirmacao">
-                                                <span class="slider"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    
-                                    
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label>Data do evento: *</label>
-                                            <input type="date" id="eventDateStart" name="data_inicio" required>
-                                            </div>
-                                        <div class="form-group time-group">
-                                            <label>De: *</label>
-                                            <input type="time" id="eventTimeStart" name="hora_inicio" required>
-                                        </div>
-                                        <div class="form-group time-group">
-                                            <label>Até: *</label>
-                                            <input type="time" id="eventTimeEnd" name="hora_fim" required>
-                                    </div>
-                                </div>
-
-                                    <div class="form-row button-row">
-                                        <button type="button" class="btn-add-time">
-                                            <i class="fas fa-plus"></i> Horário
-                                        </button>
-                                        <button type="button" class="btn-repeat-appointment">
-                                            Repetir evento
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="form-row">
-                                        <div class="form-group full-width">
-                                            <label>Objetivo/Descrição:</label>
-                                            <textarea id="eventObjetivo" name="objetivo" rows="3" placeholder="Digite o objetivo ou descrição do evento"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-actions new-appointment-actions">
-                                    <button type="button" class="btn-secondary" onclick="closeEventModal()">
-                                        Fechar
-                                    </button>
-                                    <button type="submit" class="btn-primary">
-                                        Salvar Evento
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Inserir modal no body
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            
-            // Configurar data se fornecida
-            if (date) {
-                const dateInput = document.getElementById('eventDateStart');
-                if (dateInput) {
-                    dateInput.value = date;
-                }
-            }
-            
-            // Adicionar event listener para o formulário
-            const form = document.getElementById('eventForm');
-            if (form) {
-                form.addEventListener('submit', handleEventSubmit);
-            }
-            
-            // Adicionar event listener para fechar ao clicar fora
-            const modal = document.getElementById('eventModal');
-            if (modal) {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === modal) {
-                        closeEventModal();
-                    }
-                });
-            }
-            
-            // Adicionar event listener para o toggle de status
-            const statusToggle = document.querySelector('.status-toggle');
-            const statusLabel = document.querySelector('.status-label-modal');
-            if (statusToggle && statusLabel) {
-                statusToggle.addEventListener('change', function() {
-                    statusLabel.textContent = this.checked ? 'Ativo' : 'Inativo';
-                });
-            }
-            
-            // Dados já foram carregados antecipadamente
-            
-            // Popular selects com dados do cache
-            populateSelectsFromCache();
-            
-            // Aplicar estilos de altura máxima aos selects
-            const selects = document.querySelectorAll('#eventModal select');
-            selects.forEach(select => {
-                select.style.maxHeight = '200px';
-                select.style.overflowY = 'auto';
-                select.style.height = 'auto';
-            });
-
-            // Inicializar selects customizados IMEDIATAMENTE (sem delays)
-            initializeCustomSelects('#eventModal');
-            
-            // Recarregar selects imediatamente após inicialização
-            reloadCustomSelects('#eventModal');
-            
-            // Ocultar spinner quando modal estiver pronto
-            ocultarSpinnerAgenda();
-            
-        }
+        // Função movida para modais_agenda.html
 
         // Utilitário: inicializa selects customizados com busca no container
         function initializeCustomSelects(containerSelector) {
@@ -5147,17 +4854,7 @@
             }
         }
 
-        function closeEventModal() {
-            console.log('🔒 Fechando modal de novo agendamento...');
-            
-            const modal = document.getElementById('eventModal');
-            if (modal) {
-                modal.remove();
-                console.log('✅ Modal removido com sucesso');
-            } else {
-                console.log('⚠️ Modal não encontrado');
-            }
-        }
+        // Função movida para modais_agenda.html
 
         function clearEventForm() {
             // Limpar todos os campos do formulário
@@ -5194,82 +4891,7 @@
             }
         }
 
-        function editEvent(event) {
-            console.log('🔄 Abrindo modal de edição para evento:', event);
-            console.log('🔍 Dados do evento recebido:', JSON.stringify(event, null, 2));
-            
-            // Criar modal de edição
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">
-                            <i class="fas fa-edit"></i>
-                            Editar Agendamento
-                        </h2>
-                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="event-details">
-                            <div class="detail-row">
-                                <label><i class="fas fa-calendar"></i> Título:</label>
-                                <span>${event.title || 'Sem título'}</span>
-                            </div>
-                            <div class="detail-row">
-                                <label><i class="fas fa-clock"></i> Data/Hora:</label>
-                                <span>${event.startTime ? new Date(event.startTime).toLocaleString('pt-BR') : 'Não informado'}</span>
-                            </div>
-                            <div class="detail-row">
-                                <label><i class="fas fa-map-marker-alt"></i> Local:</label>
-                                <span>${event.local_nome || 'Não informado'}</span>
-                            </div>
-                            <div class="detail-row">
-                                <label><i class="fas fa-tasks"></i> Ação:</label>
-                                <span>${event.acao_nome || 'Não informado'}</span>
-                            </div>
-                            <div class="detail-row">
-                                <label><i class="fas fa-users"></i> Comunidade:</label>
-                                <span>${event.comunidade_nome || 'Não informado'}</span>
-                            </div>
-                            <div class="detail-row">
-                                <label><i class="fas fa-church"></i> Pastoral:</label>
-                                <span>${event.pastoral_nome || 'Não informado'}</span>
-                            </div>
-                            <div class="detail-row">
-                                <label><i class="fas fa-layer-group"></i> Pilar:</label>
-                                <span>${event.pilar_nome || 'Não informado'}</span>
-                            </div>
-                            ${event.objetivo ? `
-                            <div class="detail-row">
-                                <label><i class="fas fa-bullseye"></i> Objetivo:</label>
-                                <span>${event.objetivo}</span>
-                            </div>
-                            ` : ''}
-                        </div>
-                        <div class="modal-actions">
-                            <button class="btn btn-danger" onclick="deleteEvent(${event.id}); this.closest('.modal-overlay').remove();">
-                                <i class="fas fa-trash"></i> Excluir
-                            </button>
-                            <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
-                                <i class="fas fa-times"></i> Fechar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Fechar modal ao clicar fora
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.remove();
-                }
-            });
-        }
+        // Função movida para modais_agenda.html
 
         async function handleEventSubmit(e) {
             e.preventDefault();
@@ -5822,6 +5444,83 @@
                 sidebar.classList.remove('open');
                 toggle.innerHTML = '<i class="fas fa-bars"></i>';
             }
+        });
+
+        // Carregar modais da agenda
+        async function loadModaisAgenda() {
+            try {
+                console.log('🔄 Carregando modais da agenda...');
+                const response = await fetch('modais_agenda.html');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const html = await response.text();
+                const container = document.getElementById('modais-agenda-container');
+                
+                if (container) {
+                    container.innerHTML = html;
+                    console.log('✅ Modais da agenda carregados com sucesso');
+                    
+                    // Verificar se as funções dos modais estão disponíveis
+                    if (typeof openEventModal === 'function' && typeof closeEventModal === 'function') {
+                        console.log('✅ Funções dos modais disponíveis');
+                    } else {
+                        console.warn('⚠️ Algumas funções dos modais podem não estar disponíveis');
+                    }
+                } else {
+                    console.error('❌ Container de modais não encontrado');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar modais da agenda:', error);
+                // Fallback: tentar carregar novamente após um delay
+                setTimeout(() => {
+                    console.log('🔄 Tentando carregar modais novamente...');
+                    loadModaisAgenda();
+                }, 2000);
+            }
+        }
+
+        // Função de teste para verificar se os modais estão funcionando
+        function testModais() {
+            console.log('🧪 Testando modais...');
+            
+            // Verificar se as funções existem
+            const funcoes = ['openEventModal', 'closeEventModal', 'openEventModalWithTime', 'editEventModal'];
+            funcoes.forEach(funcao => {
+                if (typeof window[funcao] === 'function') {
+                    console.log(`✅ ${funcao} está disponível`);
+                } else {
+                    console.log(`❌ ${funcao} NÃO está disponível`);
+                }
+            });
+            
+            // Verificar se os modais existem no DOM
+            const modais = ['eventModal', 'modalNovoAgendamentoComHorario', 'modalEdicaoAgendamento'];
+            modais.forEach(modal => {
+                const elemento = document.getElementById(modal);
+                if (elemento) {
+                    console.log(`✅ Modal ${modal} encontrado no DOM`);
+                } else {
+                    console.log(`❌ Modal ${modal} NÃO encontrado no DOM`);
+                }
+            });
+            
+            // Testar abertura do modal
+            try {
+                console.log('🧪 Tentando abrir modal de teste...');
+                openEventModal();
+                console.log('✅ Modal aberto com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao abrir modal:', error);
+            }
+        }
+
+        // Carregar modais quando a página estiver pronta
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM carregado, iniciando carregamento dos modais...');
+            loadModaisAgenda();
         });
     </script>
 </body>
