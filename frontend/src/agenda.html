@@ -1990,12 +1990,27 @@
             border-right: 1px solid #e0e0e0;
             position: relative;
             cursor: pointer;
-            transition: background 0.2s ease;
+            transition: all 0.2s ease;
             background: #ffffff;
         }
 
         .day-slot:hover {
-            background: #f8f9fa;
+            background: #e3f2fd;
+            border-color: #2196f3;
+            box-shadow: inset 0 0 0 2px rgba(33, 150, 243, 0.1);
+        }
+
+        .day-slot:hover::after {
+            content: '+';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            color: #2196f3;
+            font-weight: bold;
+            opacity: 0.7;
+            pointer-events: none;
         }
 
         .day-slot:last-child {
@@ -3384,13 +3399,6 @@
                         console.log('Evento:', event.title, 'Início:', startTime.toLocaleTimeString(), 'Fim:', endTime.toLocaleTimeString());
                         console.log('End Hour:', endHour, 'End Minutes:', endMinutes);
                         
-                        // TESTE TEMPORÁRIO: Simular evento que vai além das 22h
-                        if (event.title === 'Agendamento teste') {
-                            console.log('TESTE: Simulando evento que vai além das 22h');
-                            endHour = 23;
-                            endMinutes = 30;
-                        }
-                        
                         // Se o evento termina após as 22h, limitar até 22:00
                         let maxHeight = (durationMinutes / 60) * 100;
                         
@@ -3423,8 +3431,12 @@
                         daySlot.appendChild(eventElement);
                     });
                     
-                    daySlot.addEventListener('click', () => {
-                        dayDate.setHours(hour, 0, 0, 0);
+                    daySlot.addEventListener('click', (e) => {
+                        // Verificar se o clique foi diretamente no slot (não em um evento)
+                        if (e.target === daySlot) {
+                            // Criar evento para este horário específico
+                            createEventForTimeSlot(dayDate, hour);
+                        }
                     });
                     
                     calendarBody.appendChild(daySlot);
@@ -3806,6 +3818,138 @@
                 return eventDate.toDateString() === date.toDateString() && 
                        eventDate.getHours() === hour;
             });
+        }
+
+        function createEventForTimeSlot(selectedDate, selectedHour) {
+            // Criar uma data com o horário selecionado
+            const eventDate = new Date(selectedDate);
+            eventDate.setHours(selectedHour, 0, 0, 0);
+            
+            // Calcular horário de fim (1 hora depois)
+            const endDate = new Date(eventDate);
+            endDate.setHours(selectedHour + 1, 0, 0, 0);
+            
+            // Abrir modal com dados pré-preenchidos
+            openEventModalWithTime(eventDate, endDate);
+        }
+
+        function openEventModalWithTime(startTime, endTime) {
+            // Mostrar spinner durante criação do modal
+            mostrarSpinnerAgenda();
+            
+            // Criar modal baseado no design da imagem
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="new-appointment-header">
+                        <div class="header-icon">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <div class="header-text">
+                            <h2>Novo Agendamento</h2>
+                            <p>Criar novo evento no calendário</p>
+                        </div>
+                        <button class="close-btn" onclick="closeEventModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="eventForm" class="event-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="eventTitle">Título do Evento *</label>
+                                <input type="text" id="eventTitle" name="title" required 
+                                       placeholder="Digite o título do evento">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="eventCommunity">Comunidade *</label>
+                                <select id="eventCommunity" name="community" required>
+                                    <option value="">Selecione uma comunidade</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="eventStartTime">Data e Hora de Início *</label>
+                                <input type="datetime-local" id="eventStartTime" name="startTime" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="eventEndTime">Data e Hora de Fim *</label>
+                                <input type="datetime-local" id="eventEndTime" name="endTime" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="eventLocation">Local</label>
+                                <select id="eventLocation" name="location">
+                                    <option value="">Selecione um local</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="eventStatus">Status</label>
+                                <select id="eventStatus" name="status">
+                                    <option value="">Selecione um status</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="eventDescription">Descrição</label>
+                            <textarea id="eventDescription" name="description" 
+                                      placeholder="Descrição do evento (opcional)"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" onclick="closeEventModal()">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn-save">
+                                <i class="fas fa-save"></i>
+                                Salvar Evento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Preencher os campos de data e hora
+            const startTimeInput = document.getElementById('eventStartTime');
+            const endTimeInput = document.getElementById('eventEndTime');
+            
+            // Formatar data para input datetime-local
+            const formatDateTimeLocal = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${year}-${month}-${day}T${hours}:${minutes}`;
+            };
+            
+            startTimeInput.value = formatDateTimeLocal(startTime);
+            endTimeInput.value = formatDateTimeLocal(endTime);
+            
+            // Carregar dados dos selects
+            loadEventFormData();
+            
+            // Adicionar evento de submit
+            document.getElementById('eventForm').addEventListener('submit', handleEventSubmit);
+            
+            // Esconder spinner
+            esconderSpinnerAgenda();
+            
+            // Focar no campo título
+            setTimeout(() => {
+                document.getElementById('eventTitle').focus();
+            }, 100);
         }
 
         function openEventModal(date = null) {
