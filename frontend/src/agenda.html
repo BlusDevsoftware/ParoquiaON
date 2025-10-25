@@ -5519,16 +5519,15 @@
             // Definir as funções dos modais no escopo global
             window.openEventModalWithTime = function(startTime, endTime) {
                 console.log('🔄 Abrindo modal com horário:', startTime, endTime);
-                mostrarSpinnerAgenda();
                 
-                const modal = document.getElementById('modalNovoAgendamentoComHorario');
-                if (modal) {
-                    modal.style.display = 'flex';
-                    
-                    // Preencher campos de data e hora
-                    const dateInput = document.getElementById('eventDateStartWithTime');
-                    const startTimeInput = document.getElementById('eventTimeStartWithTime');
-                    const endTimeInput = document.getElementById('eventTimeEndWithTime');
+                // Usar o modal padrão com horário pré-definido
+                openEventModal();
+                
+                // Preencher campos de data e hora após o modal estar aberto
+                setTimeout(() => {
+                    const dateInput = document.getElementById('eventDateStart');
+                    const startTimeInput = document.getElementById('eventTimeStart');
+                    const endTimeInput = document.getElementById('eventTimeEnd');
                     
                     if (dateInput && startTimeInput && endTimeInput) {
                         const formatDate = (date) => {
@@ -5548,15 +5547,7 @@
                         startTimeInput.value = formatTime(startTime);
                         endTimeInput.value = formatTime(endTime);
                     }
-                    
-                    loadEventFormData();
-                    esconderSpinnerAgenda();
-                    
-                    setTimeout(() => {
-                        const titleInput = document.getElementById('eventTitleWithTime');
-                        if (titleInput) titleInput.focus();
-                    }, 100);
-                }
+                }, 200);
             };
 
             window.openEventModal = function(date = null) {
@@ -5582,13 +5573,13 @@
             };
 
             window.closeEventModal = function() {
-                console.log('🔒 Fechando modais...');
+                console.log('🔒 Fechando modal...');
                 
                 const modal = document.getElementById('eventModal');
-                const modalWithTime = document.getElementById('modalNovoAgendamentoComHorario');
-                
-                if (modal) modal.style.display = 'none';
-                if (modalWithTime) modalWithTime.style.display = 'none';
+                if (modal) {
+                    modal.style.display = 'none';
+                    console.log('✅ Modal fechado com sucesso');
+                }
             };
 
             window.editEventModal = function(event) {
@@ -5639,29 +5630,28 @@
                 e.preventDefault();
                 console.log('💾 Processando formulário...');
                 
-                const form = e.target;
-                const isWithTime = form.id === 'eventFormWithTime';
-                
                 const formData = {
-                    titulo: document.getElementById(isWithTime ? 'eventTitleWithTime' : 'eventTitle')?.value || '',
-                    comunidade: document.getElementById(isWithTime ? 'eventCommunityWithTime' : 'eventCommunity')?.value || '',
-                    pastoral: document.getElementById(isWithTime ? 'eventPastoralWithTime' : 'eventPastoral')?.value || '',
-                    pilares: document.getElementById(isWithTime ? 'eventPilaresWithTime' : 'eventPilares')?.value || '',
-                    local: document.getElementById(isWithTime ? 'eventLocationWithTime' : 'eventLocation')?.value || '',
-                    acao: document.getElementById(isWithTime ? 'eventAcaoWithTime' : 'eventAcao')?.value || '',
-                    objetivo: document.getElementById(isWithTime ? 'eventObjetivoWithTime' : 'eventObjetivo')?.value || '',
-                    dataInicio: document.getElementById(isWithTime ? 'eventDateStartWithTime' : 'eventDateStart')?.value || '',
-                    horaInicio: document.getElementById(isWithTime ? 'eventTimeStartWithTime' : 'eventTimeStart')?.value || '',
-                    dataFim: document.getElementById(isWithTime ? 'eventDateStartWithTime' : 'eventDateStart')?.value || '',
-                    horaFim: document.getElementById(isWithTime ? 'eventTimeEndWithTime' : 'eventTimeEnd')?.value || '',
-                    eventoParoquial: document.getElementById(isWithTime ? 'eventParoquialWithTime' : 'eventParoquial')?.checked || false,
-                    eventoPublico: document.getElementById(isWithTime ? 'eventPublicoWithTime' : 'eventPublico')?.checked || false,
-                    requerConfirmacao: document.getElementById(isWithTime ? 'eventConfirmacaoWithTime' : 'eventConfirmacao')?.checked || false,
+                    titulo: document.getElementById('eventTitle')?.value || '',
+                    comunidade: document.getElementById('eventCommunity')?.value || '',
+                    pastoral: document.getElementById('eventPastoral')?.value || '',
+                    pilares: document.getElementById('eventPilares')?.value || '',
+                    local: document.getElementById('eventLocation')?.value || '',
+                    acao: document.getElementById('eventAcao')?.value || '',
+                    objetivo: document.getElementById('eventObjetivo')?.value || '',
+                    dataInicio: document.getElementById('eventDateStart')?.value || '',
+                    horaInicio: document.getElementById('eventTimeStart')?.value || '',
+                    dataFim: document.getElementById('eventDateStart')?.value || '',
+                    horaFim: document.getElementById('eventTimeEnd')?.value || '',
+                    eventoParoquial: document.getElementById('eventParoquial')?.checked || false,
+                    eventoPublico: document.getElementById('eventPublico')?.checked || false,
+                    requerConfirmacao: document.getElementById('eventConfirmacao')?.checked || false,
                     status: 'agendado',
                     visibilidade: 'publico',
                     lembrete: 'nenhum',
                     capacidade: 1
                 };
+                
+                console.log('📋 Dados coletados:', formData);
                 
                 try {
                     mostrarSpinnerAgenda();
