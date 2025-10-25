@@ -3897,6 +3897,33 @@
             });
         }
 
+        // Função para carregar dados do formulário
+        function loadEventFormData() {
+            console.log('📋 Carregando dados do formulário...');
+            
+            // Carregar dados se ainda não foram carregados
+            if (!modalDataCache.comunidades || modalDataCache.comunidades.length === 0) {
+                loadCommunities();
+            }
+            if (!modalDataCache.pastorais || modalDataCache.pastorais.length === 0) {
+                loadPastorais();
+            }
+            if (!modalDataCache.pilares || modalDataCache.pilares.length === 0) {
+                loadPilares();
+            }
+            if (!modalDataCache.acoes || modalDataCache.acoes.length === 0) {
+                loadAcoes();
+            }
+            if (!modalDataCache.locais || modalDataCache.locais.length === 0) {
+                loadLocais();
+            }
+            
+            // Popular os selects após um pequeno delay para garantir que os dados foram carregados
+            setTimeout(() => {
+                populateSelectsFromCache();
+            }, 100);
+        }
+
         // Função para popular selects do modal usando dados do cache
         function populateSelectsFromCache() {
             
@@ -5671,25 +5698,12 @@
             window.esconderSpinnerAgenda = ocultarSpinnerAgenda;
             window.ocultarSpinnerAgenda = ocultarSpinnerAgenda;
 
-            window.loadEventFormData = function() {
-                console.log('📋 Carregando dados do formulário...');
-            };
+            window.loadEventFormData = loadEventFormData;
+            window.populateSelectsFromCache = populateSelectsFromCache;
+            window.initializeCustomSelects = initializeCustomSelects;
+            window.reloadCustomSelects = reloadCustomSelects;
 
-            window.populateSelectsFromCache = function() {
-                console.log('📋 Populando selects...');
-            };
-
-            window.initializeCustomSelects = function(containerSelector) {
-                console.log('🔧 Inicializando selects...');
-            };
-
-            window.reloadCustomSelects = function(containerSelector) {
-                console.log('🔄 Recarregando selects...');
-            };
-
-            window.loadEventsFromApi = async function() {
-                console.log('📅 Recarregando eventos...');
-            };
+            window.loadEventsFromApi = loadEventsFromApi;
 
             console.log('✅ Scripts dos modais executados com sucesso');
         }
