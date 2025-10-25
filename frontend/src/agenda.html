@@ -5666,18 +5666,10 @@
                 }
             };
 
-            // Funções auxiliares
-            window.mostrarSpinnerAgenda = function() {
-                console.log('🔄 Mostrando spinner...');
-            };
-
-            window.esconderSpinnerAgenda = function() {
-                console.log('✅ Escondendo spinner...');
-            };
-
-            window.ocultarSpinnerAgenda = function() {
-                esconderSpinnerAgenda();
-            };
+            // Funções auxiliares - usar as implementações reais
+            window.mostrarSpinnerAgenda = mostrarSpinnerAgenda;
+            window.esconderSpinnerAgenda = ocultarSpinnerAgenda;
+            window.ocultarSpinnerAgenda = ocultarSpinnerAgenda;
 
             window.loadEventFormData = function() {
                 console.log('📋 Carregando dados do formulário...');
