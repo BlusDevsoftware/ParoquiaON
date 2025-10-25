@@ -340,7 +340,7 @@
 <!-- Scripts para gerenciar os modais -->
 <script>
 // Função para abrir modal de novo agendamento com horário
-function openEventModalWithTime(startTime, endTime) {
+window.openEventModalWithTime = function(startTime, endTime) {
     // Mostrar spinner durante criação do modal
     mostrarSpinnerAgenda();
     
@@ -388,7 +388,7 @@ function openEventModalWithTime(startTime, endTime) {
 }
 
 // Função para abrir modal de novo agendamento padrão
-function openEventModal(date = null) {
+window.openEventModal = function(date = null) {
     // Mostrar spinner durante criação do modal
     mostrarSpinnerAgenda();
     
@@ -441,7 +441,7 @@ function openEventModal(date = null) {
 }
 
 // Função para fechar modal de evento
-function closeEventModal() {
+window.closeEventModal = function() {
     console.log('🔒 Fechando modal de novo agendamento...');
     
     // Fechar modal padrão
@@ -460,7 +460,7 @@ function closeEventModal() {
 }
 
 // Função para abrir modal de edição
-function editEventModal(event) {
+window.editEventModal = function(event) {
     console.log('🔄 Abrindo modal de edição para evento:', event);
     console.log('🔍 Dados do evento recebido:', JSON.stringify(event, null, 2));
     
@@ -503,7 +503,7 @@ function editEventModal(event) {
 }
 
 // Função para lidar com o submit dos formulários
-async function handleEventSubmit(e) {
+window.handleEventSubmit = async function(e) {
     e.preventDefault();
     console.log('💾 Processando formulário de novo agendamento...');
     
@@ -574,42 +574,42 @@ async function handleEventSubmit(e) {
 }
 
 // Funções auxiliares necessárias para os modais
-function mostrarSpinnerAgenda() {
+window.mostrarSpinnerAgenda = function() {
     // Implementação do spinner - pode ser adaptada conforme necessário
     console.log('🔄 Mostrando spinner da agenda...');
 }
 
-function esconderSpinnerAgenda() {
+window.esconderSpinnerAgenda = function() {
     // Implementação do spinner - pode ser adaptada conforme necessário
     console.log('✅ Escondendo spinner da agenda...');
 }
 
-function ocultarSpinnerAgenda() {
+window.ocultarSpinnerAgenda = function() {
     // Alias para esconderSpinnerAgenda
     esconderSpinnerAgenda();
 }
 
-function loadEventFormData() {
+window.loadEventFormData = function() {
     // Carregar dados dos selects - implementação básica
     console.log('📋 Carregando dados do formulário...');
 }
 
-function populateSelectsFromCache() {
+window.populateSelectsFromCache = function() {
     // Popular selects com dados do cache - implementação básica
     console.log('📋 Populando selects do cache...');
 }
 
-function initializeCustomSelects(containerSelector) {
+window.initializeCustomSelects = function(containerSelector) {
     // Inicializar selects customizados - implementação básica
     console.log('🔧 Inicializando selects customizados...');
 }
 
-function reloadCustomSelects(containerSelector) {
+window.reloadCustomSelects = function(containerSelector) {
     // Recarregar selects customizados - implementação básica
     console.log('🔄 Recarregando selects customizados...');
 }
 
-async function loadEventsFromApi() {
+window.loadEventsFromApi = async function() {
     // Recarregar eventos da API - implementação básica
     console.log('📅 Recarregando eventos da API...');
 }
