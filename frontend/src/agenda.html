@@ -1637,6 +1637,36 @@
             padding: 8px 16px;
         }
 
+        .date-navigation {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-nav-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .date-nav-btn:hover {
+            background: #1565c0;
+            transform: scale(1.05);
+        }
+
+        .date-nav-btn:active {
+            transform: scale(0.95);
+        }
+
         .info-today-btn {
             background: #1976d2;
             color: white;
@@ -1851,6 +1881,7 @@
             width: calc(100% - 30px);
             transition: all 0.3s ease;
         }
+
 
         /* Container do corpo do calendário - limitar altura dos eventos */
         .calendar-body {
@@ -3037,7 +3068,15 @@
                         </div>
                     </div>
                     <div class="info-right">
-                        <div class="info-date">12 - 18 outubro de 2025</div>
+                        <div class="date-navigation">
+                            <button class="date-nav-btn" onclick="navigateWeek(-1)" title="Semana anterior">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="info-date" id="dateRange">12 - 18 outubro de 2025</div>
+                            <button class="date-nav-btn" onclick="navigateWeek(1)" title="Próxima semana">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
                         <button class="info-today-btn" onclick="goToToday()">Hoje</button>
                         
                         <div class="view-dropdown">
@@ -3802,6 +3841,8 @@
             rangeElement.textContent = `${weekStart.getDate()} - ${weekEnd.getDate()} ${weekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`;
             }
         }
+
+
 
         function navigateWeek(direction) {
             if (currentView === 'dia') {
