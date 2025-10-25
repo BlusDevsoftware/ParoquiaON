@@ -3378,7 +3378,19 @@
             console.log('Data atual:', now.toDateString());
             console.log('Semana atual:', weekStart.toDateString(), 'a', weekEnd.toDateString());
             
-            if (now >= weekStart && now <= weekEnd) {
+            // Comparar apenas as datas (sem horário) para incluir o último dia da semana
+            const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const weekStartDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+            const weekEndDate = new Date(weekEnd.getFullYear(), weekEnd.getMonth(), weekEnd.getDate());
+            
+            console.log('Comparação de datas:', {
+                hoje: todayDate.toDateString(),
+                inicioSemana: weekStartDate.toDateString(),
+                fimSemana: weekEndDate.toDateString(),
+                dentroDaSemana: todayDate >= weekStartDate && todayDate <= weekEndDate
+            });
+            
+            if (todayDate >= weekStartDate && todayDate <= weekEndDate) {
                 // Calcular posição da linha
                 const currentHour = now.getHours();
                 const currentMinute = now.getMinutes();
