@@ -1852,6 +1852,12 @@
             transition: all 0.3s ease;
         }
 
+        /* Container do corpo do calendário - limitar altura dos eventos */
+        .calendar-body {
+            overflow: hidden;
+            position: relative;
+        }
+
         .weekly-calendar::-webkit-scrollbar {
             display: none;  /* Chrome, Safari and Opera */
         }
@@ -3375,18 +3381,28 @@
                         const endHour = endTime.getHours();
                         const endMinutes = endTime.getMinutes();
                         
+                        console.log('Evento:', event.title, 'Início:', startTime.toLocaleTimeString(), 'Fim:', endTime.toLocaleTimeString());
+                        console.log('End Hour:', endHour, 'End Minutes:', endMinutes);
+                        
                         // Se o evento termina após as 22h, limitar até 22:00
                         let maxHeight = (durationMinutes / 60) * 100;
                         
                         if (endHour > 22 || (endHour === 22 && endMinutes > 0)) {
+                            console.log('Evento vai além das 22h - limitando altura');
+                            
                             // Calcular altura máxima até 22:00
                             const maxEndTime = new Date(startTime);
                             maxEndTime.setHours(22, 0, 0, 0);
                             const maxDurationMinutes = (maxEndTime.getTime() - startTime.getTime()) / (1000 * 60);
                             maxHeight = (maxDurationMinutes / 60) * 100;
                             
+                            console.log('Altura original:', (durationMinutes / 60) * 100, '%');
+                            console.log('Altura limitada:', maxHeight, '%');
+                            
                             // Adicionar indicador visual de que o evento continua
                             eventElement.classList.add('event-truncated');
+                        } else {
+                            console.log('Evento dentro do horário normal');
                         }
                         
                         eventElement.style.top = `${topPosition}%`;
