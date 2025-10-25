@@ -3384,6 +3384,13 @@
                         console.log('Evento:', event.title, 'Início:', startTime.toLocaleTimeString(), 'Fim:', endTime.toLocaleTimeString());
                         console.log('End Hour:', endHour, 'End Minutes:', endMinutes);
                         
+                        // TESTE TEMPORÁRIO: Simular evento que vai além das 22h
+                        if (event.title === 'Agendamento teste') {
+                            console.log('TESTE: Simulando evento que vai além das 22h');
+                            endHour = 23;
+                            endMinutes = 30;
+                        }
+                        
                         // Se o evento termina após as 22h, limitar até 22:00
                         let maxHeight = (durationMinutes / 60) * 100;
                         
