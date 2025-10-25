@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Reset e configurações básicas */
         * {
             margin: 0;
             padding: 0;
@@ -22,14 +21,12 @@
             overflow-x: hidden;
         }
 
-        /* Layout principal */
         .app-container {
             display: flex;
             height: 100vh;
             width: 100vw;
         }
 
-        /* Barra superior ocupando toda a largura */
         .top-header {
             position: fixed;
             top: 0;
@@ -46,10 +43,9 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        /* Sidebar esquerda */
         .left-sidebar {
-            width: 300px;
-            background: #f8f9fa;
+            width: 350px;
+            background: transparent;
             border-right: none;
             display: flex;
             flex-direction: column;
@@ -60,20 +56,48 @@
             z-index: 100;
             padding: 0;
             overflow-y: auto;
+            overflow-x: hidden;
+            transition: transform 0.3s ease-in-out;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* Container lateral para o calendário */
+        .left-sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 90px;
+            left: 20px;
+            z-index: 1001;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: #1e40af;
+            transform: scale(1.1);
+        }
+
         .sidebar-content {
             display: flex;
             flex-direction: column;
             height: 100%;
             padding: 0;
+            overflow: hidden;
         }
 
 
-        /* Botão Criar */
         .create-button {
-            margin: 20px 20px 15px 20px;
+            margin: 5px auto;
             background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
             color: white;
             border: none;
@@ -83,47 +107,28 @@
             cursor: pointer;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.25);
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.15);
             position: relative;
             z-index: 10;
-            width: calc(100% - 40px);
+            width: 200px;
+            font-size: 14px;
         }
 
         .create-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.35);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
         }
 
-        /* Botão Multplus */
-        .multplus-btn {
-            margin: 0 20px 15px 20px;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.25);
-            position: relative;
-            z-index: 10;
-            width: calc(100% - 40px);
+        .create-button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(30, 58, 138, 0.2);
         }
 
-        .multplus-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.35);
-        }
 
-        /* CSS do Multplus removido - modal não disponível */
-
-        /* Modal de Evento */
         .modal {
             display: none;
             position: fixed;
@@ -146,12 +151,12 @@
             background: white;
             padding: 30px;
             border-radius: 16px;
-            max-width: 800px;
-            width: 90%;
+            max-width: 900px;
+            width: 95%;
             max-height: 90vh;
             overflow: hidden;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(0, 0, 0, 0.1);
+            border: none;
             position: relative;
             animation: modalSlideIn 0.3s ease-out;
             display: flex;
@@ -187,7 +192,6 @@
             color: #1e3a8a;
         }
 
-        /* CSS mais específico para o título do modal */
         .modal-header h2 {
             font-size: 24px;
             font-weight: 600;
@@ -212,13 +216,11 @@
             padding-right: 10px;
         }
 
-        /* Garantir que o modal-body não corte o checkbox */
         .modal-body .form-group:has(.checkbox-group) {
             overflow: visible !important;
             max-height: none !important;
         }
 
-        /* Scrollbar personalizado para o modal */
         .modal-body::-webkit-scrollbar {
             width: 6px;
         }
@@ -328,7 +330,6 @@
             color: #333;
         }
 
-        /* Responsivo */
         @media (max-width: 768px) {
             .modal-content {
                 margin: 20px;
@@ -346,7 +347,6 @@
             }
         }
 
-        /* Estilos das Seções do Formulário */
         .form-section {
             margin-bottom: 25px;
             padding: 20px;
@@ -409,7 +409,6 @@
             box-sizing: border-box;
         }
 
-        /* Estilos específicos para selects */
         .form-group select {
             max-height: 200px !important;
             overflow-y: auto !important;
@@ -418,20 +417,17 @@
             height: auto !important;
         }
 
-        /* Forçar altura máxima para todos os selects do modal */
         #eventModal select {
             max-height: 200px !important;
             overflow-y: auto !important;
             height: auto !important;
         }
 
-        /* Estilo específico para selects com muitas opções */
         select[size] {
             max-height: 200px !important;
             overflow-y: auto !important;
         }
 
-        /* Scrollbar personalizado para selects */
         .form-group select::-webkit-scrollbar {
             width: 8px;
         }
@@ -450,7 +446,6 @@
             background: #a8a8a8;
         }
 
-        /* Limitar altura das opções do select */
         .form-group select option {
             padding: 8px 12px;
             max-height: 40px;
@@ -459,20 +454,17 @@
             white-space: nowrap;
         }
 
-        /* Melhorar aparência do select quando focado */
         .form-group select:focus {
             border-color: #1e3a8a;
             outline: none;
             box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
         }
 
-        /* Estilo para select quando tem muitas opções */
         .form-group select[size] {
             max-height: 200px;
             overflow-y: auto;
         }
 
-        /* Forçar estilos para selects do modal de evento */
         #eventModal .form-group select,
         #eventModal select {
             max-height: 200px !important;
@@ -481,7 +473,6 @@
             min-height: 40px !important;
         }
 
-        /* Excluir checkbox-group das regras de altura */
         #eventModal .checkbox-group {
             max-height: none !important;
             overflow: visible !important;
@@ -490,7 +481,6 @@
             position: relative !important;
         }
 
-        /* Garantir que o form-group do checkbox não tenha limitações */
         #eventModal .form-group:has(.checkbox-group) {
             overflow: visible !important;
             max-height: none !important;
@@ -498,27 +488,23 @@
             width: 100% !important;
         }
 
-        /* Garantir que o form-row do checkbox não tenha limitações */
         #eventModal .form-row:has(.checkbox-group) {
             overflow: visible !important;
             max-height: none !important;
             height: auto !important;
         }
 
-        /* CSS específico para o checkbox do evento paroquial */
         #eventModal #eventParoquial {
             position: relative !important;
             z-index: 10 !important;
         }
 
-        /* Garantir que o texto do checkbox não seja cortado */
         #eventModal .checkbox-label {
             white-space: nowrap !important;
             overflow: visible !important;
             text-overflow: unset !important;
         }
 
-        /* CSS específico para checkbox de largura completa */
         .checkbox-full-width {
             width: 100% !important;
             flex: 1 1 100% !important;
@@ -538,22 +524,18 @@
             align-items: center !important;
         }
 
-        /* Garantir que campos de hora sejam visíveis */
         #eventModal input[type="time"] {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
         }
 
-        /* Garantir que campos de data sejam visíveis */
         #eventModal input[type="date"] {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
         }
 
-        /* Select customizado com busca (apenas dentro do modal) */
-        /* Campo de busca/seleção direto (substitui o select) */
         #eventModal .search-select-field {
             position: relative;
             width: 100%;
@@ -964,34 +946,108 @@
 
         /* Container lateral do calendário */
         .calendar-sidebar-container {
-            margin: 20px;
-            background: white;
+            margin: 5px;
+            background: transparent;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid #f0f0f0;
+            box-shadow: none;
+            border: none;
             position: relative;
             z-index: 10;
             flex: 1;
             display: flex;
             flex-direction: column;
             min-height: 0;
+            max-height: calc(100vh - 90px);
+            transition: all 0.3s ease;
+        }
+
+        .calendar-sidebar-container:hover {
+            box-shadow: none;
+            transform: none;
         }
 
         .calendar-sidebar-header {
-            background: white;
-            color: #333;
-            padding: 20px 15px 15px 15px;
+            background: #ffffff;
+            color: #495057;
+            padding: 20px;
             text-align: center;
             font-weight: 600;
-            font-size: 16px;
+            font-size: 18px;
             border-bottom: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .calendar-sidebar-header i {
+            color: #1e3a8a;
+            font-size: 20px;
+        }
+
+        /* === INDICADORES DE ESTADO === */
+        .event-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .event-item:hover {
+            background: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        .event-item.status-ativo {
+            border-left: 4px solid #28a745;
+        }
+
+        .event-item.status-concluido {
+            border-left: 4px solid #6c757d;
+            opacity: 0.7;
+        }
+
+        .event-item.status-cancelado {
+            border-left: 4px solid #dc3545;
+            opacity: 0.7;
+        }
+
+        .event-item.status-inativo {
+            border-left: 4px solid #ffc107;
+        }
+
+        .event-status-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6c757d;
+        }
+
+        .event-status-indicator.ativo {
+            background: #28a745;
+        }
+
+        .event-status-indicator.concluido {
+            background: #6c757d;
+        }
+
+        .event-status-indicator.cancelado {
+            background: #dc3545;
+        }
+
+        .event-status-indicator.inativo {
+            background: #ffc107;
         }
 
         /* Mini calendário */
         .mini-calendar {
             margin: 0;
-            background: white;
+            background: transparent;
             border-radius: 0;
             overflow: hidden;
             box-shadow: none;
@@ -999,11 +1055,12 @@
             flex: 0 0 auto;
             display: flex;
             flex-direction: column;
-            max-height: 280px;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .mini-calendar-header {
-            background: white;
+            background: transparent;
             color: #333;
             padding: 10px 15px;
             display: flex;
@@ -1047,7 +1104,7 @@
         .mini-calendar-weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            background: white;
+            background: transparent;
             border-bottom: none;
         }
 
@@ -1063,13 +1120,13 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 0;
-            background: white;
+            background: transparent;
             flex: 0 0 auto;
             min-height: 0;
         }
 
         .mini-day {
-            background: white;
+            background: transparent;
             padding: 6px 4px;
             text-align: center;
             font-size: 12px;
@@ -1099,7 +1156,7 @@
         }
 
         .mini-day.has-events {
-            background: white;
+            background: transparent;
             position: relative;
         }
 
@@ -1122,22 +1179,22 @@
         /* Seção de Últimos Agendamentos */
         .recent-appointments {
             margin: 20px;
-            background: white;
+            background: transparent;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid #f0f0f0;
+            box-shadow: none;
+            border: none;
             flex: 0 0 auto;
         }
 
         .recent-appointments-header {
-            background: white;
+            background: transparent;
             color: #333;
             padding: 15px 20px;
             text-align: center;
             font-weight: 600;
             font-size: 14px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: none;
         }
 
         .appointments-list {
@@ -1220,8 +1277,8 @@
             flex-direction: column;
             background: #f8f9fa;
             margin-top: 80px; /* Compensar altura da barra fixa */
-            margin-left: 300px;
-            width: calc(100vw - 300px);
+            margin-left: 350px;
+            width: calc(100vw - 350px);
             min-height: calc(100vh - 80px);
         }
 
@@ -1272,7 +1329,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: #4caf50;
+            background: #ffffff;
             border-radius: 2px;
         }
 
@@ -1419,17 +1476,17 @@
         .calendar-info-container {
             background: white;
             border-radius: 12px;
-            padding: 25px 30px;
+            padding: 20px 25px;
             position: relative;
-            margin: 20px 20px 15px 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin: 5px 15px 5px 15px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 25px;
+            gap: 20px;
             border: 1px solid #f0f0f0;
-            min-height: 80px;
+            min-height: 70px;
             position: relative;
             z-index: 10;
         }
@@ -1733,22 +1790,34 @@
             background: white;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
             flex: 1;
             display: flex;
             flex-direction: column;
-            margin: 0 20px 20px 20px;
+            margin: 0 15px 5px 15px;
             border: 1px solid #f0f0f0;
             position: relative;
-            z-index: 5;
-            max-height: calc(100vh - 200px);
+            z-index: 15;
+            max-height: calc(100vh - 160px);
+            overflow-y: auto;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        .weekly-calendar::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari and Opera */
         }
 
         .calendar-header {
             display: grid;
             grid-template-columns: 80px repeat(7, 1fr);
-            background: #f8f9fa;
+            background: #ffffff;
             border-bottom: 1px solid #e0e0e0;
+            border-collapse: separate;
+            border-spacing: 0;
+            position: sticky;
+            top: 0;
+            z-index: 20;
         }
 
         .time-column-header {
@@ -1757,6 +1826,10 @@
             font-weight: 600;
             color: #666;
             border-right: none; /* remove linha vertical no título da coluna de horas */
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 21;
         }
 
         .day-header {
@@ -1764,16 +1837,31 @@
             text-align: center;
             font-weight: 600;
             color: #333;
-            border-right: none; /* remove linha vertical nos títulos dos dias */
-            position: relative;
+            border-right: 1px solid #e0e0e0;
+            background: #ffffff;
+            transition: background-color 0.2s ease;
+            position: sticky;
+            top: 0;
+            z-index: 21;
+        }
+
+        .day-header:hover {
+            background: #f8f9fa;
         }
 
         .day-header:last-child {
             border-right: none;
         }
 
-        .day-header.today { background: transparent; color: inherit; }
-        .day-header.today::after { display: none; }
+        .day-header.today { 
+            background: #e3f2fd; 
+            color: #1976d2; 
+        }
+        
+        .day-header.today::after { 
+            display: none; 
+        }
+        
         .day-header.today .day-number {
             background: #1976d2;
             color: #fff;
@@ -1804,28 +1892,13 @@
             grid-template-columns: 80px repeat(7, 1fr);
             flex: 1;
             min-height: 0;
-            overflow-y: auto;
-            max-height: calc(100vh - 300px);
+            overflow: visible;
+            background: #ffffff;
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
-        /* Estilização do scroll */
-        .calendar-body::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .calendar-body::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        .calendar-body::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        .calendar-body::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
+        /* Scroll escondido no container central */
 
         .time-column {
             border-right: 1px solid #e0e0e0;
@@ -1841,10 +1914,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background: #ffffff;
+            border-right: 1px solid #e0e0e0;
         }
 
         .day-column {
-            border-right: 1px solid #e0e0e0;
             position: relative;
         }
 
@@ -1859,18 +1933,24 @@
         .day-slot {
             height: 60px;
             border-bottom: 1px solid #f0f0f0;
+            border-right: 1px solid #e0e0e0;
             position: relative;
             cursor: pointer;
             transition: background 0.2s ease;
-            /* Separação vertical entre dias */
-            border-left: 1px solid #e0e0e0;
+            background: #ffffff;
         }
 
         .day-slot:hover {
-            background: #f0f8ff;
+            background: #f8f9fa;
         }
 
-        .day-slot.today { background: transparent; }
+        .day-slot:last-child {
+            border-right: none;
+        }
+
+        .day-slot.today { 
+            background: #f0f8ff; 
+        }
 
         /* Badge para número do dia no modo mensal */
         .day-badge {
@@ -2006,23 +2086,7 @@
             z-index: 10000;
         }
 
-        .modal-content {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
 
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
 
         .modal-close {
             background: none;
@@ -2037,8 +2101,348 @@
             color: #333;
         }
 
-        .modal-body {
+
+        /* Estilos específicos para o novo modal de agendamento */
+        .new-appointment-modal {
+            max-width: 800px;
+            width: 95%;
+            border: none;
+            outline: none;
+            padding: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            border-radius: 8px !important;
+            overflow: hidden !important;
+        }
+
+        .new-appointment-header {
+            background: white;
+            color: #333;
             padding: 20px;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .new-appointment-header .modal-title {
+            margin: 0;
+            font-size: 1.5em;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .new-appointment-header .modal-title i {
+            color: #2196F3;
+        }
+
+        .new-appointment-header .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+
+        .new-appointment-header .close-modal:hover {
+            color: #333;
+        }
+
+        .modal-header.new-appointment-header {
+            border-bottom: none !important;
+        }
+
+        .new-appointment-header .modal-title {
+            color: #333;
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .new-appointment-header .close-modal {
+            color: #666;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .modal-header.new-appointment-header {
+            border-bottom: none !important;
+        }
+
+        .new-appointment-body {
+            padding: 5px 20px 20px 20px !important;
+            width: 97% !important;
+            margin: 0 auto !important;
+            overflow-y: auto !important;
+            flex: 1 !important;
+            max-height: 70vh !important;
+            border: none !important;
+            outline: none !important;
+        }
+
+        /* Override do estilo geral do modal-body para o novo modal */
+        .modal-body.new-appointment-body {
+            padding: 1px 20px 20px 20px !important;
+            border: none !important;
+            outline: none !important;
+        }
+
+        /* Override mais específico para garantir que funcione */
+        .new-appointment-modal .modal-body.new-appointment-body {
+            padding: 1px 20px 20px 20px !important;
+            border: none !important;
+            outline: none !important;
+        }
+
+        /* Override ainda mais específico */
+        .modal-content.new-appointment-modal .modal-body.new-appointment-body {
+            padding: 1px 20px 20px 20px !important;
+            border: none !important;
+            outline: none !important;
+        }
+
+        /* Scrollbar personalizado para o novo modal */
+        .new-appointment-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .new-appointment-body::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 5px 0;
+        }
+
+        .new-appointment-body::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+            margin: 2px;
+        }
+
+        .new-appointment-body::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .patient-section, .appointment-section {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .patient-section:last-child, .appointment-section:last-child {
+            border-bottom: none;
+        }
+
+        .form-row {
+            margin-bottom: 8px;
+        }
+
+        .patient-section .form-row {
+            margin-bottom: 6px;
+        }
+
+        .patient-section .form-group {
+            margin-bottom: 4px;
+        }
+
+        .patient-section .form-group label {
+            margin-bottom: 4px;
+        }
+
+        .input-with-button {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .input-with-button input,
+        .input-with-button select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn-add-patient,
+        .btn-add-insurance {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-add-patient:hover,
+        .btn-add-insurance:hover {
+            background: #2563EB;
+        }
+
+        .toggles-row {
+            display: flex;
+            gap: 20px;
+            margin: 8px 0;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-group label:first-child {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #3B82F6;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .time-group {
+            flex: 1;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+            margin: 8px 0;
+        }
+
+        .btn-add-time {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-repeat-appointment {
+            background: #E5E7EB;
+            color: #374151;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-add-time:hover {
+            background: #2563EB;
+        }
+
+        .btn-repeat-appointment:hover {
+            background: #D1D5DB;
+        }
+
+        .full-width {
+            width: 100%;
+        }
+
+        .full-width textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .new-appointment-actions {
+            padding: 12px;
+            background: #F9FAFB;
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .new-appointment-actions .btn-secondary {
+            background: #E5E7EB;
+            color: #374151;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .new-appointment-actions .btn-primary {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .new-appointment-actions .btn-secondary:hover {
+            background: #D1D5DB;
+        }
+
+        .new-appointment-actions .btn-primary:hover {
+            background: #059669;
         }
 
         /* Status dos eventos */
@@ -2191,15 +2595,14 @@
             background: #c82333;
         }
 
-        /* Responsivo */
         @media (max-width: 1200px) {
             .left-sidebar {
-                width: 250px;
+                width: 320px;
             }
             
             .main-area {
-                width: calc(100vw - 250px);
-                margin-left: 250px;
+                width: calc(100vw - 320px);
+                margin-left: 320px;
             }
             
             .nav-links {
@@ -2208,8 +2611,17 @@
         }
 
         @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block;
+            }
+            
             .left-sidebar {
-                display: none;
+                width: 320px;
+                transform: translateX(-100%);
+            }
+            
+            .left-sidebar.open {
+                transform: translateX(0);
             }
             
             .main-area {
@@ -2284,7 +2696,7 @@
             }
             
             .calendar-sidebar-container {
-                margin: 10px;
+                margin: 5px;
                 min-width: 200px;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             }
@@ -2319,6 +2731,42 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Header Superior -->
+        <div class="top-header">
+            <div class="header-left">
+                <div class="logo-section">
+                    <span style="font-size: 20px; font-weight: 600;">ParoquiaON</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">Minha Comunidade</a>
+                    <a href="agenda.html" class="nav-link active">Agenda</a>
+                    <a href="comunidades.html" class="nav-link">Comunidades</a>
+                    <a href="pastorais.html" class="nav-link">Pastorais</a>
+                    <a href="pilares.html" class="nav-link">Pilares</a>
+                    <a href="locais.html" class="nav-link">Locais</a>
+                    <a href="acoes.html" class="nav-link">Ações</a>
+                    <a href="pessoas.html" class="nav-link">Pessoas</a>
+                    <a href="usuarios.html" class="nav-link">Usuários</a>
+                    <a href="perfil.html" class="nav-link">Perfil</a>
+                    <div class="nav-dropdown">
+                        <a href="#" class="nav-link dropdown-trigger">Relatórios <i class="fas fa-chevron-down"></i></a>
+                        <div class="dropdown-menu">
+                            <a href="recebimento.html" class="dropdown-item">Recebimento</a>
+                            <a href="conferencia.html" class="dropdown-item">Conferência</a>
+                            <a href="dinamico.html" class="dropdown-item">Dinâmico <span class="beta-tag">beta</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
+        </div>
+
         <!-- Spinner Centralizado de Carregamento -->
         <div id="loader-agenda" class="loader-overlay-main">
             <div class="spinner-main"></div>
@@ -2326,7 +2774,10 @@
         </div>
 
         <!-- Sidebar Esquerda -->
-        <div class="left-sidebar">
+        <div class="left-sidebar" id="leftSidebar">
+            <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="sidebar-content">
                 <!-- Container Lateral do Calendário -->
                 <div class="calendar-sidebar-container">
@@ -2336,10 +2787,6 @@
                         Criar
                     </button>
 
-                    <button class="multplus-btn" onclick="openMultplusModal()">
-                        <i class="fas fa-layer-group"></i>
-                        Multplus
-                    </button>
 
                     <div class="calendar-sidebar-header">
                         <i class="fas fa-calendar-alt"></i> Calendário
@@ -2390,43 +2837,7 @@
 
         <!-- Área Principal -->
         <div class="main-area">
-            <!-- Header Superior -->
-            <div class="top-header">
-                <div class="header-left">
-                    <div class="logo-section">
-                        <span style="font-size: 20px; font-weight: 600;">ParoquiaON</span>
-        </div>
-                    <div class="nav-links">
-                        <a href="index.html" class="nav-link">Minha Comunidade</a>
-                        <a href="agenda.html" class="nav-link active">Agenda</a>
-                        <a href="comunidades.html" class="nav-link">Comunidades</a>
-                        <a href="pastorais.html" class="nav-link">Pastorais</a>
-                        <a href="pilares.html" class="nav-link">Pilares</a>
-                        <a href="locais.html" class="nav-link">Locais</a>
-                        <a href="acoes.html" class="nav-link">Ações</a>
-                        <a href="pessoas.html" class="nav-link">Pessoas</a>
-                        <a href="usuarios.html" class="nav-link">Usuários</a>
-                        <a href="perfil.html" class="nav-link">Perfil</a>
-                        <div class="nav-dropdown">
-                            <a href="#" class="nav-link dropdown-trigger">Relatórios <i class="fas fa-chevron-down"></i></a>
-                            <div class="dropdown-menu">
-                                <a href="recebimento.html" class="dropdown-item">Recebimento</a>
-                                <a href="conferencia.html" class="dropdown-item">Conferência</a>
-                                <a href="dinamico.html" class="dropdown-item">Dinâmico <span class="beta-tag">beta</span></a>
-                            </div>
-                        </div>
-    </div>
-            </div>
-                <div class="header-right">
-                    <div class="header-icon">
-                    <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </div>
-                <div class="user-avatar">A</div>
-            </div>
-        </div>
-
-            <!-- Área de Conteúdo -->
+            <!-- Content Area -->
             <div class="content-area">
                 <!-- Container de Informações -->
                 <div class="calendar-info-container">
@@ -2552,7 +2963,6 @@
             initializeApp();
             
             // Carregar dados em paralelo para otimizar performance
-            console.log('🔄 Carregando dados da agenda em paralelo...');
             try {
                 await Promise.all([
                     loadCommunities(),
@@ -2564,7 +2974,6 @@
                     loadEventLocais(),
                     loadEventStatus()
                 ]);
-                console.log('✅ Todos os dados foram carregados em paralelo');
             } catch (error) {
                 console.error('❌ Erro ao carregar dados:', error);
             } finally {
@@ -2603,7 +3012,6 @@
                 item.addEventListener('click', function(e) {
                     e.preventDefault();
                     const selectedView = this.getAttribute('data-view');
-                    console.log('Visualização alterada para:', selectedView);
                     
                     // Atualizar texto do trigger
                     const currentViewText = document.getElementById('currentViewText');
@@ -2796,7 +3204,6 @@
                         
                         eventElement.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            console.log('🖱️ Clique no evento detectado:', event);
                             editEvent(event);
                         });
                         
@@ -2805,7 +3212,6 @@
                     
                     daySlot.addEventListener('click', () => {
                         dayDate.setHours(hour, 0, 0, 0);
-                        console.log('Modal de novo agendamento não está disponível');
                     });
                     
                     calendarBody.appendChild(daySlot);
@@ -2866,7 +3272,7 @@
                         cell.appendChild(chip);
                     });
 
-                    cell.addEventListener('click', () => console.log('Modal de novo agendamento não está disponível'));
+                    cell.addEventListener('click', () => {});
                     calendarBody.appendChild(cell);
                 }
             }
@@ -3103,178 +3509,138 @@
         }
 
         function openEventModal(date = null) {
-            console.log('🚀 Abrindo modal de novo agendamento...');
             
             // Mostrar spinner durante criação do modal
             mostrarSpinnerAgenda();
             
-            // Criar modal dinamicamente baseado no modal de comunidade
+            // Criar modal baseado no design da imagem
             const modalHTML = `
                 <div id="eventModal" class="modal active">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h2><i class="fas fa-calendar-plus"></i> <span id="modalTitle">Novo Agendamento</span></h2>
-                            <div class="modal-header-actions">
-                                <div class="status-toggle-modal">
-                                    <label class="switch">
-                                        <input type="checkbox" class="status-toggle" checked>
-                                        <span class="slider"></span>
-                                    </label>
-                                    <span class="status-label-modal">Ativo</span>
-                                </div>
-                                <button class="close-modal" onclick="closeEventModal()">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
+                    <div class="modal-content new-appointment-modal">
+                        <div class="modal-header new-appointment-header">
+                            <h2 class="modal-title"><i class="fas fa-calendar-plus"></i> Novo Agendamento</h2>
+                            <button class="close-modal" onclick="closeEventModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
-                        <div class="modal-body">
+                        <div class="modal-body new-appointment-body">
                             <form id="eventForm">
-                                <!-- Seção: Informações Básicas do Evento -->
-                                <div class="form-section">
-                                    <h3 class="section-title"><i class="fas fa-info-circle"></i> Informações Básicas do Evento</h3>
+                                <!-- Seção: Informações da Comunidade -->
+                                <div class="form-section patient-section">
+                                    <h3 class="section-title">Informações da Comunidade</h3>
                                     
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <label><i class="fas fa-heading"></i> Título do Evento</label>
+                                            <label>Título do Evento *</label>
                                             <input type="text" id="eventTitle" name="titulo" required placeholder="Digite o título do evento">
                                         </div>
-                                    </div>
-                                    
-                                    <div class="form-row">
                                         <div class="form-group">
-                                            <label><i class="fas fa-church"></i> Comunidade</label>
-                                            <select id="eventCommunity" name="comunidade" required style="max-height: 200px; overflow-y: auto;">
+                                            <label>Comunidade *</label>
+                                            <select id="eventCommunity" name="comunidade" required>
                                                 <option value="">Selecione a comunidade</option>
                                             </select>
                                         </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
                                         <div class="form-group">
-                                            <label><i class="fas fa-cross"></i> Pastoral</label>
-                                            <select id="eventPastoral" name="pastoral" required style="max-height: 200px; overflow-y: auto;">
+                                            <label>Pastoral *</label>
+                                            <select id="eventPastoral" name="pastoral" required>
                                                 <option value="">Selecione a pastoral</option>
                                             </select>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="form-row">
                                         <div class="form-group">
-                                            <label><i class="fas fa-layer-group"></i> Pilares</label>
-                                            <select id="eventPilares" name="pilares" required style="max-height: 200px; overflow-y: auto;">
+                                            <label>Pilar *</label>
+                                            <select id="eventPilares" name="pilares" required>
                                                 <option value="">Selecione o pilar</option>
                                             </select>
                                         </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
                                         <div class="form-group">
-                                            <label><i class="fas fa-map-marker-alt"></i> Local</label>
-                                            <select id="eventLocation" name="local" required style="max-height: 200px; overflow-y: auto;">
+                                            <label>Local *</label>
+                                            <select id="eventLocation" name="local" required>
                                                 <option value="">Selecione o local</option>
                                             </select>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="form-row">
                                         <div class="form-group">
-                                            <label><i class="fas fa-tasks"></i> Ação</label>
-                                            <select id="eventAcao" name="acao" required style="max-height: 200px; overflow-y: auto;">
+                                            <label>Ação *</label>
+                                            <select id="eventAcao" name="acao" required>
                                                 <option value="">Selecione a ação</option>
                                             </select>
                                         </div>
-                                        <div class="form-group">
-                                            <label><i class="fas fa-bullseye"></i> Objetivo</label>
-                                            <input type="text" id="eventObjetivo" name="objetivo" placeholder="Digite o objetivo do evento">
                                         </div>
                                     </div>
                                     
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label><i class="fas fa-calendar-alt"></i> Data de Início</label>
-                                            <input type="date" id="eventDateStart" name="data_inicio" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label><i class="fas fa-clock"></i> Hora de Início</label>
-                                            <input type="time" id="eventTimeStart" name="hora_inicio" required>
-                                        </div>
-                                    </div>
+                                <!-- Seção: Informações do agendamento -->
+                                <div class="form-section appointment-section">
+                                    <h3 class="section-title">Informações do agendamento</h3>
                                     
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label><i class="fas fa-calendar-alt"></i> Data de Fim</label>
-                                            <input type="date" id="eventDateEnd" name="data_fim" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label><i class="fas fa-clock"></i> Hora de Fim</label>
-                                            <input type="time" id="eventTimeEnd" name="hora_fim" required>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-row checkbox-full-width">
-                                        <div class="form-group checkbox-full-width">
-                                            <label><i class="fas fa-church"></i> Evento Paroquial</label>
-                                            <div class="checkbox-group checkbox-full-width">
-                                                <label class="checkbox-label checkbox-full-width">
+                                    <!-- Toggles -->
+                                    <div class="form-row toggles-row">
+                                        <div class="toggle-group">
+                                            <label>Evento Paroquial:</label>
+                                            <label class="switch">
                                                     <input type="checkbox" id="eventParoquial" name="evento_paroquial">
-                                                    <span class="checkmark"></span>
-                                                    Marcar como evento paroquial
+                                                <span class="slider"></span>
                                                 </label>
                                             </div>
+                                        <div class="toggle-group">
+                                            <label>Evento Público:</label>
+                                            <label class="switch">
+                                                <input type="checkbox" id="eventPublico" name="evento_publico">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="toggle-group">
+                                            <label>Requer Confirmação:</label>
+                                            <label class="switch">
+                                                <input type="checkbox" id="eventConfirmacao" name="requer_confirmacao">
+                                                <span class="slider"></span>
+                                            </label>
                                         </div>
                                     </div>
                                     
+                                    
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <label><i class="fas fa-paperclip"></i> Anexos de Documento</label>
-                                            <input type="file" id="eventAttachments" name="anexos" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                                            <div class="file-info">
-                                                <small>Formatos aceitos: PDF, DOC, DOCX, JPG, PNG (máx. 10MB cada)</small>
+                                            <label>Data do evento: *</label>
+                                            <input type="date" id="eventDateStart" name="data_inicio" required>
                                             </div>
+                                        <div class="form-group time-group">
+                                            <label>De: *</label>
+                                            <input type="time" id="eventTimeStart" name="hora_inicio" required>
                                         </div>
+                                        <div class="form-group time-group">
+                                            <label>Até: *</label>
+                                            <input type="time" id="eventTimeEnd" name="hora_fim" required>
                                     </div>
                                 </div>
 
-
-                                <!-- Seção: Configurações Adicionais -->
-                                <div class="form-section">
-                                    <h3 class="section-title"><i class="fas fa-cog"></i> Configurações Adicionais</h3>
-                                    
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label><i class="fas fa-exclamation-circle"></i> Status</label>
-                                            <select id="eventStatus" name="status" required>
-                                                <option value="">Carregando status...</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label><i class="fas fa-eye"></i> Visibilidade</label>
-                                            <select id="eventVisibility" name="visibilidade">
-                                                <option value="publico">Público</option>
-                                                <option value="privado">Privado</option>
-                                                <option value="interno">Interno</option>
-                                            </select>
-                                        </div>
+                                    <div class="form-row button-row">
+                                        <button type="button" class="btn-add-time">
+                                            <i class="fas fa-plus"></i> Horário
+                                        </button>
+                                        <button type="button" class="btn-repeat-appointment">
+                                            Repetir evento
+                                        </button>
                                     </div>
                                     
                                     <div class="form-row">
-                                        <div class="form-group">
-                                            <label><i class="fas fa-bell"></i> Lembrete</label>
-                                            <select id="eventReminder" name="lembrete">
-                                                <option value="nenhum">Nenhum</option>
-                                                <option value="15min">15 minutos antes</option>
-                                                <option value="30min">30 minutos antes</option>
-                                                <option value="1hora">1 hora antes</option>
-                                                <option value="1dia">1 dia antes</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label><i class="fas fa-users"></i> Capacidade Máxima</label>
-                                            <input type="number" id="eventCapacity" name="capacidade" placeholder="Número de pessoas" min="1">
+                                        <div class="form-group full-width">
+                                            <label>Objetivo/Descrição:</label>
+                                            <textarea id="eventObjetivo" name="objetivo" rows="3" placeholder="Digite o objetivo ou descrição do evento"></textarea>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <div class="form-actions">
+                                <div class="form-actions new-appointment-actions">
                                     <button type="button" class="btn-secondary" onclick="closeEventModal()">
-                                        <i class="fas fa-times"></i> Cancelar
+                                        Fechar
                                     </button>
                                     <button type="submit" class="btn-primary">
-                                        <i class="fas fa-save"></i> Salvar Evento
+                                        Salvar Evento
                                     </button>
                                 </div>
                             </form>
@@ -3320,7 +3686,6 @@
             }
             
             // Dados já foram carregados antecipadamente
-            console.log('✅ Dados dos selects já carregados previamente');
             
             // Popular selects com dados do cache
             populateSelectsFromCache();
@@ -3334,32 +3699,26 @@
             });
 
             // Inicializar selects customizados IMEDIATAMENTE (sem delays)
-            console.log('🔄 Inicializando dropdowns customizados...');
             initializeCustomSelects('#eventModal');
             
             // Recarregar selects imediatamente após inicialização
-            console.log('🔄 Recarregando selects após carregamento de dados...');
             reloadCustomSelects('#eventModal');
             
             // Ocultar spinner quando modal estiver pronto
             ocultarSpinnerAgenda();
             
-            console.log('✅ Modal de novo agendamento criado e exibido');
         }
 
         // Utilitário: inicializa selects customizados com busca no container
         function initializeCustomSelects(containerSelector) {
             const container = document.querySelector(containerSelector);
             if (!container) {
-                console.log('❌ Container não encontrado:', containerSelector);
                 return;
             }
 
             // Aplicar aos selects
             const nativeSelects = container.querySelectorAll('select');
-            console.log(`🔍 Encontrados ${nativeSelects.length} selects no container`);
             nativeSelects.forEach(select => {
-                console.log(`📋 Processando select: ${select.id}`);
                 makeCustomSelect(select);
             });
             
@@ -3377,7 +3736,6 @@
             const container = document.querySelector(containerSelector);
             if (!container) return;
             
-            console.log('🔄 Recarregando todos os selects customizados...');
             
             // Recarregar todos os campos customizados
             const customFields = container.querySelectorAll('.search-select-field');
@@ -3390,7 +3748,6 @@
 
         // Função para popular selects do modal usando dados do cache
         function populateSelectsFromCache() {
-            console.log('🔄 Populando selects do modal com dados do cache...');
             
             // Popular select de comunidades
             const communitySelect = document.getElementById('eventCommunity');
@@ -3402,7 +3759,6 @@
                     option.textContent = comunidade.nome;
                     communitySelect.appendChild(option);
                 });
-                console.log(`✅ ${modalDataCache.comunidades.length} comunidades adicionadas do cache`);
             }
             
             // Popular select de pastorais
@@ -3415,7 +3771,6 @@
                     option.textContent = pastoral.nome;
                     pastoralSelect.appendChild(option);
                 });
-                console.log(`✅ ${modalDataCache.pastorais.length} pastorais adicionadas do cache`);
             }
             
             // Popular select de pilares
@@ -3428,7 +3783,6 @@
                     option.textContent = pilar.nome;
                     pilarSelect.appendChild(option);
                 });
-                console.log(`✅ ${modalDataCache.pilares.length} pilares adicionados do cache`);
             }
             
             // Popular select de ações
@@ -3441,7 +3795,6 @@
                     option.textContent = acao.nome;
                     acaoSelect.appendChild(option);
                 });
-                console.log(`✅ ${modalDataCache.acoes.length} ações adicionadas do cache`);
             }
             
             // Popular select de locais
@@ -3454,7 +3807,6 @@
                     option.textContent = local.nome;
                     localSelect.appendChild(option);
                 });
-                console.log(`✅ ${modalDataCache.locais.length} locais adicionados do cache`);
             }
             
             // Popular select de status
@@ -3467,7 +3819,6 @@
                     option.textContent = status.nome.charAt(0).toUpperCase() + status.nome.slice(1);
                     statusSelect.appendChild(option);
                 });
-                console.log(`✅ ${modalDataCache.status.length} status adicionados do cache`);
             }
         }
 
@@ -3475,7 +3826,6 @@
         function makeCustomSelect(nativeSelect) {
             if (!nativeSelect || nativeSelect.dataset.enhanced === 'true') return;
             
-            console.log(`🔧 Criando select customizado para: ${nativeSelect.id}`);
 
             // Campo de busca direto
             const field = document.createElement('div');
@@ -3499,7 +3849,6 @@
             const buildItems = () => {
                 list.innerHTML = '';
                 const options = Array.from(nativeSelect.options);
-                console.log(`🔍 BuildItems para ${nativeSelect.id}: ${options.length} opções encontradas`);
                 
                 if (options.length <= 1) {
                     // Se não há opções além do placeholder, mostrar mensagem
@@ -3535,13 +3884,11 @@
             
             // Aguardar um pouco para garantir que os dados foram carregados
             setTimeout(() => {
-                console.log(`🔄 Executando buildItems para ${nativeSelect.id}`);
                 buildItems();
             }, 200);
             
             // Função para recarregar itens (chamada quando dados são carregados)
             const reloadItems = () => {
-                console.log(`🔄 Recarregando itens para ${nativeSelect.id}`);
                 buildItems();
             };
             
@@ -4148,9 +4495,6 @@
         }
 
 
-        function loadEventModalData() {
-            console.log('Modal de novo agendamento não está disponível');
-        }
 
         // Cache para dados dos selects
         let modalDataCache = {
@@ -4165,17 +4509,14 @@
         async function loadEventCommunities() {
             // Verificar se já temos dados no cache
             if (modalDataCache.comunidades.length > 0) {
-                console.log('✅ Comunidades já carregadas do cache:', modalDataCache.comunidades.length);
                 return;
             }
             
             try {
-                console.log('🔄 Carregando comunidades...');
                 const { data, error } = await window.api.get(window.endpoints.comunidades.list);
                 if (error) throw error;
                 
                 const comunidades = Array.isArray(data) ? data : [];
-                console.log(`📋 ${comunidades.length} comunidades carregadas da API`);
                 
                 // Armazenar no cache
                 modalDataCache.comunidades = comunidades;
@@ -4193,8 +4534,6 @@
                         select.appendChild(option);
                     });
                     
-                    console.log(`✅ ${comunidades.length} opções adicionadas ao select eventCommunity`);
-                    console.log('🔍 Opções do select:', Array.from(select.options).map(opt => opt.textContent));
                 }
             } catch (error) {
                 console.error('❌ Erro ao carregar comunidades:', error);
@@ -4503,21 +4842,21 @@
                 objetivo: document.getElementById('eventObjetivo').value,
                 dataInicio: document.getElementById('eventDateStart').value,
                 horaInicio: document.getElementById('eventTimeStart').value,
-                dataFim: document.getElementById('eventDateEnd').value,
+                dataFim: document.getElementById('eventDateStart').value, // Usar mesma data para fim
                 horaFim: document.getElementById('eventTimeEnd').value,
                 eventoParoquial: document.getElementById('eventParoquial').checked,
-                anexos: document.getElementById('eventAttachments').files,
-                status: document.getElementById('eventStatus').value,
-                visibilidade: document.getElementById('eventVisibility').value,
-                lembrete: document.getElementById('eventReminder').value,
-                capacidade: document.getElementById('eventCapacity').value,
-                ativo: document.querySelector('.status-toggle').checked
+                eventoPublico: document.getElementById('eventPublico').checked,
+                requerConfirmacao: document.getElementById('eventConfirmacao').checked,
+                status: 'agendado', // Status padrão
+                visibilidade: 'publico', // Visibilidade padrão
+                lembrete: 'nenhum', // Lembrete padrão
+                capacidade: 1 // Capacidade padrão
             };
             
             // Validação básica
             if (!formData.titulo || !formData.comunidade || !formData.pastoral || !formData.pilares || 
                 !formData.local || !formData.acao || !formData.dataInicio || !formData.horaInicio || 
-                !formData.dataFim || !formData.horaFim || !formData.status) {
+                !formData.horaFim) {
                 showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
                 return;
             }
@@ -4853,469 +5192,27 @@
             }
         }
 
-        function loadAgendaLookups() {
-            console.log('Função removida - modais não disponíveis');
-        }
 
 
-        async function openMultplusModal() {
-            console.log('Modal Multplus não está mais disponível');
-            alert('Modal de múltiplos agendamentos não está disponível no momento.');
-                    return;
+
+
+
+
+
+
+
+
             
-            // Carregar comunidades no select
-            loadMultplusCommunities();
+
+
+
+
+
+
+
             
-            // Carregar locais no select
-            loadMultplusLocais();
             
-            // Definir data inicial como hoje
-            const today = new Date().toISOString().split('T')[0];
-            const startDate = document.getElementById('multplusStartDate');
-            if (startDate) {
-                startDate.value = today;
-            }
             
-            // Limpar preview
-            const preview = document.getElementById('multplusPreview');
-            if (preview) {
-                preview.innerHTML = `
-                    <div class="preview-placeholder">
-                        <i class="fas fa-calendar-plus"></i>
-                        <p>Configure os parâmetros acima para ver o preview dos eventos</p>
-                    </div>
-                `;
-            }
-            
-            // Resetar tabs
-            currentTab = 'config';
-            updateTabDisplay();
-        }
-
-        function closeMultplusModal() {
-            console.log('Modal Multplus não está mais disponível');
-        }
-
-        async function loadMultplusCommunities() {
-            try {
-                const { data, error } = await window.api.get(window.endpoints.comunidades.list);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-                
-                const select = document.getElementById('multplusCommunity');
-                if (select) {
-                    select.innerHTML = '<option value="">Selecione uma comunidade</option>' +
-                        lista.map(comunidade => 
-                            `<option value="${comunidade.id}">${comunidade.nome}</option>`
-                        ).join('');
-                }
-            } catch (err) {
-                console.error('Erro ao carregar comunidades:', err);
-                const select = document.getElementById('multplusCommunity');
-                if (select) {
-                    select.innerHTML = '<option value="">Erro ao carregar</option>';
-                }
-            }
-        }
-
-        async function loadMultplusLocais() {
-            try {
-                const { data, error } = await window.api.get(window.endpoints.locais.list);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-                
-                const select = document.getElementById('multplusLocation');
-                if (select) {
-                    select.innerHTML = '<option value="">Selecione um local</option>' +
-                        lista.map(local => 
-                            `<option value="${local.id}">${local.nome}</option>`
-                        ).join('');
-                    console.log('✅ Locais carregados no Multplus:', lista.length);
-                }
-            } catch (err) {
-                console.error('Erro ao carregar locais no Multplus:', err);
-                const select = document.getElementById('multplusLocation');
-                if (select) {
-                    select.innerHTML = '<option value="">Erro ao carregar</option>';
-                }
-            }
-        }
-
-        function addTimeItem() {
-            const container = document.getElementById('multplusTimesContainer');
-            const timeItem = document.createElement('div');
-            timeItem.className = 'time-item';
-            timeItem.innerHTML = `
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Horário</label>
-                        <input type="time" class="form-input multplus-time" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Duração (min)</label>
-                        <input type="number" class="form-input multplus-duration" value="60" min="15" step="15">
-                    </div>
-                    <div class="form-group">
-                        <button type="button" class="btn btn-danger btn-sm remove-time" onclick="removeTimeItem(this)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-            container.appendChild(timeItem);
-        }
-
-        function removeTimeItem(button) {
-            const timeItem = button.closest('.time-item');
-            const container = document.getElementById('multplusTimesContainer');
-            
-            // Não permitir remover se só há um item
-            if (container.children.length > 1) {
-                timeItem.remove();
-            } else {
-                showToast('Deve haver pelo menos um horário', 'error');
-            }
-        }
-
-        function generatePreview() {
-            const title = document.getElementById('multplusTitle').value;
-            const startDate = document.getElementById('multplusStartDate').value;
-            const endDate = document.getElementById('multplusEndDate').value;
-            const frequency = document.getElementById('multplusFrequency').value;
-            const times = Array.from(document.querySelectorAll('.multplus-time')).map(input => input.value);
-            const durations = Array.from(document.querySelectorAll('.multplus-duration')).map(input => input.value);
-            
-            if (!title || !startDate || !endDate || !frequency || times.some(t => !t)) {
-                showToast('Preencha todos os campos obrigatórios', 'error');
-                return;
-            }
-            
-            const events = generateEventsList(title, startDate, endDate, frequency, times, durations);
-            displayPreview(events);
-        }
-
-        function generateEventsList(title, startDate, endDate, frequency, times, durations) {
-            const events = [];
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            
-            // Mostrar/ocultar seletor de dias baseado na frequência
-            const daysContainer = document.getElementById('multplusDaysContainer');
-            if (frequency === 'weekly' || frequency === 'custom') {
-                daysContainer.style.display = 'block';
-            } else {
-                daysContainer.style.display = 'none';
-            }
-            
-            let currentDate = new Date(start);
-            
-            while (currentDate <= end) {
-                let shouldAddEvent = false;
-                
-                switch (frequency) {
-                    case 'daily':
-                        shouldAddEvent = true;
-                        break;
-                    case 'weekly':
-                        const selectedDays = Array.from(document.querySelectorAll('input[name="multplusDays"]:checked'))
-                            .map(cb => parseInt(cb.value));
-                        shouldAddEvent = selectedDays.includes(currentDate.getDay());
-                        break;
-                    case 'monthly':
-                        shouldAddEvent = currentDate.getDate() === start.getDate();
-                        break;
-                    case 'custom':
-                        const customDays = Array.from(document.querySelectorAll('input[name="multplusDays"]:checked'))
-                            .map(cb => parseInt(cb.value));
-                        shouldAddEvent = customDays.includes(currentDate.getDay());
-                        break;
-                }
-                
-                if (shouldAddEvent) {
-                    times.forEach((time, index) => {
-                        const event = {
-                            title: title,
-                            date: currentDate.toISOString().split('T')[0],
-                            time: time,
-                            duration: durations[index] || '60',
-                            type: document.getElementById('multplusType').value,
-                            location: document.getElementById('multplusLocation').value,
-                            description: document.getElementById('multplusDescription').value
-                        };
-                        events.push(event);
-                    });
-                }
-                
-                // Avançar para próxima data baseado na frequência
-                switch (frequency) {
-                    case 'daily':
-                        currentDate.setDate(currentDate.getDate() + 1);
-                        break;
-                    case 'weekly':
-                        currentDate.setDate(currentDate.getDate() + 7);
-                        break;
-                    case 'monthly':
-                        currentDate.setMonth(currentDate.getMonth() + 1);
-                        break;
-                    case 'custom':
-                        currentDate.setDate(currentDate.getDate() + 1);
-                        break;
-                }
-            }
-            
-            return events;
-        }
-
-        function displayPreview(events) {
-            const preview = document.getElementById('multplusPreview');
-            
-            if (events.length === 0) {
-                preview.innerHTML = `
-                    <div class="preview-placeholder">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Nenhum evento será criado com os parâmetros atuais</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            const eventsHTML = events.map(event => `
-                <div class="preview-event">
-                    <div class="preview-event-info">
-                        <div class="preview-event-title">${event.title}</div>
-                        <div class="preview-event-details">
-                            ${event.time} - ${event.duration}min | ${event.location || 'Sem local'}
-                        </div>
-                    </div>
-                    <div class="preview-event-date">
-                        ${new Date(event.date).toLocaleDateString('pt-BR')}
-                    </div>
-                </div>
-            `).join('');
-            
-            preview.innerHTML = `
-                <div style="margin-bottom: 15px; font-weight: 600; color: #1e3a8a;">
-                    <i class="fas fa-calendar-check"></i>
-                    ${events.length} evento(s) serão criados
-                </div>
-                ${eventsHTML}
-            `;
-        }
-
-        // Event listeners para o modal Multplus
-        document.addEventListener('DOMContentLoaded', function() {
-            // Frequência change
-            const multplusFrequency = document.getElementById('multplusFrequency');
-            if (multplusFrequency) {
-                multplusFrequency.addEventListener('change', function() {
-                    const daysContainer = document.getElementById('multplusDaysContainer');
-                    if (this.value === 'weekly' || this.value === 'custom') {
-                        daysContainer.style.display = 'block';
-                    } else {
-                        daysContainer.style.display = 'none';
-                    }
-                });
-            }
-            
-            // Form submit
-            const multplusForm = document.getElementById('multplusForm');
-            if (multplusForm) {
-                multplusForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    await handleMultplusSubmit();
-                });
-            }
-        });
-
-        // Função para verificar se os modais estão carregados - Removida (modal não disponível)
-        function areModalsLoaded() {
-            return false; // Modal não disponível
-        }
-
-        // Função para aguardar o carregamento dos modais
-        async function waitForModals(maxAttempts = 10) {
-            for (let i = 0; i < maxAttempts; i++) {
-                if (areModalsLoaded()) {
-                    console.log('Modais carregados com sucesso');
-                    return true;
-                }
-                console.log(`Aguardando modais... tentativa ${i + 1}/${maxAttempts}`);
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-            return false;
-        }
-
-        // Variáveis dos modais removidas - modal não disponível
-        let currentTab = 'config';
-
-        // Funções do Modal de Evento removidas - modal não disponível
-
-        // Funções do Modal Multplus (Tabs)
-        function nextTab() {
-            if (validateCurrentTab()) {
-                const tabs = ['config', 'schedule', 'preview'];
-                const currentIndex = tabs.indexOf(currentTab);
-                if (currentIndex < tabs.length - 1) {
-                    currentTab = tabs[currentIndex + 1];
-                    updateTabDisplay();
-                }
-            }
-        }
-
-        function prevTab() {
-            const tabs = ['config', 'schedule', 'preview'];
-            const currentIndex = tabs.indexOf(currentTab);
-            if (currentIndex > 0) {
-                currentTab = tabs[currentIndex - 1];
-                updateTabDisplay();
-            }
-        }
-
-        function updateTabDisplay() {
-            // Atualizar tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-tab="${currentTab}"]`).classList.add('active');
-
-            // Mostrar/ocultar panes
-            document.querySelectorAll('.tab-pane').forEach(pane => {
-                pane.classList.remove('active');
-            });
-            document.querySelector(`[data-tab="${currentTab}"]`).classList.add('active');
-
-            // Atualizar botões
-            const prevBtn = document.getElementById('prevTabBtn');
-            const nextBtn = document.getElementById('nextTabBtn');
-            const submitBtn = document.getElementById('multplusSubmitBtn');
-
-            prevBtn.style.display = currentTab !== 'config' ? 'flex' : 'none';
-            nextBtn.style.display = currentTab !== 'preview' ? 'flex' : 'none';
-            submitBtn.style.display = currentTab === 'preview' ? 'flex' : 'none';
-        }
-
-        function validateCurrentTab() {
-            const currentTabElement = document.querySelector(`[data-tab="${currentTab}"]`);
-            const requiredInputs = currentTabElement.querySelectorAll('input[required], select[required]');
-            
-            let isValid = true;
-            requiredInputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    showInputError(input, 'Este campo é obrigatório');
-                } else {
-                    clearInputError(input);
-                }
-            });
-
-            return isValid;
-        }
-
-        // Funções de validação removidas - modal não disponível
-
-        // Event listeners para tabs
-        document.addEventListener('DOMContentLoaded', function() {
-            // Tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const tab = this.getAttribute('data-tab');
-                    currentTab = tab;
-                    updateTabDisplay();
-                });
-            });
-
-            // Step buttons
-            document.querySelectorAll('.step').forEach(step => {
-                step.addEventListener('click', function() {
-                    const stepNumber = parseInt(this.getAttribute('data-step'));
-                    if (stepNumber <= currentStep || validateCurrentStep()) {
-                        currentStep = stepNumber;
-                        updateStepDisplay();
-                    }
-                });
-            });
-
-            // Duration change
-            const eventDuration = document.getElementById('eventDuration');
-            if (eventDuration) {
-                eventDuration.addEventListener('change', function() {
-                    const customGroup = document.getElementById('customDurationGroup');
-                    if (this.value === 'custom') {
-                        customGroup.style.display = 'block';
-                    } else {
-                        customGroup.style.display = 'none';
-                    }
-                });
-            }
-        });
-
-        async function handleMultplusSubmit() {
-            const title = document.getElementById('multplusTitle').value;
-            const startDate = document.getElementById('multplusStartDate').value;
-            const endDate = document.getElementById('multplusEndDate').value;
-            const frequency = document.getElementById('multplusFrequency').value;
-            const times = Array.from(document.querySelectorAll('.multplus-time')).map(input => input.value);
-            const durations = Array.from(document.querySelectorAll('.multplus-duration')).map(input => input.value);
-            
-            const events = generateEventsList(title, startDate, endDate, frequency, times, durations);
-            
-            if (events.length === 0) {
-                showToast('Nenhum evento para criar', 'error');
-                return;
-            }
-            
-            try {
-                const btn = document.querySelector('#multplusForm button[type="submit"]');
-                const original = btn ? btn.innerHTML : '';
-                if (btn) { 
-                    btn.disabled = true; 
-                    btn.innerHTML = '<span style="width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .9s linear infinite"></span>&nbsp;&nbsp;Criando eventos...'; 
-                }
-                
-                // Criar eventos em lote
-                const promises = events.map(event => {
-                    const formData = new FormData();
-                    formData.append('titulo', event.title);
-                    formData.append('data', event.date);
-                    formData.append('hora', event.time);
-                    formData.append('duracao', event.duration);
-                    formData.append('local', event.location || '');
-                    formData.append('descricao', event.description || '');
-                    formData.append('comunidade_id', document.getElementById('multplusCommunity').value);
-                    
-                    return window.api.post(window.endpoints.agenda.create, formData);
-                });
-                
-                const results = await Promise.all(promises);
-                const errors = results.filter(r => r.error);
-                
-                if (errors.length > 0) {
-                    throw new Error(`${errors.length} eventos falharam ao ser criados`);
-                }
-                
-                showToast(`${events.length} eventos criados com sucesso!`, 'success');
-                closeMultplusModal();
-                
-                // Recarregar eventos
-                await loadEventsFromApi();
-                filterEventsByCommunity();
-                
-                // Atualizar visualização do calendário
-                renderCalendar();
-                updateMiniCalendar();
-                updateRecentAppointments();
-                
-            } catch (err) {
-                console.error('Erro ao criar eventos:', err);
-                showToast('Erro ao criar eventos: ' + err.message, 'error');
-            } finally {
-                const btn = document.querySelector('#multplusForm button[type="submit"]');
-                if (btn) { 
-                    btn.disabled = false; 
-                    btn.innerHTML = '<i class="fas fa-save"></i> Criar Eventos'; 
-                }
-            }
-        }
 
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
@@ -5403,7 +5300,6 @@
                 // Adicionar click para criar evento
                 daySlot.addEventListener('click', (e) => {
                     if (e.target === daySlot) {
-                        console.log('Modal de novo agendamento não está disponível');
                     }
                 });
 
@@ -5424,6 +5320,45 @@
             }
         `;
         document.head.appendChild(style);
+
+        // Função para toggle da sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('leftSidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                toggle.innerHTML = '<i class="fas fa-bars"></i>';
+            } else {
+                sidebar.classList.add('open');
+                toggle.innerHTML = '<i class="fas fa-times"></i>';
+            }
+        }
+
+        // Fechar sidebar ao clicar fora dela em mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('leftSidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target) &&
+                sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                toggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
+
+        // Ajustar sidebar ao redimensionar a janela
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('leftSidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('open');
+                toggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
     </script>
 </body>
 </html>
