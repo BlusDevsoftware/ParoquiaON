@@ -2059,6 +2059,33 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
 
+        /* Evento truncado (que vai além das 22h) */
+        .event-block.event-truncated {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-block.event-truncated::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+            border-radius: 0 0 4px 4px;
+        }
+
+        .event-block.event-truncated::before {
+            content: '...';
+            position: absolute;
+            bottom: 2px;
+            right: 4px;
+            font-size: 10px;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
         /* Estilo padrão para todos os eventos */
         .event-block {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -3341,8 +3368,29 @@
                         const startMinutes = startTime.getMinutes();
                         const durationMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
                         
-                        eventElement.style.top = `${(startMinutes / 60) * 100}%`;
-                        eventElement.style.height = `${(durationMinutes / 60) * 100}%`;
+                        // Calcular posição vertical (baseada nos minutos da hora)
+                        const topPosition = (startMinutes / 60) * 100;
+                        
+                        // Calcular altura máxima permitida (até o final do calendário - 22h)
+                        const endHour = endTime.getHours();
+                        const endMinutes = endTime.getMinutes();
+                        
+                        // Se o evento termina após as 22h, limitar até 22:00
+                        let maxHeight = (durationMinutes / 60) * 100;
+                        
+                        if (endHour > 22 || (endHour === 22 && endMinutes > 0)) {
+                            // Calcular altura máxima até 22:00
+                            const maxEndTime = new Date(startTime);
+                            maxEndTime.setHours(22, 0, 0, 0);
+                            const maxDurationMinutes = (maxEndTime.getTime() - startTime.getTime()) / (1000 * 60);
+                            maxHeight = (maxDurationMinutes / 60) * 100;
+                            
+                            // Adicionar indicador visual de que o evento continua
+                            eventElement.classList.add('event-truncated');
+                        }
+                        
+                        eventElement.style.top = `${topPosition}%`;
+                        eventElement.style.height = `${maxHeight}%`;
                         
                         eventElement.addEventListener('click', (e) => {
                             e.stopPropagation();
