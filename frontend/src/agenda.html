@@ -1667,6 +1667,71 @@
             transform: scale(0.95);
         }
 
+        /* Estilos para múltiplos horários */
+        .time-slots-container {
+            margin-bottom: 15px;
+        }
+
+        .time-slot {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+            position: relative;
+        }
+
+        .time-slot:first-child {
+            background: #fff;
+            border-color: #1976d2;
+        }
+
+        .time-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 50px;
+        }
+
+        .btn-remove-time {
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+        }
+
+        .btn-remove-time:hover {
+            background: #d32f2f;
+            transform: scale(1.05);
+        }
+
+        .btn-add-time {
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add-time:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+
         .info-today-btn {
             background: #1976d2;
             color: white;
@@ -4934,8 +4999,7 @@
                 const fields = [
                     'eventTitle', 'eventCommunity', 'eventPastoral', 'eventPilares',
                     'eventLocation', 'eventAcao', 'eventObjetivo', 'eventDateStart',
-                    'eventTimeStart', 'eventDateEnd', 'eventTimeEnd', 'eventStatus',
-                    'eventVisibility', 'eventReminder', 'eventCapacity'
+                    'eventStatus', 'eventVisibility', 'eventReminder', 'eventCapacity'
                 ];
                 
                 fields.forEach(fieldId => {
@@ -4944,6 +5008,22 @@
                         field.value = '';
                     }
                 });
+
+                // Limpar múltiplos horários - manter apenas o primeiro
+                const container = document.getElementById('timeSlotsContainer');
+                if (container) {
+                    const timeSlots = container.querySelectorAll('.time-slot');
+                    // Remover todos os slots exceto o primeiro
+                    for (let i = timeSlots.length - 1; i > 0; i--) {
+                        timeSlots[i].remove();
+                    }
+                    // Limpar o primeiro slot
+                    const firstSlot = container.querySelector('.time-slot');
+                    if (firstSlot) {
+                        const inputs = firstSlot.querySelectorAll('input[type="time"]');
+                        inputs.forEach(input => input.value = '');
+                    }
+                }
                 
                 // Limpar checkbox
                 const checkbox = document.getElementById('eventParoquial');
@@ -4966,6 +5046,24 @@
             console.log('💾 Processando formulário de novo agendamento...');
             
             // Coletar dados do formulário
+            const dataInicio = document.getElementById('eventDateStart').value;
+            
+            // Coletar múltiplos horários
+            const timeSlots = document.querySelectorAll('.time-slot');
+            const horarios = [];
+            
+            timeSlots.forEach((slot, index) => {
+                const horaInicio = slot.querySelector('input[name="hora_inicio[]"]').value;
+                const horaFim = slot.querySelector('input[name="hora_fim[]"]').value;
+                
+                if (horaInicio && horaFim) {
+                    horarios.push({
+                        horaInicio: horaInicio,
+                        horaFim: horaFim
+                    });
+                }
+            });
+
             const formData = {
                 titulo: document.getElementById('eventTitle').value,
                 comunidade: document.getElementById('eventCommunity').value,
@@ -4974,10 +5072,8 @@
                 local: document.getElementById('eventLocation').value,
                 acao: document.getElementById('eventAcao').value,
                 objetivo: document.getElementById('eventObjetivo').value,
-                dataInicio: document.getElementById('eventDateStart').value,
-                horaInicio: document.getElementById('eventTimeStart').value,
-                dataFim: document.getElementById('eventDateStart').value, // Usar mesma data para fim
-                horaFim: document.getElementById('eventTimeEnd').value,
+                dataInicio: dataInicio,
+                horarios: horarios, // Array de horários
                 eventoParoquial: document.getElementById('eventParoquial').checked,
                 status: 'agendado', // Status padrão
                 visibilidade: 'publico', // Visibilidade padrão
@@ -4987,70 +5083,88 @@
             
             // Validação básica
             if (!formData.titulo || !formData.comunidade || !formData.pastoral || !formData.pilares || 
-                !formData.local || !formData.acao || !formData.dataInicio || !formData.horaInicio || 
-                !formData.horaFim) {
-                showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
+                !formData.local || !formData.acao || !formData.dataInicio || horarios.length === 0) {
+                showToast('Por favor, preencha todos os campos obrigatórios e adicione pelo menos um horário.', 'error');
                 return;
+            }
+
+            // Validar horários
+            for (let i = 0; i < horarios.length; i++) {
+                const horario = horarios[i];
+                if (!horario.horaInicio || !horario.horaFim) {
+                    showToast(`Por favor, preencha os horários do slot ${i + 1}.`, 'error');
+                    return;
+                }
+                if (horario.horaInicio >= horario.horaFim) {
+                    showToast(`O horário de início deve ser anterior ao horário de fim no slot ${i + 1}.`, 'error');
+                    return;
+                }
             }
             
-            // Validar se data de fim é posterior à data de início
-            const dataInicio = new Date(formData.dataInicio + ' ' + formData.horaInicio);
-            const dataFim = new Date(formData.dataFim + ' ' + formData.horaFim);
-            if (dataFim <= dataInicio) {
-                showToast('A data e hora de fim devem ser posteriores à data e hora de início.', 'error');
-                return;
-            }
             
             // Validar se a data não é no passado
             const now = new Date();
-            if (dataInicio < now) {
-                showToast('A data e hora de início do evento não podem ser no passado.', 'error');
+            const dataInicioEvento = new Date(formData.dataInicio);
+            if (dataInicioEvento < now.setHours(0, 0, 0, 0)) {
+                showToast('A data do evento não pode ser no passado.', 'error');
                 return;
             }
             
             console.log('📋 Dados do evento:', formData);
             
             try {
-                // Preparar dados para a API
-                const eventData = {
-                    titulo: formData.titulo,
-                    objetivo: formData.objetivo || '',
-                    data_inicio: new Date(formData.dataInicio + ' ' + formData.horaInicio).toISOString(),
-                    data_fim: new Date(formData.dataFim + ' ' + formData.horaFim).toISOString(),
-                    local_id: parseInt(formData.local),
-                    acao_id: parseInt(formData.acao),
-                    responsavel_id: null, // Pode ser implementado depois
-                    comunidade_id: parseInt(formData.comunidade),
-                    pastoral_id: parseInt(formData.pastoral),
-                    pilar_id: parseInt(formData.pilares),
-                    status_id: getStatusIdByName(formData.status) || 1,
-                    evento_paroquial: formData.eventoParoquial || false,
-                    visibilidade: formData.visibilidade || 'Publico',
-                    lembrete: formData.lembrete || 'Nenhum',
-                    capacidade: formData.capacidade ? parseInt(formData.capacidade) : null
-                };
+                // Criar múltiplos eventos para cada horário
+                const eventos = horarios.map((horario, index) => {
+                    const tituloComHorario = horarios.length > 1 ? 
+                        `${formData.titulo} (${horario.horaInicio} - ${horario.horaFim})` : 
+                        formData.titulo;
+                    
+                    return {
+                        titulo: tituloComHorario,
+                        objetivo: formData.objetivo || '',
+                        data_inicio: new Date(formData.dataInicio + ' ' + horario.horaInicio).toISOString(),
+                        data_fim: new Date(formData.dataInicio + ' ' + horario.horaFim).toISOString(),
+                        local_id: parseInt(formData.local),
+                        acao_id: parseInt(formData.acao),
+                        responsavel_id: null, // Pode ser implementado depois
+                        comunidade_id: parseInt(formData.comunidade),
+                        pastoral_id: parseInt(formData.pastoral),
+                        pilar_id: parseInt(formData.pilares),
+                        status_id: getStatusIdByName(formData.status) || 1,
+                        evento_paroquial: formData.eventoParoquial || false,
+                        visibilidade: formData.visibilidade || 'Publico',
+                        lembrete: formData.lembrete || 'Nenhum',
+                        capacidade: formData.capacidade ? parseInt(formData.capacidade) : null
+                    };
+                });
                 
                 // Validar se os IDs são válidos
                 console.log('🔍 Validação dos IDs:', {
-                    local_id: eventData.local_id,
-                    acao_id: eventData.acao_id,
-                    comunidade_id: eventData.comunidade_id,
-                    pastoral_id: eventData.pastoral_id,
-                    pilar_id: eventData.pilar_id
+                    local_id: eventos[0].local_id,
+                    acao_id: eventos[0].acao_id,
+                    comunidade_id: eventos[0].comunidade_id,
+                    pastoral_id: eventos[0].pastoral_id,
+                    pilar_id: eventos[0].pilar_id
                 });
                 
-                console.log('🚀 Enviando evento para API:', eventData);
-                console.log('🔍 Dados detalhados:', JSON.stringify(eventData, null, 2));
+                console.log('🚀 Enviando eventos para API:', eventos);
+                console.log('🔍 Dados detalhados:', JSON.stringify(eventos, null, 2));
                 
-                // Salvar evento na API
-                const { data, error } = await window.api.post(window.endpoints.agenda.create, eventData);
-                
-                if (error) {
-                    throw error;
+                // Salvar múltiplos eventos na API
+                const resultados = [];
+                for (const evento of eventos) {
+                    const { data, error } = await window.api.post(window.endpoints.agenda.create, evento);
+                    if (error) {
+                        throw error;
+                    }
+                    resultados.push(data);
                 }
                 
-                console.log('✅ Evento criado com sucesso:', data);
-                showToast('Evento criado com sucesso!', 'success');
+                console.log('✅ Eventos criados com sucesso:', resultados);
+                const mensagem = eventos.length > 1 ? 
+                    `${eventos.length} eventos criados com sucesso!` : 
+                    'Evento criado com sucesso!';
+                showToast(mensagem, 'success');
                 
                 // Limpar formulário
                 clearEventForm();
@@ -5731,6 +5845,85 @@
             window.reloadCustomSelects = reloadCustomSelects;
 
             window.loadEventsFromApi = loadEventsFromApi;
+
+            // Funções para múltiplos horários
+            window.addTimeSlot = function() {
+                const container = document.getElementById('timeSlotsContainer');
+                const timeSlots = container.querySelectorAll('.time-slot');
+                const newSlotIndex = timeSlots.length;
+                
+                const newSlot = document.createElement('div');
+                newSlot.className = 'time-slot';
+                newSlot.setAttribute('data-slot', newSlotIndex);
+                
+                newSlot.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group time-group">
+                            <label>De: *</label>
+                            <input type="time" name="hora_inicio[]" required>
+                        </div>
+                        <div class="form-group time-group">
+                            <label>Até: *</label>
+                            <input type="time" name="hora_fim[]" required>
+                        </div>
+                        <div class="form-group time-actions">
+                            <button type="button" class="btn-remove-time">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(newSlot);
+                
+                // Mostrar botões de remover em todos os slots
+                updateRemoveButtons();
+                
+                // Adicionar evento de remoção
+                const removeBtn = newSlot.querySelector('.btn-remove-time');
+                removeBtn.addEventListener('click', function() {
+                    removeTimeSlot(newSlotIndex);
+                });
+            };
+
+            window.removeTimeSlot = function(slotIndex) {
+                const container = document.getElementById('timeSlotsContainer');
+                const timeSlots = container.querySelectorAll('.time-slot');
+                
+                if (timeSlots.length <= 1) {
+                    alert('É necessário pelo menos um horário.');
+                    return;
+                }
+                
+                const slotToRemove = container.querySelector(`[data-slot="${slotIndex}"]`);
+                if (slotToRemove) {
+                    slotToRemove.remove();
+                    updateRemoveButtons();
+                }
+            };
+
+            window.updateRemoveButtons = function() {
+                const container = document.getElementById('timeSlotsContainer');
+                const timeSlots = container.querySelectorAll('.time-slot');
+                const removeButtons = container.querySelectorAll('.btn-remove-time');
+                
+                // Mostrar/ocultar botões de remoção baseado na quantidade de slots
+                removeButtons.forEach((btn, index) => {
+                    if (timeSlots.length > 1) {
+                        btn.style.display = 'flex';
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                });
+            };
+
+            // Adicionar evento ao botão de adicionar horário
+            setTimeout(() => {
+                const addTimeBtn = document.getElementById('btnAddTime');
+                if (addTimeBtn) {
+                    addTimeBtn.addEventListener('click', window.addTimeSlot);
+                }
+            }, 100);
 
             console.log('✅ Scripts dos modais executados com sucesso');
         }

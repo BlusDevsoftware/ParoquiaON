@@ -82,19 +82,32 @@
                             <label>Data do evento: *</label>
                             <input type="date" id="eventDateStart" name="data_inicio" required>
                         </div>
-                        <div class="form-group time-group">
-                            <label>De: *</label>
-                            <input type="time" id="eventTimeStart" name="hora_inicio" required>
-                        </div>
-                        <div class="form-group time-group">
-                            <label>Até: *</label>
-                            <input type="time" id="eventTimeEnd" name="hora_fim" required>
+                    </div>
+
+                    <!-- Container para horários -->
+                    <div class="time-slots-container" id="timeSlotsContainer">
+                        <div class="time-slot" data-slot="0">
+                            <div class="form-row">
+                                <div class="form-group time-group">
+                                    <label>De: *</label>
+                                    <input type="time" name="hora_inicio[]" required>
+                                </div>
+                                <div class="form-group time-group">
+                                    <label>Até: *</label>
+                                    <input type="time" name="hora_fim[]" required>
+                                </div>
+                                <div class="form-group time-actions">
+                                    <button type="button" class="btn-remove-time" style="display: none;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="form-row button-row">
-                        <button type="button" class="btn-add-time">
-                            <i class="fas fa-plus"></i> Horário
+                        <button type="button" class="btn-add-time" id="btnAddTime">
+                            <i class="fas fa-plus"></i> Adicionar Horário
                         </button>
                         <button type="button" class="btn-repeat-appointment">
                             Repetir evento
