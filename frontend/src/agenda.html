@@ -3374,10 +3374,16 @@
             const weekEnd = new Date(weekStart);
             weekEnd.setDate(weekStart.getDate() + 6);
             
+            // Debug: verificar se estamos na semana atual
+            console.log('Data atual:', now.toDateString());
+            console.log('Semana atual:', weekStart.toDateString(), 'a', weekEnd.toDateString());
+            
             if (now >= weekStart && now <= weekEnd) {
                 // Calcular posição da linha
                 const currentHour = now.getHours();
                 const currentMinute = now.getMinutes();
+                
+                console.log('Hora atual:', currentHour + ':' + currentMinute);
                 
                 // Verificar se está dentro do horário do calendário (6h - 22h)
                 if (currentHour >= 6 && currentHour <= 22) {
@@ -3389,31 +3395,44 @@
                     const totalHours = 17; // 6h às 22h = 17 horas
                     const positionPercent = (totalMinutes / (totalHours * 60)) * 100;
                     
+                    console.log('Posição vertical:', positionPercent + '%');
+                    
                     timeLine.style.top = `${positionPercent}%`;
                     
                     // Calcular qual coluna do dia (0-6)
                     const dayOfWeek = now.getDay();
-                    const daySlotIndex = dayOfWeek + 1; // +1 porque a primeira coluna é de horas
+                    console.log('Dia da semana:', dayOfWeek);
                     
-                    // Encontrar o slot do dia de hoje
+                    // Encontrar o slot do dia de hoje - corrigir lógica
                     const daySlots = calendarBody.querySelectorAll('.day-slot');
-                    let targetSlot = null;
-                    let slotIndex = 0;
+                    console.log('Total de day-slots:', daySlots.length);
                     
-                    for (let i = 0; i < daySlots.length; i++) {
-                        if (slotIndex === daySlotIndex) {
-                            targetSlot = daySlots[i];
-                            break;
-                        }
-                        slotIndex++;
-                        if (slotIndex > 6) slotIndex = 0;
-                    }
+                    // A lógica anterior estava incorreta. Vamos encontrar o slot correto
+                    // Os slots são organizados por linha (hora) e coluna (dia)
+                    // Para cada hora, temos 7 slots (um para cada dia)
+                    // Precisamos encontrar o slot da linha atual (hora atual) e coluna do dia
+                    const currentHourIndex = currentHour - 6; // Índice da hora atual (0-16)
+                    
+                    // Calcular índice do slot: (hora * 7) + dia
+                    const slotIndex = (currentHourIndex * 7) + dayOfWeek;
+                    const targetSlot = daySlots[slotIndex];
+                    
+                    console.log('Índice da hora:', currentHourIndex);
+                    console.log('Índice do slot:', slotIndex);
+                    console.log('Slot encontrado:', targetSlot);
                     
                     if (targetSlot) {
                         targetSlot.style.position = 'relative';
                         targetSlot.appendChild(timeLine);
+                        console.log('Linha de tempo adicionada!');
+                    } else {
+                        console.log('Slot não encontrado!');
                     }
+                } else {
+                    console.log('Fora do horário do calendário (6h-22h)');
                 }
+            } else {
+                console.log('Hoje não está na semana atual');
             }
         }
 
