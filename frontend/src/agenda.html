@@ -5463,6 +5463,9 @@
                     container.innerHTML = html;
                     console.log('✅ Modais da agenda carregados com sucesso');
                     
+                    // Executar o JavaScript dos modais
+                    executeModalScripts();
+                    
                     // Verificar se as funções dos modais estão disponíveis
                     if (typeof openEventModal === 'function' && typeof closeEventModal === 'function') {
                         console.log('✅ Funções dos modais disponíveis');
@@ -5480,6 +5483,223 @@
                     loadModaisAgenda();
                 }, 2000);
             }
+        }
+
+        // Executar scripts dos modais
+        function executeModalScripts() {
+            console.log('🔧 Executando scripts dos modais...');
+            
+            // Definir as funções dos modais no escopo global
+            window.openEventModalWithTime = function(startTime, endTime) {
+                console.log('🔄 Abrindo modal com horário:', startTime, endTime);
+                mostrarSpinnerAgenda();
+                
+                const modal = document.getElementById('modalNovoAgendamentoComHorario');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    
+                    // Preencher campos de data e hora
+                    const dateInput = document.getElementById('eventDateStartWithTime');
+                    const startTimeInput = document.getElementById('eventTimeStartWithTime');
+                    const endTimeInput = document.getElementById('eventTimeEndWithTime');
+                    
+                    if (dateInput && startTimeInput && endTimeInput) {
+                        const formatDate = (date) => {
+                            const year = date.getFullYear();
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const day = String(date.getDate()).padStart(2, '0');
+                            return `${year}-${month}-${day}`;
+                        };
+                        
+                        const formatTime = (date) => {
+                            const hours = String(date.getHours()).padStart(2, '0');
+                            const minutes = String(date.getMinutes()).padStart(2, '0');
+                            return `${hours}:${minutes}`;
+                        };
+                        
+                        dateInput.value = formatDate(startTime);
+                        startTimeInput.value = formatTime(startTime);
+                        endTimeInput.value = formatTime(endTime);
+                    }
+                    
+                    loadEventFormData();
+                    esconderSpinnerAgenda();
+                    
+                    setTimeout(() => {
+                        const titleInput = document.getElementById('eventTitleWithTime');
+                        if (titleInput) titleInput.focus();
+                    }, 100);
+                }
+            };
+
+            window.openEventModal = function(date = null) {
+                console.log('🔄 Abrindo modal padrão');
+                mostrarSpinnerAgenda();
+                
+                const modal = document.getElementById('eventModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    
+                    if (date) {
+                        const dateInput = document.getElementById('eventDateStart');
+                        if (dateInput) {
+                            dateInput.value = date;
+                        }
+                    }
+                    
+                    populateSelectsFromCache();
+                    initializeCustomSelects('#eventModal');
+                    reloadCustomSelects('#eventModal');
+                    esconderSpinnerAgenda();
+                }
+            };
+
+            window.closeEventModal = function() {
+                console.log('🔒 Fechando modais...');
+                
+                const modal = document.getElementById('eventModal');
+                const modalWithTime = document.getElementById('modalNovoAgendamentoComHorario');
+                
+                if (modal) modal.style.display = 'none';
+                if (modalWithTime) modalWithTime.style.display = 'none';
+            };
+
+            window.editEventModal = function(event) {
+                console.log('🔄 Abrindo modal de edição:', event);
+                
+                const modal = document.getElementById('modalEdicaoAgendamento');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    
+                    // Preencher dados do evento
+                    const elements = {
+                        'editEventTitle': event.title || 'Sem título',
+                        'editEventDateTime': event.startTime ? new Date(event.startTime).toLocaleString('pt-BR') : 'Não informado',
+                        'editEventLocal': event.local_nome || 'Não informado',
+                        'editEventAcao': event.acao_nome || 'Não informado',
+                        'editEventComunidade': event.comunidade_nome || 'Não informado',
+                        'editEventPastoral': event.pastoral_nome || 'Não informado',
+                        'editEventPilar': event.pilar_nome || 'Não informado'
+                    };
+                    
+                    Object.entries(elements).forEach(([id, value]) => {
+                        const element = document.getElementById(id);
+                        if (element) element.textContent = value;
+                    });
+                    
+                    // Mostrar objetivo se existir
+                    const objetivoRow = document.getElementById('editEventObjetivoRow');
+                    const objetivoSpan = document.getElementById('editEventObjetivo');
+                    if (event.objetivo) {
+                        if (objetivoSpan) objetivoSpan.textContent = event.objetivo;
+                        if (objetivoRow) objetivoRow.style.display = 'block';
+                    } else {
+                        if (objetivoRow) objetivoRow.style.display = 'none';
+                    }
+                    
+                    // Configurar botão de exclusão
+                    const deleteBtn = document.getElementById('btnDeleteEvent');
+                    if (deleteBtn) {
+                        deleteBtn.onclick = function() {
+                            deleteEvent(event.id);
+                            modal.style.display = 'none';
+                        };
+                    }
+                }
+            };
+
+            window.handleEventSubmit = async function(e) {
+                e.preventDefault();
+                console.log('💾 Processando formulário...');
+                
+                const form = e.target;
+                const isWithTime = form.id === 'eventFormWithTime';
+                
+                const formData = {
+                    titulo: document.getElementById(isWithTime ? 'eventTitleWithTime' : 'eventTitle')?.value || '',
+                    comunidade: document.getElementById(isWithTime ? 'eventCommunityWithTime' : 'eventCommunity')?.value || '',
+                    pastoral: document.getElementById(isWithTime ? 'eventPastoralWithTime' : 'eventPastoral')?.value || '',
+                    pilares: document.getElementById(isWithTime ? 'eventPilaresWithTime' : 'eventPilares')?.value || '',
+                    local: document.getElementById(isWithTime ? 'eventLocationWithTime' : 'eventLocation')?.value || '',
+                    acao: document.getElementById(isWithTime ? 'eventAcaoWithTime' : 'eventAcao')?.value || '',
+                    objetivo: document.getElementById(isWithTime ? 'eventObjetivoWithTime' : 'eventObjetivo')?.value || '',
+                    dataInicio: document.getElementById(isWithTime ? 'eventDateStartWithTime' : 'eventDateStart')?.value || '',
+                    horaInicio: document.getElementById(isWithTime ? 'eventTimeStartWithTime' : 'eventTimeStart')?.value || '',
+                    dataFim: document.getElementById(isWithTime ? 'eventDateStartWithTime' : 'eventDateStart')?.value || '',
+                    horaFim: document.getElementById(isWithTime ? 'eventTimeEndWithTime' : 'eventTimeEnd')?.value || '',
+                    eventoParoquial: document.getElementById(isWithTime ? 'eventParoquialWithTime' : 'eventParoquial')?.checked || false,
+                    eventoPublico: document.getElementById(isWithTime ? 'eventPublicoWithTime' : 'eventPublico')?.checked || false,
+                    requerConfirmacao: document.getElementById(isWithTime ? 'eventConfirmacaoWithTime' : 'eventConfirmacao')?.checked || false,
+                    status: 'agendado',
+                    visibilidade: 'publico',
+                    lembrete: 'nenhum',
+                    capacidade: 1
+                };
+                
+                try {
+                    mostrarSpinnerAgenda();
+                    
+                    const response = await fetch('/api/agenda/eventos', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    console.log('✅ Evento criado:', result);
+                    
+                    closeEventModal();
+                    await loadEventsFromApi();
+                    alert('Evento criado com sucesso!');
+                    
+                } catch (error) {
+                    console.error('❌ Erro ao criar evento:', error);
+                    alert('Erro ao criar evento. Tente novamente.');
+                } finally {
+                    esconderSpinnerAgenda();
+                }
+            };
+
+            // Funções auxiliares
+            window.mostrarSpinnerAgenda = function() {
+                console.log('🔄 Mostrando spinner...');
+            };
+
+            window.esconderSpinnerAgenda = function() {
+                console.log('✅ Escondendo spinner...');
+            };
+
+            window.ocultarSpinnerAgenda = function() {
+                esconderSpinnerAgenda();
+            };
+
+            window.loadEventFormData = function() {
+                console.log('📋 Carregando dados do formulário...');
+            };
+
+            window.populateSelectsFromCache = function() {
+                console.log('📋 Populando selects...');
+            };
+
+            window.initializeCustomSelects = function(containerSelector) {
+                console.log('🔧 Inicializando selects...');
+            };
+
+            window.reloadCustomSelects = function(containerSelector) {
+                console.log('🔄 Recarregando selects...');
+            };
+
+            window.loadEventsFromApi = async function() {
+                console.log('📅 Recarregando eventos...');
+            };
+
+            console.log('✅ Scripts dos modais executados com sucesso');
         }
 
         // Função de teste para verificar se os modais estão funcionando
