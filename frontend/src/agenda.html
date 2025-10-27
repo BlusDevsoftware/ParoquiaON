@@ -3774,34 +3774,23 @@
             const calendarBody = document.getElementById('calendarBody');
             const now = new Date();
             
-            // Usar componentes diretos (sem conversões)
-            const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth();
-            const currentDay = currentDate.getDate();
-            const currentDayOfWeek = currentDate.getDay();
-            
-            const nowYear = now.getFullYear();
-            const nowMonth = now.getMonth();
-            const nowDay = now.getDate();
-            
-            // Calcular início da semana usando apenas matemática
-            const weekStartDay = currentDay - currentDayOfWeek;
-            const weekEndDay = weekStartDay + 6;
+            // Calcular início da semana usando objetos Date
+            const weekStart = new Date(currentDate);
+            weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
             
             // Debug: verificar se estamos na semana atual
-            console.log('Data atual:', nowYear, nowMonth + 1, nowDay);
-            console.log('Semana atual:', weekStartDay, 'a', weekEndDay);
+            console.log('Data atual:', now.toDateString());
+            console.log('Semana atual:', weekStart.toDateString(), 'a', weekEnd.toDateString());
             
-            // Comparar apenas números (sem objetos Date)
-            const isInCurrentWeek = nowYear === currentYear && 
-                                  nowMonth === currentMonth && 
-                                  nowDay >= weekStartDay && 
-                                  nowDay <= weekEndDay;
+            // Comparar usando objetos Date
+            const isInCurrentWeek = now >= weekStart && now <= weekEnd;
             
             console.log('Comparação de datas:', {
-                hoje: `${nowYear}-${nowMonth + 1}-${nowDay}`,
-                inicioSemana: `${currentYear}-${currentMonth + 1}-${weekStartDay}`,
-                fimSemana: `${currentYear}-${currentMonth + 1}-${weekEndDay}`,
+                hoje: now.toDateString(),
+                inicioSemana: weekStart.toDateString(),
+                fimSemana: weekEnd.toDateString(),
                 dentroDaSemana: isInCurrentWeek
             });
             
