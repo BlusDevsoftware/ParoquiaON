@@ -3616,8 +3616,8 @@
 
                 // Colunas dos dias
                 for (let day = 0; day < 7; day++) {
-                    const dayDate = new Date(weekStart);
-                    dayDate.setDate(weekStart.getDate() + day);
+                    // Criar data diretamente sem problemas de timezone
+                    const dayDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + day);
                     
                     const daySlot = document.createElement('div');
                     daySlot.className = 'day-slot';
@@ -3743,15 +3743,13 @@
                     daySlot.addEventListener('click', (e) => {
                         // Verificar se o clique foi diretamente no slot (não em um evento)
                         if (e.target === daySlot) {
-                            // Capturar data diretamente sem conversões
-                            const selectedDate = new Date(weekStart);
-                            selectedDate.setDate(weekStart.getDate() + day);
-                            
-                            console.log('📅 Data selecionada no calendário:', selectedDate.toDateString());
+                            // Usar a mesma data já criada (dayDate) que está sendo exibida
+                            console.log('📅 Data selecionada no calendário:', dayDate.toDateString());
                             console.log('🕐 Hora selecionada:', hour);
+                            console.log('📅 Data completa:', dayDate);
                             
                             // Criar evento para este horário específico
-                            createEventForTimeSlot(selectedDate, hour);
+                            createEventForTimeSlot(dayDate, hour);
                         }
                     });
                     
@@ -4142,13 +4140,13 @@
             console.log('🔧 createEventForTimeSlot - Data recebida:', selectedDate);
             console.log('🔧 createEventForTimeSlot - Hora recebida:', selectedHour);
             
-            // Usar a data exatamente como recebida, apenas adicionando o horário
-            const eventDate = new Date(selectedDate);
-            eventDate.setHours(selectedHour, 0, 0, 0);
+            // Criar datas usando os componentes diretos (sem conversões)
+            const year = selectedDate.getFullYear();
+            const month = selectedDate.getMonth();
+            const day = selectedDate.getDate();
             
-            // Calcular horário de fim (1 hora depois)
-            const endDate = new Date(selectedDate);
-            endDate.setHours(selectedHour + 1, 0, 0, 0);
+            const eventDate = new Date(year, month, day, selectedHour, 0, 0);
+            const endDate = new Date(year, month, day, selectedHour + 1, 0, 0);
             
             console.log('🔧 Data final do evento:', eventDate.toDateString(), eventDate.getHours() + 'h');
             console.log('🔧 Data final de fim:', endDate.toDateString(), endDate.getHours() + 'h');
