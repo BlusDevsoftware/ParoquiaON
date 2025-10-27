@@ -3584,15 +3584,23 @@
                 `;
             }
 
-            // Calcular início da semana (domingo = 0)
-            const weekStart = new Date(currentDate);
-            weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+            // Calcular início da semana (domingo = 0) - usando componentes locais
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth();
+            const currentDay = currentDate.getDate();
+            const currentDayOfWeek = currentDate.getDay();
+            
+            const weekStart = new Date(currentYear, currentMonth, currentDay - currentDayOfWeek);
+            
+            console.log('🔧 Debug semana:');
+            console.log('  - currentDate:', currentDate.toDateString());
+            console.log('  - currentYear:', currentYear, 'currentMonth:', currentMonth, 'currentDay:', currentDay, 'currentDayOfWeek:', currentDayOfWeek);
+            console.log('  - weekStart:', weekStart.toDateString());
 
             // Atualizar cabeçalhos dos dias
             const dayNames = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
             for (let i = 0; i < 7; i++) {
-                const dayDate = new Date(weekStart);
-                dayDate.setDate(weekStart.getDate() + i);
+                const dayDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + i);
                 const dayHeader = document.getElementById(`day${i}`);
                 
                 dayHeader.querySelector('.day-name').textContent = dayNames[i];
@@ -3618,6 +3626,12 @@
                 for (let day = 0; day < 7; day++) {
                     // Criar data diretamente sem problemas de timezone
                     const dayDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + day);
+                    
+                    if (day === 0) { // Log apenas para o primeiro dia para não poluir
+                        console.log('🔧 Debug calendário:');
+                        console.log('  - weekStart:', weekStart.toDateString());
+                        console.log('  - dayDate (dia 0):', dayDate.toDateString());
+                    }
                     
                     const daySlot = document.createElement('div');
                     daySlot.className = 'day-slot';
