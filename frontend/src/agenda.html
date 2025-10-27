@@ -3584,36 +3584,30 @@
                 `;
             }
 
-            // Calcular início da semana usando apenas strings (sem conversões de data)
-            const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth();
-            const currentDay = currentDate.getDate();
-            const currentDayOfWeek = currentDate.getDay();
+            // Calcular início da semana usando objetos Date (mais confiável)
+            const weekStart = new Date(currentDate);
+            weekStart.setDate(currentDate.getDate() - currentDate.getDay());
             
-            // Criar data de início da semana usando string
-            const weekStartDay = currentDay - currentDayOfWeek;
-            const weekStartString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(weekStartDay).padStart(2, '0')}`;
-            
-            console.log('🔧 Debug semana (corrigido):');
+            console.log('🔧 Debug semana (usando Date):');
             console.log('  - currentDate:', currentDate.toDateString());
-            console.log('  - currentDay:', currentDay, 'currentDayOfWeek:', currentDayOfWeek);
-            console.log('  - weekStartDay:', weekStartDay);
-            console.log('  - weekStartString:', weekStartString);
+            console.log('  - weekStart:', weekStart.toDateString());
 
-            // Atualizar cabeçalhos dos dias usando apenas strings
+            // Atualizar cabeçalhos dos dias
             const dayNames = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
             for (let i = 0; i < 7; i++) {
-                // Calcular dia usando apenas matemática (sem objetos Date)
-                const dayNumber = weekStartDay + i;
+                // Criar data para cada dia da semana
+                const dayDate = new Date(weekStart);
+                dayDate.setDate(weekStart.getDate() + i);
+                
                 const dayHeader = document.getElementById(`day${i}`);
                 
                 dayHeader.querySelector('.day-name').textContent = dayNames[i];
-                dayHeader.querySelector('.day-number').textContent = dayNumber;
+                dayHeader.querySelector('.day-number').textContent = dayDate.getDate();
                 
                 // Remover classe today de todos
                 dayHeader.classList.remove('today');
-                // Adicionar classe today se for hoje (comparando apenas números)
-                if (dayNumber === currentDay) {
+                // Adicionar classe today se for hoje
+                if (isToday(dayDate)) {
                     dayHeader.classList.add('today');
                 }
             }
@@ -3628,21 +3622,25 @@
 
                 // Colunas dos dias
                 for (let day = 0; day < 7; day++) {
-                    // Criar data usando apenas strings (sem objetos Date)
-                    const dayNumber = weekStartDay + day;
-                    const dayString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+                    // Criar data para cada dia da semana
+                    const dayDate = new Date(weekStart);
+                    dayDate.setDate(weekStart.getDate() + day);
+                    
+                    // Criar string da data
+                    const dayString = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, '0')}-${String(dayDate.getDate()).padStart(2, '0')}`;
                     
                     if (day === 0) { // Log apenas para o primeiro dia para não poluir
-                        console.log('🔧 Debug calendário (sem conversões):');
-                        console.log('  - weekStartString:', weekStartString);
+                        console.log('🔧 Debug calendário (usando Date):');
+                        console.log('  - weekStart:', weekStart.toDateString());
+                        console.log('  - dayDate (dia 0):', dayDate.toDateString());
                         console.log('  - dayString (dia 0):', dayString);
                     }
                     
                     const daySlot = document.createElement('div');
                     daySlot.className = 'day-slot';
                     
-                    // Verificar se é hoje comparando apenas números
-                    if (dayNumber === currentDay) {
+                    // Verificar se é hoje
+                    if (isToday(dayDate)) {
                         daySlot.classList.add('today');
                     }
                     
@@ -3754,13 +3752,13 @@
                     daySlot.addEventListener('click', (e) => {
                         // Verificar se o clique foi diretamente no slot (não em um evento)
                         if (e.target === daySlot) {
-                            // Usar a string da data que está sendo exibida
-                            console.log('📅 Data selecionada no calendário (string):', dayString);
+                            // Usar a data que está sendo exibida
+                            console.log('📅 Data selecionada no calendário:', dayDate.toDateString());
                             console.log('🕐 Hora selecionada:', hour);
-                            console.log('📅 Dia número:', dayNumber);
+                            console.log('📅 Data string:', dayString);
                             
-                            // Criar evento para este horário específico usando string
-                            createEventForTimeSlotByString(dayString, hour);
+                            // Criar evento para este horário específico
+                            createEventForTimeSlot(dayDate, hour);
                         }
                     });
                     
