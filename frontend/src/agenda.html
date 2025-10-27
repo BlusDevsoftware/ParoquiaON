@@ -6273,17 +6273,18 @@
                     return;
                 }
 
-                // Ordenar períodos por data e horário
+                // Ordenar períodos por data e horário (sem conversão de timezone)
                 periodsList.sort((a, b) => {
                     if (a.date !== b.date) {
-                        return new Date(a.date) - new Date(b.date);
+                        return a.date.localeCompare(b.date);
                     }
                     return a.startTime.localeCompare(b.startTime);
                 });
 
                 let html = '';
                 periodsList.forEach(period => {
-                    const formattedDate = new Date(period.date).toLocaleDateString('pt-BR');
+                    // Formatar data sem conversão de timezone
+                    const formattedDate = formatDateForDisplay(period.date);
                     const formattedStartTime = period.startTime;
                     const formattedEndTime = period.endTime;
                     
