@@ -4132,13 +4132,15 @@
         }
 
         function createEventForTimeSlot(selectedDate, selectedHour) {
-            // Criar uma data com o horário selecionado
-            const eventDate = new Date(selectedDate);
-            eventDate.setHours(selectedHour, 0, 0, 0);
+            // Criar uma data LOCAL com o horário selecionado (sem problemas de timezone)
+            const year = selectedDate.getFullYear();
+            const month = selectedDate.getMonth();
+            const day = selectedDate.getDate();
+            
+            const eventDate = new Date(year, month, day, selectedHour, 0, 0);
             
             // Calcular horário de fim (1 hora depois)
-            const endDate = new Date(eventDate);
-            endDate.setHours(selectedHour + 1, 0, 0, 0);
+            const endDate = new Date(year, month, day, selectedHour + 1, 0, 0);
             
             // Abrir modal com dados pré-preenchidos
             openEventModalWithTime(eventDate, endDate);
@@ -5863,30 +5865,18 @@
                 
                 // Preencher e adicionar período após o modal estar aberto
                 setTimeout(() => {
-                    // Criar data local para evitar problemas de timezone
-                    const localDate = (date) => {
-                        const year = date.getFullYear();
-                        const month = date.getMonth();
-                        const day = date.getDate();
-                        const hours = date.getHours();
-                        const minutes = date.getMinutes();
-                        return new Date(year, month, day, hours, minutes);
-                    };
-                    
                     // Formatar data corretamente (sem timezone issues)
                     const formatDate = (date) => {
-                        const d = localDate(date);
-                        const year = d.getFullYear();
-                        const month = String(d.getMonth() + 1).padStart(2, '0');
-                        const day = String(d.getDate()).padStart(2, '0');
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
                         return `${year}-${month}-${day}`;
                     };
                     
                     // Formatar hora corretamente
                     const formatTime = (date) => {
-                        const d = localDate(date);
-                        const hours = String(d.getHours()).padStart(2, '0');
-                        const minutes = String(d.getMinutes()).padStart(2, '0');
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
                         return `${hours}:${minutes}`;
                     };
                     
