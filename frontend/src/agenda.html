@@ -5921,20 +5921,20 @@
                     console.log('🔧 openEventModalWithTime - startTime recebido:', startTime);
                     console.log('🔧 openEventModalWithTime - endTime recebido:', endTime);
                     
-                    // Formatar data diretamente dos objetos Date recebidos
-                    const formatDate = (date) => {
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        return `${year}-${month}-${day}`;
-                    };
+                    // Extrair componentes das datas recebidas (sem conversões)
+                    const startYear = startTime.getFullYear();
+                    const startMonth = startTime.getMonth();
+                    const startDay = startTime.getDate();
+                    const startHour = startTime.getHours();
+                    const startMinute = startTime.getMinutes();
                     
-                    // Formatar hora diretamente dos objetos Date recebidos
-                    const formatTime = (date) => {
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                        return `${hours}:${minutes}`;
-                    };
+                    const endHour = endTime.getHours();
+                    const endMinute = endTime.getMinutes();
+                    
+                    // Criar strings diretamente dos componentes
+                    const dateString = `${startYear}-${String(startMonth + 1).padStart(2, '0')}-${String(startDay).padStart(2, '0')}`;
+                    const startTimeString = `${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
+                    const endTimeString = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
                     
                     const dateInput = document.getElementById('newPeriodDate');
                     const startTimeInput = document.getElementById('newPeriodStartTime');
@@ -5942,12 +5942,12 @@
                     
                     if (dateInput && startTimeInput && endTimeInput) {
                         // Preencher campos do formulário de período
-                        dateInput.value = formatDate(startTime);
-                        startTimeInput.value = formatTime(startTime);
-                        endTimeInput.value = formatTime(endTime);
+                        dateInput.value = dateString;
+                        startTimeInput.value = startTimeString;
+                        endTimeInput.value = endTimeString;
                         
-                        console.log('📅 Data formatada para input:', formatDate(startTime));
-                        console.log('🕐 Horários formatados:', formatTime(startTime), '-', formatTime(endTime));
+                        console.log('📅 Data string para input:', dateString);
+                        console.log('🕐 Horários string:', startTimeString, '-', endTimeString);
                         
                         // Adicionar período automaticamente
                         if (window.addPeriod) {
