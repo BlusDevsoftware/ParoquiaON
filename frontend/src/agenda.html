@@ -5858,34 +5858,44 @@
             window.openEventModalWithTime = function(startTime, endTime) {
                 console.log('🔄 Abrindo modal com horário:', startTime, endTime);
                 
-                // Usar o modal padrão com horário pré-definido
+                // Usar o modal padrão
                 openEventModal();
                 
-                // Preencher campos de data e hora após o modal estar aberto
+                // Preencher e adicionar período após o modal estar aberto
                 setTimeout(() => {
-                    const dateInput = document.getElementById('eventDateStart');
-                    const startTimeInput = document.getElementById('eventTimeStart');
-                    const endTimeInput = document.getElementById('eventTimeEnd');
+                    // Formatar data corretamente (sem timezone issues)
+                    const formatDate = (date) => {
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        return `${year}-${month}-${day}`;
+                    };
+                    
+                    // Formatar hora corretamente
+                    const formatTime = (date) => {
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        return `${hours}:${minutes}`;
+                    };
+                    
+                    const dateInput = document.getElementById('newPeriodDate');
+                    const startTimeInput = document.getElementById('newPeriodStartTime');
+                    const endTimeInput = document.getElementById('newPeriodEndTime');
                     
                     if (dateInput && startTimeInput && endTimeInput) {
-                        const formatDate = (date) => {
-                            const year = date.getFullYear();
-                            const month = String(date.getMonth() + 1).padStart(2, '0');
-                            const day = String(date.getDate()).padStart(2, '0');
-                            return `${year}-${month}-${day}`;
-                        };
-                        
-                        const formatTime = (date) => {
-                            const hours = String(date.getHours()).padStart(2, '0');
-                            const minutes = String(date.getMinutes()).padStart(2, '0');
-                            return `${hours}:${minutes}`;
-                        };
-                        
+                        // Preencher campos do formulário de período
                         dateInput.value = formatDate(startTime);
                         startTimeInput.value = formatTime(startTime);
                         endTimeInput.value = formatTime(endTime);
+                        
+                        // Adicionar período automaticamente
+                        if (window.addPeriod) {
+                            setTimeout(() => {
+                                window.addPeriod();
+                            }, 100);
+                        }
                     }
-                }, 200);
+                }, 300);
             };
 
             window.openEventModal = function(date = null) {
