@@ -3663,7 +3663,13 @@
                         let cleanTitle = event.title || 'Agendamento';
                         // Remover padrão antigo de horário no título: "Titulo (13:00 - 14:00)"
                         cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
-                        titleElement.textContent = cleanTitle;
+                        
+                        // Adicionar ícone de paroquial se for evento paroquial
+                        if (event.evento_paroquial || event.eventoParoquial) {
+                            titleElement.innerHTML = `<i class="fas fa-church" style="color: #1e3a8a; margin-right: 4px;"></i>${cleanTitle}`;
+                        } else {
+                            titleElement.textContent = cleanTitle;
+                        }
                         
                         // Elemento para data e hora
                         const datetimeElement = document.createElement('div');
