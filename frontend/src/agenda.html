@@ -1669,21 +1669,17 @@
 
         /* Estilos para múltiplos horários */
         .time-slots-container {
-            margin-bottom: 15px;
         }
 
         .time-slot {
-            border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 15px;
-            margin-bottom: 10px;
             background: #f9f9f9;
             position: relative;
         }
 
         .time-slot:first-child {
             background: #fff;
-            border-color: #1976d2;
         }
 
         .time-actions {
@@ -2046,12 +2042,13 @@
             background: #ffffff;
             border-collapse: separate;
             border-spacing: 0;
+            gap: 0;
+            row-gap: 0;
         }
 
         /* Scroll escondido no container central */
 
         .time-column {
-            border-right: 1px solid #e0e0e0;
         }
 
         .time-slot {
@@ -2060,12 +2057,13 @@
             text-align: center;
             font-size: 12px;
             color: #666;
-            border-bottom: 1px solid #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #ffffff;
-            border-right: 1px solid #e0e0e0;
+            margin: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
         }
 
         .day-column {
@@ -2948,10 +2946,16 @@
 
             .calendar-body {
                 min-height: 400px;
+                gap: 0 !important;
+                row-gap: 0 !important;
             }
 
             .time-slot, .day-slot {
                 height: 40px;
+                margin-bottom: 0 !important;
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
             }
         }
 
@@ -2987,6 +2991,10 @@
             .time-slot, .day-slot {
                 height: 30px;
                 font-size: 10px;
+                margin-bottom: 0 !important;
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
             }
 
             .event-block {
