@@ -4774,8 +4774,13 @@
 
             // Sincronizar mudanças simples
             dateInput.addEventListener('change', () => {
+                console.log('🔍 DEBUG - dateInput change event:', {
+                    dateInputValue: dateInput.value,
+                    timestamp: new Date().getTime()
+                });
                 const displayValue = dateInput.value ? formatDateForDisplay(dateInput.value) : '';
                 input.value = displayValue;
+                console.log('🔍 DEBUG - input.value atualizado:', input.value);
                 // Atualizar seleção no calendário
                 calendar.querySelectorAll('.calendar-day').forEach(day => {
                     day.classList.toggle('selected', day.dataset.date === dateInput.value);
@@ -5937,16 +5942,29 @@
                     const endTimeInput = document.getElementById('newPeriodEndTime');
                     
                     if (dateInput && startTimeInput && endTimeInput) {
+                        console.log('🔍 DEBUG - ANTES de preencher:', {
+                            dateInputValue: dateInput.value,
+                            dateInputDataset: dateInput.dataset.enhanced,
+                            dateString: dateString
+                        });
+                        
                         // Preencher campos do formulário de período
                         dateInput.value = dateString;
                         startTimeInput.value = startTimeString;
                         endTimeInput.value = endTimeString;
                         
+                        console.log('🔍 DEBUG - DEPOIS de preencher:', {
+                            dateInputValue: dateInput.value,
+                            dateInputDataset: dateInput.dataset.enhanced
+                        });
+                        
                         // Forçar atualização da interface do campo de data customizado
                         if (dateInput.dataset.enhanced === 'true') {
                             const displayInput = dateInput.previousElementSibling;
                             if (displayInput && displayInput.type === 'text') {
-                                displayInput.value = formatDateForDisplay(dateString);
+                                const displayValue = formatDateForDisplay(dateString);
+                                displayInput.value = displayValue;
+                                console.log('🔍 DEBUG - displayInput atualizado:', displayValue);
                             }
                         }
                         
