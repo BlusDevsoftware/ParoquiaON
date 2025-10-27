@@ -5863,18 +5863,30 @@
                 
                 // Preencher e adicionar período após o modal estar aberto
                 setTimeout(() => {
+                    // Criar data local para evitar problemas de timezone
+                    const localDate = (date) => {
+                        const year = date.getFullYear();
+                        const month = date.getMonth();
+                        const day = date.getDate();
+                        const hours = date.getHours();
+                        const minutes = date.getMinutes();
+                        return new Date(year, month, day, hours, minutes);
+                    };
+                    
                     // Formatar data corretamente (sem timezone issues)
                     const formatDate = (date) => {
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
+                        const d = localDate(date);
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
                         return `${year}-${month}-${day}`;
                     };
                     
                     // Formatar hora corretamente
                     const formatTime = (date) => {
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        const d = localDate(date);
+                        const hours = String(d.getHours()).padStart(2, '0');
+                        const minutes = String(d.getMinutes()).padStart(2, '0');
                         return `${hours}:${minutes}`;
                     };
                     
@@ -5887,6 +5899,9 @@
                         dateInput.value = formatDate(startTime);
                         startTimeInput.value = formatTime(startTime);
                         endTimeInput.value = formatTime(endTime);
+                        
+                        console.log('📅 Data selecionada:', formatDate(startTime));
+                        console.log('🕐 Horários:', formatTime(startTime), '-', formatTime(endTime));
                         
                         // Adicionar período automaticamente
                         if (window.addPeriod) {
