@@ -5217,9 +5217,6 @@
             e.preventDefault();
             console.log('💾 Processando formulário de novo agendamento...');
             
-            // Coletar dados do formulário
-            const dataInicio = document.getElementById('eventDateStart').value;
-            
             // Coletar múltiplos períodos
             const periods = getPeriodsData();
             
@@ -5228,23 +5225,27 @@
                 return;
             }
             
+            // Converter períodos para payload de horários
             const horarios = periods.map(period => ({
                 data: period.date,
                 hora_inicio: period.startTime,
                 hora_fim: period.endTime
             }));
+            
+            // A data de início geral será a data do primeiro período
+            const dataInicio = periods[0]?.date || '';
 
             const formData = {
-                titulo: document.getElementById('eventTitle').value,
-                comunidade: document.getElementById('eventCommunity').value,
-                pastoral: document.getElementById('eventPastoral').value,
-                pilares: document.getElementById('eventPilares').value,
-                local: document.getElementById('eventLocation').value,
-                acao: document.getElementById('eventAcao').value,
-                objetivo: document.getElementById('eventObjetivo').value,
+                titulo: document.getElementById('eventTitle')?.value || '',
+                comunidade: document.getElementById('eventCommunity')?.value || '',
+                pastoral: document.getElementById('eventPastoral')?.value || '',
+                pilares: document.getElementById('eventPilares')?.value || '',
+                local: document.getElementById('eventLocation')?.value || '',
+                acao: document.getElementById('eventAcao')?.value || '',
+                objetivo: document.getElementById('eventObjetivo')?.value || '',
                 dataInicio: dataInicio,
                 horarios: horarios, // Array de horários
-                eventoParoquial: document.getElementById('eventParoquial').checked,
+                eventoParoquial: document.getElementById('eventParoquial')?.checked || false,
                 status: 'agendado', // Status padrão
                 visibilidade: 'publico', // Visibilidade padrão
                 lembrete: 'nenhum', // Lembrete padrão
@@ -5261,11 +5262,11 @@
             // Validar horários
             for (let i = 0; i < horarios.length; i++) {
                 const horario = horarios[i];
-                if (!horario.horaInicio || !horario.horaFim) {
+                if (!horario.hora_inicio || !horario.hora_fim) {
                     showToast(`Por favor, preencha os horários do slot ${i + 1}.`, 'error');
                     return;
                 }
-                if (horario.horaInicio >= horario.horaFim) {
+                if (horario.hora_inicio >= horario.hora_fim) {
                     showToast(`O horário de início deve ser anterior ao horário de fim no slot ${i + 1}.`, 'error');
                     return;
                 }
@@ -5286,14 +5287,14 @@
                 // Criar múltiplos eventos para cada horário
                 const eventos = horarios.map((horario, index) => {
                     const tituloComHorario = horarios.length > 1 ? 
-                        `${formData.titulo} (${horario.horaInicio} - ${horario.horaFim})` : 
+                        `${formData.titulo} (${horario.hora_inicio} - ${horario.hora_fim})` : 
                         formData.titulo;
                     
                     return {
                         titulo: tituloComHorario,
                         objetivo: formData.objetivo || '',
-                        data_inicio: new Date(formData.dataInicio + ' ' + horario.horaInicio).toISOString(),
-                        data_fim: new Date(formData.dataInicio + ' ' + horario.horaFim).toISOString(),
+                        data_inicio: new Date(formData.dataInicio + ' ' + horario.hora_inicio).toISOString(),
+                        data_fim: new Date(formData.dataInicio + ' ' + horario.hora_fim).toISOString(),
                         local_id: parseInt(formData.local),
                         acao_id: parseInt(formData.acao),
                         responsavel_id: null, // Pode ser implementado depois
