@@ -5923,6 +5923,17 @@
                             btnAddPeriod.setAttribute('data-listener-added', 'true');
                             console.log('✅ Event listener adicionado ao btnAddPeriod');
                         }
+                        
+                        // Desativar validação nativa do formulário; usamos validação customizada
+                        const form = document.getElementById('eventForm');
+                        if (form) {
+                            form.setAttribute('novalidate', 'true');
+                        }
+                        
+                        // Ajustar obrigatoriedade dos campos de período conforme a lista
+                        if (typeof window.togglePeriodFieldsRequired === 'function') {
+                            window.togglePeriodFieldsRequired();
+                        }
                     }, 300);
                 }
                 
@@ -6121,6 +6132,11 @@
                 periodsList.push(period);
                 updatePeriodsList();
                 clearPeriodForm();
+
+                // Após adicionar o primeiro período, remover obrigatoriedade dos campos de período
+                if (typeof window.togglePeriodFieldsRequired === 'function') {
+                    window.togglePeriodFieldsRequired();
+                }
             };
 
             window.removePeriod = function(periodId) {
@@ -6192,6 +6208,37 @@
             window.clearAllPeriods = function() {
                 periodsList = [];
                 updatePeriodsList();
+                if (typeof window.togglePeriodFieldsRequired === 'function') {
+                    window.togglePeriodFieldsRequired();
+                }
+            };
+
+            // Alterna required/disabled nos campos de período conforme a lista
+            window.togglePeriodFieldsRequired = function() {
+                const dateEl = document.getElementById('newPeriodDate');
+                const startEl = document.getElementById('newPeriodStartTime');
+                const endEl = document.getElementById('newPeriodEndTime');
+                const hasPeriods = Array.isArray(periodsList) && periodsList.length > 0;
+
+                [dateEl, startEl, endEl].forEach((el) => {
+                    if (!el) return;
+                    if (hasPeriods) {
+                        el.removeAttribute('required');
+                    } else {
+                        el.setAttribute('required', '');
+                    }
+                });
+
+                // Se existirem campos antigos de data/hora únicos, também remover required deles
+                const singleDate = document.getElementById('eventDateStart');
+                const singleStart = document.getElementById('eventTimeStart');
+                const singleEnd = document.getElementById('eventTimeEnd');
+                [singleDate, singleStart, singleEnd].forEach((el) => {
+                    if (!el) return;
+                    if (hasPeriods) {
+                        el.removeAttribute('required');
+                    }
+                });
             };
 
             // Event listeners são configurados no openEventModal() agora
