@@ -5972,6 +5972,15 @@
                             // Se não está customizado, forçar evento change para atualizar qualquer campo wrapper
                             console.log('🔍 DEBUG - Campo não enhanced, despachando evento change');
                             dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+                            
+                            // Aguardar um pouco e verificar o valor final
+                            setTimeout(() => {
+                                console.log('🔍 DEBUG - Valor final do campo após 50ms:', dateInput.value);
+                                const displayInput = dateInput.previousElementSibling;
+                                if (displayInput) {
+                                    console.log('🔍 DEBUG - displayInput encontrado:', displayInput.type, displayInput.value);
+                                }
+                            }, 50);
                         }
                         
                         // Adicionar período automaticamente
