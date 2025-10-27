@@ -2174,7 +2174,7 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
 
-        /* Evento truncado (que vai além das 22h) */
+        /* Evento truncado (que vai além das 23h) */
         .event-block.event-truncated {
             position: relative;
             overflow: hidden;
@@ -3432,8 +3432,8 @@
                 }
             }
 
-            // Gerar horários (06:00 - 22:00)
-            for (let hour = 6; hour <= 22; hour++) {
+            // Gerar horários (01:00 - 23:00)
+            for (let hour = 1; hour <= 23; hour++) {
                 // Coluna de hora
                 const timeSlot = document.createElement('div');
                 timeSlot.className = 'time-slot';
@@ -3527,22 +3527,22 @@
                         // Calcular posição vertical (baseada nos minutos da hora)
                         const topPosition = (startMinutes / 60) * 100;
                         
-                        // Calcular altura máxima permitida (até o final do calendário - 22h)
+                        // Calcular altura máxima permitida (até o final do calendário - 23h)
                         const endHour = endTime.getHours();
                         const endMinutes = endTime.getMinutes();
                         
                         console.log('Evento:', event.title, 'Início:', startTime.toLocaleTimeString(), 'Fim:', endTime.toLocaleTimeString());
                         console.log('End Hour:', endHour, 'End Minutes:', endMinutes);
                         
-                        // Se o evento termina após as 22h, limitar até 22:00
+                        // Se o evento termina após as 23h, limitar até 23:00
                         let maxHeight = (durationMinutes / 60) * 100;
                         
-                        if (endHour > 22 || (endHour === 22 && endMinutes > 0)) {
-                            console.log('Evento vai além das 22h - limitando altura');
+                        if (endHour > 23 || (endHour === 23 && endMinutes > 0)) {
+                            console.log('Evento vai além das 23h - limitando altura');
                             
-                            // Calcular altura máxima até 22:00
+                            // Calcular altura máxima até 23:00
                             const maxEndTime = new Date(startTime);
-                            maxEndTime.setHours(22, 0, 0, 0);
+                            maxEndTime.setHours(23, 0, 0, 0);
                             const maxDurationMinutes = (maxEndTime.getTime() - startTime.getTime()) / (1000 * 60);
                             maxHeight = (maxDurationMinutes / 60) * 100;
                             
@@ -3615,14 +3615,14 @@
                 
                 console.log('Hora atual:', currentHour + ':' + currentMinute);
                 
-                // Verificar se está dentro do horário do calendário (6h - 22h)
-                if (currentHour >= 6 && currentHour <= 22) {
+                // Verificar se está dentro do horário do calendário (1h - 23h)
+                if (currentHour >= 1 && currentHour <= 23) {
                     const timeLine = document.createElement('div');
                     timeLine.className = 'current-time-line';
                     
                     // Calcular posição vertical
-                    const totalMinutes = (currentHour - 6) * 60 + currentMinute;
-                    const totalHours = 17; // 6h às 22h = 17 horas
+                    const totalMinutes = (currentHour - 1) * 60 + currentMinute;
+                    const totalHours = 23; // 1h às 23h = 23 horas
                     const positionPercent = (totalMinutes / (totalHours * 60)) * 100;
                     
                     console.log('Posição vertical:', positionPercent + '%');
@@ -3659,7 +3659,7 @@
                         console.log('Slot não encontrado!');
                     }
                 } else {
-                    console.log('Fora do horário do calendário (6h-22h)');
+                    console.log('Fora do horário do calendário (1h-23h)');
                 }
             } else {
                 console.log('Hoje não está na semana atual');
@@ -4602,8 +4602,8 @@
                 list.innerHTML = '';
                 const options = [];
                 
-                // Gerar horários de 06:00 às 22:00 em intervalos de 30 minutos
-                for (let hour = 6; hour <= 22; hour++) {
+                // Gerar horários de 01:00 às 23:00 em intervalos de 30 minutos
+                for (let hour = 1; hour <= 23; hour++) {
                     for (let minute = 0; minute < 60; minute += 30) {
                         const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
                         options.push({
@@ -5525,8 +5525,8 @@
                 `;
             }
 
-            // Gerar horários (06:00 - 22:00) - estilo Google Calendar
-            for (let hour = 6; hour <= 22; hour++) {
+            // Gerar horários (01:00 - 23:00) - estilo Google Calendar
+            for (let hour = 1; hour <= 23; hour++) {
                 // Coluna de hora (primeira coluna) - igual ao estilo da semana
                 const timeSlot = document.createElement('div');
                 timeSlot.className = 'time-slot';
