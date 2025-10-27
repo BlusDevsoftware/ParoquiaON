@@ -5959,6 +5959,8 @@
                         });
                         
                         // Forçar atualização da interface do campo de data customizado
+                        console.log('🔍 DEBUG - Verificando enhanced:', dateInput.dataset.enhanced);
+                        
                         if (dateInput.dataset.enhanced === 'true') {
                             const displayInput = dateInput.previousElementSibling;
                             if (displayInput && displayInput.type === 'text') {
@@ -5966,6 +5968,10 @@
                                 displayInput.value = displayValue;
                                 console.log('🔍 DEBUG - displayInput atualizado:', displayValue);
                             }
+                        } else {
+                            // Se não está customizado, forçar evento change para atualizar qualquer campo wrapper
+                            console.log('🔍 DEBUG - Campo não enhanced, despachando evento change');
+                            dateInput.dispatchEvent(new Event('change', { bubbles: true }));
                         }
                         
                         // Adicionar período automaticamente
