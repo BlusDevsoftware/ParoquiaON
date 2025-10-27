@@ -4184,17 +4184,23 @@
         function createEventForTimeSlot(selectedDate, selectedHour) {
             console.log('🔧 createEventForTimeSlot - Data recebida:', selectedDate);
             console.log('🔧 createEventForTimeSlot - Hora recebida:', selectedHour);
+            console.log('🔧 createEventForTimeSlot - Data original toString:', selectedDate.toString());
+            console.log('🔧 createEventForTimeSlot - Data original toISOString:', selectedDate.toISOString());
             
             // Criar datas usando os componentes diretos (sem conversões)
             const year = selectedDate.getFullYear();
             const month = selectedDate.getMonth();
             const day = selectedDate.getDate();
             
+            console.log('🔧 Componentes extraídos:', { year, month, day, selectedHour });
+            
             const eventDate = new Date(year, month, day, selectedHour, 0, 0);
             const endDate = new Date(year, month, day, selectedHour + 1, 0, 0);
             
             console.log('🔧 Data final do evento:', eventDate.toDateString(), eventDate.getHours() + 'h');
             console.log('🔧 Data final de fim:', endDate.toDateString(), endDate.getHours() + 'h');
+            console.log('🔧 Data final toString:', eventDate.toString());
+            console.log('🔧 Data final toISOString:', eventDate.toISOString());
             
             // Abrir modal com dados pré-preenchidos
             openEventModalWithTime(eventDate, endDate);
@@ -5939,6 +5945,8 @@
                 setTimeout(() => {
                     console.log('🔧 openEventModalWithTime - startTime recebido:', startTime);
                     console.log('🔧 openEventModalWithTime - endTime recebido:', endTime);
+                    console.log('🔧 openEventModalWithTime - startTime toString:', startTime.toString());
+                    console.log('🔧 openEventModalWithTime - startTime toISOString:', startTime.toISOString());
                     
                     // Extrair componentes das datas recebidas (sem conversões)
                     const startYear = startTime.getFullYear();
@@ -5950,10 +5958,17 @@
                     const endHour = endTime.getHours();
                     const endMinute = endTime.getMinutes();
                     
+                    console.log('🔧 Componentes extraídos no modal:', { 
+                        startYear, startMonth, startDay, startHour, startMinute,
+                        endHour, endMinute 
+                    });
+                    
                     // Criar strings diretamente dos componentes
                     const dateString = `${startYear}-${String(startMonth + 1).padStart(2, '0')}-${String(startDay).padStart(2, '0')}`;
                     const startTimeString = `${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
                     const endTimeString = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
+                    
+                    console.log('🔧 Strings criadas:', { dateString, startTimeString, endTimeString });
                     
                     const dateInput = document.getElementById('newPeriodDate');
                     const startTimeInput = document.getElementById('newPeriodStartTime');
@@ -5967,6 +5982,9 @@
                         
                         console.log('📅 Data string para input:', dateString);
                         console.log('🕐 Horários string:', startTimeString, '-', endTimeString);
+                        console.log('📅 Valor real no input date:', dateInput.value);
+                        console.log('🕐 Valor real no input startTime:', startTimeInput.value);
+                        console.log('🕐 Valor real no input endTime:', endTimeInput.value);
                         
                         // Adicionar período automaticamente
                         if (window.addPeriod) {
