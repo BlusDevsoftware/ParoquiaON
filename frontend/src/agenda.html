@@ -5246,10 +5246,7 @@
                 dataInicio: dataInicio,
                 horarios: horarios, // Array de horários
                 eventoParoquial: document.getElementById('eventParoquial')?.checked || false,
-                status: 'agendado', // Status padrão
-                visibilidade: 'publico', // Visibilidade padrão
-                lembrete: 'nenhum', // Lembrete padrão
-                capacidade: 1 // Capacidade padrão
+                status: 'agendado' // Status padrão
             };
             
             // Validação básica
@@ -5302,10 +5299,7 @@
                         pastoral_id: parseInt(formData.pastoral),
                         pilar_id: parseInt(formData.pilares),
                         status_id: getStatusIdByName(formData.status) || 1,
-                        evento_paroquial: formData.eventoParoquial || false,
-                        visibilidade: formData.visibilidade || 'Publico',
-                        lembrete: formData.lembrete || 'Nenhum',
-                        capacidade: formData.capacidade ? parseInt(formData.capacidade) : null
+                        evento_paroquial: formData.eventoParoquial || false
                     };
                 });
                 
