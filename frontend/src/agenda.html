@@ -5329,10 +5329,22 @@
             }
             
             
-            // Validar se a data não é no passado
-            const now = new Date();
-            const dataInicioEvento = new Date(formData.dataInicio);
-            if (dataInicioEvento < now.setHours(0, 0, 0, 0)) {
+            // Validar se a data não é no passado (sem conversão de timezone)
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Extrair componentes da data do evento (formato YYYY-MM-DD)
+            const [year, month, day] = formData.dataInicio.split('-').map(Number);
+            const dataInicioEvento = new Date(year, month - 1, day);
+            
+            console.log('🔍 Validação de data:', {
+                dataInicio: formData.dataInicio,
+                dataInicioEvento: dataInicioEvento.toDateString(),
+                today: today.toDateString(),
+                isPast: dataInicioEvento < today
+            });
+            
+            if (dataInicioEvento < today) {
                 showToast('A data do evento não pode ser no passado.', 'error');
                 return;
             }
