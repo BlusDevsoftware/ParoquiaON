@@ -3594,8 +3594,10 @@
             const weekStartDay = currentDay - currentDayOfWeek;
             const weekStartString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(weekStartDay).padStart(2, '0')}`;
             
-            console.log('🔧 Debug semana (sem conversões):');
+            console.log('🔧 Debug semana (corrigido):');
             console.log('  - currentDate:', currentDate.toDateString());
+            console.log('  - currentDay:', currentDay, 'currentDayOfWeek:', currentDayOfWeek);
+            console.log('  - weekStartDay:', weekStartDay);
             console.log('  - weekStartString:', weekStartString);
 
             // Atualizar cabeçalhos dos dias usando apenas strings
@@ -3777,7 +3779,7 @@
             // Usar componentes diretos (sem conversões)
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth();
-            const currentDay = currentDate.getDay();
+            const currentDay = currentDate.getDate();
             const currentDayOfWeek = currentDate.getDay();
             
             const nowYear = now.getFullYear();
