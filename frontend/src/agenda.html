@@ -3719,6 +3719,11 @@
                         eventElement.appendChild(communityElement);
                         eventElement.appendChild(datetimeElement);
                         
+                        // Aplicar cor da comunidade no card (borda esquerda)
+                        if (event.color) {
+                            eventElement.style.borderLeft = `4px solid ${event.color}`;
+                        }
+                        
                         // Calcular posição e altura baseada no horário
                         const startMinutes = startTime.getMinutes();
                         const durationMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
@@ -3916,7 +3921,7 @@
                     });
                     dayEvents.slice(0, 3).forEach(ev => {
                         const chip = document.createElement('div');
-                        chip.style.cssText = 'margin:4px; padding:2px 6px; border-radius:10px; font-size:10px; color:#fff; display:inline-block; background:#1976d2;';
+                        chip.style.cssText = `margin:4px; padding:2px 6px; border-radius:10px; font-size:10px; color:#fff; display:inline-block; background:${ev.color || '#1976d2'};`;
                         
                         // Remover horário do título se houver
                         let cleanTitle = ev.title || 'Evento';
@@ -5570,8 +5575,8 @@
                         // Garantir título
                         title: ev.titulo || ev.title || 'Agendamento sem título',
                         // Remover campo type - não temos mais separação por tipo
-                        // Garantir cor baseada no pilar da ação
-                        color: ev.acoes?.pilares?.cor || ev.pilares?.cor || ev.cor || '#1e3a8a'
+                        // Garantir cor baseada na cor da comunidade
+                        color: ev.comunidades?.cor || ev.comunidade_cor || ev.acoes?.pilares?.cor || ev.pilares?.cor || ev.cor || '#1e3a8a'
                     };
                 });
                 
@@ -5661,7 +5666,7 @@
                 const appointmentItem = document.createElement('div');
                 appointmentItem.className = 'appointment-item';
                 appointmentItem.innerHTML = `
-                    <div class="appointment-time">${timeString}</div>
+                    <div class="appointment-time" style="background: ${event.color || '#007bff'};">${timeString}</div>
                     <div class="appointment-details">
                         <div class="appointment-title">${event.title}</div>
                         <div class="appointment-type">Agendamento • ${dateString}</div>
