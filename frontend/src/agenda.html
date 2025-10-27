@@ -2341,14 +2341,20 @@
         }
 
         .event-block:hover {
-            transform: translateY(-1px) scale(1.8);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
             z-index: 100 !important;
-            white-space: normal;
-            overflow: visible;
-            padding: 8px;
-            max-width: 400px;
-            width: auto;
+            white-space: normal !important;
+            overflow: visible !important;
+            padding: 12px;
+            width: auto !important;
+            height: auto !important;
+            min-width: 300px;
+            max-width: 500px;
+        }
+        
+        .event-block:hover * {
+            white-space: normal !important;
         }
 
         /* Evento truncado (que vai além das 23h) */
