@@ -5287,11 +5287,26 @@
                         `${formData.titulo} (${horario.hora_inicio} - ${horario.hora_fim})` : 
                         formData.titulo;
                     
+                    // Criar data corretamente preservando horário local
+                    const dataInicioLocal = new Date(formData.dataInicio + ' ' + horario.hora_inicio);
+                    const dataFimLocal = new Date(formData.dataInicio + ' ' + horario.hora_fim);
+                    
+                    // Formatar data/hora no formato YYYY-MM-DDTHH:MM:SS (sem conversão para UTC)
+                    const formatDateTime = (date) => {
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        const seconds = String(date.getSeconds()).padStart(2, '0');
+                        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+                    };
+                    
                     return {
                         titulo: tituloComHorario,
                         objetivo: formData.objetivo || '',
-                        data_inicio: new Date(formData.dataInicio + ' ' + horario.hora_inicio).toISOString(),
-                        data_fim: new Date(formData.dataInicio + ' ' + horario.hora_fim).toISOString(),
+                        data_inicio: formatDateTime(dataInicioLocal),
+                        data_fim: formatDateTime(dataFimLocal),
                         local_id: parseInt(formData.local),
                         acao_id: parseInt(formData.acao),
                         responsavel_id: null, // Pode ser implementado depois
