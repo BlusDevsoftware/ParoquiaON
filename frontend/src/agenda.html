@@ -1729,6 +1729,171 @@
             transform: translateY(-1px);
         }
 
+        /* Estilos para múltiplos períodos de agendamento */
+        .add-period-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .subsection-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .subsection-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #1e3a8a;
+            border-radius: 2px;
+        }
+
+        .btn-add-period {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 40px;
+            margin-top: 20px;
+        }
+
+        .btn-add-period:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .periods-list-section {
+            margin-bottom: 20px;
+        }
+
+        .periods-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .no-periods-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .no-periods-message i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .no-periods-message p {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .no-periods-message small {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .period-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background 0.2s ease;
+        }
+
+        .period-item:last-child {
+            border-bottom: none;
+        }
+
+        .period-item:hover {
+            background: #f8f9fa;
+        }
+
+        .period-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .period-date {
+            background: #1e3a8a;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .period-time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .period-time i {
+            color: #1e3a8a;
+        }
+
+        .period-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-remove-period {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-remove-period:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        .periods-count {
+            background: #17a2b8;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
         .info-today-btn {
             background: #1976d2;
             color: white;
@@ -5026,21 +5191,11 @@
                     }
                 });
 
-                // Limpar múltiplos horários - manter apenas o primeiro
-                const container = document.getElementById('timeSlotsContainer');
-                if (container) {
-                    const timeSlots = container.querySelectorAll('.time-slot');
-                    // Remover todos os slots exceto o primeiro
-                    for (let i = timeSlots.length - 1; i > 0; i--) {
-                        timeSlots[i].remove();
-                    }
-                    // Limpar o primeiro slot
-                    const firstSlot = container.querySelector('.time-slot');
-                    if (firstSlot) {
-                        const inputs = firstSlot.querySelectorAll('input[type="time"]');
-                        inputs.forEach(input => input.value = '');
-                    }
-                }
+                // Limpar períodos adicionados
+                clearAllPeriods();
+                
+                // Limpar formulário de adicionar período
+                clearPeriodForm();
                 
                 // Limpar checkbox
                 const checkbox = document.getElementById('eventParoquial');
@@ -5065,21 +5220,19 @@
             // Coletar dados do formulário
             const dataInicio = document.getElementById('eventDateStart').value;
             
-            // Coletar múltiplos horários
-            const timeSlots = document.querySelectorAll('.time-slot');
-            const horarios = [];
+            // Coletar múltiplos períodos
+            const periods = getPeriodsData();
             
-            timeSlots.forEach((slot, index) => {
-                const horaInicio = slot.querySelector('input[name="hora_inicio[]"]').value;
-                const horaFim = slot.querySelector('input[name="hora_fim[]"]').value;
-                
-                if (horaInicio && horaFim) {
-                    horarios.push({
-                        horaInicio: horaInicio,
-                        horaFim: horaFim
-                    });
-                }
-            });
+            if (periods.length === 0) {
+                alert('Por favor, adicione pelo menos um período para o agendamento.');
+                return;
+            }
+            
+            const horarios = periods.map(period => ({
+                data: period.date,
+                hora_inicio: period.startTime,
+                hora_fim: period.endTime
+            }));
 
             const formData = {
                 titulo: document.getElementById('eventTitle').value,
@@ -5933,6 +6086,136 @@
                     }
                 });
             };
+
+            // Funções para múltiplos períodos de agendamento
+            let periodsList = [];
+
+            window.addPeriod = function() {
+                const date = document.getElementById('newPeriodDate').value;
+                const startTime = document.getElementById('newPeriodStartTime').value;
+                const endTime = document.getElementById('newPeriodEndTime').value;
+
+                // Validações
+                if (!date || !startTime || !endTime) {
+                    alert('Por favor, preencha todos os campos do período.');
+                    return;
+                }
+
+                if (startTime >= endTime) {
+                    alert('O horário de início deve ser anterior ao horário de fim.');
+                    return;
+                }
+
+                // Verificar se já existe um período com a mesma data e horário
+                const existingPeriod = periodsList.find(period => 
+                    period.date === date && 
+                    period.startTime === startTime && 
+                    period.endTime === endTime
+                );
+
+                if (existingPeriod) {
+                    alert('Já existe um período com esta data e horário.');
+                    return;
+                }
+
+                // Adicionar período à lista
+                const period = {
+                    id: Date.now(),
+                    date: date,
+                    startTime: startTime,
+                    endTime: endTime
+                };
+
+                periodsList.push(period);
+                updatePeriodsList();
+                clearPeriodForm();
+            };
+
+            window.removePeriod = function(periodId) {
+                periodsList = periodsList.filter(period => period.id !== periodId);
+                updatePeriodsList();
+            };
+
+            window.updatePeriodsList = function() {
+                const periodsListElement = document.getElementById('periodsList');
+                
+                if (periodsList.length === 0) {
+                    periodsListElement.innerHTML = `
+                        <div class="no-periods-message">
+                            <i class="fas fa-calendar-plus"></i>
+                            <p>Nenhum período adicionado ainda.</p>
+                            <small>Adicione pelo menos um período para continuar.</small>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Ordenar períodos por data e horário
+                periodsList.sort((a, b) => {
+                    if (a.date !== b.date) {
+                        return new Date(a.date) - new Date(b.date);
+                    }
+                    return a.startTime.localeCompare(b.startTime);
+                });
+
+                let html = '';
+                periodsList.forEach(period => {
+                    const formattedDate = new Date(period.date).toLocaleDateString('pt-BR');
+                    const formattedStartTime = period.startTime;
+                    const formattedEndTime = period.endTime;
+                    
+                    html += `
+                        <div class="period-item">
+                            <div class="period-info">
+                                <div class="period-date">${formattedDate}</div>
+                                <div class="period-time">
+                                    <i class="fas fa-clock"></i>
+                                    <span>${formattedStartTime} - ${formattedEndTime}</span>
+                                </div>
+                            </div>
+                            <div class="period-actions">
+                                <span class="periods-count">${periodsList.length}</span>
+                                <button type="button" class="btn-remove-period" onclick="removePeriod(${period.id})">
+                                    <i class="fas fa-trash"></i>
+                                    Remover
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                periodsListElement.innerHTML = html;
+            };
+
+            window.clearPeriodForm = function() {
+                document.getElementById('newPeriodDate').value = '';
+                document.getElementById('newPeriodStartTime').value = '';
+                document.getElementById('newPeriodEndTime').value = '';
+            };
+
+            window.getPeriodsData = function() {
+                return periodsList;
+            };
+
+            window.clearAllPeriods = function() {
+                periodsList = [];
+                updatePeriodsList();
+            };
+
+            // Event listeners para os novos elementos
+            document.addEventListener('DOMContentLoaded', function() {
+                const btnAddPeriod = document.getElementById('btnAddPeriod');
+                if (btnAddPeriod) {
+                    btnAddPeriod.addEventListener('click', addPeriod);
+                }
+
+                // Definir data padrão como hoje
+                const today = new Date().toISOString().split('T')[0];
+                const dateInput = document.getElementById('newPeriodDate');
+                if (dateInput) {
+                    dateInput.value = today;
+                }
+            });
 
             // Adicionar evento ao botão de adicionar horário
             setTimeout(() => {
