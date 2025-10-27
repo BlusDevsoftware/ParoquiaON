@@ -1859,6 +1859,11 @@
             color: #1e3a8a;
         }
 
+        .period-time .time-range {
+            display: inline-block;
+            white-space: nowrap;
+        }
+
         .period-actions {
             display: flex;
             align-items: center;
@@ -6306,7 +6311,7 @@
                                 <div class="period-date">${formattedDate}</div>
                                 <div class="period-time">
                                     <i class="fas fa-clock"></i>
-                                    <span>${formattedStartTime} - ${formattedEndTime}</span>
+                                    <span class="time-range">${formattedStartTime} - ${formattedEndTime}</span>
                                 </div>
                             </div>
                             <div class="period-actions">
