@@ -3651,7 +3651,7 @@
                     
                     // Adicionar eventos para este horário usando string
                     const hourEvents = getEventsForHourByString(dayString, hour);
-                    hourEvents.forEach(event => {
+                    hourEvents.forEach((event, index) => {
                         const eventElement = document.createElement('div');
                         eventElement.className = 'event-block';
                         
@@ -3731,6 +3731,16 @@
                         // Calcular posição vertical (baseada nos minutos da hora)
                         const topPosition = (startMinutes / 60) * 100;
                         
+                        // Calcular deslocamento horizontal para eventos simultâneos
+                        let leftOffset = 0;
+                        let widthPercent = 100;
+                        if (hourEvents.length > 1) {
+                            // Calcular largura e deslocamento baseado no índice
+                            const numEvents = hourEvents.length;
+                            widthPercent = 100 / numEvents;
+                            leftOffset = index * widthPercent;
+                        }
+                        
                         // Calcular altura máxima permitida (até o final do calendário - 23h)
                         const endHour = endTime.getHours();
                         const endMinutes = endTime.getMinutes();
@@ -3761,6 +3771,8 @@
                         
                         eventElement.style.top = `${topPosition}%`;
                         eventElement.style.height = `${maxHeight}%`;
+                        eventElement.style.left = `${leftOffset}%`;
+                        eventElement.style.width = `${widthPercent}%`;
                         
                         eventElement.addEventListener('click', (e) => {
                             e.stopPropagation();
