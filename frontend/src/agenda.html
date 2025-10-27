@@ -3662,21 +3662,12 @@
                         const startTime = new Date(event.startTime);
                         const endTime = new Date(event.endTime);
                         
-                        // Formatar data
-                        const dateString = startTime.toLocaleDateString('pt-BR', { 
-                            day: '2-digit', 
-                            month: '2-digit' 
-                        });
+                        // Formatar data usando componentes diretos
+                        const dateString = `${String(startTime.getDate()).padStart(2, '0')}/${String(startTime.getMonth() + 1).padStart(2, '0')}`;
                         
-                        // Formatar horários
-                        const startTimeString = startTime.toLocaleTimeString('pt-BR', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                        });
-                        const endTimeString = endTime.toLocaleTimeString('pt-BR', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                        });
+                        // Formatar horários usando componentes diretos
+                        const startTimeString = `${String(startTime.getHours()).padStart(2, '0')}:${String(startTime.getMinutes()).padStart(2, '0')}`;
+                        const endTimeString = `${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
                         
                         datetimeElement.innerHTML = `
                             <div class="event-date">${dateString}</div>
@@ -3723,7 +3714,7 @@
                         const endHour = endTime.getHours();
                         const endMinutes = endTime.getMinutes();
                         
-                        console.log('Evento:', event.title, 'Início:', startTime.toLocaleTimeString(), 'Fim:', endTime.toLocaleTimeString());
+                        console.log('Evento:', event.title, 'Início:', startTimeString, 'Fim:', endTimeString);
                         console.log('End Hour:', endHour, 'End Minutes:', endMinutes);
                         
                         // Se o evento termina após as 23h, limitar até 23:00
@@ -3783,29 +3774,38 @@
             const calendarBody = document.getElementById('calendarBody');
             const now = new Date();
             
-            // Verificar se hoje está na semana atual
-            const weekStart = new Date(currentDate);
-            weekStart.setDate(currentDate.getDate() - currentDate.getDay());
-            const weekEnd = new Date(weekStart);
-            weekEnd.setDate(weekStart.getDate() + 6);
+            // Usar componentes diretos (sem conversões)
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth();
+            const currentDay = currentDate.getDay();
+            const currentDayOfWeek = currentDate.getDay();
+            
+            const nowYear = now.getFullYear();
+            const nowMonth = now.getMonth();
+            const nowDay = now.getDate();
+            
+            // Calcular início da semana usando apenas matemática
+            const weekStartDay = currentDay - currentDayOfWeek;
+            const weekEndDay = weekStartDay + 6;
             
             // Debug: verificar se estamos na semana atual
-            console.log('Data atual:', now.toDateString());
-            console.log('Semana atual:', weekStart.toDateString(), 'a', weekEnd.toDateString());
+            console.log('Data atual:', nowYear, nowMonth + 1, nowDay);
+            console.log('Semana atual:', weekStartDay, 'a', weekEndDay);
             
-            // Comparar apenas as datas (sem horário) para incluir o último dia da semana
-            const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const weekStartDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
-            const weekEndDate = new Date(weekEnd.getFullYear(), weekEnd.getMonth(), weekEnd.getDate());
+            // Comparar apenas números (sem objetos Date)
+            const isInCurrentWeek = nowYear === currentYear && 
+                                  nowMonth === currentMonth && 
+                                  nowDay >= weekStartDay && 
+                                  nowDay <= weekEndDay;
             
             console.log('Comparação de datas:', {
-                hoje: todayDate.toDateString(),
-                inicioSemana: weekStartDate.toDateString(),
-                fimSemana: weekEndDate.toDateString(),
-                dentroDaSemana: todayDate >= weekStartDate && todayDate <= weekEndDate
+                hoje: `${nowYear}-${nowMonth + 1}-${nowDay}`,
+                inicioSemana: `${currentYear}-${currentMonth + 1}-${weekStartDay}`,
+                fimSemana: `${currentYear}-${currentMonth + 1}-${weekEndDay}`,
+                dentroDaSemana: isInCurrentWeek
             });
             
-            if (todayDate >= weekStartDate && todayDate <= weekEndDate) {
+            if (isInCurrentWeek) {
                 // Calcular posição da linha
                 const currentHour = now.getHours();
                 const currentMinute = now.getMinutes();
@@ -4104,52 +4104,71 @@
             } else if (currentView === 'ano') {
                 rangeElement.textContent = currentDate.getFullYear().toString();
             } else {
-            const weekStart = new Date(currentDate);
-                weekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Domingo = 0
-            const weekEnd = new Date(weekStart);
-            weekEnd.setDate(weekStart.getDate() + 6);
-            rangeElement.textContent = `${weekStart.getDate()} - ${weekEnd.getDate()} ${weekStart.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`;
+                // Calcular semana usando apenas componentes
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                const day = currentDate.getDate();
+                const dayOfWeek = currentDate.getDay();
+                
+                const weekStartDay = day - dayOfWeek;
+                const weekEndDay = weekStartDay + 6;
+                
+                const monthNames = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+                                  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+                
+                rangeElement.textContent = `${weekStartDay} - ${weekEndDay} ${monthNames[month]} ${year}`;
             }
         }
 
 
 
         function navigateWeek(direction) {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const day = currentDate.getDate();
+            
             if (currentView === 'dia') {
-                currentDate.setDate(currentDate.getDate() + direction);
+                currentDate = new Date(year, month, day + direction);
             } else if (currentView === 'mês') {
-                currentDate.setMonth(currentDate.getMonth() + direction);
+                currentDate = new Date(year, month + direction, day);
             } else if (currentView === 'ano') {
-                currentDate.setFullYear(currentDate.getFullYear() + direction);
+                currentDate = new Date(year + direction, month, day);
             } else {
-            currentDate.setDate(currentDate.getDate() + (direction * 7));
+                currentDate = new Date(year, month, day + (direction * 7));
             }
             renderCalendar();
             updateCurrentWeekRange();
         }
 
         function goToToday() {
-            currentDate = new Date();
+            const now = new Date();
+            currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             renderCalendar();
             updateCurrentWeekRange();
         }
 
         function isToday(date) {
             const today = new Date();
-            return date.toDateString() === today.toDateString();
+            return date.getFullYear() === today.getFullYear() &&
+                   date.getMonth() === today.getMonth() &&
+                   date.getDate() === today.getDate();
         }
 
         function hasEventsOnDate(date) {
             return events.some(event => {
                 const eventDate = new Date(event.startTime);
-                return eventDate.toDateString() === date.toDateString();
+                return eventDate.getFullYear() === date.getFullYear() &&
+                       eventDate.getMonth() === date.getMonth() &&
+                       eventDate.getDate() === date.getDate();
             });
         }
 
         function getEventsForHour(date, hour) {
             return events.filter(event => {
                 const eventDate = new Date(event.startTime);
-                return eventDate.toDateString() === date.toDateString() && 
+                return eventDate.getFullYear() === date.getFullYear() &&
+                       eventDate.getMonth() === date.getMonth() &&
+                       eventDate.getDate() === date.getDate() &&
                        eventDate.getHours() === hour;
             });
         }
