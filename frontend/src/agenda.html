@@ -3658,7 +3658,12 @@
                         // Criar estrutura do card do evento
                         const titleElement = document.createElement('div');
                         titleElement.className = 'event-title';
-                        titleElement.textContent = event.title || 'Agendamento';
+                        
+                        // Remover horário do título se houver (para eventos antigos salvos)
+                        let cleanTitle = event.title || 'Agendamento';
+                        // Remover padrão antigo de horário no título: "Titulo (13:00 - 14:00)"
+                        cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
+                        titleElement.textContent = cleanTitle;
                         
                         // Elemento para data e hora
                         const datetimeElement = document.createElement('div');
@@ -3906,7 +3911,11 @@
                     dayEvents.slice(0, 3).forEach(ev => {
                         const chip = document.createElement('div');
                         chip.style.cssText = 'margin:4px; padding:2px 6px; border-radius:10px; font-size:10px; color:#fff; display:inline-block; background:#1976d2;';
-                        chip.textContent = ev.title || 'Evento';
+                        
+                        // Remover horário do título se houver
+                        let cleanTitle = ev.title || 'Evento';
+                        cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
+                        chip.textContent = cleanTitle;
                         cell.appendChild(chip);
                     });
 
@@ -6095,8 +6104,12 @@
                     modal.style.display = 'flex';
                     
                     // Preencher dados do evento
+                    // Limpar horário do título para exibição
+                    let cleanTitle = event.title || 'Sem título';
+                    cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
+                    
                     const elements = {
-                        'editEventTitle': event.title || 'Sem título',
+                        'editEventTitle': cleanTitle,
                         'editEventDateTime': event.startTime ? new Date(event.startTime).toLocaleString('pt-BR') : 'Não informado',
                         'editEventLocal': event.local_nome || 'Não informado',
                         'editEventAcao': event.acao_nome || 'Não informado',
