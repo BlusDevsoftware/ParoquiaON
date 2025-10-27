@@ -5368,9 +5368,12 @@
             try {
                 // Criar múltiplos eventos para cada horário
                 const eventos = horarios.map((horario, index) => {
+                    // Usar a data específica de cada horário (pode ser diferente para cada período)
+                    const horarioDate = horario.data || formData.dataInicio;
+                    
                     // Criar data corretamente preservando horário local
-                    const dataInicioLocal = new Date(formData.dataInicio + ' ' + horario.hora_inicio);
-                    const dataFimLocal = new Date(formData.dataInicio + ' ' + horario.hora_fim);
+                    const dataInicioLocal = new Date(horarioDate + ' ' + horario.hora_inicio);
+                    const dataFimLocal = new Date(horarioDate + ' ' + horario.hora_fim);
                     
                     // Formatar data/hora no formato YYYY-MM-DDTHH:MM:SS (sem conversão para UTC)
                     const formatDateTime = (date) => {
