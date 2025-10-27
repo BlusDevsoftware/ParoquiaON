@@ -5359,10 +5359,6 @@
             try {
                 // Criar múltiplos eventos para cada horário
                 const eventos = horarios.map((horario, index) => {
-                    const tituloComHorario = horarios.length > 1 ? 
-                        `${formData.titulo} (${horario.hora_inicio} - ${horario.hora_fim})` : 
-                        formData.titulo;
-                    
                     // Criar data corretamente preservando horário local
                     const dataInicioLocal = new Date(formData.dataInicio + ' ' + horario.hora_inicio);
                     const dataFimLocal = new Date(formData.dataInicio + ' ' + horario.hora_fim);
@@ -5379,7 +5375,7 @@
                     };
                     
                     return {
-                        titulo: tituloComHorario,
+                        titulo: formData.titulo,
                         objetivo: formData.objetivo || '',
                         data_inicio: formatDateTime(dataInicioLocal),
                         data_fim: formatDateTime(dataFimLocal),
