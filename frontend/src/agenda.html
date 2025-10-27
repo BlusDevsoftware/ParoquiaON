@@ -3641,7 +3641,7 @@
                     // Os slots são organizados por linha (hora) e coluna (dia)
                     // Para cada hora, temos 7 slots (um para cada dia)
                     // Precisamos encontrar o slot da linha atual (hora atual) e coluna do dia
-                    const currentHourIndex = currentHour - 6; // Índice da hora atual (0-16)
+                    const currentHourIndex = currentHour - 1; // Índice da hora atual (0-22)
                     
                     // Calcular índice do slot: (hora * 7) + dia
                     const slotIndex = (currentHourIndex * 7) + dayOfWeek;
