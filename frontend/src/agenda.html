@@ -5339,6 +5339,11 @@
                 // Limpar formulário
                 clearEventForm();
                 
+                // Limpar períodos
+                if (window.clearAllPeriods) {
+                    window.clearAllPeriods();
+                }
+                
                 // Fechar o modal
                 closeEventModal();
                 
@@ -5877,6 +5882,11 @@
                 console.log('🔄 Abrindo modal padrão');
                 mostrarSpinnerAgenda();
                 
+                // Limpar períodos anteriores
+                if (window.clearAllPeriods) {
+                    window.clearAllPeriods();
+                }
+                
                 const modal = document.getElementById('eventModal');
                 if (modal) {
                     modal.style.display = 'flex';
@@ -5891,7 +5901,40 @@
                     populateSelectsFromCache();
                     initializeCustomSelects('#eventModal');
                     reloadCustomSelects('#eventModal');
-                    esconderSpinnerAgenda();
+                    ocultarSpinnerAgenda();
+                    
+                    // Configurar data padrão do período como hoje
+                    setTimeout(() => {
+                        const today = new Date().toISOString().split('T')[0];
+                        const dateInput = document.getElementById('newPeriodDate');
+                        if (dateInput) {
+                            dateInput.value = today;
+                        }
+                        
+                        // Adicionar event listener ao botão de adicionar período
+                        const btnAddPeriod = document.getElementById('btnAddPeriod');
+                        if (btnAddPeriod && !btnAddPeriod.hasAttribute('data-listener-added')) {
+                            btnAddPeriod.addEventListener('click', function() {
+                                console.log('🔘 Botão Adicionar Período clicado');
+                                if (window.addPeriod) {
+                                    window.addPeriod();
+                                }
+                            });
+                            btnAddPeriod.setAttribute('data-listener-added', 'true');
+                            console.log('✅ Event listener adicionado ao btnAddPeriod');
+                        }
+                    }, 300);
+                }
+                
+                // Adicionar event listener ao formulário se ainda não tiver
+                const form = document.getElementById('eventForm');
+                if (form && !form.hasAttribute('data-submit-listener')) {
+                    form.addEventListener('submit', function(e) {
+                        console.log('📝 Formulário submetido');
+                        handleEventSubmit(e);
+                    });
+                    form.setAttribute('data-submit-listener', 'true');
+                    console.log('✅ Event listener de submit adicionado ao formulário');
                 }
             };
 
@@ -5949,64 +5992,13 @@
                 }
             };
 
-            window.handleEventSubmit = async function(e) {
-                e.preventDefault();
-                console.log('💾 Processando formulário...');
-                
-                const formData = {
-                    titulo: document.getElementById('eventTitle')?.value || '',
-                    comunidade: document.getElementById('eventCommunity')?.value || '',
-                    pastoral: document.getElementById('eventPastoral')?.value || '',
-                    pilares: document.getElementById('eventPilares')?.value || '',
-                    local: document.getElementById('eventLocation')?.value || '',
-                    acao: document.getElementById('eventAcao')?.value || '',
-                    objetivo: document.getElementById('eventObjetivo')?.value || '',
-                    dataInicio: document.getElementById('eventDateStart')?.value || '',
-                    horaInicio: document.getElementById('eventTimeStart')?.value || '',
-                    dataFim: document.getElementById('eventDateStart')?.value || '',
-                    horaFim: document.getElementById('eventTimeEnd')?.value || '',
-                    eventoParoquial: document.getElementById('eventParoquial')?.checked || false,
-                    status: 'agendado',
-                    visibilidade: 'publico',
-                    lembrete: 'nenhum',
-                    capacidade: 1
-                };
-                
-                console.log('📋 Dados coletados:', formData);
-                
-                try {
-                    mostrarSpinnerAgenda();
-                    
-                    const response = await fetch('/api/agenda/eventos', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(formData)
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`Erro HTTP: ${response.status}`);
-                    }
-                    
-                    const result = await response.json();
-                    console.log('✅ Evento criado:', result);
-                    
-                    closeEventModal();
-                    await loadEventsFromApi();
-                    alert('Evento criado com sucesso!');
-                    
-                } catch (error) {
-                    console.error('❌ Erro ao criar evento:', error);
-                    alert('Erro ao criar evento. Tente novamente.');
-                } finally {
-                    esconderSpinnerAgenda();
-                }
-            };
+            // Removido - usando a implementação global handleEventSubmit() da linha 5216
+            // que já inclui suporte a múltiplos períodos via getPeriodsData()
 
             // Funções auxiliares - usar as implementações reais
             window.mostrarSpinnerAgenda = mostrarSpinnerAgenda;
-            window.esconderSpinnerAgenda = ocultarSpinnerAgenda;
+            // Corrigido - usar função correta
+            // window.esconderSpinnerAgenda não existe
             window.ocultarSpinnerAgenda = ocultarSpinnerAgenda;
 
             window.loadEventFormData = loadEventFormData;
@@ -6202,20 +6194,7 @@
                 updatePeriodsList();
             };
 
-            // Event listeners para os novos elementos
-            document.addEventListener('DOMContentLoaded', function() {
-                const btnAddPeriod = document.getElementById('btnAddPeriod');
-                if (btnAddPeriod) {
-                    btnAddPeriod.addEventListener('click', addPeriod);
-                }
-
-                // Definir data padrão como hoje
-                const today = new Date().toISOString().split('T')[0];
-                const dateInput = document.getElementById('newPeriodDate');
-                if (dateInput) {
-                    dateInput.value = today;
-                }
-            });
+            // Event listeners são configurados no openEventModal() agora
 
             // Adicionar evento ao botão de adicionar horário
             setTimeout(() => {
