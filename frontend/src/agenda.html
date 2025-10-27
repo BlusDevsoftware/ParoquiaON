@@ -5932,49 +5932,23 @@
                     const startTimeString = `${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
                     const endTimeString = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
                     
-                    console.log('🔍 DEBUG MODAL - Componentes extraídos:', {
-                        startYear, startMonth, startDay, startHour, startMinute
-                    });
-                    console.log('🔍 DEBUG MODAL - Strings criadas:', {
-                        dateString, startTimeString, endTimeString
-                    });
-                    
                     const dateInput = document.getElementById('newPeriodDate');
                     const startTimeInput = document.getElementById('newPeriodStartTime');
                     const endTimeInput = document.getElementById('newPeriodEndTime');
                     
-                    console.log('🔍 DEBUG MODAL - Inputs encontrados:', {
-                        dateInput: !!dateInput,
-                        startTimeInput: !!startTimeInput,
-                        endTimeInput: !!endTimeInput
-                    });
-                    
                     if (dateInput && startTimeInput && endTimeInput) {
                         // Preencher campos do formulário de período
-                        console.log('🔍 DEBUG MODAL - ANTES de preencher:', {
-                            dateInputValue: dateInput.value,
-                            startTimeValue: startTimeInput.value,
-                            endTimeValue: endTimeInput.value
-                        });
-                        
                         dateInput.value = dateString;
                         startTimeInput.value = startTimeString;
                         endTimeInput.value = endTimeString;
                         
-                        console.log('🔍 DEBUG MODAL - DEPOIS de preencher:', {
-                            dateInputValue: dateInput.value,
-                            startTimeValue: startTimeInput.value,
-                            endTimeValue: endTimeInput.value
-                        });
-                        
-                        // Verificar se o valor foi realmente definido
-                        setTimeout(() => {
-                            console.log('🔍 DEBUG MODAL - 100ms depois:', {
-                                dateInputValue: dateInput.value,
-                                startTimeValue: startTimeInput.value,
-                                endTimeValue: endTimeInput.value
-                            });
-                        }, 100);
+                        // Forçar atualização da interface do campo de data customizado
+                        if (dateInput.dataset.enhanced === 'true') {
+                            const displayInput = dateInput.previousElementSibling;
+                            if (displayInput && displayInput.type === 'text') {
+                                displayInput.value = formatDateForDisplay(dateString);
+                            }
+                        }
                         
                         // Adicionar período automaticamente
                         if (window.addPeriod) {
