@@ -2173,7 +2173,7 @@
         }
 
         .day-header.today { 
-            background: #e3f2fd; 
+            background: white; 
             color: #1976d2; 
         }
         
@@ -2300,16 +2300,17 @@
         .time-slot {
             height: 60px;
             padding: 8px;
-            text-align: center;
-            font-size: 12px;
+            text-align: right;
+            font-size: 9px;
             color: #666;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-end;
             background: #ffffff;
             margin: 0 !important;
             padding-top: 0 !important;
             padding-bottom: 0 !important;
+            width: 44px;
         }
 
         .day-column {
@@ -5760,6 +5761,9 @@
         function updateDailyCalendar() {
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
+            
+            // Configurar grid para visão diária: coluna de hora + coluna do dia
+            calendarBody.style.gridTemplateColumns = '44px 1fr';
 
             // Cabeçalho do dia (igual ao estilo da semana)
             const header = document.querySelector('.calendar-header');
@@ -5772,13 +5776,14 @@
                 const year = currentDate.getFullYear();
                 
                 header.innerHTML = `
-                    <div class="time-column-header">Hora</div>
+                    <div class="time-column-header"></div>
                     <div class="day-header today" style="grid-column: span 1;">
                         <div class="day-name">${dayName}</div>
                         <div class="day-number">${dayNumber}</div>
                         <div class="day-month">${monthName} ${year}</div>
                     </div>
                 `;
+                header.style.gridTemplateColumns = '44px 1fr';
             }
 
             // Gerar horários (01:00 - 23:00) - estilo Google Calendar
@@ -5798,19 +5803,74 @@
                 hourEvents.forEach(event => {
                     const eventElement = document.createElement('div');
                     eventElement.className = 'event-item';
-                    // Past marker for daily view
+                    
+                    // Título (limpo) no padrão do sistema
+                    const titleElement = document.createElement('div');
+                    titleElement.className = 'event-title';
+                    let cleanTitle = event.title || 'Agendamento';
+                    cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
+                    if (event.evento_paroquial || event.eventoParoquial) {
+                        titleElement.innerHTML = `<i class="fas fa-church" style="color: #1e3a8a; margin-right: 4px;"></i>${cleanTitle}`;
+                    } else {
+                        titleElement.textContent = cleanTitle;
+                    }
+                    
+                    // Comunidade (avatar + nome)
+                    const communityElement = document.createElement('div');
+                    communityElement.className = 'event-community';
+                    const avatarElement = document.createElement('div');
+                    avatarElement.className = 'event-avatar';
+                    const communityName = event.comunidade_nome || 'Comunidade';
+                    if (event.comunidades?.foto) {
+                        avatarElement.style.backgroundImage = `url(${event.comunidades.foto})`;
+                        avatarElement.textContent = '';
+                    } else {
+                        avatarElement.textContent = communityName.charAt(0).toUpperCase();
+                    }
+                    const communityNameElement = document.createElement('span');
+                    communityNameElement.textContent = communityName;
+                    communityElement.appendChild(avatarElement);
+                    communityElement.appendChild(communityNameElement);
+                    
+                    // Data e horário (início - fim)
+                    const datetimeElement = document.createElement('div');
+                    datetimeElement.className = 'event-datetime';
+                    const startTime = new Date(event.startTime);
+                    const endTime = new Date(event.endTime || event.startTime);
+                    const dateString = `${String(startTime.getDate()).padStart(2, '0')}/${String(startTime.getMonth() + 1).padStart(2, '0')}`;
+                    const startTimeString = `${String(startTime.getHours()).padStart(2, '0')}:${String(startTime.getMinutes()).padStart(2, '0')}`;
+                    const endTimeString = `${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
+                    datetimeElement.innerHTML = `
+                        <div class="event-date">${dateString}</div>
+                        <div class="event-time">${startTimeString} - ${endTimeString}</div>
+                    `;
+                    
+                    // Aplicar cor da comunidade na borda esquerda
+                    if (event.color) {
+                        eventElement.style.borderLeft = `4px solid ${event.color}`;
+                    }
+                    
+                    // Marcar como passado (padrão do sistema)
                     try {
-                        const endTime = new Date(event.endTime || event.startTime);
                         if (!isNaN(endTime) && endTime < new Date()) {
                             eventElement.classList.add('event-past');
                         }
                     } catch (_) {}
-                    eventElement.textContent = event.title || 'Evento';
-                    eventElement.title = `${event.title || 'Evento'}\n${event.time || ''}\n${event.location || ''}`;
+                    
+                    // Montar card
+                    eventElement.appendChild(titleElement);
+                    eventElement.appendChild(communityElement);
+                    eventElement.appendChild(datetimeElement);
+                    
+                    // Tooltip
+                    eventElement.title = `${cleanTitle}\n${startTimeString} - ${endTimeString}`;
+                    
+                    // Ação de editar
                     eventElement.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        editEvent(event);
+                        editEventModal(event);
                     });
+                    
                     daySlot.appendChild(eventElement);
                 });
 
