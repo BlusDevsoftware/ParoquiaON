@@ -2232,11 +2232,11 @@
             height: 100% !important;
             min-height: 100% !important;
             width: 100% !important;
-            padding: 6px 6px 6px 6px;
-            padding-top: 26px; /* reserva espaço para o número do dia */
+            padding: 0;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            overflow: hidden; /* impede crescimento da linha */
         }
 
         /* Ajuste do número do dia na visão mensal para não desalinha header/célula */
@@ -2266,6 +2266,33 @@
             justify-content: center;
             font-weight: 700;
             font-size: 11px;
+        }
+
+        /* Container dos eventos na visão mensal, posicionado e com scroll interno */
+        .calendar-body.month-view .month-events {
+            position: absolute;
+            top: 28px; /* abaixo do número do dia */
+            left: 4px;
+            right: 4px;
+            bottom: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow: auto;
+        }
+
+        .calendar-body.month-view .month-event {
+            padding: 4px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         /* Scroll escondido no container central */
@@ -4194,25 +4221,15 @@
                         const d = new Date(ev.startTime);
                         return d.toDateString() === date.toDateString();
                     });
-                    dayEvents.slice(0, 3).forEach(ev => {
-                        const chip = document.createElement('div');
-                        // Reduzir largura para não sobrepor o número do dia e manter respiro nas bordas
-                        chip.style.cssText = `
-                            margin: 4px 6px 2px 6px;
-                            padding: 4px 6px;
-                            border-radius: 8px;
-                            font-size: 10px;
-                            color: #1f2937;
-                            display: flex;
-                            align-items: center;
-                            gap: 6px;
-                            background: #f3f4f6;
-                            border: 1px solid #e5e7eb;
-                            max-width: 92%;
-                            box-sizing: border-box;
-                        `;
+                    // Container fixo interno para os eventos (evita aumentar a célula)
+                    const eventsWrap = document.createElement('div');
+                    eventsWrap.className = 'month-events';
+                    cell.appendChild(eventsWrap);
 
-                        // Avatar/foto da comunidade
+                    dayEvents.slice(0, 4).forEach(ev => {
+                        const chip = document.createElement('div');
+                        chip.className = 'month-event';
+
                         const avatar = document.createElement('div');
                         avatar.style.cssText = `
                             width: 16px; height: 16px; border-radius: 50%;
@@ -4227,19 +4244,18 @@
                             avatar.textContent = (comunidadeNome.charAt(0) || 'C').toUpperCase();
                         }
 
-                        // Texto: horário + nome da comunidade + título
                         const textWrap = document.createElement('div');
-                        textWrap.style.cssText = 'display:flex; align-items:center; gap:6px; overflow:hidden;';
+                        textWrap.style.cssText = 'display:flex; align-items:center; gap:6px; overflow:hidden; width:100%;';
 
                         const start = new Date(ev.startTime);
                         const hh = String(start.getHours()).padStart(2, '0');
                         const mm = String(start.getMinutes()).padStart(2, '0');
                         const timeSpan = document.createElement('span');
-                        timeSpan.style.cssText = 'color:#111827; font-weight:700;';
+                        timeSpan.style.cssText = 'color:#111827; font-weight:700; flex:0 0 auto;';
                         timeSpan.textContent = `${hh}:${mm}`;
 
                         const comunidadeSpan = document.createElement('span');
-                        comunidadeSpan.style.cssText = 'color:#374151; font-weight:600; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; max-width:120px;';
+                        comunidadeSpan.style.cssText = 'color:#374151; font-weight:600; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; max-width:100px;';
                         comunidadeSpan.textContent = comunidadeNome;
 
                         let cleanTitle = ev.title || 'Evento';
@@ -4254,11 +4270,9 @@
 
                         chip.appendChild(avatar);
                         chip.appendChild(textWrap);
-
-                        // Tooltip
                         chip.title = `${cleanTitle} — ${comunidadeNome} às ${hh}:${mm}`;
 
-                        cell.appendChild(chip);
+                        eventsWrap.appendChild(chip);
                     });
 
                     cell.addEventListener('click', () => {});
