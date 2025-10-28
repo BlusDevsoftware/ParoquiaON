@@ -3876,7 +3876,7 @@
                         datetimeElement.className = 'event-datetime';
                         
                         const startTime = new Date(event.startTime);
-                        const endTime = new Date(event.endTime);
+                        const endTime = new Date(event.endTime || event.startTime);
                         
                         // Formatar data usando componentes diretos
                         const dateString = `${String(startTime.getDate()).padStart(2, '0')}/${String(startTime.getMonth() + 1).padStart(2, '0')}`;
@@ -3974,6 +3974,14 @@
                         eventElement.style.left = `${leftOffset}%`;
                         eventElement.style.width = `${widthPercent}%`;
                         
+                        // Marcar como passado se já terminou
+                        try {
+                            const now = new Date();
+                            if (!isNaN(endTime) && endTime < now) {
+                                eventElement.classList.add('event-past');
+                            }
+                        } catch (_) {}
+
                         eventElement.addEventListener('click', (e) => {
                             e.stopPropagation();
                             editEventModal(event);
@@ -5507,6 +5515,13 @@
                 hourEvents.forEach(event => {
                     const eventElement = document.createElement('div');
                     eventElement.className = 'event-item';
+                    // Past marker for daily view
+                    try {
+                        const endTime = new Date(event.endTime || event.startTime);
+                        if (!isNaN(endTime) && endTime < new Date()) {
+                            eventElement.classList.add('event-past');
+                        }
+                    } catch (_) {}
                     eventElement.textContent = event.title || 'Evento';
                     eventElement.title = `${event.title || 'Evento'}\n${event.time || ''}\n${event.location || ''}`;
                     eventElement.addEventListener('click', (e) => {
