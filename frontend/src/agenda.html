@@ -6363,6 +6363,20 @@
                 }
             };
 
+            // Função para fechar modal de edição
+            window.closeEditEventModal = function() {
+                console.log('🔒 Fechando modal de edição...');
+                
+                // Resetar todos os cards expandidos
+                resetExpandedCards();
+                
+                const modal = document.getElementById('modalEdicaoAgendamento');
+                if (modal) {
+                    modal.style.display = 'none';
+                    console.log('✅ Modal de edição fechado com sucesso');
+                }
+            };
+
             // Removido - usando a implementação global handleEventSubmit() da linha 5216
             // que já inclui suporte a múltiplos períodos via getPeriodsData()
 
