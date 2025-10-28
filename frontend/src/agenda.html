@@ -2392,6 +2392,21 @@
             gap: 4px;
         }
 
+        /* Eventos passados: escurecer sem transparência */
+        .event-past {
+            filter: grayscale(80%) brightness(0.85) contrast(0.95);
+        }
+        .event-block.event-past {
+            background: linear-gradient(135deg, #bcc2c8 0%, #9aa1a8 100%) !important;
+            color: #1f2937;
+            border-color: #9aa1a8 !important;
+        }
+        .event-item.event-past {
+            background: #cbd1d7 !important;
+            color: #111827;
+            border-left-color: #6b7280 !important;
+        }
+
         .event-title {
             font-weight: 600;
             font-size: 12px;
