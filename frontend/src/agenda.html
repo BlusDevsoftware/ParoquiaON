@@ -4226,7 +4226,8 @@
                     eventsWrap.className = 'month-events';
                     cell.appendChild(eventsWrap);
 
-                    dayEvents.slice(0, 4).forEach(ev => {
+                    // Renderizar até 3 cards compactos
+                    dayEvents.slice(0, 3).forEach(ev => {
                         const chip = document.createElement('div');
                         chip.className = 'month-event';
                         chip.style.cssText = 'display:flex; align-items:center; gap:8px; padding:6px; background:#fff; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow:hidden;';
@@ -4260,6 +4261,80 @@
 
                         eventsWrap.appendChild(chip);
                     });
+
+                    // Interação: ao passar o mouse, mostrar todos os eventos do dia em um painel flutuante
+                    cell.style.position = 'relative';
+                    let hoverPanel;
+                    const openHoverPanel = () => {
+                        // Evitar recriar caso já exista
+                        if (hoverPanel) return;
+                        hoverPanel = document.createElement('div');
+                        hoverPanel.className = 'month-day-hover-panel';
+                        hoverPanel.style.cssText = [
+                            'position:absolute; left:8px; right:8px; top:28px; z-index:20;',
+                            'background:#ffffff; border:1px solid #e5e7eb; border-radius:10px;',
+                            'box-shadow:0 10px 25px rgba(0,0,0,0.15);',
+                            'padding:10px; max-height:260px; overflow:auto; animation:fadeIn 120ms ease-out;'
+                        ].join(' ');
+
+                        // Cabeçalho do painel
+                        const header = document.createElement('div');
+                        header.textContent = 'Agendamentos do dia';
+                        header.style.cssText = 'font-weight:700; color:#111827; font-size:12px; margin-bottom:8px;';
+                        hoverPanel.appendChild(header);
+
+                        // Lista completa de eventos
+                        dayEvents.forEach(ev => {
+                            const item = document.createElement('div');
+                            item.style.cssText = 'display:flex; align-items:center; gap:8px; padding:6px; border:1px solid #f1f5f9; border-radius:8px; background:#fff; margin-bottom:6px;';
+
+                            const colorBar = document.createElement('div');
+                            colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${ev.color || '#1976d2'};`;
+
+                            const textCol = document.createElement('div');
+                            textCol.style.cssText = 'display:flex; flex-direction:column; gap:2px; min-width:0;';
+
+                            let cleanTitle = ev.title || 'Evento';
+                            cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
+                            const titleDiv = document.createElement('div');
+                            titleDiv.textContent = cleanTitle;
+                            titleDiv.style.cssText = 'font-weight:700; color:#111827; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+
+                            const comunidadeNome = ev.comunidade_nome || 'Comunidade';
+                            const nameDiv = document.createElement('div');
+                            nameDiv.textContent = comunidadeNome;
+                            nameDiv.style.cssText = 'color:#374151; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+
+                            textCol.appendChild(titleDiv);
+                            textCol.appendChild(nameDiv);
+
+                            item.appendChild(colorBar);
+                            item.appendChild(textCol);
+
+                            // Clique para abrir modal de edição/detalhe se existir
+                            item.style.cursor = 'pointer';
+                            item.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                if (typeof window.editEventModal === 'function') {
+                                    window.editEventModal(ev);
+                                }
+                            });
+
+                            hoverPanel.appendChild(item);
+                        });
+
+                        cell.appendChild(hoverPanel);
+                    };
+
+                    const closeHoverPanel = () => {
+                        if (hoverPanel && hoverPanel.parentNode) {
+                            hoverPanel.parentNode.removeChild(hoverPanel);
+                        }
+                        hoverPanel = null;
+                    };
+
+                    cell.addEventListener('mouseenter', openHoverPanel);
+                    cell.addEventListener('mouseleave', closeHoverPanel);
 
                     cell.addEventListener('click', () => {});
                     calendarBody.appendChild(cell);
