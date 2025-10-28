@@ -3411,6 +3411,7 @@
     <script src="scripts/agenda/api.js"></script>
     <script src="scripts/agenda/data-cache.js"></script>
     <script src="scripts/agenda/ui-utils.js"></script>
+    <script src="scripts/agenda/selects.js"></script>
     <script>
         // Wire shims to new modules
         if (window.AgendaUI) {
@@ -5596,6 +5597,10 @@
                     
                     // Executar o JavaScript dos modais
                     executeModalScripts();
+                    // Pré-carregar selects do modal assim que os modais estiverem no DOM
+                    if (window.AgendaSelects && typeof window.AgendaSelects.populateSelectsForModal === 'function') {
+                        window.AgendaSelects.populateSelectsForModal();
+                    }
                     
                     // Verificar se as funções dos modais estão disponíveis
                     if (typeof openEventModal === 'function' && typeof closeEventModal === 'function') {
@@ -5720,7 +5725,13 @@
                         }
                     }
                     
-                    populateSelectsFromCache();
+                    // Popular selects usando cache centralizado
+                    if (window.AgendaSelects && typeof window.AgendaSelects.populateSelectsForModal === 'function') {
+                        window.AgendaSelects.populateSelectsForModal();
+                    } else if (typeof populateSelectsFromCache === 'function') {
+                        // fallback antigo
+                        populateSelectsFromCache();
+                    }
                     initializeCustomSelects('#eventModal');
                     reloadCustomSelects('#eventModal');
                     ocultarSpinnerAgenda();
