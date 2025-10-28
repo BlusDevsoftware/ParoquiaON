@@ -4241,18 +4241,13 @@
                         colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${ev.color || '#1976d2'};`;
 
                         const textCol = document.createElement('div');
-                        textCol.style.cssText = 'display:flex; flex-direction:column; gap:2px; min-width:0;';
+                        textCol.style.cssText = 'display:flex; flex-direction:column; gap:0; min-width:0;';
 
                         const titleDiv = document.createElement('div');
                         titleDiv.textContent = cleanTitle;
                         titleDiv.style.cssText = 'font-weight:700; color:#111827; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
 
-                        const nameDiv = document.createElement('div');
-                        nameDiv.textContent = comunidadeNome;
-                        nameDiv.style.cssText = 'color:#374151; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
-
                         textCol.appendChild(titleDiv);
-                        textCol.appendChild(nameDiv);
 
                         chip.appendChild(colorBar);
                         chip.appendChild(textCol);
@@ -4330,6 +4325,31 @@
                         });
 
                         document.body.appendChild(hoverPanel);
+
+                        // Ajustar posição/altura para não cortar fora da tela
+                        requestAnimationFrame(() => {
+                            const panelRect = hoverPanel.getBoundingClientRect();
+                            const spaceBelow = window.innerHeight - (top) - 8;
+                            const spaceAbove = rect.top - 8;
+
+                            let finalTop = top;
+                            // Se não cabe abaixo e há mais espaço acima, posicione acima
+                            if (spaceBelow < panelRect.height && spaceAbove > spaceBelow) {
+                                finalTop = Math.max(8, rect.top - panelRect.height - 8);
+                            }
+                            // Clamp dentro da viewport
+                            if (finalTop + panelRect.height + 8 > window.innerHeight) {
+                                finalTop = Math.max(8, window.innerHeight - panelRect.height - 8);
+                            }
+
+                            hoverPanel.style.top = `${finalTop}px`;
+
+                            // Ajustar maxHeight com base no espaço disponível da posição final
+                            const available = finalTop === top
+                                ? Math.max(120, window.innerHeight - finalTop - 8)
+                                : Math.max(120, rect.top - 8);
+                            hoverPanel.style.maxHeight = `${Math.min(available, Math.floor(window.innerHeight * 0.8))}px`;
+                        });
 
                         // Manter aberto ao mover o mouse para o painel
                         hoverPanel.addEventListener('mouseenter', () => {
