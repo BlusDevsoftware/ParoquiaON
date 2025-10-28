@@ -4096,12 +4096,17 @@
         function updateMonthlyCalendar() {
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
+            // Visão mensal deve ocupar todo o container em 7 colunas (sem coluna de horário)
+            if (calendarBody && calendarBody.style) {
+                calendarBody.style.gridTemplateColumns = 'repeat(7, 1fr)';
+            }
 
             // Cabeçalhos dos dias (Dom-Sáb)
             const dayNames = ['DOM','SEG','TER','QUA','QUI','SEX','SAB'];
             const header = document.querySelector('.calendar-header');
             if (header) {
-                header.innerHTML = '<div class="time-column-header">Dia</div>' + dayNames.map(n => `<div class="day-header"><div class="day-name">${n}</div></div>`).join('');
+                // Remover o texto "Dia" e a coluna inicial; apenas 7 colunas de dias
+                header.innerHTML = dayNames.map(n => `<div class="day-header"><div class="day-name">${n}</div></div>`).join('');
             }
 
             const year = currentDate.getFullYear();
@@ -4112,11 +4117,7 @@
 
             // 6 semanas (máximo)
             for (let week = 0; week < 6; week++) {
-                // Coluna "hora" vira coluna do número da semana (ou vazia)
-                const weekCell = document.createElement('div');
-                weekCell.className = 'time-slot';
-                weekCell.textContent = '';
-                calendarBody.appendChild(weekCell);
+                // Sem coluna de hora/número da semana na visão mensal
 
                 for (let day = 0; day < 7; day++) {
                     const date = new Date(start);
