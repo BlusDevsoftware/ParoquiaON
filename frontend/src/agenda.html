@@ -3481,7 +3481,19 @@
             e.preventDefault();
             const DU = window.DateUtils;
             const AC = window.AgendaCache;
-            if (!DU) { console.error('DateUtils indisponível'); return; }
+            // Fallbacks locais se DateUtils não estiver disponível
+            const pad2 = (n) => String(n).padStart(2, '0');
+            const buildDateFromYmdHm = DU && DU.buildDateFromYmdHm ? DU.buildDateFromYmdHm : function(yyyy, mm, dd, hh, mi) {
+                const d = new Date();
+                d.setFullYear(Number(yyyy));
+                d.setMonth(Number(mm) - 1);
+                d.setDate(Number(dd));
+                d.setHours(Number(hh), Number(mi), 0, 0);
+                return d;
+            };
+            const formatLocalDateTime = DU && DU.formatLocalDateTime ? DU.formatLocalDateTime : function(date) {
+                return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}T${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`;
+            };
 
             const periods = typeof window.getPeriodsData === 'function' ? window.getPeriodsData() : [];
             if (!Array.isArray(periods) || periods.length === 0) {
@@ -3532,10 +3544,10 @@
                 const [y, m, d] = dateStr.split('-');
                 const [sh, sm] = h.hora_inicio.split(':');
                 const [eh, em] = h.hora_fim.split(':');
-                const startDate = DU.buildDateFromYmdHm(y, m, d, sh, sm);
-                const endDate = DU.buildDateFromYmdHm(y, m, d, eh, em);
+                const startDate = buildDateFromYmdHm(y, m, d, sh, sm);
+                const endDate = buildDateFromYmdHm(y, m, d, eh, em);
                 const today = new Date(); today.setHours(0,0,0,0);
-                const startDay = DU.buildDateFromYmdHm(y, m, d, 0, 0);
+                const startDay = buildDateFromYmdHm(y, m, d, 0, 0);
                 if (startDay < today) {
                     if (typeof showToast === 'function') showToast('A data do evento não pode ser no passado.', 'error');
                     return;
@@ -3543,8 +3555,8 @@
                 eventos.push({
                     titulo: formData.titulo,
                     objetivo: formData.objetivo || '',
-                    data_inicio: DU.formatLocalDateTime(startDate),
-                    data_fim: DU.formatLocalDateTime(endDate),
+                    data_inicio: formatLocalDateTime(startDate),
+                    data_fim: formatLocalDateTime(endDate),
                     local_id: parseInt(formData.local),
                     acao_id: parseInt(formData.acao),
                     responsavel_id: null,
