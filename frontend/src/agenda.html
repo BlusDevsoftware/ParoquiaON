@@ -2134,6 +2134,10 @@
             top: 0;
             z-index: 20;
         }
+        /* Ajuste de cabeçalho para visão mensal: 7 colunas iguais */
+        .calendar-header.month-view {
+            grid-template-columns: repeat(7, 1fr) !important;
+        }
 
         .time-column-header {
             padding: 15px 10px;
@@ -2213,6 +2217,24 @@
             border-spacing: 0;
             gap: 0;
             row-gap: 0;
+        }
+        /* Ajuste de corpo para visão mensal: 7 colunas e sem gaps */
+        .calendar-body.month-view {
+            grid-template-columns: repeat(7, 1fr) !important;
+            grid-auto-rows: 1fr !important; /* linhas iguais ocupando todo o espaço */
+            gap: 0 !important;
+            row-gap: 0 !important;
+        }
+
+        /* Day-slot deve ocupar 100% da célula na visão mensal */
+        .calendar-body.month-view .day-slot {
+            height: 100% !important;
+            min-height: 100% !important;
+            width: 100% !important;
+            padding: 6px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Scroll escondido no container central */
@@ -3981,7 +4003,7 @@
                                 eventElement.classList.add('event-past');
                             }
                         } catch (_) {}
-
+                        
                         eventElement.addEventListener('click', (e) => {
                             e.stopPropagation();
                             editEventModal(event);
@@ -4105,6 +4127,7 @@
             const dayNames = ['DOM','SEG','TER','QUA','QUI','SEX','SAB'];
             const header = document.querySelector('.calendar-header');
             if (header) {
+                header.classList.add('month-view');
                 // Remover o texto "Dia" e a coluna inicial; apenas 7 colunas de dias
                 header.innerHTML = dayNames.map(n => `<div class="day-header"><div class="day-name">${n}</div></div>`).join('');
             }
@@ -4155,6 +4178,9 @@
                     calendarBody.appendChild(cell);
                 }
             }
+
+            // Aplicar classe de layout ao corpo na visão mensal
+            calendarBody.classList.add('month-view');
         }
 
         function updateYearlyCalendar() {
@@ -5767,7 +5793,7 @@
                         window.AgendaSelects.populateSelectsForModal();
                     } else if (typeof populateSelectsFromCache === 'function') {
                         // fallback antigo
-                        populateSelectsFromCache();
+                    populateSelectsFromCache();
                     }
                     initializeCustomSelects('#eventModal');
                     reloadCustomSelects('#eventModal');
