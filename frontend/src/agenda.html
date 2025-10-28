@@ -3615,13 +3615,7 @@
             try {
                 await Promise.all([
                     loadCommunities(),
-                    loadEventsFromApi(),
-                    loadEventCommunities(),
-                    loadEventPastorals(),
-                    loadEventPilares(),
-                    loadEventAcoes(),
-                    loadEventLocais(),
-                    loadEventStatus()
+                    loadEventsFromApi()
                 ]);
             } catch (error) {
                 console.error('❌ Erro ao carregar dados:', error);
