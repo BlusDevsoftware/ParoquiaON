@@ -4265,16 +4265,22 @@
                     // Interação: ao passar o mouse, mostrar todos os eventos do dia em um painel flutuante
                     cell.style.position = 'relative';
                     let hoverPanel;
+                    let hoverTimeout;
                     const openHoverPanel = () => {
                         // Evitar recriar caso já exista
                         if (hoverPanel) return;
                         hoverPanel = document.createElement('div');
                         hoverPanel.className = 'month-day-hover-panel';
+                        const rect = cell.getBoundingClientRect();
+                        const panelWidth = 420;
+                        const left = Math.max(8, Math.min(window.innerWidth - panelWidth - 8, rect.left + 4));
+                        const top = Math.max(8, rect.top + 28);
                         hoverPanel.style.cssText = [
-                            'position:absolute; left:8px; right:8px; top:28px; z-index:20;',
+                            `position:fixed; left:${left}px; top:${top}px; z-index:1000;`,
+                            `width:${panelWidth}px;`,
                             'background:#ffffff; border:1px solid #e5e7eb; border-radius:10px;',
                             'box-shadow:0 10px 25px rgba(0,0,0,0.15);',
-                            'padding:10px; max-height:260px; overflow:auto; animation:fadeIn 120ms ease-out;'
+                            'padding:10px; max-height:60vh; overflow:auto; animation:fadeIn 120ms ease-out;'
                         ].join(' ');
 
                         // Cabeçalho do painel
@@ -4294,8 +4300,8 @@
                             const textCol = document.createElement('div');
                             textCol.style.cssText = 'display:flex; flex-direction:column; gap:2px; min-width:0;';
 
-                            let cleanTitle = ev.title || 'Evento';
-                            cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
+                        let cleanTitle = ev.title || 'Evento';
+                        cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
                             const titleDiv = document.createElement('div');
                             titleDiv.textContent = cleanTitle;
                             titleDiv.style.cssText = 'font-weight:700; color:#111827; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
@@ -4323,7 +4329,18 @@
                             hoverPanel.appendChild(item);
                         });
 
-                        cell.appendChild(hoverPanel);
+                        document.body.appendChild(hoverPanel);
+
+                        // Manter aberto ao mover o mouse para o painel
+                        hoverPanel.addEventListener('mouseenter', () => {
+                            if (hoverTimeout) {
+                                clearTimeout(hoverTimeout);
+                                hoverTimeout = null;
+                            }
+                        });
+                        hoverPanel.addEventListener('mouseleave', () => {
+                            closeHoverPanel();
+                        });
                     };
 
                     const closeHoverPanel = () => {
@@ -4333,8 +4350,19 @@
                         hoverPanel = null;
                     };
 
-                    cell.addEventListener('mouseenter', openHoverPanel);
-                    cell.addEventListener('mouseleave', closeHoverPanel);
+                    cell.addEventListener('mouseenter', () => {
+                        if (hoverTimeout) {
+                            clearTimeout(hoverTimeout);
+                            hoverTimeout = null;
+                        }
+                        openHoverPanel();
+                    });
+                    cell.addEventListener('mouseleave', () => {
+                        // Aguardar pequeno atraso para permitir mover o mouse ao painel sem fechar
+                        hoverTimeout = setTimeout(() => {
+                            closeHoverPanel();
+                        }, 120);
+                    });
 
                     cell.addEventListener('click', () => {});
                     calendarBody.appendChild(cell);
