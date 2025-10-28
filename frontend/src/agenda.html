@@ -4282,166 +4282,169 @@
                     });
 
                     // Interação: ao passar o mouse, mostrar todos os eventos do dia em um painel flutuante
-                    cell.style.position = 'relative';
-                    let hoverPanel;
-                    let hoverTimeout;
-                    const openHoverPanel = () => {
-                        // Evitar recriar caso já exista
-                        if (hoverPanel) return;
-                        hoverPanel = document.createElement('div');
-                        hoverPanel.className = 'month-day-hover-panel';
-                        const rect = cell.getBoundingClientRect();
-                        const panelWidth = 420;
-                        const left = Math.max(8, Math.min(window.innerWidth - panelWidth - 8, rect.left + 4));
-                        const top = Math.max(8, rect.top + 28);
-                        hoverPanel.style.cssText = [
-                            `position:fixed; left:${left}px; top:${top}px; z-index:1000;`,
-                            `width:${panelWidth}px;`,
-                            'background:#ffffff; border:1px solid #e5e7eb; border-radius:10px;',
-                            'box-shadow:0 10px 25px rgba(0,0,0,0.15);',
-                            'padding:10px; max-height:60vh; overflow:auto; animation:fadeIn 120ms ease-out;'
-                        ].join(' ');
+                    // Só adicionar eventos de hover se houver eventos no dia
+                    if (dayEvents.length > 0) {
+                        cell.style.position = 'relative';
+                        let hoverPanel;
+                        let hoverTimeout;
+                        const openHoverPanel = () => {
+                            // Evitar recriar caso já exista
+                            if (hoverPanel) return;
+                            hoverPanel = document.createElement('div');
+                            hoverPanel.className = 'month-day-hover-panel';
+                            const rect = cell.getBoundingClientRect();
+                            const panelWidth = 420;
+                            const left = Math.max(8, Math.min(window.innerWidth - panelWidth - 8, rect.left + 4));
+                            const top = Math.max(8, rect.top + 28);
+                            hoverPanel.style.cssText = [
+                                `position:fixed; left:${left}px; top:${top}px; z-index:1000;`,
+                                `width:${panelWidth}px;`,
+                                'background:#ffffff; border:1px solid #e5e7eb; border-radius:10px;',
+                                'box-shadow:0 10px 25px rgba(0,0,0,0.15);',
+                                'padding:10px; max-height:60vh; overflow:auto; animation:fadeIn 120ms ease-out;'
+                            ].join(' ');
 
-                        // Cabeçalho do painel
-                        const header = document.createElement('div');
-                        header.textContent = 'Agendamentos do dia';
-                        header.style.cssText = 'font-weight:700; color:#111827; font-size:12px; margin-bottom:8px;';
-                        hoverPanel.appendChild(header);
+                            // Cabeçalho do painel
+                            const header = document.createElement('div');
+                            header.textContent = 'Agendamentos do dia';
+                            header.style.cssText = 'font-weight:700; color:#111827; font-size:12px; margin-bottom:8px;';
+                            hoverPanel.appendChild(header);
 
-                        // Container de lista com rolagem quando houver mais de 5
-                        const listContainer = document.createElement('div');
-                        listContainer.style.cssText = 'display:flex; flex-direction:column; gap:6px;';
-                        hoverPanel.appendChild(listContainer);
+                            // Container de lista com rolagem quando houver mais de 5
+                            const listContainer = document.createElement('div');
+                            listContainer.style.cssText = 'display:flex; flex-direction:column; gap:6px;';
+                            hoverPanel.appendChild(listContainer);
 
-                        // Lista completa de eventos
-                        dayEvents.forEach(ev => {
-                            const item = document.createElement('div');
-                            item.style.cssText = 'display:flex; align-items:center; gap:10px; padding:8px; border:1px solid #f1f5f9; border-radius:8px; background:#fff;';
+                            // Lista completa de eventos
+                            dayEvents.forEach(ev => {
+                                const item = document.createElement('div');
+                                item.style.cssText = 'display:flex; align-items:center; gap:10px; padding:8px; border:1px solid #f1f5f9; border-radius:8px; background:#fff;';
 
-                            const colorBar = document.createElement('div');
-                            colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${ev.color || '#1976d2'};`;
+                                const colorBar = document.createElement('div');
+                                colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${ev.color || '#1976d2'};`;
 
-                            // Avatar/foto da comunidade
-                            let avatarEl;
+                                // Avatar/foto da comunidade
+                                let avatarEl;
                         const comunidadeNome = ev.comunidade_nome || 'Comunidade';
                         if (ev.comunidades?.foto) {
-                                avatarEl = document.createElement('img');
-                                avatarEl.src = ev.comunidades.foto;
-                                avatarEl.alt = comunidadeNome;
-                                avatarEl.style.cssText = 'width:28px; height:28px; border-radius:50%; object-fit:cover; flex:0 0 28px; background:#f3f4f6;';
+                                    avatarEl = document.createElement('img');
+                                    avatarEl.src = ev.comunidades.foto;
+                                    avatarEl.alt = comunidadeNome;
+                                    avatarEl.style.cssText = 'width:28px; height:28px; border-radius:50%; object-fit:cover; flex:0 0 28px; background:#f3f4f6;';
                         } else {
-                                avatarEl = document.createElement('div');
-                                avatarEl.style.cssText = `width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 28px; background:${ev.color || '#1976d2'}; color:#fff; font-weight:700; font-size:12px;`;
-                                avatarEl.textContent = (comunidadeNome.charAt(0) || 'C').toUpperCase();
-                            }
+                                    avatarEl = document.createElement('div');
+                                    avatarEl.style.cssText = `width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 28px; background:${ev.color || '#1976d2'}; color:#fff; font-weight:700; font-size:12px;`;
+                                    avatarEl.textContent = (comunidadeNome.charAt(0) || 'C').toUpperCase();
+                                }
 
-                            const textCol = document.createElement('div');
-                            textCol.style.cssText = 'display:flex; flex-direction:column; gap:2px; min-width:0;';
+                                const textCol = document.createElement('div');
+                                textCol.style.cssText = 'display:flex; flex-direction:column; gap:2px; min-width:0;';
 
                         let cleanTitle = ev.title || 'Evento';
                         cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
-                            const titleDiv = document.createElement('div');
-                            titleDiv.textContent = cleanTitle;
-                            titleDiv.style.cssText = 'font-weight:700; color:#1e3a8a; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+                                const titleDiv = document.createElement('div');
+                                titleDiv.textContent = cleanTitle;
+                                titleDiv.style.cssText = 'font-weight:700; color:#1e3a8a; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
 
-                            // Hora início e fim (HH:mm - HH:mm)
-                            const startDate = new Date(ev.startTime);
-                            const endDate = new Date(ev.endTime || ev.startTime);
-                            const fmt = (n) => String(n).padStart(2, '0');
-                            const timeText = `${fmt(startDate.getHours())}:${fmt(startDate.getMinutes())} - ${fmt(endDate.getHours())}:${fmt(endDate.getMinutes())}`;
-                            const timeDiv = document.createElement('div');
-                            timeDiv.textContent = timeText;
-                            timeDiv.style.cssText = 'color:#6b7280; font-size:11px;';
+                                // Hora início e fim (HH:mm - HH:mm)
+                                const startDate = new Date(ev.startTime);
+                                const endDate = new Date(ev.endTime || ev.startTime);
+                                const fmt = (n) => String(n).padStart(2, '0');
+                                const timeText = `${fmt(startDate.getHours())}:${fmt(startDate.getMinutes())} - ${fmt(endDate.getHours())}:${fmt(endDate.getMinutes())}`;
+                                const timeDiv = document.createElement('div');
+                                timeDiv.textContent = timeText;
+                                timeDiv.style.cssText = 'color:#6b7280; font-size:11px;';
 
-                            const nameDiv = document.createElement('div');
-                            nameDiv.textContent = comunidadeNome;
-                            nameDiv.style.cssText = 'color:#374151; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+                                const nameDiv = document.createElement('div');
+                                nameDiv.textContent = comunidadeNome;
+                                nameDiv.style.cssText = 'color:#374151; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
 
-                            textCol.appendChild(titleDiv);
-                            textCol.appendChild(timeDiv);
-                            textCol.appendChild(nameDiv);
+                                textCol.appendChild(titleDiv);
+                                textCol.appendChild(timeDiv);
+                                textCol.appendChild(nameDiv);
 
-                            item.appendChild(colorBar);
-                            item.appendChild(avatarEl);
-                            item.appendChild(textCol);
+                                item.appendChild(colorBar);
+                                item.appendChild(avatarEl);
+                                item.appendChild(textCol);
 
-                            // Clique para abrir modal de edição/detalhe se existir
-                            item.style.cursor = 'pointer';
-                            item.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                if (typeof window.editEventModal === 'function') {
-                                    window.editEventModal(ev);
-                                }
+                                // Clique para abrir modal de edição/detalhe se existir
+                                item.style.cursor = 'pointer';
+                                item.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    if (typeof window.editEventModal === 'function') {
+                                        window.editEventModal(ev);
+                                    }
+                                });
+
+                                listContainer.appendChild(item);
                             });
 
-                            listContainer.appendChild(item);
-                        });
-
-                        // Ativar rolagem quando houver mais de 5 itens
-                        if (dayEvents.length > 5) {
-                            listContainer.style.maxHeight = '240px';
-                            listContainer.style.overflow = 'auto';
-                        }
-
-                        document.body.appendChild(hoverPanel);
-
-                        // Ajustar posição/altura para não cortar fora da tela
-                        requestAnimationFrame(() => {
-                            const panelRect = hoverPanel.getBoundingClientRect();
-                            const spaceBelow = window.innerHeight - (top) - 8;
-                            const spaceAbove = rect.top - 8;
-
-                            let finalTop = top;
-                            // Se não cabe abaixo e há mais espaço acima, posicione acima
-                            if (spaceBelow < panelRect.height && spaceAbove > spaceBelow) {
-                                finalTop = Math.max(8, rect.top - panelRect.height - 8);
-                            }
-                            // Clamp dentro da viewport
-                            if (finalTop + panelRect.height + 8 > window.innerHeight) {
-                                finalTop = Math.max(8, window.innerHeight - panelRect.height - 8);
+                            // Ativar rolagem quando houver mais de 5 itens
+                            if (dayEvents.length > 5) {
+                                listContainer.style.maxHeight = '240px';
+                                listContainer.style.overflow = 'auto';
                             }
 
-                            hoverPanel.style.top = `${finalTop}px`;
+                            document.body.appendChild(hoverPanel);
 
-                            // Ajustar maxHeight com base no espaço disponível da posição final
-                            const available = finalTop === top
-                                ? Math.max(120, window.innerHeight - finalTop - 8)
-                                : Math.max(120, rect.top - 8);
-                            hoverPanel.style.maxHeight = `${Math.min(available, Math.floor(window.innerHeight * 0.8))}px`;
-                        });
+                            // Ajustar posição/altura para não cortar fora da tela
+                            requestAnimationFrame(() => {
+                                const panelRect = hoverPanel.getBoundingClientRect();
+                                const spaceBelow = window.innerHeight - (top) - 8;
+                                const spaceAbove = rect.top - 8;
 
-                        // Manter aberto ao mover o mouse para o painel
-                        hoverPanel.addEventListener('mouseenter', () => {
+                                let finalTop = top;
+                                // Se não cabe abaixo e há mais espaço acima, posicione acima
+                                if (spaceBelow < panelRect.height && spaceAbove > spaceBelow) {
+                                    finalTop = Math.max(8, rect.top - panelRect.height - 8);
+                                }
+                                // Clamp dentro da viewport
+                                if (finalTop + panelRect.height + 8 > window.innerHeight) {
+                                    finalTop = Math.max(8, window.innerHeight - panelRect.height - 8);
+                                }
+
+                                hoverPanel.style.top = `${finalTop}px`;
+
+                                // Ajustar maxHeight com base no espaço disponível da posição final
+                                const available = finalTop === top
+                                    ? Math.max(120, window.innerHeight - finalTop - 8)
+                                    : Math.max(120, rect.top - 8);
+                                hoverPanel.style.maxHeight = `${Math.min(available, Math.floor(window.innerHeight * 0.8))}px`;
+                            });
+
+                            // Manter aberto ao mover o mouse para o painel
+                            hoverPanel.addEventListener('mouseenter', () => {
+                                if (hoverTimeout) {
+                                    clearTimeout(hoverTimeout);
+                                    hoverTimeout = null;
+                                }
+                            });
+                            hoverPanel.addEventListener('mouseleave', () => {
+                                closeHoverPanel();
+                            });
+                        };
+
+                        const closeHoverPanel = () => {
+                            if (hoverPanel && hoverPanel.parentNode) {
+                                hoverPanel.parentNode.removeChild(hoverPanel);
+                            }
+                            hoverPanel = null;
+                        };
+
+                        cell.addEventListener('mouseenter', () => {
                             if (hoverTimeout) {
                                 clearTimeout(hoverTimeout);
                                 hoverTimeout = null;
                             }
+                            openHoverPanel();
                         });
-                        hoverPanel.addEventListener('mouseleave', () => {
-                            closeHoverPanel();
+                        cell.addEventListener('mouseleave', () => {
+                            // Aguardar pequeno atraso para permitir mover o mouse ao painel sem fechar
+                            hoverTimeout = setTimeout(() => {
+                                closeHoverPanel();
+                            }, 120);
                         });
-                    };
-
-                    const closeHoverPanel = () => {
-                        if (hoverPanel && hoverPanel.parentNode) {
-                            hoverPanel.parentNode.removeChild(hoverPanel);
-                        }
-                        hoverPanel = null;
-                    };
-
-                    cell.addEventListener('mouseenter', () => {
-                        if (hoverTimeout) {
-                            clearTimeout(hoverTimeout);
-                            hoverTimeout = null;
-                        }
-                        openHoverPanel();
-                    });
-                    cell.addEventListener('mouseleave', () => {
-                        // Aguardar pequeno atraso para permitir mover o mouse ao painel sem fechar
-                        hoverTimeout = setTimeout(() => {
-                            closeHoverPanel();
-                        }, 120);
-                    });
+                    }
 
                     cell.addEventListener('click', () => {});
                     calendarBody.appendChild(cell);
@@ -5838,7 +5841,7 @@
                     const datetimeElement = document.createElement('div');
                     datetimeElement.className = 'event-datetime';
                     const startTime = new Date(event.startTime);
-                    const endTime = new Date(event.endTime || event.startTime);
+                        const endTime = new Date(event.endTime || event.startTime);
                     const dateString = `${String(startTime.getDate()).padStart(2, '0')}/${String(startTime.getMonth() + 1).padStart(2, '0')}`;
                     const startTimeString = `${String(startTime.getHours()).padStart(2, '0')}:${String(startTime.getMinutes()).padStart(2, '0')}`;
                     const endTimeString = `${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
