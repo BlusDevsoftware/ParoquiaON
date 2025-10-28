@@ -5800,11 +5800,11 @@
                 
                 // Adicionar eventos para este horário - igual ao estilo da semana
                 const hourEvents = getEventsForHour(currentDate, hour);
-                hourEvents.forEach(event => {
+                hourEvents.forEach((event, index) => {
                     const eventElement = document.createElement('div');
-                    eventElement.className = 'event-item';
-                    
-                    // Título (limpo) no padrão do sistema
+                    eventElement.className = 'event-block';
+
+                    // Título (limpo) no padrão semanal
                     const titleElement = document.createElement('div');
                     titleElement.className = 'event-title';
                     let cleanTitle = event.title || 'Agendamento';
@@ -5814,7 +5814,20 @@
                     } else {
                         titleElement.textContent = cleanTitle;
                     }
-                    
+
+                    // Data/hora
+                    const datetimeElement = document.createElement('div');
+                    datetimeElement.className = 'event-datetime';
+                    const startTime = new Date(event.startTime);
+                    const endTime = new Date(event.endTime || event.startTime);
+                    const dateString = `${String(startTime.getDate()).padStart(2, '0')}/${String(startTime.getMonth() + 1).padStart(2, '0')}`;
+                    const startTimeString = `${String(startTime.getHours()).padStart(2, '0')}:${String(startTime.getMinutes()).padStart(2, '0')}`;
+                    const endTimeString = `${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
+                    datetimeElement.innerHTML = `
+                        <div class="event-date">${dateString}</div>
+                        <div class="event-time">${startTimeString} - ${endTimeString}</div>
+                    `;
+
                     // Comunidade (avatar + nome)
                     const communityElement = document.createElement('div');
                     communityElement.className = 'event-community';
@@ -5831,46 +5844,58 @@
                     communityNameElement.textContent = communityName;
                     communityElement.appendChild(avatarElement);
                     communityElement.appendChild(communityNameElement);
-                    
-                    // Data e horário (início - fim)
-                    const datetimeElement = document.createElement('div');
-                    datetimeElement.className = 'event-datetime';
-                    const startTime = new Date(event.startTime);
-                    const endTime = new Date(event.endTime || event.startTime);
-                    const dateString = `${String(startTime.getDate()).padStart(2, '0')}/${String(startTime.getMonth() + 1).padStart(2, '0')}`;
-                    const startTimeString = `${String(startTime.getHours()).padStart(2, '0')}:${String(startTime.getMinutes()).padStart(2, '0')}`;
-                    const endTimeString = `${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
-                    datetimeElement.innerHTML = `
-                        <div class="event-date">${dateString}</div>
-                        <div class="event-time">${startTimeString} - ${endTimeString}</div>
-                    `;
-                    
-                    // Aplicar cor da comunidade na borda esquerda
+
+                    // Montar estrutura
+                    eventElement.appendChild(titleElement);
+                    eventElement.appendChild(communityElement);
+                    eventElement.appendChild(datetimeElement);
+
+                    // Borda colorida
                     if (event.color) {
                         eventElement.style.borderLeft = `4px solid ${event.color}`;
                     }
-                    
-                    // Marcar como passado (padrão do sistema)
+
+                    // Posicionamento e tamanho (minutos)
+                    const startMinutes = startTime.getMinutes();
+                    const durationMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
+                    const topPosition = (startMinutes / 60) * 100;
+
+                    let leftOffset = 0;
+                    let widthPercent = 100;
+                    if (hourEvents.length > 1) {
+                        const numEvents = hourEvents.length;
+                        widthPercent = 100 / numEvents;
+                        leftOffset = index * widthPercent;
+                    }
+
+                    let maxHeight = (durationMinutes / 60) * 100;
+                    const endHour = endTime.getHours();
+                    const endMinutes = endTime.getMinutes();
+                    if (endHour > 23 || (endHour === 23 && endMinutes > 0)) {
+                        const maxEndTime = new Date(startTime);
+                        maxEndTime.setHours(23, 0, 0, 0);
+                        const maxDurationMinutes = (maxEndTime.getTime() - startTime.getTime()) / (1000 * 60);
+                        maxHeight = (maxDurationMinutes / 60) * 100;
+                        eventElement.classList.add('event-truncated');
+                    }
+
+                    eventElement.style.top = `${topPosition}%`;
+                    eventElement.style.height = `${maxHeight}%`;
+                    eventElement.style.left = `${leftOffset}%`;
+                    eventElement.style.width = `${widthPercent}%`;
+
+                    // Passado
                     try {
                         if (!isNaN(endTime) && endTime < new Date()) {
                             eventElement.classList.add('event-past');
                         }
                     } catch (_) {}
-                    
-                    // Montar card
-                    eventElement.appendChild(titleElement);
-                    eventElement.appendChild(communityElement);
-                    eventElement.appendChild(datetimeElement);
-                    
-                    // Tooltip
-                    eventElement.title = `${cleanTitle}\n${startTimeString} - ${endTimeString}`;
-                    
-                    // Ação de editar
+
                     eventElement.addEventListener('click', (e) => {
                         e.stopPropagation();
                         editEventModal(event);
                     });
-                    
+
                     daySlot.appendChild(eventElement);
                 });
 
