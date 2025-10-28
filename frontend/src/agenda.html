@@ -4229,48 +4229,38 @@
                     dayEvents.slice(0, 4).forEach(ev => {
                         const chip = document.createElement('div');
                         chip.className = 'month-event';
+                        chip.style.cssText = 'display:flex; flex-direction:column; align-items:center; gap:6px; padding:6px; background:#fff; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow:hidden;';
 
-                        const avatar = document.createElement('div');
-                        avatar.style.cssText = `
-                            width: 16px; height: 16px; border-radius: 50%;
-                            flex: 0 0 16px; display: inline-flex; align-items: center; justify-content: center;
-                            font-size: 9px; font-weight: 700; color: #fff; background: ${ev.color || '#1976d2'}; overflow: hidden;
-                        `;
                         const comunidadeNome = ev.comunidade_nome || 'Comunidade';
-                        if (ev.comunidades?.foto) {
-                            avatar.style.background = `url(${ev.comunidades.foto}) center/cover no-repeat`;
-                            avatar.textContent = '';
-                        } else {
-                            avatar.textContent = (comunidadeNome.charAt(0) || 'C').toUpperCase();
-                        }
-
-                        const textWrap = document.createElement('div');
-                        textWrap.style.cssText = 'display:flex; align-items:center; gap:6px; overflow:hidden; width:100%;';
-
-                        const start = new Date(ev.startTime);
-                        const hh = String(start.getHours()).padStart(2, '0');
-                        const mm = String(start.getMinutes()).padStart(2, '0');
-                        const timeSpan = document.createElement('span');
-                        timeSpan.style.cssText = 'color:#111827; font-weight:700; flex:0 0 auto;';
-                        timeSpan.textContent = `${hh}:${mm}`;
-
-                        const comunidadeSpan = document.createElement('span');
-                        comunidadeSpan.style.cssText = 'color:#374151; font-weight:600; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; max-width:100px;';
-                        comunidadeSpan.textContent = comunidadeNome;
 
                         let cleanTitle = ev.title || 'Evento';
                         cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
-                        const titleSpan = document.createElement('span');
-                        titleSpan.style.cssText = 'color:#4b5563; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;';
-                        titleSpan.textContent = `• ${cleanTitle}`;
 
-                        textWrap.appendChild(timeSpan);
-                        textWrap.appendChild(comunidadeSpan);
-                        textWrap.appendChild(titleSpan);
+                        const titleDiv = document.createElement('div');
+                        titleDiv.textContent = cleanTitle;
+                        titleDiv.style.cssText = 'width:100%; text-align:center; font-weight:700; color:#111827; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
 
-                        chip.appendChild(avatar);
-                        chip.appendChild(textWrap);
-                        chip.title = `${cleanTitle} — ${comunidadeNome} às ${hh}:${mm}`;
+                        let mediaEl;
+                        if (ev.comunidades?.foto) {
+                            mediaEl = document.createElement('img');
+                            mediaEl.src = ev.comunidades.foto;
+                            mediaEl.alt = comunidadeNome;
+                            mediaEl.style.cssText = 'width:100%; height:60px; object-fit:cover; border-radius:6px; background:#f3f4f6;';
+                        } else {
+                            mediaEl = document.createElement('div');
+                            mediaEl.style.cssText = `width:100%; height:60px; display:flex; align-items:center; justify-content:center; border-radius:6px; background:${ev.color || '#1976d2'}; color:#fff; font-weight:700;`;
+                            mediaEl.textContent = (comunidadeNome.charAt(0) || 'C').toUpperCase();
+                        }
+
+                        const nameDiv = document.createElement('div');
+                        nameDiv.textContent = comunidadeNome;
+                        nameDiv.style.cssText = 'width:100%; text-align:center; color:#374151; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+
+                        chip.appendChild(titleDiv);
+                        chip.appendChild(mediaEl);
+                        chip.appendChild(nameDiv);
+
+                        chip.title = `${cleanTitle} — ${comunidadeNome}`;
 
                         eventsWrap.appendChild(chip);
                     });
