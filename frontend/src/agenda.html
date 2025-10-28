@@ -4165,12 +4165,68 @@
                     });
                     dayEvents.slice(0, 3).forEach(ev => {
                         const chip = document.createElement('div');
-                        chip.style.cssText = `margin:4px; padding:2px 6px; border-radius:10px; font-size:10px; color:#fff; display:inline-block; background:${ev.color || '#1976d2'};`;
-                        
-                        // Remover horário do título se houver
+                        // Reduzir largura para não sobrepor o número do dia e manter respiro nas bordas
+                        chip.style.cssText = `
+                            margin: 4px 6px 2px 6px;
+                            padding: 4px 6px;
+                            border-radius: 8px;
+                            font-size: 10px;
+                            color: #1f2937;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            background: #f3f4f6;
+                            border: 1px solid #e5e7eb;
+                            max-width: 92%;
+                            box-sizing: border-box;
+                        `;
+
+                        // Avatar/foto da comunidade
+                        const avatar = document.createElement('div');
+                        avatar.style.cssText = `
+                            width: 16px; height: 16px; border-radius: 50%;
+                            flex: 0 0 16px; display: inline-flex; align-items: center; justify-content: center;
+                            font-size: 9px; font-weight: 700; color: #fff; background: ${ev.color || '#1976d2'}; overflow: hidden;
+                        `;
+                        const comunidadeNome = ev.comunidade_nome || 'Comunidade';
+                        if (ev.comunidades?.foto) {
+                            avatar.style.background = `url(${ev.comunidades.foto}) center/cover no-repeat`;
+                            avatar.textContent = '';
+                        } else {
+                            avatar.textContent = (comunidadeNome.charAt(0) || 'C').toUpperCase();
+                        }
+
+                        // Texto: horário + nome da comunidade + título
+                        const textWrap = document.createElement('div');
+                        textWrap.style.cssText = 'display:flex; align-items:center; gap:6px; overflow:hidden;';
+
+                        const start = new Date(ev.startTime);
+                        const hh = String(start.getHours()).padStart(2, '0');
+                        const mm = String(start.getMinutes()).padStart(2, '0');
+                        const timeSpan = document.createElement('span');
+                        timeSpan.style.cssText = 'color:#111827; font-weight:700;';
+                        timeSpan.textContent = `${hh}:${mm}`;
+
+                        const comunidadeSpan = document.createElement('span');
+                        comunidadeSpan.style.cssText = 'color:#374151; font-weight:600; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; max-width:120px;';
+                        comunidadeSpan.textContent = comunidadeNome;
+
                         let cleanTitle = ev.title || 'Evento';
                         cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
-                        chip.textContent = cleanTitle;
+                        const titleSpan = document.createElement('span');
+                        titleSpan.style.cssText = 'color:#4b5563; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;';
+                        titleSpan.textContent = `• ${cleanTitle}`;
+
+                        textWrap.appendChild(timeSpan);
+                        textWrap.appendChild(comunidadeSpan);
+                        textWrap.appendChild(titleSpan);
+
+                        chip.appendChild(avatar);
+                        chip.appendChild(textWrap);
+
+                        // Tooltip
+                        chip.title = `${cleanTitle} — ${comunidadeNome} às ${hh}:${mm}`;
+
                         cell.appendChild(chip);
                     });
 
