@@ -4229,7 +4229,7 @@
                     dayEvents.slice(0, 4).forEach(ev => {
                         const chip = document.createElement('div');
                         chip.className = 'month-event';
-                        chip.style.cssText = 'display:flex; flex-direction:column; align-items:center; gap:6px; padding:6px; background:#fff; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow:hidden;';
+                        chip.style.cssText = 'display:flex; flex-direction:column; align-items:flex-start; gap:6px; padding:6px; background:#fff; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow:hidden;';
 
                         const comunidadeNome = ev.comunidade_nome || 'Comunidade';
 
@@ -4238,27 +4238,32 @@
 
                         const titleDiv = document.createElement('div');
                         titleDiv.textContent = cleanTitle;
-                        titleDiv.style.cssText = 'width:100%; text-align:center; font-weight:700; color:#111827; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+                        titleDiv.style.cssText = 'width:100%; text-align:left; font-weight:700; color:#111827; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
 
-                        let mediaEl;
+                        const infoRow = document.createElement('div');
+                        infoRow.style.cssText = 'display:flex; align-items:center; gap:8px; width:100%; overflow:hidden;';
+
+                        let avatarEl;
                         if (ev.comunidades?.foto) {
-                            mediaEl = document.createElement('img');
-                            mediaEl.src = ev.comunidades.foto;
-                            mediaEl.alt = comunidadeNome;
-                            mediaEl.style.cssText = 'width:100%; height:60px; object-fit:cover; border-radius:6px; background:#f3f4f6;';
+                            avatarEl = document.createElement('img');
+                            avatarEl.src = ev.comunidades.foto;
+                            avatarEl.alt = comunidadeNome;
+                            avatarEl.style.cssText = 'width:24px; height:24px; border-radius:50%; object-fit:cover; flex:0 0 24px; background:#f3f4f6;';
                         } else {
-                            mediaEl = document.createElement('div');
-                            mediaEl.style.cssText = `width:100%; height:60px; display:flex; align-items:center; justify-content:center; border-radius:6px; background:${ev.color || '#1976d2'}; color:#fff; font-weight:700;`;
-                            mediaEl.textContent = (comunidadeNome.charAt(0) || 'C').toUpperCase();
+                            avatarEl = document.createElement('div');
+                            avatarEl.style.cssText = `width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 24px; background:${ev.color || '#1976d2'}; color:#fff; font-weight:700; font-size:12px;`;
+                            avatarEl.textContent = (comunidadeNome.charAt(0) || 'C').toUpperCase();
                         }
 
                         const nameDiv = document.createElement('div');
                         nameDiv.textContent = comunidadeNome;
-                        nameDiv.style.cssText = 'width:100%; text-align:center; color:#374151; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+                        nameDiv.style.cssText = 'color:#374151; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+
+                        infoRow.appendChild(avatarEl);
+                        infoRow.appendChild(nameDiv);
 
                         chip.appendChild(titleDiv);
-                        chip.appendChild(mediaEl);
-                        chip.appendChild(nameDiv);
+                        chip.appendChild(infoRow);
 
                         chip.title = `${cleanTitle} — ${comunidadeNome}`;
 
