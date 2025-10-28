@@ -3854,12 +3854,18 @@
         function updateWeeklyCalendar() {
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
+            // Resetar layout para semanal (coluna de hora + 7 dias)
+            if (calendarBody && calendarBody.style) {
+                calendarBody.style.gridTemplateColumns = '44px repeat(7, 1fr)';
+            }
 
             // Reconstruir cabeçalhos dos dias (DOM-SAB) com IDs esperados
             const header = document.querySelector('.calendar-header');
             if (header) {
+                header.classList.remove('month-view');
+                header.style.gridTemplateColumns = '44px repeat(7, 1fr)';
                 header.innerHTML = `
-                    <div class="time-column-header">Hora</div>
+                    <div class="time-column-header"></div>
                     <div class="day-header" id="day0"><div class="day-name">DOM</div><div class="day-number">-</div></div>
                     <div class="day-header" id="day1"><div class="day-name">SEG</div><div class="day-number">-</div></div>
                     <div class="day-header" id="day2"><div class="day-name">TER</div><div class="day-number">-</div></div>
@@ -4186,6 +4192,9 @@
             const dayNames = ['DOM','SEG','TER','QUA','QUI','SEX','SAB'];
             const header = document.querySelector('.calendar-header');
             if (header) {
+                // Garantir estado de mês
+                header.classList.add('month-view');
+                header.style.gridTemplateColumns = '';
                 header.classList.add('month-view');
                 // Remover o texto "Dia" e a coluna inicial; apenas 7 colunas de dias
                 header.innerHTML = dayNames.map(n => `<div class="day-header"><div class="day-name">${n}</div></div>`).join('');
@@ -5768,6 +5777,7 @@
             // Cabeçalho do dia (igual ao estilo da semana)
             const header = document.querySelector('.calendar-header');
             if (header) {
+                header.classList.remove('month-view');
                 const dayNames = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
                 const dayName = dayNames[currentDate.getDay()];
                 const dayNumber = currentDate.getDate();
