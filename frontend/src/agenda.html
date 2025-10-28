@@ -4221,6 +4221,17 @@
                         const d = new Date(ev.startTime);
                         return d.toDateString() === date.toDateString();
                     });
+                    // Contador de eventos no canto superior esquerdo (ao lado do dia)
+                    if (dayEvents.length > 0) {
+                        const countBadge = document.createElement('div');
+                        countBadge.textContent = String(dayEvents.length);
+                        countBadge.style.cssText = [
+                            'position:absolute; top:6px; left:28px;',
+                            'background:#111827; color:#ffffff; font-size:10px; line-height:14px;',
+                            'padding:0 6px; border-radius:9999px; font-weight:700; opacity:0.9;'
+                        ].join(' ');
+                        cell.appendChild(countBadge);
+                    }
                     // Container fixo interno para os eventos (evita aumentar a célula)
                     const eventsWrap = document.createElement('div');
                     eventsWrap.className = 'month-events';
@@ -4245,7 +4256,7 @@
 
                         const titleDiv = document.createElement('div');
                         titleDiv.textContent = cleanTitle;
-                        titleDiv.style.cssText = 'font-weight:700; color:#111827; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+                        titleDiv.style.cssText = 'font-weight:700; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#1e3a8a;';
 
                         textCol.appendChild(titleDiv);
 
@@ -4299,13 +4310,13 @@
 
                             // Avatar/foto da comunidade
                             let avatarEl;
-                            const comunidadeNome = ev.comunidade_nome || 'Comunidade';
-                            if (ev.comunidades?.foto) {
+                        const comunidadeNome = ev.comunidade_nome || 'Comunidade';
+                        if (ev.comunidades?.foto) {
                                 avatarEl = document.createElement('img');
                                 avatarEl.src = ev.comunidades.foto;
                                 avatarEl.alt = comunidadeNome;
                                 avatarEl.style.cssText = 'width:28px; height:28px; border-radius:50%; object-fit:cover; flex:0 0 28px; background:#f3f4f6;';
-                            } else {
+                        } else {
                                 avatarEl = document.createElement('div');
                                 avatarEl.style.cssText = `width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 28px; background:${ev.color || '#1976d2'}; color:#fff; font-weight:700; font-size:12px;`;
                                 avatarEl.textContent = (comunidadeNome.charAt(0) || 'C').toUpperCase();
@@ -4314,17 +4325,27 @@
                             const textCol = document.createElement('div');
                             textCol.style.cssText = 'display:flex; flex-direction:column; gap:2px; min-width:0;';
 
-                            let cleanTitle = ev.title || 'Evento';
-                            cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
+                        let cleanTitle = ev.title || 'Evento';
+                        cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
                             const titleDiv = document.createElement('div');
                             titleDiv.textContent = cleanTitle;
-                            titleDiv.style.cssText = 'font-weight:700; color:#111827; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+                            titleDiv.style.cssText = 'font-weight:700; color:#1e3a8a; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+
+                            // Hora início e fim (HH:mm - HH:mm)
+                            const startDate = new Date(ev.startTime);
+                            const endDate = new Date(ev.endTime || ev.startTime);
+                            const fmt = (n) => String(n).padStart(2, '0');
+                            const timeText = `${fmt(startDate.getHours())}:${fmt(startDate.getMinutes())} - ${fmt(endDate.getHours())}:${fmt(endDate.getMinutes())}`;
+                            const timeDiv = document.createElement('div');
+                            timeDiv.textContent = timeText;
+                            timeDiv.style.cssText = 'color:#6b7280; font-size:11px;';
 
                             const nameDiv = document.createElement('div');
                             nameDiv.textContent = comunidadeNome;
                             nameDiv.style.cssText = 'color:#374151; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
 
                             textCol.appendChild(titleDiv);
+                            textCol.appendChild(timeDiv);
                             textCol.appendChild(nameDiv);
 
                             item.appendChild(colorBar);
