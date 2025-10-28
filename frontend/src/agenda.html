@@ -4072,9 +4072,27 @@
                             }
                         } catch (_) {}
                         
+                        // Estado de clique: primeira vez expande, segunda vez abre modal
+                        let isExpanded = false;
                         eventElement.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            editEventModal(event);
+                            
+                            if (!isExpanded) {
+                                // Primeiro clique: expandir permanentemente
+                                eventElement.classList.add('event-expanded');
+                                eventElement.style.zIndex = '1000';
+                                eventElement.style.width = 'auto';
+                                eventElement.style.minWidth = '300px';
+                                eventElement.style.maxWidth = '500px';
+                                eventElement.style.height = 'auto';
+                                eventElement.style.whiteSpace = 'normal';
+                                eventElement.style.overflow = 'visible';
+                                eventElement.style.padding = '12px';
+                                isExpanded = true;
+                            } else {
+                                // Segundo clique: abrir modal
+                                editEventModal(event);
+                            }
                         });
                         
                         daySlot.appendChild(eventElement);
@@ -5922,9 +5940,27 @@
                         }
                     } catch (_) {}
 
+                    // Estado de clique: primeira vez expande, segunda vez abre modal
+                    let isExpanded = false;
                     eventElement.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        editEventModal(event);
+                        
+                        if (!isExpanded) {
+                            // Primeiro clique: expandir permanentemente
+                            eventElement.classList.add('event-expanded');
+                            eventElement.style.zIndex = '1000';
+                            eventElement.style.width = 'auto';
+                            eventElement.style.minWidth = '300px';
+                            eventElement.style.maxWidth = '500px';
+                            eventElement.style.height = 'auto';
+                            eventElement.style.whiteSpace = 'normal';
+                            eventElement.style.overflow = 'visible';
+                            eventElement.style.padding = '12px';
+                            isExpanded = true;
+                        } else {
+                            // Segundo clique: abrir modal
+                            editEventModal(event);
+                        }
                     });
 
                     daySlot.appendChild(eventElement);
@@ -5987,6 +6023,22 @@
                 collapseIcon.className = 'fas fa-chevron-right';
             }
         }
+
+        // Fechar cards expandidos ao clicar fora
+        document.addEventListener('click', function(event) {
+            const expandedCards = document.querySelectorAll('.event-expanded');
+            expandedCards.forEach(card => {
+                if (!card.contains(event.target)) {
+                    card.classList.remove('event-expanded');
+                    card.style.width = '';
+                    card.style.height = '';
+                    card.style.whiteSpace = '';
+                    card.style.overflow = '';
+                    card.style.padding = '';
+                    card.style.zIndex = '';
+                }
+            });
+        });
 
         // Fechar sidebar ao clicar fora dela em mobile
         document.addEventListener('click', function(event) {
