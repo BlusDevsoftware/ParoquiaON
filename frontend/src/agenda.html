@@ -1975,17 +1975,8 @@
             }
         }
 
-        .mobile-menu-header {
-            padding: 16px 20px;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            color: white;
-            border-radius: 16px 16px 0 0;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
         .mobile-menu-links {
-            padding: 8px;
+            padding: 16px 8px 8px 8px;
         }
 
         .mobile-menu-link {
@@ -3606,15 +3597,12 @@
     </div>
 
     <!-- Botão Flutuante Mobile -->
-    <button class="mobile-menu-fab" id="mobileMenuFab" onclick="toggleMobileMenu()">
-        <i class="fas fa-plus"></i>
+    <button class="mobile-menu-fab" id="mobileMenuFab">
+        <i class="fas fa-bars"></i>
     </button>
 
     <!-- Menu Flutuante Mobile -->
     <div class="mobile-menu-container" id="mobileMenuContainer">
-        <div class="mobile-menu-header">
-            <i class="fas fa-bars"></i> Menu
-        </div>
         <div class="mobile-menu-links">
             <a href="index.html" class="mobile-menu-link">
                 <i class="fas fa-home"></i> Minha Comunidade
@@ -3645,12 +3633,6 @@
                 <i class="fas fa-user-shield"></i> Usuários
             </a>
             <div class="mobile-menu-divider"></div>
-            <a href="recebimento.html" class="mobile-menu-link">
-                <i class="fas fa-file-alt"></i> Recebimento
-            </a>
-            <a href="conferencia.html" class="mobile-menu-link">
-                <i class="fas fa-clipboard-check"></i> Conferência
-            </a>
             <a href="dinamico.html" class="mobile-menu-link">
                 <i class="fas fa-chart-line"></i> Dinâmico <span style="font-size: 11px; color: #fbbf24; font-weight: bold;">BETA</span>
             </a>
@@ -6192,14 +6174,21 @@
         }
 
         // Função para toggle do menu mobile
-        function toggleMobileMenu() {
+        function toggleMobileMenu(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
             const menuContainer = document.getElementById('mobileMenuContainer');
             const menuFab = document.getElementById('mobileMenuFab');
+            
+            if (!menuContainer || !menuFab) return;
             
             if (menuContainer.classList.contains('show')) {
                 menuContainer.classList.remove('show');
                 menuFab.classList.remove('active');
-                menuFab.innerHTML = '<i class="fas fa-plus"></i>';
+                menuFab.innerHTML = '<i class="fas fa-bars"></i>';
             } else {
                 menuContainer.classList.add('show');
                 menuFab.classList.add('active');
@@ -6207,18 +6196,34 @@
             }
         }
 
+        // Event listener direto no botão mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuFab = document.getElementById('mobileMenuFab');
+            if (menuFab) {
+                menuFab.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    toggleMobileMenu(event);
+                });
+            }
+        });
+
         // Fechar menu mobile ao clicar fora
         document.addEventListener('click', function(event) {
+            // Só executa em mobile
+            if (window.innerWidth > 768) return;
+            
             const menuContainer = document.getElementById('mobileMenuContainer');
             const menuFab = document.getElementById('mobileMenuFab');
             
-            if (window.innerWidth <= 768 && 
-                !menuContainer.contains(event.target) && 
-                !menuFab.contains(event.target) &&
-                menuContainer.classList.contains('show')) {
+            // Verifica se os elementos existem e o menu está aberto
+            if (!menuContainer || !menuFab || !menuContainer.classList.contains('show')) return;
+            
+            // Verifica se o clique foi fora do menu e do botão
+            if (!menuContainer.contains(event.target) && !menuFab.contains(event.target)) {
                 menuContainer.classList.remove('show');
                 menuFab.classList.remove('active');
-                menuFab.innerHTML = '<i class="fas fa-plus"></i>';
+                menuFab.innerHTML = '<i class="fas fa-bars"></i>';
             }
         });
 
