@@ -4229,41 +4229,32 @@
                     dayEvents.slice(0, 4).forEach(ev => {
                         const chip = document.createElement('div');
                         chip.className = 'month-event';
-                        chip.style.cssText = 'display:flex; flex-direction:column; align-items:flex-start; gap:6px; padding:6px; background:#fff; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow:hidden;';
+                        chip.style.cssText = 'display:flex; align-items:center; gap:8px; padding:6px; background:#fff; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow:hidden;';
 
                         const comunidadeNome = ev.comunidade_nome || 'Comunidade';
 
                         let cleanTitle = ev.title || 'Evento';
                         cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
 
+                        const colorBar = document.createElement('div');
+                        colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${ev.color || '#1976d2'};`;
+
+                        const textCol = document.createElement('div');
+                        textCol.style.cssText = 'display:flex; flex-direction:column; gap:2px; min-width:0;';
+
                         const titleDiv = document.createElement('div');
                         titleDiv.textContent = cleanTitle;
-                        titleDiv.style.cssText = 'width:100%; text-align:left; font-weight:700; color:#111827; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
-
-                        const infoRow = document.createElement('div');
-                        infoRow.style.cssText = 'display:flex; align-items:center; gap:8px; width:100%; overflow:hidden;';
-
-                        let avatarEl;
-                        if (ev.comunidades?.foto) {
-                            avatarEl = document.createElement('img');
-                            avatarEl.src = ev.comunidades.foto;
-                            avatarEl.alt = comunidadeNome;
-                            avatarEl.style.cssText = 'width:24px; height:24px; border-radius:50%; object-fit:cover; flex:0 0 24px; background:#f3f4f6;';
-                        } else {
-                            avatarEl = document.createElement('div');
-                            avatarEl.style.cssText = `width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 24px; background:${ev.color || '#1976d2'}; color:#fff; font-weight:700; font-size:12px;`;
-                            avatarEl.textContent = (comunidadeNome.charAt(0) || 'C').toUpperCase();
-                        }
+                        titleDiv.style.cssText = 'font-weight:700; color:#111827; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
 
                         const nameDiv = document.createElement('div');
                         nameDiv.textContent = comunidadeNome;
                         nameDiv.style.cssText = 'color:#374151; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
 
-                        infoRow.appendChild(avatarEl);
-                        infoRow.appendChild(nameDiv);
+                        textCol.appendChild(titleDiv);
+                        textCol.appendChild(nameDiv);
 
-                        chip.appendChild(titleDiv);
-                        chip.appendChild(infoRow);
+                        chip.appendChild(colorBar);
+                        chip.appendChild(textCol);
 
                         chip.title = `${cleanTitle} — ${comunidadeNome}`;
 
