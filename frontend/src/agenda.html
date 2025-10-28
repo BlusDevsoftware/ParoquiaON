@@ -3850,9 +3850,16 @@
         function updateWeeklyCalendar() {
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
+            
+            // Limpar classes e estilos da visão mensal
+            calendarBody.classList.remove('month-view');
+            calendarBody.style.gridTemplateColumns = '';
+            calendarBody.style.display = '';
+            
             // Resetar layout para semanal (coluna de hora + 7 dias)
             if (calendarBody && calendarBody.style) {
                 calendarBody.style.gridTemplateColumns = '44px repeat(7, 1fr)';
+                calendarBody.style.display = 'grid';
             }
 
             // Reconstruir cabeçalhos dos dias (DOM-SAB) com IDs esperados
@@ -5767,8 +5774,14 @@
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
             
+            // Limpar classes e estilos da visão mensal
+            calendarBody.classList.remove('month-view');
+            calendarBody.style.gridTemplateColumns = '';
+            calendarBody.style.display = '';
+            
             // Configurar grid para visão diária: coluna de hora + coluna do dia
             calendarBody.style.gridTemplateColumns = '44px 1fr';
+            calendarBody.style.display = 'grid';
 
             // Cabeçalho do dia (igual ao estilo da semana)
             const header = document.querySelector('.calendar-header');
