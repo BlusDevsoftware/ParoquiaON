@@ -4613,7 +4613,7 @@
         }
 
         function updateCurrentWeekRange() {
-            const rangeElement = document.getElementById('currentWeekRange');
+            const rangeElement = document.getElementById('dateRange');
             if (!rangeElement) return; // Evita erro se o elemento não existir no layout
             
             // Atualizar texto do dropdown
@@ -4643,13 +4643,22 @@
                 const day = currentDate.getDate();
                 const dayOfWeek = currentDate.getDay();
                 
-                const weekStartDay = day - dayOfWeek;
-                const weekEndDay = weekStartDay + 6;
+                const weekStart = new Date(year, month, day - dayOfWeek);
+                const weekEnd = new Date(year, month, day - dayOfWeek + 6);
                 
                 const monthNames = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
                                   'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
                 
-                rangeElement.textContent = `${weekStartDay} - ${weekEndDay} ${monthNames[month]} ${year}`;
+                const startDay = weekStart.getDate();
+                const endDay = weekEnd.getDate();
+                const endMonth = weekEnd.getMonth();
+                
+                // Se mudou de mês
+                if (endMonth !== month) {
+                    rangeElement.textContent = `${startDay} ${monthNames[month]} - ${endDay} ${monthNames[endMonth]} ${year}`;
+                } else {
+                    rangeElement.textContent = `${startDay} - ${endDay} ${monthNames[month]} ${year}`;
+                }
             }
         }
 
