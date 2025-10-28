@@ -4073,12 +4073,14 @@
                         } catch (_) {}
                         
                         // Estado de clique: primeira vez expande, segunda vez abre modal
-                        let isExpanded = false;
                         eventElement.addEventListener('click', (e) => {
                             e.stopPropagation();
                             
                             // Detectar se é dispositivo mobile (touch)
                             const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                            
+                            // Verificar estado de expansão usando a classe
+                            const isExpanded = eventElement.classList.contains('event-expanded');
                             
                             if (isMobile) {
                                 // Mobile: Primeiro clique expande, segundo clique abre modal
@@ -4092,7 +4094,6 @@
                                     eventElement.style.whiteSpace = 'normal';
                                     eventElement.style.overflow = 'visible';
                                     eventElement.style.padding = '12px';
-                                    isExpanded = true;
                                 } else {
                                     editEventModal(event);
                                 }
@@ -5948,12 +5949,14 @@
                     } catch (_) {}
 
                     // Estado de clique: primeira vez expande, segunda vez abre modal
-                    let isExpanded = false;
                     eventElement.addEventListener('click', (e) => {
                         e.stopPropagation();
                         
                         // Detectar se é dispositivo mobile (touch)
                         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                        
+                        // Verificar estado de expansão usando a classe
+                        const isExpanded = eventElement.classList.contains('event-expanded');
                         
                         if (isMobile) {
                             // Mobile: Primeiro clique expande, segundo clique abre modal
@@ -5967,7 +5970,6 @@
                                 eventElement.style.whiteSpace = 'normal';
                                 eventElement.style.overflow = 'visible';
                                 eventElement.style.padding = '12px';
-                                isExpanded = true;
                             } else {
                                 editEventModal(event);
                             }
@@ -6283,8 +6285,27 @@
                 }
             };
 
+            // Função auxiliar para resetar cards expandidos
+            function resetExpandedCards() {
+                const expandedCards = document.querySelectorAll('.event-expanded');
+                expandedCards.forEach(card => {
+                    card.classList.remove('event-expanded');
+                    card.style.width = '';
+                    card.style.height = '';
+                    card.style.whiteSpace = '';
+                    card.style.overflow = '';
+                    card.style.padding = '';
+                    card.style.zIndex = '';
+                    card.style.minWidth = '';
+                    card.style.maxWidth = '';
+                });
+            }
+
             window.closeEventModal = function() {
                 console.log('🔒 Fechando modal...');
+                
+                // Resetar todos os cards expandidos
+                resetExpandedCards();
                 
                 const modal = document.getElementById('eventModal');
                 if (modal) {
@@ -6335,6 +6356,7 @@
                     if (deleteBtn) {
                         deleteBtn.onclick = function() {
                             deleteEvent(event.id);
+                            resetExpandedCards();
                             modal.style.display = 'none';
                         };
                     }
