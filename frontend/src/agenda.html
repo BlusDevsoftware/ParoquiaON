@@ -4077,20 +4077,27 @@
                         eventElement.addEventListener('click', (e) => {
                             e.stopPropagation();
                             
-                            if (!isExpanded) {
-                                // Primeiro clique: expandir permanentemente
-                                eventElement.classList.add('event-expanded');
-                                eventElement.style.zIndex = '1000';
-                                eventElement.style.width = 'auto';
-                                eventElement.style.minWidth = '300px';
-                                eventElement.style.maxWidth = '500px';
-                                eventElement.style.height = 'auto';
-                                eventElement.style.whiteSpace = 'normal';
-                                eventElement.style.overflow = 'visible';
-                                eventElement.style.padding = '12px';
-                                isExpanded = true;
+                            // Detectar se é dispositivo mobile (touch)
+                            const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                            
+                            if (isMobile) {
+                                // Mobile: Primeiro clique expande, segundo clique abre modal
+                                if (!isExpanded) {
+                                    eventElement.classList.add('event-expanded');
+                                    eventElement.style.zIndex = '1000';
+                                    eventElement.style.width = 'auto';
+                                    eventElement.style.minWidth = '300px';
+                                    eventElement.style.maxWidth = '500px';
+                                    eventElement.style.height = 'auto';
+                                    eventElement.style.whiteSpace = 'normal';
+                                    eventElement.style.overflow = 'visible';
+                                    eventElement.style.padding = '12px';
+                                    isExpanded = true;
+                                } else {
+                                    editEventModal(event);
+                                }
                             } else {
-                                // Segundo clique: abrir modal
+                                // Desktop: Abre modal diretamente
                                 editEventModal(event);
                             }
                         });
@@ -5945,20 +5952,27 @@
                     eventElement.addEventListener('click', (e) => {
                         e.stopPropagation();
                         
-                        if (!isExpanded) {
-                            // Primeiro clique: expandir permanentemente
-                            eventElement.classList.add('event-expanded');
-                            eventElement.style.zIndex = '1000';
-                            eventElement.style.width = 'auto';
-                            eventElement.style.minWidth = '300px';
-                            eventElement.style.maxWidth = '500px';
-                            eventElement.style.height = 'auto';
-                            eventElement.style.whiteSpace = 'normal';
-                            eventElement.style.overflow = 'visible';
-                            eventElement.style.padding = '12px';
-                            isExpanded = true;
+                        // Detectar se é dispositivo mobile (touch)
+                        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                        
+                        if (isMobile) {
+                            // Mobile: Primeiro clique expande, segundo clique abre modal
+                            if (!isExpanded) {
+                                eventElement.classList.add('event-expanded');
+                                eventElement.style.zIndex = '1000';
+                                eventElement.style.width = 'auto';
+                                eventElement.style.minWidth = '300px';
+                                eventElement.style.maxWidth = '500px';
+                                eventElement.style.height = 'auto';
+                                eventElement.style.whiteSpace = 'normal';
+                                eventElement.style.overflow = 'visible';
+                                eventElement.style.padding = '12px';
+                                isExpanded = true;
+                            } else {
+                                editEventModal(event);
+                            }
                         } else {
-                            // Segundo clique: abrir modal
+                            // Desktop: Abre modal diretamente
                             editEventModal(event);
                         }
                     });
