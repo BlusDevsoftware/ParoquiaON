@@ -1669,8 +1669,6 @@
         }
 
         /* Estilos para múltiplos horários */
-        .time-slots-container {
-        }
 
         .time-slot {
             border-radius: 8px;
@@ -2218,9 +2216,6 @@
         }
 
         /* Scroll escondido no container central */
-
-        .time-column {
-        }
 
         .time-slot {
             height: 60px;
@@ -3411,6 +3406,177 @@
         // Carregamento de modais removido - modais não disponíveis
     </script>
     <script src="scripts/config/api.js"></script>
+    <!-- Agenda modular scripts -->
+    <script src="scripts/agenda/date-utils.js"></script>
+    <script src="scripts/agenda/api.js"></script>
+    <script src="scripts/agenda/data-cache.js"></script>
+    <script src="scripts/agenda/ui-utils.js"></script>
+    <script>
+        // Wire shims to new modules
+        if (window.AgendaUI) {
+            window.showToast = window.AgendaUI.showToast;
+        }
+
+        // Override: loadEventsFromApi using AgendaAPI + normalization
+        window.loadEventsFromApi = async function() {
+            try {
+                const lista = await window.AgendaAPI.list();
+                allEvents = lista.map(ev => {
+                    const localNome = ev.locais?.nome || ev.local_nome || 'Local não informado';
+                    const acaoNome = ev.acoes?.nome || ev.acao_nome || 'Ação não informada';
+                    const responsavelNome = ev.pessoas?.nome || ev.responsavel_nome || 'Responsável não informado';
+                    const comunidadeNome = ev.comunidades?.nome || ev.comunidade_nome || 'Comunidade não informada';
+                    const pastoralNome = ev.pastorais?.nome || ev.pastoral_nome || 'Pastoral não informada';
+                    const pilarNome = ev.pilares?.nome || ev.pilar_nome || 'Pilar não informado';
+                    const usuarioLancamento = ev.usuarios?.nome || ev.usuario_lancamento_nome || 'Sistema';
+                    return {
+                        ...ev,
+                        title: ev.titulo || ev.title || 'Agendamento sem título',
+                        local_nome: localNome,
+                        acao_nome: acaoNome,
+                        responsavel_nome: responsavelNome,
+                        comunidade_nome: comunidadeNome,
+                        pastoral_nome: pastoralNome,
+                        pilar_nome: pilarNome,
+                        usuario_lancamento_nome: usuarioLancamento,
+                        color: ev.comunidades?.cor || ev.comunidade_cor || ev.acoes?.pilares?.cor || ev.pilares?.cor || ev.cor || '#1e3a8a'
+                    };
+                });
+                filterEventsByCommunity();
+            } catch (err) {
+                console.error('Erro ao carregar eventos:', err);
+                if (typeof showToast === 'function') showToast('Erro ao carregar eventos', 'error');
+                allEvents = [];
+                events = [];
+            }
+        };
+
+        // Override: deleteEvent via AgendaAPI
+        window.deleteEvent = async function(eventId) {
+            if (!confirm('Tem certeza que deseja excluir este evento?')) return;
+            try {
+                await window.AgendaAPI.remove(eventId);
+                await loadEventsFromApi();
+                filterEventsByCommunity();
+                renderCalendar();
+                updateMiniCalendar();
+                updateRecentAppointments();
+                if (typeof showToast === 'function') showToast('Evento excluído com sucesso!', 'success');
+            } catch (err) {
+                console.error('Erro ao excluir evento:', err);
+                if (typeof showToast === 'function') showToast('Erro ao excluir evento', 'error');
+            }
+        };
+
+        // Override: updateRecentAppointments to use AgendaUI
+        window.updateRecentAppointments = function() {
+            if (window.AgendaUI) {
+                window.AgendaUI.updateRecentAppointments(events || []);
+            }
+        };
+
+        // Override: handleEventSubmit standardizing date/time
+        window.handleEventSubmit = async function(e) {
+            e.preventDefault();
+            const DU = window.DateUtils;
+            const AC = window.AgendaCache;
+            if (!DU) { console.error('DateUtils indisponível'); return; }
+
+            const periods = typeof window.getPeriodsData === 'function' ? window.getPeriodsData() : [];
+            if (!Array.isArray(periods) || periods.length === 0) {
+                if (typeof showToast === 'function') showToast('Por favor, adicione pelo menos um período.', 'error');
+                return;
+            }
+
+            const horarios = periods.map(p => ({
+                data: p.date,
+                hora_inicio: p.startTime,
+                hora_fim: p.endTime
+            }));
+
+            const dataInicio = periods[0]?.date || '';
+            const formData = {
+                titulo: document.getElementById('eventTitle')?.value || '',
+                comunidade: document.getElementById('eventCommunity')?.value || '',
+                pastoral: document.getElementById('eventPastoral')?.value || '',
+                pilares: document.getElementById('eventPilares')?.value || '',
+                local: document.getElementById('eventLocation')?.value || '',
+                acao: document.getElementById('eventAcao')?.value || '',
+                objetivo: document.getElementById('eventObjetivo')?.value || '',
+                dataInicio,
+                horarios,
+                eventoParoquial: document.getElementById('eventParoquial')?.checked || false,
+                status: 'agendado'
+            };
+
+            if (!formData.titulo || !formData.comunidade || !formData.pastoral || !formData.pilares ||
+                !formData.local || !formData.acao || !formData.dataInicio || horarios.length === 0) {
+                if (typeof showToast === 'function') showToast('Preencha campos obrigatórios e adicione um horário.', 'error');
+                return;
+            }
+
+            // Validate times and build API payloads using DateUtils
+            const eventos = [];
+            for (let i = 0; i < horarios.length; i++) {
+                const h = horarios[i];
+                if (!h.hora_inicio || !h.hora_fim) {
+                    if (typeof showToast === 'function') showToast(`Preencha os horários do slot ${i + 1}.`, 'error');
+                    return;
+                }
+                if (h.hora_inicio >= h.hora_fim) {
+                    if (typeof showToast === 'function') showToast(`Início deve ser antes do fim no slot ${i + 1}.`, 'error');
+                    return;
+                }
+                const dateStr = h.data || formData.dataInicio; // YYYY-MM-DD
+                const [y, m, d] = dateStr.split('-');
+                const [sh, sm] = h.hora_inicio.split(':');
+                const [eh, em] = h.hora_fim.split(':');
+                const startDate = DU.buildDateFromYmdHm(y, m, d, sh, sm);
+                const endDate = DU.buildDateFromYmdHm(y, m, d, eh, em);
+                const today = new Date(); today.setHours(0,0,0,0);
+                const startDay = DU.buildDateFromYmdHm(y, m, d, 0, 0);
+                if (startDay < today) {
+                    if (typeof showToast === 'function') showToast('A data do evento não pode ser no passado.', 'error');
+                    return;
+                }
+                eventos.push({
+                    titulo: formData.titulo,
+                    objetivo: formData.objetivo || '',
+                    data_inicio: DU.formatLocalDateTime(startDate),
+                    data_fim: DU.formatLocalDateTime(endDate),
+                    local_id: parseInt(formData.local),
+                    acao_id: parseInt(formData.acao),
+                    responsavel_id: null,
+                    comunidade_id: parseInt(formData.comunidade),
+                    pastoral_id: parseInt(formData.pastoral),
+                    pilar_id: parseInt(formData.pilares),
+                    status_id: (AC && typeof AC.getStatusIdByName === 'function') ? AC.getStatusIdByName(formData.status) : 1,
+                    evento_paroquial: formData.eventoParoquial || false
+                });
+            }
+
+            try {
+                const resultados = [];
+                for (const evento of eventos) {
+                    const { data, error } = await window.AgendaAPI.create(evento);
+                    if (error) throw error;
+                    resultados.push(data);
+                }
+                if (typeof showToast === 'function') showToast(eventos.length > 1 ? `${eventos.length} eventos criados com sucesso!` : 'Evento criado com sucesso!', 'success');
+                if (typeof window.clearEventForm === 'function') window.clearEventForm();
+                if (typeof window.clearAllPeriods === 'function') window.clearAllPeriods();
+                if (typeof window.closeEventModal === 'function') window.closeEventModal();
+                await loadEventsFromApi();
+                filterEventsByCommunity();
+                renderCalendar();
+                updateMiniCalendar();
+                updateRecentAppointments();
+            } catch (error) {
+                console.error('Erro ao criar evento:', error);
+                if (typeof showToast === 'function') showToast('Erro ao criar evento', 'error');
+            }
+        };
+    </script>
     
     <script>
         // Variáveis globais
@@ -5080,109 +5246,13 @@
         };
 
         // Função para carregar comunidades (com cache)
-        async function loadEventCommunities() {
-            // Verificar se já temos dados no cache
-            if (modalDataCache.comunidades.length > 0) {
-                return;
-            }
-            
-            try {
-                const { data, error } = await window.api.get(window.endpoints.comunidades.list);
-                if (error) throw error;
-                
-                const comunidades = Array.isArray(data) ? data : [];
-                
-                // Armazenar no cache
-                modalDataCache.comunidades = comunidades;
-                
-                const select = document.getElementById('eventCommunity');
-                if (select) {
-                    // Limpar opções existentes (exceto a primeira)
-                    select.innerHTML = '<option value="">Selecione a comunidade</option>';
-                    
-                    // Adicionar opções das comunidades
-                    comunidades.forEach(comunidade => {
-                        const option = document.createElement('option');
-                        option.value = comunidade.id;
-                        option.textContent = comunidade.nome;
-                        select.appendChild(option);
-                    });
-                    
-                }
-            } catch (error) {
-                console.error('❌ Erro ao carregar comunidades:', error);
-                const select = document.getElementById('eventCommunity');
-                if (select) {
-                    select.innerHTML = '<option value="">Erro ao carregar comunidades</option>';
-                }
-            }
-        }
+        // Removido: loadEventCommunities (usar AgendaCache)
 
         // Função para carregar pastorais (com cache)
-        async function loadEventPastorals() {
-            // Verificar se já temos dados no cache
-            if (modalDataCache.pastorais.length > 0) {
-                console.log('✅ Pastorais já carregadas do cache:', modalDataCache.pastorais.length);
-                return;
-            }
-            
-            try {
-                console.log('🔄 Carregando pastorais...');
-                const { data, error } = await window.api.get(window.endpoints.pastorais.list);
-                if (error) throw error;
-                
-                const pastorais = Array.isArray(data) ? data : [];
-                // Armazenar no cache
-                modalDataCache.pastorais = pastorais;
-                
-                const select = document.getElementById('eventPastoral');
-                if (select) {
-                    // Limpar opções existentes (exceto a primeira)
-                    select.innerHTML = '<option value="">Selecione a pastoral</option>';
-                    
-                    // Adicionar opções das pastorais
-                    pastorais.forEach(pastoral => {
-                        const option = document.createElement('option');
-                        option.value = pastoral.id;
-                        option.textContent = pastoral.nome;
-                        select.appendChild(option);
-                    });
-                    
-                    console.log('✅ Pastorais carregadas:', pastorais.length);
-                }
-            } catch (error) {
-                console.error('❌ Erro ao carregar pastorais:', error);
-                const select = document.getElementById('eventPastoral');
-                if (select) {
-                    select.innerHTML = '<option value="">Erro ao carregar pastorais</option>';
-                }
-            }
-        }
+        // Removido: loadEventPastorals (usar AgendaCache)
 
         // Função para carregar pilares (com cache)
-        async function loadEventPilares() {
-            // Verificar se já temos dados no cache
-            if (modalDataCache.pilares.length > 0) {
-                console.log('✅ Pilares já carregados do cache:', modalDataCache.pilares.length);
-                return;
-            }
-            
-            try {
-                console.log('🔄 Carregando pilares...');
-                const { data, error } = await window.api.get(window.endpoints.pilares.list);
-                if (error) throw error;
-                
-                const pilares = Array.isArray(data) ? data : [];
-                
-                // Armazenar no cache
-                modalDataCache.pilares = pilares;
-                console.log('✅ Pilares carregados e armazenados no cache:', pilares.length);
-                
-            } catch (error) {
-                console.error('❌ Erro ao carregar pilares:', error);
-                modalDataCache.pilares = [];
-            }
-        }
+        // Removido: loadEventPilares (usar AgendaCache)
 
         // Função para obter ID do status pelo nome
         function getStatusIdByName(statusName) {
@@ -5197,85 +5267,13 @@
         }
 
         // Função para carregar status (com cache)
-        async function loadEventStatus() {
-            if (modalDataCache.status && modalDataCache.status.length > 0) {
-                console.log('✅ Status já carregados do cache:', modalDataCache.status.length);
-                return;
-            }
-            
-            try {
-                console.log('🔄 Carregando status...');
-                const { data, error } = await window.api.get(window.endpoints.statusAgendamento.list);
-                if (error) throw error;
-                
-                const status = Array.isArray(data) ? data : [];
-                
-                // Armazenar no cache
-                modalDataCache.status = status;
-                console.log('✅ Status carregados e armazenados no cache:', status.length);
-                console.log('📋 Status disponíveis:', status.map(s => `${s.id}: ${s.nome}`));
-                
-            } catch (error) {
-                console.error('❌ Erro ao carregar status:', error);
-                // Fallback para status padrão
-                modalDataCache.status = [
-                    { id: 1, nome: 'agendado', descricao: 'Evento agendado' },
-                    { id: 2, nome: 'confirmado', descricao: 'Evento confirmado' },
-                    { id: 3, nome: 'pendente', descricao: 'Evento pendente' },
-                    { id: 4, nome: 'cancelado', descricao: 'Evento cancelado' }
-                ];
-            }
-        }
+        // Removido: loadEventStatus (usar AgendaCache)
 
         // Função para carregar ações (com cache)
-        async function loadEventAcoes() {
-            // Verificar se já temos dados no cache
-            if (modalDataCache.acoes.length > 0) {
-                console.log('✅ Ações já carregadas do cache:', modalDataCache.acoes.length);
-                return;
-            }
-            
-            try {
-                console.log('🔄 Carregando ações...');
-                const { data, error } = await window.api.get(window.endpoints.acoes.list);
-                if (error) throw error;
-                
-                const acoes = Array.isArray(data) ? data : [];
-                
-                // Armazenar no cache
-                modalDataCache.acoes = acoes;
-                console.log('✅ Ações carregadas e armazenadas no cache:', acoes.length);
-                
-            } catch (error) {
-                console.error('❌ Erro ao carregar ações:', error);
-                modalDataCache.acoes = [];
-            }
-        }
+        // Removido: loadEventAcoes (usar AgendaCache)
 
         // Função para carregar locais (com cache)
-        async function loadEventLocais() {
-            // Verificar se já temos dados no cache
-            if (modalDataCache.locais.length > 0) {
-                console.log('✅ Locais já carregados do cache:', modalDataCache.locais.length);
-                return;
-            }
-            
-            try {
-                console.log('🔄 Carregando locais...');
-                const { data, error } = await window.api.get(window.endpoints.locais.list);
-                if (error) throw error;
-                
-                const locais = Array.isArray(data) ? data : [];
-                
-                // Armazenar no cache
-                modalDataCache.locais = locais;
-                console.log('✅ Locais carregados e armazenados no cache:', locais.length);
-                
-            } catch (error) {
-                console.error('❌ Erro ao carregar locais:', error);
-                modalDataCache.locais = [];
-            }
-        }
+        // Removido: loadEventLocais (usar AgendaCache)
 
         // Função movida para modais_agenda.html
 
@@ -5321,195 +5319,9 @@
 
         // Função movida para modais_agenda.html
 
-        async function handleEventSubmit(e) {
-            e.preventDefault();
-            console.log('💾 Processando formulário de novo agendamento...');
-            
-            // Coletar múltiplos períodos
-            const periods = getPeriodsData();
-            
-            if (periods.length === 0) {
-                alert('Por favor, adicione pelo menos um período para o agendamento.');
-                return;
-            }
-            
-            // Converter períodos para payload de horários
-            const horarios = periods.map(period => ({
-                data: period.date,
-                hora_inicio: period.startTime,
-                hora_fim: period.endTime
-            }));
-            
-            // A data de início geral será a data do primeiro período
-            const dataInicio = periods[0]?.date || '';
+        // Removido: handleEventSubmit duplicado (usa override com módulos)
 
-            const formData = {
-                titulo: document.getElementById('eventTitle')?.value || '',
-                comunidade: document.getElementById('eventCommunity')?.value || '',
-                pastoral: document.getElementById('eventPastoral')?.value || '',
-                pilares: document.getElementById('eventPilares')?.value || '',
-                local: document.getElementById('eventLocation')?.value || '',
-                acao: document.getElementById('eventAcao')?.value || '',
-                objetivo: document.getElementById('eventObjetivo')?.value || '',
-                dataInicio: dataInicio,
-                horarios: horarios, // Array de horários
-                eventoParoquial: document.getElementById('eventParoquial')?.checked || false,
-                status: 'agendado' // Status padrão
-            };
-            
-            // Validação básica
-            if (!formData.titulo || !formData.comunidade || !formData.pastoral || !formData.pilares || 
-                !formData.local || !formData.acao || !formData.dataInicio || horarios.length === 0) {
-                showToast('Por favor, preencha todos os campos obrigatórios e adicione pelo menos um horário.', 'error');
-                return;
-            }
-
-            // Validar horários
-            for (let i = 0; i < horarios.length; i++) {
-                const horario = horarios[i];
-                if (!horario.hora_inicio || !horario.hora_fim) {
-                    showToast(`Por favor, preencha os horários do slot ${i + 1}.`, 'error');
-                    return;
-                }
-                if (horario.hora_inicio >= horario.hora_fim) {
-                    showToast(`O horário de início deve ser anterior ao horário de fim no slot ${i + 1}.`, 'error');
-                    return;
-                }
-            }
-            
-            
-            // Validar se a data não é no passado (sem conversão de timezone)
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            // Extrair componentes da data do evento (formato YYYY-MM-DD)
-            const [year, month, day] = formData.dataInicio.split('-').map(Number);
-            const dataInicioEvento = new Date(year, month - 1, day);
-            
-            console.log('🔍 Validação de data:', {
-                dataInicio: formData.dataInicio,
-                dataInicioEvento: dataInicioEvento.toDateString(),
-                today: today.toDateString(),
-                isPast: dataInicioEvento < today
-            });
-            
-            if (dataInicioEvento < today) {
-                showToast('A data do evento não pode ser no passado.', 'error');
-                return;
-            }
-            
-            console.log('📋 Dados do evento:', formData);
-            
-            try {
-                // Criar múltiplos eventos para cada horário
-                const eventos = horarios.map((horario, index) => {
-                    // Usar a data específica de cada horário (pode ser diferente para cada período)
-                    const horarioDate = horario.data || formData.dataInicio;
-                    
-                    // Criar data corretamente preservando horário local
-                    const dataInicioLocal = new Date(horarioDate + ' ' + horario.hora_inicio);
-                    const dataFimLocal = new Date(horarioDate + ' ' + horario.hora_fim);
-                    
-                    // Formatar data/hora no formato YYYY-MM-DDTHH:MM:SS (sem conversão para UTC)
-                    const formatDateTime = (date) => {
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                        const seconds = String(date.getSeconds()).padStart(2, '0');
-                        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-                    };
-                    
-                    return {
-                        titulo: formData.titulo,
-                        objetivo: formData.objetivo || '',
-                        data_inicio: formatDateTime(dataInicioLocal),
-                        data_fim: formatDateTime(dataFimLocal),
-                        local_id: parseInt(formData.local),
-                        acao_id: parseInt(formData.acao),
-                        responsavel_id: null, // Pode ser implementado depois
-                        comunidade_id: parseInt(formData.comunidade),
-                        pastoral_id: parseInt(formData.pastoral),
-                        pilar_id: parseInt(formData.pilares),
-                        status_id: getStatusIdByName(formData.status) || 1,
-                        evento_paroquial: formData.eventoParoquial || false
-                    };
-                });
-                
-                // Validar se os IDs são válidos
-                console.log('🔍 Validação dos IDs:', {
-                    local_id: eventos[0].local_id,
-                    acao_id: eventos[0].acao_id,
-                    comunidade_id: eventos[0].comunidade_id,
-                    pastoral_id: eventos[0].pastoral_id,
-                    pilar_id: eventos[0].pilar_id
-                });
-                
-                console.log('🚀 Enviando eventos para API:', eventos);
-                console.log('🔍 Dados detalhados:', JSON.stringify(eventos, null, 2));
-                
-                // Salvar múltiplos eventos na API
-                const resultados = [];
-                for (const evento of eventos) {
-                    const { data, error } = await window.api.post(window.endpoints.agenda.create, evento);
-                    if (error) {
-                        throw error;
-                    }
-                    resultados.push(data);
-                }
-                
-                console.log('✅ Eventos criados com sucesso:', resultados);
-                const mensagem = eventos.length > 1 ? 
-                    `${eventos.length} eventos criados com sucesso!` : 
-                    'Evento criado com sucesso!';
-                showToast(mensagem, 'success');
-                
-                // Limpar formulário
-                clearEventForm();
-                
-                // Limpar períodos
-                if (window.clearAllPeriods) {
-                    window.clearAllPeriods();
-                }
-                
-                // Fechar o modal
-                closeEventModal();
-                
-                // Recarregar eventos
-                await loadEventsFromApi();
-                filterEventsByCommunity();
-                
-                // Atualizar visualização do calendário
-                renderCalendar();
-                updateMiniCalendar();
-                updateRecentAppointments();
-                
-            } catch (error) {
-                console.error('❌ Erro ao criar evento:', error);
-                showToast('Erro ao criar evento: ' + (error.message || 'Erro desconhecido'), 'error');
-            }
-        }
-
-        async function deleteEvent(eventId) {
-            if (!confirm('Tem certeza que deseja excluir este evento?')) return;
-            try {
-                const { error } = await window.api.delete(window.endpoints.agenda.delete(eventId));
-                if (error) throw error;
-                await loadEventsFromApi();
-                filterEventsByCommunity();
-                
-                // Atualizar visualização do calendário
-                renderCalendar();
-                updateMiniCalendar();
-                updateRecentAppointments();
-                
-                showToast('Evento excluído com sucesso!', 'success');
-            } catch (err) {
-                console.error('Erro ao excluir evento:', err);
-                showToast('Erro ao excluir evento', 'error');
-            }
-        }
+        // Removido: deleteEvent duplicado (usa override com módulos)
 
         async function loadCommunities() {
             try {
@@ -5563,58 +5375,7 @@
             }
         }
 
-        async function loadEventsFromApi() {
-            try {
-                console.log('🔄 Carregando eventos da API...');
-                const { data, error } = await window.api.get(window.endpoints.agenda.list);
-                if (error) throw error;
-                
-                const lista = Array.isArray(data) ? data : [];
-                console.log('📋 Eventos recebidos da API:', lista.length);
-                
-                // Normalizar objetos para uso no calendário
-                allEvents = lista.map(ev => {
-                    // Buscar informações relacionadas
-                    const localNome = ev.locais?.nome || ev.local_nome || 'Local não informado';
-                    const acaoNome = ev.acoes?.nome || ev.acao_nome || 'Ação não informada';
-                    const responsavelNome = ev.pessoas?.nome || ev.responsavel_nome || 'Responsável não informado';
-                    const comunidadeNome = ev.comunidades?.nome || ev.comunidade_nome || 'Comunidade não informada';
-                    const pastoralNome = ev.pastorais?.nome || ev.pastoral_nome || 'Pastoral não informada';
-                    const pilarNome = ev.pilares?.nome || ev.pilar_nome || 'Pilar não informado';
-                    const usuarioLancamento = ev.usuarios?.nome || ev.usuario_lancamento_nome || 'Sistema';
-                    
-                    return {
-                        ...ev,
-                        // Garantir compatibilidade de tipos
-                        startTime: ev.startTime || ev.start_time || ev.inicio || ev.data_inicio || ev.dataHoraInicio || ev.start || ev.startedAt || ev.inicio_iso || ev.inicioISO || ev.data_inicio_iso || ev.dataInicioISO || ev.data_inicio_iso || ev.start_iso || ev.startISO || ev.startDate || ev.start_date,
-                        endTime: ev.endTime || ev.end_time || ev.fim || ev.data_fim || ev.dataHoraFim || ev.end || ev.endedAt || ev.fim_iso || ev.fimISO || ev.data_fim_iso || ev.dataFimISO || ev.data_fim_iso || ev.end_iso || ev.endISO || ev.endDate || ev.end_date,
-                        // Adicionar informações relacionadas
-                        local_nome: localNome,
-                        acao_nome: acaoNome,
-                        responsavel_nome: responsavelNome,
-                        comunidade_nome: comunidadeNome,
-                        pastoral_nome: pastoralNome,
-                        pilar_nome: pilarNome,
-                        usuario_lancamento_nome: usuarioLancamento,
-                        // Garantir título
-                        title: ev.titulo || ev.title || 'Agendamento sem título',
-                        // Remover campo type - não temos mais separação por tipo
-                        // Garantir cor baseada na cor da comunidade
-                        color: ev.comunidades?.cor || ev.comunidade_cor || ev.acoes?.pilares?.cor || ev.pilares?.cor || ev.cor || '#1e3a8a'
-                    };
-                });
-                
-                console.log('✅ Eventos processados:', allEvents.length);
-                
-                // Aplicar filtro inicial
-                filterEventsByCommunity();
-            } catch (err) {
-                console.error('❌ Erro ao carregar eventos da API:', err);
-                showToast('Erro ao carregar eventos: ' + (err.message || 'Erro desconhecido'), 'error');
-                allEvents = [];
-                events = [];
-            }
-        }
+        // Removido: loadEventsFromApi duplicado (usa override com módulos)
 
         function filterEventsByCommunity() {
             if (selectedCommunityId === null) {
@@ -5643,104 +5404,14 @@
             updateRecentAppointments();
         }
 
-        function updateRecentAppointments() {
-            const appointmentsList = document.getElementById('recentAppointmentsList');
-            appointmentsList.innerHTML = '';
-
-            // Ordenar eventos por data (mais recentes primeiro)
-            const sortedEvents = [...events].sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
-            
-            // Pegar os últimos 5 eventos
-            const recentEvents = sortedEvents.slice(0, 5);
-
-            if (recentEvents.length === 0) {
-                appointmentsList.innerHTML = `
-                    <div style="padding: 20px; text-align: center; color: #666; font-size: 12px;">
-                        <i class="fas fa-calendar-plus" style="font-size: 24px; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
-                        Nenhum agendamento encontrado
-                    </div>
-                `;
-                return;
-            }
-
-            recentEvents.forEach(event => {
-                const eventDate = new Date(event.startTime);
-                const timeString = eventDate.toLocaleTimeString('pt-BR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
-                
-                const dateString = eventDate.toLocaleDateString('pt-BR', { 
-                    day: '2-digit', 
-                    month: '2-digit' 
-                });
-
-                // Determinar status baseado na data
-                let status = 'confirmed';
-                let statusClass = 'status-confirmed';
-                
-                if (eventDate < new Date()) {
-                    status = 'completed';
-                    statusClass = 'status-confirmed';
-                } else if (eventDate.toDateString() === new Date().toDateString()) {
-                    status = 'today';
-                    statusClass = 'status-pending';
-                }
-
-                const appointmentItem = document.createElement('div');
-                appointmentItem.className = 'appointment-item';
-                appointmentItem.innerHTML = `
-                    <div class="appointment-time" style="background: ${event.color || '#007bff'};">${timeString}</div>
-                    <div class="appointment-details">
-                        <div class="appointment-title">${event.title}</div>
-                        <div class="appointment-type">Agendamento • ${dateString}</div>
-                    </div>
-                    <div class="appointment-status ${statusClass}"></div>
-                `;
-                
-                appointmentItem.addEventListener('click', () => {
-                    editEvent(event);
-                });
-                
-                appointmentsList.appendChild(appointmentItem);
-            });
-        }
+        // Removido: updateRecentAppointments duplicado (usa AgendaUI)
 
 
         // Carregar opções dos selects (Comunidade, Pastoral, Pilar, Local, Ação)
-        async function loadSelectOptions(selectId, endpoint) {
-            try {
-                const select = document.getElementById(selectId);
-                if (!select) return;
-                select.innerHTML = '<option value="">Carregando...</option>';
-                const { data, error } = await window.api.get(endpoint);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-                const options = ['<option value="">Selecione</option>']
-                    .concat(lista.map(item => `<option value="${item.id || item.codigo}">${item.nome || item.titulo || item.descricao || 'Registro'}</option>`));
-                select.innerHTML = options.join('');
-            } catch (e) {
-                const select = document.getElementById(selectId);
-                if (select) select.innerHTML = '<option value="">Erro ao carregar</option>';
-                console.error('Erro ao carregar select', selectId, e);
-            }
-        }
+        // Removido: loadSelectOptions duplicado (usar AgendaCache/implementação central)
 
         // Carregar opções para um select específico (elemento já existente)
-        async function loadSelectOptionsForElement(selectEl, endpoint) {
-            try {
-                if (!selectEl) return;
-                selectEl.innerHTML = '<option value="">Carregando...</option>';
-                const { data, error } = await window.api.get(endpoint);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-                const options = ['<option value="">Selecione</option>']
-                    .concat(lista.map(item => `<option value="${item.id || item.codigo}">${item.nome || item.titulo || item.descricao || 'Registro'}</option>`));
-                selectEl.innerHTML = options.join('');
-            } catch (e) {
-                if (selectEl) selectEl.innerHTML = '<option value="">Erro ao carregar</option>';
-            }
-        }
+        // Removido: loadSelectOptionsForElement duplicado (usar AgendaCache/implementação central)
 
 
 
@@ -5764,31 +5435,7 @@
             
             
 
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#007bff'};
-                color: white;
-                padding: 15px 20px;
-                border-radius: 6px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                z-index: 10000;
-                animation: slideIn 0.3s ease;
-            `;
-            toast.textContent = message;
-            
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 3000);
-        }
+        // Removido: showToast duplicado (usar AgendaUI)
 
         function goToToday() {
             currentDate = new Date();
