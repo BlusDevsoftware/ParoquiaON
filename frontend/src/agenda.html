@@ -3832,12 +3832,7 @@
                 const [eh, em] = h.hora_fim.split(':');
                 const startDate = buildDateFromYmdHm(y, m, d, sh, sm);
                 const endDate = buildDateFromYmdHm(y, m, d, eh, em);
-                const today = new Date(); today.setHours(0,0,0,0);
-                const startDay = buildDateFromYmdHm(y, m, d, 0, 0);
-                if (startDay < today) {
-                    if (typeof showToast === 'function') showToast('A data do evento não pode ser no passado.', 'error');
-                    return;
-                }
+                // Permitir agendamentos no passado: remover validação de data anterior
                 eventos.push({
                     titulo: formData.titulo,
                     objetivo: formData.objetivo || '',
@@ -3884,7 +3879,7 @@
         let allEvents = []; // Todos os eventos (sem filtro)
         let editingEvent = null;
         let miniCalendarDate = new Date();
-        let currentView = 'semana'; // 'semana' | 'mês'
+        let currentView = 'mês'; // 'semana' | 'mês'
 
         // Atualiza a lista do dropdown de visão para ocultar a visão atualmente selecionada
         function updateViewDropdown() {
