@@ -1778,21 +1778,34 @@
             background: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 12px;
+            margin-bottom: 16px;
         }
 
         /* Layout responsivo para o formulário de períodos */
         .add-period-section .form-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 8px;
             align-items: flex-end;
         }
 
         .add-period-section .form-group {
-            flex: 1 1 180px;
-            min-width: 160px;
+            flex: 0 1 140px;
+            min-width: 140px;
+        }
+
+        .add-period-section label {
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .add-period-section input[type="date"],
+        .add-period-section input[type="time"],
+        .add-period-section select {
+            height: 32px;
+            padding: 6px 8px;
+            font-size: 12px;
         }
 
         .subsection-title {
@@ -1817,17 +1830,18 @@
             background: #28a745;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 6px 12px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
-            height: 40px;
+            gap: 6px;
+            height: 32px;
             margin-top: 0;
+            align-self: flex-start;
         }
 
         .btn-add-period:hover {
