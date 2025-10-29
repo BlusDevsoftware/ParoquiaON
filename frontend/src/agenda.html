@@ -4577,6 +4577,24 @@
                         eventsWrap.appendChild(chip);
                     });
 
+                    // Clique no dia (fora dos chips) abre modal de novo agendamento para a data
+                    cell.addEventListener('click', function(e) {
+                        // Evitar conflito quando clicar em um chip existente
+                        if (e.target && (e.target.closest && e.target.closest('.month-event'))) {
+                            return;
+                        }
+                        const startDt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 19, 0, 0);
+                        const endDt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 0, 0);
+                        if (typeof window.openEventModalWithTime === 'function') {
+                            window.openEventModalWithTime(startDt, endDt);
+                        } else if (typeof window.openEventModal === 'function') {
+                            const y = date.getFullYear();
+                            const m = String(date.getMonth() + 1).padStart(2, '0');
+                            const d = String(date.getDate()).padStart(2, '0');
+                            window.openEventModal(`${y}-${m}-${d}`);
+                        }
+                    });
+
                     // Interação: ao passar o mouse, mostrar todos os eventos do dia em um painel flutuante
                     // Só adicionar eventos de hover se houver eventos no dia
                     if (dayEvents.length > 0) {
