@@ -1217,6 +1217,16 @@
             justify-content: center;
         }
 
+        /* Override: Hoje no mini calendário da sidebar deve ser preto, negrito e alinhado (sem círculo) */
+        .calendar-sidebar-container .mini-day.selected {
+            background: transparent;
+            color: #1e3a8a; /* azul do sistema */
+            font-weight: 700;
+            border-radius: 0;
+            width: auto;
+            height: auto;
+        }
+
         .mini-day.has-events {
             background: #ffffff;
             position: relative;
