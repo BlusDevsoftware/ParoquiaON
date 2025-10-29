@@ -2557,7 +2557,8 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            will-change: transform;
         }
 
         .event-block:hover {
@@ -4299,6 +4300,28 @@
                                 // Desktop: Abre modal diretamente
                                 editEventModal(event);
                             }
+                        });
+
+                        // Prevenir flicker ao passar o mouse entre eventos sobrepostos:
+                        // quando um evento recebe hover, desabilitamos pointer-events dos irmãos
+                        eventElement.addEventListener('mouseenter', () => {
+                            const siblings = daySlot.querySelectorAll('.event-block');
+                            siblings.forEach(el => {
+                                if (el !== eventElement) {
+                                    el.style.pointerEvents = 'none';
+                                }
+                            });
+                            // garantir topo
+                            eventElement.style.zIndex = '200';
+                        });
+                        eventElement.addEventListener('mouseleave', () => {
+                            const siblings = daySlot.querySelectorAll('.event-block');
+                            siblings.forEach(el => {
+                                if (el !== eventElement) {
+                                    el.style.pointerEvents = '';
+                                }
+                            });
+                            eventElement.style.zIndex = '';
                         });
                         
                         daySlot.appendChild(eventElement);
