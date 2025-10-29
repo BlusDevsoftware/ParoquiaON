@@ -326,6 +326,18 @@
             transform: translateY(-1px);
         }
 
+        /* Estado de carregamento para botões (padrão do sistema) */
+        .btn-loading { opacity: .85; pointer-events: none; }
+        .btn-spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,.35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .9s linear infinite;
+            display: inline-block;
+            vertical-align: -3px;
+        }
+
         .close-btn {
             background: none;
             border: none;
@@ -1837,7 +1849,7 @@
         }
 
         .btn-add-period {
-            background: #28a745;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
             color: white;
             border: none;
             padding: 6px 12px;
@@ -1855,8 +1867,9 @@
         }
 
         .btn-add-period:hover {
-            background: #218838;
+            filter: brightness(1.05);
             transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(30,58,138,0.25);
         }
 
         .periods-list-section {
@@ -3145,13 +3158,14 @@
         }
 
         .new-appointment-actions .btn-primary {
-            background: #10B981;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
+            box-shadow: 0 2px 8px rgba(30,58,138,0.25);
         }
 
         .new-appointment-actions .btn-secondary:hover {
@@ -3159,7 +3173,8 @@
         }
 
         .new-appointment-actions .btn-primary:hover {
-            background: #059669;
+            filter: brightness(1.05);
+            box-shadow: 0 6px 20px rgba(30,58,138,0.35);
         }
 
         /* Status dos eventos */
@@ -3802,6 +3817,12 @@
         // Override: handleEventSubmit standardizing date/time
         window.handleEventSubmit = async function(e) {
             e.preventDefault();
+            const submitBtn = document.querySelector('#eventForm .new-appointment-actions .btn-primary');
+            const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.classList.add('btn-loading');
+                submitBtn.innerHTML = '<span class="btn-spinner"></span>&nbsp;Salvando...';
+            }
             const DU = window.DateUtils;
             const AC = window.AgendaCache;
             // Fallbacks locais se DateUtils não estiver disponível
@@ -3905,6 +3926,11 @@
             } catch (error) {
                 console.error('Erro ao criar evento:', error);
                 if (typeof showToast === 'function') showToast('Erro ao criar evento', 'error');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.classList.remove('btn-loading');
+                    submitBtn.innerHTML = originalBtnHtml || 'Salvar Evento';
+                }
             }
         };
     </script>
