@@ -4567,6 +4567,15 @@
                         titleDiv.textContent = cleanTitle;
                         titleDiv.style.cssText = 'font-weight:500; font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#1e3a8a;';
 
+                        // Ícone para evento paroquial (quando marcado)
+                        if (ev && (ev.evento_paroquial === true || ev.evento_paroquial === 'true' || ev.paroquial === true)) {
+                            const icon = document.createElement('span');
+                            icon.textContent = '⛪';
+                            icon.title = 'Evento paroquial';
+                            icon.style.cssText = 'margin-right:4px; color:#334155; opacity:0.85; font-size:10px;';
+                            titleDiv.prepend(icon);
+                        }
+
                         textCol.appendChild(titleDiv);
 
                         chip.appendChild(colorBar);
