@@ -4668,6 +4668,14 @@
                                 const titleDiv = document.createElement('div');
                                 titleDiv.textContent = cleanTitle;
                                 titleDiv.style.cssText = 'font-weight:700; color:#1e3a8a; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+                                // Ícone para evento paroquial também no card expandido (hover)
+                                if (ev && (ev.evento_paroquial === true || ev.evento_paroquial === 'true' || ev.paroquial === true)) {
+                                    const icon = document.createElement('span');
+                                    icon.textContent = '⛪';
+                                    icon.title = 'Evento paroquial';
+                                    icon.style.cssText = 'margin-right:6px; color:#334155; opacity:0.85; font-size:12px;';
+                                    titleDiv.prepend(icon);
+                                }
 
                                 // Hora início e fim (HH:mm - HH:mm)
                                 const startDate = new Date(ev.startTime);
@@ -4683,8 +4691,8 @@
                                 nameDiv.style.cssText = 'color:#374151; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
 
                                 textCol.appendChild(titleDiv);
-                                textCol.appendChild(timeDiv);
                                 textCol.appendChild(nameDiv);
+                                textCol.appendChild(timeDiv);
 
                                 item.appendChild(colorBar);
                                 item.appendChild(avatarEl);
