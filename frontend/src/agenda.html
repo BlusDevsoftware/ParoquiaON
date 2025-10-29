@@ -4314,13 +4314,6 @@
                             document.removeEventListener('mousemove', trackMouse);
                             window.removeEventListener('scroll', onScrollOrResize, true);
                             window.removeEventListener('resize', onScrollOrResize, true);
-                            // Restaurar overflow do calendário
-                            if (calendarBodyEl) calendarBodyEl.style.overflow = originalOverflow;
-                            // Restaurar minHeight do slot se alterado
-                            if (daySlot && daySlot.dataset.prevMinHeight !== undefined) {
-                                daySlot.style.minHeight = daySlot.dataset.prevMinHeight;
-                                delete daySlot.dataset.prevMinHeight;
-                            }
                         };
                         const onScrollOrResize = () => {
                             // Se rolou ou redimensionou, revalidar imediatamente
@@ -4333,24 +4326,6 @@
                             eventElement.classList.add('event-block-hover');
                             const siblings = daySlot.querySelectorAll('.event-block');
                             siblings.forEach(el => { if (el !== eventElement) el.style.pointerEvents = 'none'; });
-                            // Garantir que o calendário não recorte o conteúdo expandido
-                            if (calendarBodyEl) calendarBodyEl.style.overflow = 'visible';
-                            // Após aplicar classe, medir e ajustar altura do slot se necessário
-                            setTimeout(() => {
-                                try {
-                                    const eventRect = eventElement.getBoundingClientRect();
-                                    const slotRect = daySlot.getBoundingClientRect();
-                                    const requiredHeight = (eventRect.bottom - slotRect.top) + 8; // padding extra
-                                    const currentSlotHeight = slotRect.height;
-                                    if (requiredHeight > currentSlotHeight) {
-                                        // Guardar valor anterior e aplicar novo minHeight
-                                        if (daySlot && daySlot.dataset.prevMinHeight === undefined) {
-                                            daySlot.dataset.prevMinHeight = daySlot.style.minHeight || '';
-                                        }
-                                        daySlot.style.minHeight = `${requiredHeight}px`;
-                                    }
-                                } catch (_) {}
-                            }, 0);
                             
                             trackMouse = (e) => {
                                 if (!hoverActive) return;
@@ -4590,7 +4565,7 @@
 
                         const titleDiv = document.createElement('div');
                         titleDiv.textContent = cleanTitle;
-                        titleDiv.style.cssText = 'font-weight:700; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#1e3a8a;';
+                        titleDiv.style.cssText = 'font-weight:500; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#1e3a8a;';
 
                         textCol.appendChild(titleDiv);
 
