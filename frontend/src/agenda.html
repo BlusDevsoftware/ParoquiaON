@@ -1257,7 +1257,10 @@
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             border: 1px solid #f0f0f0;
-            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto; /* ocupar espaço restante da sidebar */
+            min-height: 0; /* permitir que a lista interna calcule altura */
         }
 
         .recent-appointments-header {
@@ -1273,7 +1276,8 @@
         .appointments-list {
             padding: 0;
             margin: 0;
-            max-height: 70vh;
+            flex: 1 1 auto; /* preencher o restante dentro do card */
+            min-height: 0;
             overflow-y: auto;
         }
 
@@ -3512,8 +3516,7 @@
                         </div>
                     </div>
                     
-                    <!-- Espaço em branco para não ocupar todo o container -->
-                    <div style="flex: 1;"></div>
+                    
                 </div>
             </div>
         </div>
