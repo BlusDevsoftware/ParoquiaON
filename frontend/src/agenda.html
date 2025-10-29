@@ -4303,25 +4303,42 @@
                         });
 
                         // Controlar hover com classe para evitar flicker quando card expande
-                        let hoverTimeout = null;
-                        
-                        eventElement.addEventListener('mouseenter', () => {
-                            // Cancelar timeout se o mouse voltou antes do timeout executar
-                            if (hoverTimeout) {
-                                clearTimeout(hoverTimeout);
-                                hoverTimeout = null;
-                            }
-                            
-                            // Adicionar classe de hover
-                            eventElement.classList.add('event-block-hover');
-                            
-                            // Desabilitar pointer-events dos irmãos para evitar conflitos
+                        let hoverActive = false;
+                        let trackMouse;
+                        const cleanupHover = () => {
+                            if (!hoverActive) return;
+                            hoverActive = false;
+                            eventElement.classList.remove('event-block-hover');
                             const siblings = daySlot.querySelectorAll('.event-block');
-                            siblings.forEach(el => {
-                                if (el !== eventElement) {
-                                    el.style.pointerEvents = 'none';
+                            siblings.forEach(el => { if (el !== eventElement) el.style.pointerEvents = ''; });
+                            document.removeEventListener('mousemove', trackMouse);
+                            window.removeEventListener('scroll', onScrollOrResize, true);
+                            window.removeEventListener('resize', onScrollOrResize, true);
+                        };
+                        const onScrollOrResize = () => {
+                            // Se rolou ou redimensionou, revalidar imediatamente
+                            if (!hoverActive) return;
+                            // Força rechecagem na próxima movimentação do mouse
+                        };
+                        eventElement.addEventListener('mouseenter', () => {
+                            if (hoverActive) return;
+                            hoverActive = true;
+                            eventElement.classList.add('event-block-hover');
+                            const siblings = daySlot.querySelectorAll('.event-block');
+                            siblings.forEach(el => { if (el !== eventElement) el.style.pointerEvents = 'none'; });
+                            
+                            trackMouse = (e) => {
+                                if (!hoverActive) return;
+                                const rect = eventElement.getBoundingClientRect();
+                                const x = e.clientX, y = e.clientY;
+                                const inside = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+                                if (!inside) {
+                                    cleanupHover();
                                 }
-                            });
+                            };
+                            document.addEventListener('mousemove', trackMouse);
+                            window.addEventListener('scroll', onScrollOrResize, true);
+                            window.addEventListener('resize', onScrollOrResize, true);
                         });
                         
                         eventElement.addEventListener('mouseleave', () => {
