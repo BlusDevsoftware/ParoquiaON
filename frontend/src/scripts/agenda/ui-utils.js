@@ -29,7 +29,7 @@
     if (!appointmentsList) return;
     appointmentsList.innerHTML = '';
     const sortedEvents = [...events].sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
-    const recentEvents = sortedEvents.slice(0, 5);
+    const recentEvents = sortedEvents.slice(0, 10);
     if (recentEvents.length === 0) {
       appointmentsList.innerHTML = `
         <div style="padding: 20px; text-align: center; color: #666; font-size: 12px;">
@@ -48,7 +48,7 @@
       const appointmentItem = document.createElement('div');
       appointmentItem.className = 'appointment-item';
       appointmentItem.innerHTML = `
-        <div class="appointment-time" style="background: ${event.color || '#007bff'};">${timeString}</div>
+        <div class="appointment-time" style="background: ${event.color || '#1e3a8a'};">${timeString}</div>
         <div class="appointment-details">
           <div class="appointment-title">${event.title || 'Agendamento'}</div>
           <div class="appointment-type">Agendamento • ${dateString}</div>
