@@ -1279,7 +1279,12 @@
             flex: 1 1 auto; /* preencher o restante dentro do card */
             min-height: 0;
             overflow-y: auto;
+            /* Scroll invisível */
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
         }
+
+        .appointments-list::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
 
         .appointment-item {
             padding: 12px 15px;
@@ -3740,7 +3745,14 @@
         // Override: updateRecentAppointments to use AgendaUI
         window.updateRecentAppointments = function() {
             if (window.AgendaUI) {
-                window.AgendaUI.updateRecentAppointments(events || []);
+                const list = Array.isArray(events) ? [...events] : [];
+                // Ordenar por início desc e limitar aos 10 mais recentes
+                list.sort((a, b) => {
+                    const getTime = (ev) => new Date(ev.startTime || ev.start_time || ev.inicio || ev.data_inicio || ev.dataHoraInicio || ev.start || 0).getTime();
+                    return getTime(b) - getTime(a);
+                });
+                const top10 = list.slice(0, 10);
+                window.AgendaUI.updateRecentAppointments(top10);
             }
         };
 
