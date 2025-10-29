@@ -59,15 +59,15 @@
       const appointmentItem = document.createElement('div');
       appointmentItem.className = 'appointment-item';
       appointmentItem.innerHTML = `
-        <div class="appointment-time" style="background: ${event.color || '#1e3a8a'};">${timeString}</div>
-        <div style="width:32px; height:32px; border-radius:50%; overflow:hidden; flex:0 0 32px; display:flex; align-items:center; justify-content:center; background:${event.color || '#1e3a8a'}; color:#fff; font-weight:700; font-size:12px;">
+        <div style="width:32px; height:32px; border-radius:50%; overflow:hidden; flex:0 0 32px; display:flex; align-items:center; justify-content:center; background:#fff; border:2px solid ${event.color || '#1e3a8a'}; color:${event.color || '#1e3a8a'}; font-weight:700; font-size:12px;">
           ${communityPhoto ? `<img src="${communityPhoto}" alt="${communityName}" style="width:100%; height:100%; object-fit:cover;" />` : initials}
         </div>
         <div class="appointment-details" style="display:flex; flex-direction:column; gap:2px;">
           <div class="appointment-title">${event.title || 'Agendamento'}</div>
-          <div class="appointment-type" style="display:flex; gap:6px; align-items:center;">
+          <div class="appointment-type" style="display:flex; gap:6px; align-items:center; color:#666;">
             <span style="color:#1e3a8a; font-weight:600;">${communityName}</span>
-            <span style="color:#666;">• ${dateString}</span>
+            <span>• ${dateString}</span>
+            <span>• ${timeString}</span>
           </div>
         </div>
         <div class="appointment-status ${statusClass}"></div>
