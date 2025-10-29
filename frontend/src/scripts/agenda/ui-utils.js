@@ -43,8 +43,7 @@
       const eventDate = new Date(event.startTime);
       const timeString = eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
       const dateString = eventDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-      let statusClass = 'status-confirmed';
-      if (eventDate > new Date() && eventDate.toDateString() === new Date().toDateString()) statusClass = 'status-pending';
+      // status indicator removed from card UI
 
       const communityName = (event.comunidades && event.comunidades.nome) || event.comunidade_nome || 'Comunidade';
       const communityPhoto = (event.comunidades && (event.comunidades.foto || event.comunidades.logo || event.comunidades.imagem)) || event.comunidade_foto || event.comunidade_logo || null;
@@ -70,7 +69,6 @@
             <span>• ${timeString}</span>
           </div>
         </div>
-        <div class="appointment-status ${statusClass}"></div>
       `;
       appointmentItem.addEventListener('click', () => {
         if (typeof window.editEvent === 'function') window.editEvent(event);
