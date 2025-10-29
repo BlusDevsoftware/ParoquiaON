@@ -1791,8 +1791,16 @@
         }
 
         .add-period-section .form-group {
-            flex: 0 1 140px;
-            min-width: 140px;
+            flex: 0 1 120px;
+            min-width: 120px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .add-period-section .add-period-btn-group {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: flex-end;
         }
 
         .add-period-section label {
@@ -1841,7 +1849,7 @@
             gap: 6px;
             height: 32px;
             margin-top: 0;
-            align-self: flex-start;
+            align-self: flex-end;
         }
 
         .btn-add-period:hover {
