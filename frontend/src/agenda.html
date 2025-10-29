@@ -3893,6 +3893,8 @@
             renderCalendar();
             updateCurrentWeekRange();
             updateRecentAppointments();
+            // Ajusta o dropdown para esconder a opção já selecionada
+            try { updateViewDropdownVisibility(); } catch(_) {}
             
             // Atualizar linha de tempo a cada minuto
             setInterval(() => {
@@ -3934,6 +3936,8 @@
                     currentView = selectedView;
                     renderCalendar();
                     updateCurrentWeekRange();
+                    // Esconde a opção atualmente selecionada no dropdown
+                    try { updateViewDropdownVisibility(); } catch(_) {}
                 });
             });
 
@@ -3946,6 +3950,24 @@
             // Presets de duração removidos - modal não disponível
 
             // Event listeners de status e horários removidos - modal não disponível
+            // Estado inicial do dropdown
+            try { updateViewDropdownVisibility(); } catch(_) {}
+        }
+
+        // Esconde a opção de visualização já selecionada no dropdown
+        function updateViewDropdownVisibility() {
+            const items = document.querySelectorAll('.view-dropdown-item');
+            items.forEach(item => {
+                const view = item.getAttribute('data-view');
+                if (!view) return;
+                if (view === currentView) {
+                    item.style.display = 'none';
+                    item.setAttribute('aria-hidden', 'true');
+                } else {
+                    item.style.display = '';
+                    item.removeAttribute('aria-hidden');
+                }
+            });
         }
 
         function updateMiniCalendar() {
