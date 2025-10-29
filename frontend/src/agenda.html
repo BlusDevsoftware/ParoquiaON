@@ -641,7 +641,7 @@
         #eventModal .calendar-weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
+            gap: 2px;
             margin-bottom: 8px;
             font-weight: 600;
             color: #666;
@@ -4546,8 +4546,8 @@
                     eventsWrap.className = 'month-events';
                     cell.appendChild(eventsWrap);
 
-                    // Renderizar até 3 cards compactos
-                    dayEvents.slice(0, 3).forEach(ev => {
+                    // Renderizar até 4 cards compactos
+                    dayEvents.slice(0, 4).forEach(ev => {
                         const chip = document.createElement('div');
                         chip.className = 'month-event';
                         chip.style.cssText = 'display:flex; align-items:center; gap:4px; padding:3px 5px; background:#fff; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow:hidden;';
