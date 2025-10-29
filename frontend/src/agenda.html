@@ -43,6 +43,36 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
+        /* Botão hamburger no header */
+        .header-hamburger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 0;
+            width: auto;
+            height: auto;
+            transition: transform 0.1s ease;
+        }
+
+        .header-hamburger i {
+            font-size: 18px;
+            color: #ffffff;
+        }
+
+        .header-hamburger:hover {
+            background: transparent;
+        }
+
+        .header-hamburger:active {
+            transform: scale(0.95);
+        }
+
         .left-sidebar {
             width: 350px;
             background: transparent;
@@ -65,27 +95,7 @@
             transform: translateX(-100%);
         }
 
-        .sidebar-toggle {
-            display: none;
-            position: fixed;
-            top: 90px;
-            left: 20px;
-            z-index: 1001;
-            background: #1e3a8a;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .sidebar-toggle:hover {
-            background: #1e40af;
-            transform: scale(1.1);
-        }
+        /* removido: .sidebar-toggle antigo */
 
 
 
@@ -999,8 +1009,9 @@
             overflow: hidden;
         }
 
-        .left-sidebar.calendar-collapsed {
-            width: 60px;
+        /* Quando a sidebar estiver colapsada no desktop, esconda-a fora da tela */
+        .left-sidebar.collapsed {
+            transform: translateX(-100%);
         }
 
         .calendar-sidebar-container.collapsed .calendar-sidebar-header {
@@ -1320,9 +1331,10 @@
             transition: all 0.3s ease;
         }
 
-        .main-area.calendar-collapsed {
-            margin-left: 60px;
-            width: calc(100vw - 60px);
+        /* Quando a sidebar estiver colapsada, a área principal ocupa a tela toda */
+        .left-sidebar.collapsed ~ .main-area {
+            margin-left: 0;
+            width: 100vw;
         }
 
 
@@ -3232,18 +3244,9 @@
                 width: 320px;
             }
             
-            .left-sidebar.calendar-collapsed {
-                width: 60px;
-            }
-            
             .main-area {
                 width: calc(100vw - 320px);
                 margin-left: 320px;
-            }
-            
-            .main-area.calendar-collapsed {
-                width: calc(100vw - 60px);
-                margin-left: 60px;
             }
             
             .nav-links {
@@ -3401,6 +3404,9 @@
         <div class="top-header">
             <div class="header-left">
                 <div class="logo-section">
+                    <button class="header-hamburger" id="headerHamburger" aria-label="Alternar menu" title="Alternar menu" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
                     <span style="font-size: 20px; font-weight: 600;">ParoquiaON</span>
                 </div>
                 <div class="nav-links">
@@ -3441,9 +3447,6 @@
 
         <!-- Sidebar Esquerda -->
         <div class="left-sidebar" id="leftSidebar">
-            <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
             <div>
                 <!-- Container Lateral do Calendário -->
                 <div class="calendar-sidebar-container">
@@ -3458,9 +3461,7 @@
                         <div class="calendar-sidebar-title">
                             <i class="fas fa-calendar-alt"></i> Calendário
                         </div>
-                        <button class="calendar-collapse-btn" onclick="toggleCalendarSidebar()" title="Recolher/Expandir">
-                            <i class="fas fa-chevron-left" id="calendarCollapseIcon"></i>
-                        </button>
+                        
                     </div>
                     
                     <!-- Mini Calendário -->
@@ -6173,17 +6174,21 @@
         `;
         document.head.appendChild(style);
 
-        // Função para toggle da sidebar
+        // Função para alternar visibilidade da sidebar (desktop: collapsed; mobile: open)
         function toggleSidebar() {
             const sidebar = document.getElementById('leftSidebar');
-            const toggle = document.getElementById('sidebarToggle');
-            
-            if (sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-                toggle.innerHTML = '<i class="fas fa-bars"></i>';
+            const headerHamburger = document.getElementById('headerHamburger');
+            if (!sidebar) return;
+
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                // No mobile o padrão já é escondido; "open" exibe
+                const opened = sidebar.classList.toggle('open');
+                if (headerHamburger) headerHamburger.innerHTML = opened ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
             } else {
-                sidebar.classList.add('open');
-                toggle.innerHTML = '<i class="fas fa-times"></i>';
+                // No desktop, usar classe "collapsed" para esconder completamente
+                const collapsed = sidebar.classList.toggle('collapsed');
+                if (headerHamburger) headerHamburger.innerHTML = collapsed ? '<i class="fas fa-bars"></i>' : '<i class="fas fa-bars"></i>';
             }
         }
 
@@ -6241,25 +6246,7 @@
             }
         });
 
-        // Função para toggle do calendário sidebar
-        function toggleCalendarSidebar() {
-            const calendarContainer = document.querySelector('.calendar-sidebar-container');
-            const leftSidebar = document.getElementById('leftSidebar');
-            const mainArea = document.querySelector('.main-area');
-            const collapseIcon = document.getElementById('calendarCollapseIcon');
-            
-            if (calendarContainer.classList.contains('collapsed')) {
-                calendarContainer.classList.remove('collapsed');
-                leftSidebar.classList.remove('calendar-collapsed');
-                if (mainArea) mainArea.classList.remove('calendar-collapsed');
-                collapseIcon.className = 'fas fa-chevron-left';
-            } else {
-                calendarContainer.classList.add('collapsed');
-                leftSidebar.classList.add('calendar-collapsed');
-                if (mainArea) mainArea.classList.add('calendar-collapsed');
-                collapseIcon.className = 'fas fa-chevron-right';
-            }
-        }
+        // Removido: toggleCalendarSidebar - comportamento migrado para toggleSidebar()
 
         // Fechar cards expandidos ao clicar fora
         document.addEventListener('click', function(event) {
@@ -6280,25 +6267,25 @@
         // Fechar sidebar ao clicar fora dela em mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('leftSidebar');
-            const toggle = document.getElementById('sidebarToggle');
+            const headerHamburger = document.getElementById('headerHamburger');
             
             if (window.innerWidth <= 768 && 
-                !sidebar.contains(event.target) && 
-                !toggle.contains(event.target) &&
+                sidebar && !sidebar.contains(event.target) && 
+                headerHamburger && !headerHamburger.contains(event.target) &&
                 sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
-                toggle.innerHTML = '<i class="fas fa-bars"></i>';
+                headerHamburger.innerHTML = '<i class="fas fa-bars"></i>';
             }
         });
 
         // Ajustar sidebar ao redimensionar a janela
         window.addEventListener('resize', function() {
             const sidebar = document.getElementById('leftSidebar');
-            const toggle = document.getElementById('sidebarToggle');
+            const headerHamburger = document.getElementById('headerHamburger');
             
             if (window.innerWidth > 768) {
-                sidebar.classList.remove('open');
-                toggle.innerHTML = '<i class="fas fa-bars"></i>';
+                if (sidebar) sidebar.classList.remove('open');
+                if (headerHamburger) headerHamburger.innerHTML = '<i class="fas fa-bars"></i>';
             }
         });
 
