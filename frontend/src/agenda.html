@@ -6615,6 +6615,20 @@
                         if (typeof window.togglePeriodFieldsRequired === 'function') {
                             window.togglePeriodFieldsRequired();
                         }
+                        // Listener para alternar múltiplos dias (mostrar Data fim e ajustar rótulo)
+                        const multiplosToggle = document.getElementById('eventMultiplos');
+                        const endDateGroup = document.getElementById('groupNewPeriodEndDate');
+                        const dateLabel = document.getElementById('labelNewPeriodDate');
+                        if (multiplosToggle && !multiplosToggle.hasAttribute('data-listener-added')) {
+                            const applyView = () => {
+                                const on = multiplosToggle.checked;
+                                if (endDateGroup) endDateGroup.style.display = on ? '' : 'none';
+                                if (dateLabel) dateLabel.textContent = on ? 'Data início: *' : 'Data: *';
+                            };
+                            multiplosToggle.addEventListener('change', applyView);
+                            applyView();
+                            multiplosToggle.setAttribute('data-listener-added', 'true');
+                        }
                     }, 300);
                 }
                 
@@ -6814,8 +6828,10 @@
 
             window.addPeriod = function() {
                 const date = document.getElementById('newPeriodDate').value;
+                const endDateValue = document.getElementById('newPeriodEndDate') ? document.getElementById('newPeriodEndDate').value : '';
                 const startTime = document.getElementById('newPeriodStartTime').value;
                 const endTime = document.getElementById('newPeriodEndTime').value;
+                const multiplos = document.getElementById('eventMultiplos');
 
                 // Validações
                 if (!date || !startTime || !endTime) {
@@ -6828,27 +6844,60 @@
                     return;
                 }
 
-                // Verificar se já existe um período com a mesma data e horário
-                const existingPeriod = periodsList.find(period => 
-                    period.date === date && 
-                    period.startTime === startTime && 
-                    period.endTime === endTime
-                );
+                // Modo múltiplos dias
+                if (multiplos && multiplos.checked) {
+                    if (!endDateValue) {
+                        alert('Por favor, informe a data de fim.');
+                        return;
+                    }
+                    if (endDateValue < date) {
+                        alert('A data de fim deve ser igual ou posterior à data de início.');
+                        return;
+                    }
+                    const start = new Date(date + 'T00:00:00');
+                    const end = new Date(endDateValue + 'T00:00:00');
+                    let cursor = new Date(start);
+                    const toAdd = [];
+                    while (cursor <= end) {
+                        const y = cursor.getFullYear();
+                        const m = String(cursor.getMonth() + 1).padStart(2, '0');
+                        const d = String(cursor.getDate()).padStart(2, '0');
+                        const ymd = `${y}-${m}-${d}`;
+                        const dup = periodsList.find(p => p.date === ymd && p.startTime === startTime && p.endTime === endTime) ||
+                                    toAdd.find(p => p.date === ymd && p.startTime === startTime && p.endTime === endTime);
+                        if (!dup) {
+                            toAdd.push({ id: Date.now() + toAdd.length, date: ymd, startTime, endTime });
+                        }
+                        cursor.setDate(cursor.getDate() + 1);
+                    }
+                    if (toAdd.length === 0) {
+                        alert('Os períodos selecionados já existem na lista.');
+                        return;
+                    }
+                    periodsList = periodsList.concat(toAdd);
+                } else {
+                    // Verificar se já existe um período com a mesma data e horário
+                    const existingPeriod = periodsList.find(period => 
+                        period.date === date && 
+                        period.startTime === startTime && 
+                        period.endTime === endTime
+                    );
 
-                if (existingPeriod) {
-                    alert('Já existe um período com esta data e horário.');
-                    return;
+                    if (existingPeriod) {
+                        alert('Já existe um período com esta data e horário.');
+                        return;
+                    }
+
+                    // Adicionar período à lista
+                    const period = {
+                        id: Date.now(),
+                        date: date,
+                        startTime: startTime,
+                        endTime: endTime
+                    };
+
+                    periodsList.push(period);
                 }
-
-                // Adicionar período à lista
-                const period = {
-                    id: Date.now(),
-                    date: date,
-                    startTime: startTime,
-                    endTime: endTime
-                };
-
-                periodsList.push(period);
                 updatePeriodsList();
                 clearPeriodForm();
 
@@ -6917,6 +6966,7 @@
 
             window.clearPeriodForm = function() {
                 document.getElementById('newPeriodDate').value = '';
+                if (document.getElementById('newPeriodEndDate')) document.getElementById('newPeriodEndDate').value = '';
                 document.getElementById('newPeriodStartTime').value = '';
                 document.getElementById('newPeriodEndTime').value = '';
             };

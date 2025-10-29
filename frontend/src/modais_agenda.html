@@ -75,6 +75,13 @@
                                 <span class="slider"></span>
                             </label>
                         </div>
+                        <div class="toggle-group">
+                            <label>Múltiplos dias:</label>
+                            <label class="switch">
+                                <input type="checkbox" id="eventMultiplos" name="multiplos">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                     </div>
                     
                     <!-- Formulário para adicionar novo período -->
@@ -82,8 +89,12 @@
                         <h4 class="subsection-title">Adicionar Período</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Data: *</label>
+                                <label id="labelNewPeriodDate">Data: *</label>
                                 <input type="date" id="newPeriodDate" required>
+                            </div>
+                            <div class="form-group" id="groupNewPeriodEndDate" style="display:none;">
+                                <label>Data fim: *</label>
+                                <input type="date" id="newPeriodEndDate">
                             </div>
                             <div class="form-group">
                                 <label>De: *</label>
