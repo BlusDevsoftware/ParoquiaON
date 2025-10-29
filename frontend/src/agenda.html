@@ -120,6 +120,15 @@
             font-size: 14px;
         }
 
+        /* Ajuste do botão Criar quando estiver no container superior */
+        .info-left .create-button,
+        .info-right .create-button {
+            margin: 0 12px 0 0;
+            width: auto;
+            padding: 10px 16px;
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.15);
+        }
+
         .create-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
@@ -966,6 +975,11 @@
             transition: all 0.3s ease;
         }
 
+        /* Espaço superior no mini calendário no container lateral */
+        .calendar-sidebar-container .mini-calendar { 
+            margin-top: 30px; 
+        }
+
         /* Efeito hover removido para manter consistência com o layout */
 
         .calendar-sidebar-header {
@@ -1248,7 +1262,7 @@
         .appointments-list {
             padding: 0;
             margin: 0;
-            max-height: 200px;
+            max-height: 380px;
             overflow-y: auto;
         }
 
@@ -3450,20 +3464,6 @@
             <div>
                 <!-- Container Lateral do Calendário -->
                 <div class="calendar-sidebar-container">
-                    <!-- Botão Criar -->
-                    <button class="create-button" onclick="openEventModal()">
-                        <i class="fas fa-plus"></i>
-                        Criar
-                    </button>
-
-
-                    <div class="calendar-sidebar-header">
-                        <div class="calendar-sidebar-title">
-                            <i class="fas fa-calendar-alt"></i> Calendário
-                        </div>
-                        
-                    </div>
-                    
                     <!-- Mini Calendário -->
                     <div class="mini-calendar">
                         <div class="mini-calendar-header">
@@ -3514,6 +3514,10 @@
                 <!-- Container de Informações -->
                 <div class="calendar-info-container">
                     <div class="info-left">
+                        <button class="create-button" onclick="openEventModal()">
+                            <i class="fas fa-plus"></i>
+                            Criar
+                        </button>
                         <div class="info-location">
                             <div class="info-location-container">
                             <div class="info-location-label">Você está em:</div>
