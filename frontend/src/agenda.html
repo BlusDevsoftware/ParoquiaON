@@ -2561,10 +2561,10 @@
             will-change: transform;
         }
 
-        .event-block:hover {
+        .event-block.event-block-hover {
             transform: translateY(-1px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-            z-index: 100 !important;
+            z-index: 200 !important;
             white-space: normal !important;
             overflow: visible !important;
             padding: 12px;
@@ -2574,7 +2574,7 @@
             max-width: 500px;
         }
         
-        .event-block:hover * {
+        .event-block.event-block-hover * {
             white-space: normal !important;
         }
 
@@ -4302,26 +4302,58 @@
                             }
                         });
 
-                        // Prevenir flicker ao passar o mouse entre eventos sobrepostos:
-                        // quando um evento recebe hover, desabilitamos pointer-events dos irmãos
+                        // Controlar hover com classe para evitar flicker quando card expande
+                        let hoverTimeout = null;
+                        
                         eventElement.addEventListener('mouseenter', () => {
+                            // Cancelar timeout se o mouse voltou antes do timeout executar
+                            if (hoverTimeout) {
+                                clearTimeout(hoverTimeout);
+                                hoverTimeout = null;
+                            }
+                            
+                            // Adicionar classe de hover
+                            eventElement.classList.add('event-block-hover');
+                            
+                            // Desabilitar pointer-events dos irmãos para evitar conflitos
                             const siblings = daySlot.querySelectorAll('.event-block');
                             siblings.forEach(el => {
                                 if (el !== eventElement) {
                                     el.style.pointerEvents = 'none';
                                 }
                             });
-                            // garantir topo
-                            eventElement.style.zIndex = '200';
                         });
+                        
                         eventElement.addEventListener('mouseleave', () => {
-                            const siblings = daySlot.querySelectorAll('.event-block');
-                            siblings.forEach(el => {
-                                if (el !== eventElement) {
-                                    el.style.pointerEvents = '';
+                            // Usar um pequeno delay antes de remover hover
+                            // Isso permite que o mouse entre na área expandida sem perder hover
+                            hoverTimeout = setTimeout(() => {
+                                // Verificar se ainda está em hover (mouse pode ter voltado)
+                                if (!eventElement.classList.contains('event-block-hover')) {
+                                    return;
                                 }
-                            });
-                            eventElement.style.zIndex = '';
+                                
+                                // Remover hover apenas se realmente saiu
+                                eventElement.classList.remove('event-block-hover');
+                                
+                                // Reabilitar pointer-events dos irmãos
+                                const siblings = daySlot.querySelectorAll('.event-block');
+                                siblings.forEach(el => {
+                                    if (el !== eventElement) {
+                                        el.style.pointerEvents = '';
+                                    }
+                                });
+                                
+                                hoverTimeout = null;
+                            }, 150);
+                        });
+                        
+                        // Manter hover se o mouse entrar na área expandida
+                        eventElement.addEventListener('mousemove', () => {
+                            if (hoverTimeout) {
+                                clearTimeout(hoverTimeout);
+                                hoverTimeout = null;
+                            }
                         });
                         
                         daySlot.appendChild(eventElement);
