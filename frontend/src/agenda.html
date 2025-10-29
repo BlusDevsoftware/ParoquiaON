@@ -3848,6 +3848,16 @@
         let editingEvent = null;
         let miniCalendarDate = new Date();
         let currentView = 'semana'; // 'semana' | 'mês'
+
+        // Atualiza a lista do dropdown de visão para ocultar a visão atualmente selecionada
+        function updateViewDropdown() {
+            const viewDropdownItems = document.querySelectorAll('.view-dropdown-item');
+            viewDropdownItems.forEach(item => {
+                const v = item.getAttribute('data-view');
+                // Oculta o item correspondente à visão atual; mostra os demais
+                item.style.display = (v === currentView) ? 'none' : 'block';
+            });
+        }
         let selectedCommunityId = null; // ID da comunidade selecionada
 
         // Funções para controlar o spinner da agenda
@@ -3893,8 +3903,6 @@
             renderCalendar();
             updateCurrentWeekRange();
             updateRecentAppointments();
-            // Ajusta o dropdown para esconder a opção já selecionada
-            try { updateViewDropdownVisibility(); } catch(_) {}
             
             // Atualizar linha de tempo a cada minuto
             setInterval(() => {
@@ -3934,12 +3942,14 @@
                     
                     // Atualizar visualização
                     currentView = selectedView;
+                    // Atualizar dropdown para esconder a visão atual
+                    updateViewDropdown();
                     renderCalendar();
                     updateCurrentWeekRange();
-                    // Esconde a opção atualmente selecionada no dropdown
-                    try { updateViewDropdownVisibility(); } catch(_) {}
                 });
             });
+            // Garantir sincronização do dropdown ao renderizar
+            updateViewDropdown();
 
             // Formulário de evento - Removido (modal não disponível)
 
@@ -3950,24 +3960,6 @@
             // Presets de duração removidos - modal não disponível
 
             // Event listeners de status e horários removidos - modal não disponível
-            // Estado inicial do dropdown
-            try { updateViewDropdownVisibility(); } catch(_) {}
-        }
-
-        // Esconde a opção de visualização já selecionada no dropdown
-        function updateViewDropdownVisibility() {
-            const items = document.querySelectorAll('.view-dropdown-item');
-            items.forEach(item => {
-                const view = item.getAttribute('data-view');
-                if (!view) return;
-                if (view === currentView) {
-                    item.style.display = 'none';
-                    item.setAttribute('aria-hidden', 'true');
-                } else {
-                    item.style.display = '';
-                    item.removeAttribute('aria-hidden');
-                }
-            });
         }
 
         function updateMiniCalendar() {
@@ -4058,7 +4050,9 @@
             const weekStart = new Date(currentDate);
             weekStart.setDate(currentDate.getDate() - currentDate.getDay());
             
-            
+            console.log('🔧 Debug semana (usando Date):');
+            console.log('  - currentDate:', currentDate.toDateString());
+            console.log('  - weekStart:', weekStart.toDateString());
 
             // Atualizar cabeçalhos dos dias
             const dayNames = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
@@ -4097,8 +4091,11 @@
                     // Criar string da data
                     const dayString = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, '0')}-${String(dayDate.getDate()).padStart(2, '0')}`;
                     
-                    if (day === 0) {
-                        
+                    if (day === 0) { // Log apenas para o primeiro dia para não poluir
+                        console.log('🔧 Debug calendário (usando Date):');
+                        console.log('  - weekStart:', weekStart.toDateString());
+                        console.log('  - dayDate (dia 0):', dayDate.toDateString());
+                        console.log('  - dayString (dia 0):', dayString);
                     }
                     
                     const daySlot = document.createElement('div');
@@ -4205,13 +4202,14 @@
                         const endHour = endTime.getHours();
                         const endMinutes = endTime.getMinutes();
                         
-                        
+                        console.log('Evento:', event.title, 'Início:', startTimeString, 'Fim:', endTimeString);
+                        console.log('End Hour:', endHour, 'End Minutes:', endMinutes);
                         
                         // Se o evento termina após as 23h, limitar até 23:00
                         let maxHeight = (durationMinutes / 60) * 100;
                         
                         if (endHour > 23 || (endHour === 23 && endMinutes > 0)) {
-                            
+                            console.log('Evento vai além das 23h - limitando altura');
                             
                             // Calcular altura máxima até 23:00
                             const maxEndTime = new Date(startTime);
@@ -4219,12 +4217,13 @@
                             const maxDurationMinutes = (maxEndTime.getTime() - startTime.getTime()) / (1000 * 60);
                             maxHeight = (maxDurationMinutes / 60) * 100;
                             
-                            
+                            console.log('Altura original:', (durationMinutes / 60) * 100, '%');
+                            console.log('Altura limitada:', maxHeight, '%');
                             
                             // Adicionar indicador visual de que o evento continua
                             eventElement.classList.add('event-truncated');
                         } else {
-                            
+                            console.log('Evento dentro do horário normal');
                         }
                         
                         eventElement.style.top = `${topPosition}%`;
@@ -4278,7 +4277,9 @@
                         // Verificar se o clique foi diretamente no slot (não em um evento)
                         if (e.target === daySlot) {
                             // Usar a data que está sendo exibida
-                            
+                            console.log('📅 Data selecionada no calendário:', dayDate.toDateString());
+                            console.log('🕐 Hora selecionada:', hour);
+                            console.log('📅 Data string:', dayString);
                             
                             // Criar evento para este horário específico
                             createEventForTimeSlot(dayDate, hour);
@@ -4304,19 +4305,25 @@
             weekEnd.setDate(weekStart.getDate() + 6);
             
             // Debug: verificar se estamos na semana atual
-            
+            console.log('Data atual:', now.toDateString());
+            console.log('Semana atual:', weekStart.toDateString(), 'a', weekEnd.toDateString());
             
             // Comparar usando objetos Date
             const isInCurrentWeek = now >= weekStart && now <= weekEnd;
             
-            
+            console.log('Comparação de datas:', {
+                hoje: now.toDateString(),
+                inicioSemana: weekStart.toDateString(),
+                fimSemana: weekEnd.toDateString(),
+                dentroDaSemana: isInCurrentWeek
+            });
             
             if (isInCurrentWeek) {
                 // Calcular posição da linha
                 const currentHour = now.getHours();
                 const currentMinute = now.getMinutes();
                 
-                
+                console.log('Hora atual:', currentHour + ':' + currentMinute);
                 
                 // Verificar se está dentro do horário do calendário (1h - 23h)
                 if (currentHour >= 1 && currentHour <= 23) {
@@ -4328,17 +4335,17 @@
                     const totalHours = 23; // 1h às 23h = 23 horas
                     const positionPercent = (totalMinutes / (totalHours * 60)) * 100;
                     
-                    
+                    console.log('Posição vertical:', positionPercent + '%');
                     
                     timeLine.style.top = `${positionPercent}%`;
                     
                     // Calcular qual coluna do dia (0-6)
                     const dayOfWeek = now.getDay();
-                    
+                    console.log('Dia da semana:', dayOfWeek);
                     
                     // Encontrar o slot do dia de hoje - corrigir lógica
                     const daySlots = calendarBody.querySelectorAll('.day-slot');
-                    
+                    console.log('Total de day-slots:', daySlots.length);
                     
                     // A lógica anterior estava incorreta. Vamos encontrar o slot correto
                     // Os slots são organizados por linha (hora) e coluna (dia)
@@ -4350,20 +4357,22 @@
                     const slotIndex = (currentHourIndex * 7) + dayOfWeek;
                     const targetSlot = daySlots[slotIndex];
                     
-                    
+                    console.log('Índice da hora:', currentHourIndex);
+                    console.log('Índice do slot:', slotIndex);
+                    console.log('Slot encontrado:', targetSlot);
                     
                     if (targetSlot) {
                         targetSlot.style.position = 'relative';
                         targetSlot.appendChild(timeLine);
-                        
+                        console.log('Linha de tempo adicionada!');
                     } else {
-                        
+                        console.log('Slot não encontrado!');
                     }
                 } else {
-                    
+                    console.log('Fora do horário do calendário (1h-23h)');
                 }
             } else {
-                
+                console.log('Hoje não está na semana atual');
             }
         }
 
@@ -4921,7 +4930,8 @@
         }
 
         function createEventForTimeSlotByString(dateString, selectedHour) {
-            
+            console.log('🔧 createEventForTimeSlotByString - Data string:', dateString);
+            console.log('🔧 createEventForTimeSlotByString - Hora:', selectedHour);
             
             // Extrair componentes da string de data
             const [year, month, day] = dateString.split('-').map(Number);
@@ -4930,7 +4940,8 @@
             const eventDate = new Date(year, month - 1, day, selectedHour, 0, 0);
             const endDate = new Date(year, month - 1, day, selectedHour + 1, 0, 0);
             
-            
+            console.log('🔧 Data final do evento (string):', eventDate.toDateString(), eventDate.getHours() + 'h');
+            console.log('🔧 Data final de fim (string):', endDate.toDateString(), endDate.getHours() + 'h');
             
             // Abrir modal com dados pré-preenchidos
             openEventModalWithTime(eventDate, endDate);
@@ -4979,7 +4990,7 @@
 
         // Função para carregar dados do formulário
         function loadEventFormData() {
-            
+            console.log('📋 Carregando dados do formulário...');
             
             // Carregar dados se ainda não foram carregados
             if (!modalDataCache.comunidades || modalDataCache.comunidades.length === 0) {
@@ -5509,13 +5520,13 @@
 
             // Sincronizar mudanças simples
             dateInput.addEventListener('change', () => {
-                
+                console.log('🔍 DEBUG - dateInput change event:', {
                     dateInputValue: dateInput.value,
                     timestamp: new Date().getTime()
                 });
                 const displayValue = dateInput.value ? formatDateForDisplay(dateInput.value) : '';
                 input.value = displayValue;
-                
+                console.log('🔍 DEBUG - input.value atualizado:', input.value);
                 // Atualizar seleção no calendário
                 calendar.querySelectorAll('.calendar-day').forEach(day => {
                     day.classList.toggle('selected', day.dataset.date === dateInput.value);
@@ -5777,12 +5788,12 @@
         // Função para obter ID do status pelo nome
         function getStatusIdByName(statusName) {
             if (!modalDataCache.status || !statusName) {
-                
+                console.log('⚠️ Status não encontrado, usando padrão (1)');
                 return 1; // Padrão: agendado
             }
             
             const status = modalDataCache.status.find(s => s.nome === statusName);
-            
+            console.log(`🔍 Buscando status: "${statusName}", encontrado:`, status);
             return status ? status.id : 1;
         }
 
@@ -6294,7 +6305,7 @@
         // Carregar modais da agenda
         async function loadModaisAgenda() {
             try {
-                
+                console.log('🔄 Carregando modais da agenda...');
                 const response = await fetch('modais_agenda.html');
                 
                 if (!response.ok) {
@@ -6306,7 +6317,7 @@
                 
                 if (container) {
                     container.innerHTML = html;
-                    
+                    console.log('✅ Modais da agenda carregados com sucesso');
                     
                     // Executar o JavaScript dos modais
                     executeModalScripts();
@@ -6317,7 +6328,7 @@
                     
                     // Verificar se as funções dos modais estão disponíveis
                     if (typeof openEventModal === 'function' && typeof closeEventModal === 'function') {
-                        
+                        console.log('✅ Funções dos modais disponíveis');
                     } else {
                         console.warn('⚠️ Algumas funções dos modais podem não estar disponíveis');
                     }
@@ -6328,7 +6339,7 @@
                 console.error('❌ Erro ao carregar modais da agenda:', error);
                 // Fallback: tentar carregar novamente após um delay
                 setTimeout(() => {
-                    
+                    console.log('🔄 Tentando carregar modais novamente...');
                     loadModaisAgenda();
                 }, 2000);
             }
@@ -6336,11 +6347,11 @@
 
         // Executar scripts dos modais
         function executeModalScripts() {
-            
+            console.log('🔧 Executando scripts dos modais...');
             
             // Definir as funções dos modais no escopo global
             window.openEventModalWithTime = function(startTime, endTime) {
-                
+                console.log('🔄 Abrindo modal com horário:', startTime, endTime);
                 
                 // Usar o modal padrão
                 openEventModal();
@@ -6367,7 +6378,7 @@
                     const endTimeInput = document.getElementById('newPeriodEndTime');
                     
                     if (dateInput && startTimeInput && endTimeInput) {
-                        
+                        console.log('🔍 DEBUG - ANTES de preencher:', {
                             dateInputValue: dateInput.value,
                             dateInputDataset: dateInput.dataset.enhanced,
                             dateString: dateString
@@ -6378,32 +6389,32 @@
                         startTimeInput.value = startTimeString;
                         endTimeInput.value = endTimeString;
                         
-                        
+                        console.log('🔍 DEBUG - DEPOIS de preencher:', {
                             dateInputValue: dateInput.value,
                             dateInputDataset: dateInput.dataset.enhanced
                         });
                         
                         // Forçar atualização da interface do campo de data customizado
-                        
+                        console.log('🔍 DEBUG - Verificando enhanced:', dateInput.dataset.enhanced);
                         
                         if (dateInput.dataset.enhanced === 'true') {
                             const displayInput = dateInput.previousElementSibling;
                             if (displayInput && displayInput.type === 'text') {
                                 const displayValue = formatDateForDisplay(dateString);
                                 displayInput.value = displayValue;
-                                
+                                console.log('🔍 DEBUG - displayInput atualizado:', displayValue);
                             }
                         } else {
                             // Se não está customizado, forçar evento change para atualizar qualquer campo wrapper
-                            
+                            console.log('🔍 DEBUG - Campo não enhanced, despachando evento change');
                             dateInput.dispatchEvent(new Event('change', { bubbles: true }));
                             
                             // Aguardar um pouco e verificar o valor final
                             setTimeout(() => {
-                                
+                                console.log('🔍 DEBUG - Valor final do campo após 50ms:', dateInput.value);
                                 const displayInput = dateInput.previousElementSibling;
                                 if (displayInput) {
-                                    
+                                    console.log('🔍 DEBUG - displayInput encontrado:', displayInput.type, displayInput.value);
                                 }
                             }, 50);
                         }
@@ -6419,7 +6430,7 @@
             };
 
             window.openEventModal = function(date = null) {
-                
+                console.log('🔄 Abrindo modal padrão');
                 mostrarSpinnerAgenda();
                 
                 // Limpar períodos anteriores
@@ -6461,13 +6472,13 @@
                         const btnAddPeriod = document.getElementById('btnAddPeriod');
                         if (btnAddPeriod && !btnAddPeriod.hasAttribute('data-listener-added')) {
                             btnAddPeriod.addEventListener('click', function() {
-                                
+                                console.log('🔘 Botão Adicionar Período clicado');
                                 if (window.addPeriod) {
                                     window.addPeriod();
                                 }
                             });
                             btnAddPeriod.setAttribute('data-listener-added', 'true');
-                            
+                            console.log('✅ Event listener adicionado ao btnAddPeriod');
                         }
                         
                         // Desativar validação nativa do formulário; usamos validação customizada
@@ -6487,11 +6498,11 @@
                 const form = document.getElementById('eventForm');
                 if (form && !form.hasAttribute('data-submit-listener')) {
                     form.addEventListener('submit', function(e) {
-                        
+                        console.log('📝 Formulário submetido');
                         handleEventSubmit(e);
                     });
                     form.setAttribute('data-submit-listener', 'true');
-                    
+                    console.log('✅ Event listener de submit adicionado ao formulário');
                 }
             };
 
@@ -6512,7 +6523,7 @@
             }
 
             window.closeEventModal = function() {
-                
+                console.log('🔒 Fechando modal...');
                 
                 // Resetar todos os cards expandidos
                 resetExpandedCards();
@@ -6520,12 +6531,12 @@
                 const modal = document.getElementById('eventModal');
                 if (modal) {
                     modal.style.display = 'none';
-                    
+                    console.log('✅ Modal fechado com sucesso');
                 }
             };
 
             window.editEventModal = function(event) {
-                
+                console.log('🔄 Abrindo modal de edição:', event);
                 
                 const modal = document.getElementById('modalEdicaoAgendamento');
                 if (modal) {
@@ -6575,7 +6586,7 @@
 
             // Função para fechar modal de edição
             window.closeEditEventModal = function() {
-                
+                console.log('🔒 Fechando modal de edição...');
                 
                 // Resetar todos os cards expandidos
                 resetExpandedCards();
@@ -6583,7 +6594,7 @@
                 const modal = document.getElementById('modalEdicaoAgendamento');
                 if (modal) {
                     modal.style.display = 'none';
-                    
+                    console.log('✅ Modal de edição fechado com sucesso');
                 }
             };
 
