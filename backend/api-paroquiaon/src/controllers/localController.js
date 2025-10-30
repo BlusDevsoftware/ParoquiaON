@@ -35,7 +35,6 @@ async function criarLocal(req, res) {
         const insertData = {
             nome: body.nome,
             endereco: body.endereco ?? null,
-            tipo: body.tipo ?? null,
             observacao: body.observacao ?? body.descricao ?? null,
             status: normalizedStatus,
             usuario_id: body.usuario_id ?? null,
@@ -55,7 +54,6 @@ async function criarLocal(req, res) {
             const fallbackData = {
                 nome: insertData.nome,
                 endereco: insertData.endereco,
-                tipo: insertData.tipo,
                 observacao: insertData.observacao,
                 ativo: normalizedStatus === 'ativo',
                 usuario_id: insertData.usuario_id,
@@ -93,7 +91,6 @@ async function atualizarLocal(req, res) {
         const updateData = {
             ...(body.nome !== undefined ? { nome: body.nome } : {}),
             ...(body.endereco !== undefined ? { endereco: body.endereco } : {}),
-            ...(body.tipo !== undefined ? { tipo: body.tipo } : {}),
             ...(body.observacao !== undefined ? { observacao: body.observacao } : (body.descricao !== undefined ? { observacao: body.descricao } : {})),
             ...(normalizedStatus !== undefined ? { status: normalizedStatus } : {}),
             ...(body.usuario_id !== undefined ? { usuario_id: body.usuario_id } : {}),
