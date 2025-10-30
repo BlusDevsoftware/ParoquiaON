@@ -308,9 +308,11 @@
         }
 
         .pastorais-rows {
-            /* altura é 100% menos a altura do cabeçalho */
+            /* altura é 100% menos a altura do cabeçalho e o espaçamento desejado */
             --header-height: 54px;
-            height: calc(100% - var(--header-height));
+            --header-spacing: 8px;
+            height: calc(100% - var(--header-height) - var(--header-spacing));
+            margin-top: var(--header-spacing);
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -330,7 +332,7 @@
             font-size: 14px;
             margin: 0; /* sem espaçamento abaixo do cabeçalho */
             border: none;
-            border-bottom: 1px solid #e6e9ef;
+            border-bottom: none; /* sem linha inferior */
             min-height: 54px; /* define a altura usada pelo cálculo acima */
         }
 
