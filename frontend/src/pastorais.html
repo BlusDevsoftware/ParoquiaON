@@ -1458,13 +1458,23 @@
                 const { data, error } = await api.get(endpoints.pastorais.list);
                 if (error) throw error;
                 const lista = Array.isArray(data) ? data : [];
-                // Aplicar filtro de status, se existir
+                // Capturar filtros
                 const statusSelect = document.getElementById('statusFilter');
                 const filtro = statusSelect ? statusSelect.value : 'todos';
+                const searchInput = document.querySelector('.search-box input');
+                const termo = (searchInput && searchInput.value ? searchInput.value : '').trim().toLowerCase();
+
                 const listaFiltrada = lista.filter(p => {
-                    if (filtro === 'todos') return true;
+                    // filtro por status
                     const ativo = p?.ativo !== false;
-                    return filtro === 'ativo' ? ativo : !ativo;
+                    const statusOk = (filtro === 'todos') ? true : (filtro === 'ativo' ? ativo : !ativo);
+                    if (!statusOk) return false;
+                    // filtro por texto (nome, tipo, responsável)
+                    if (!termo) return true;
+                    const nome = (p?.nome || '').toLowerCase();
+                    const tipo = (p?.tipo || '').toLowerCase();
+                    const respNome = (p?.responsavel_id && pessoasById[p.responsavel_id]?.nome) ? String(pessoasById[p.responsavel_id].nome).toLowerCase() : '';
+                    return nome.includes(termo) || tipo.includes(termo) || respNome.includes(termo);
                 });
                 const grid = document.getElementById('pastorais-grid');
                 if (!grid) return;
@@ -1801,6 +1811,11 @@ async function visualizarPastoral(id) {
             const statusSelect = document.getElementById('statusFilter');
             if (statusSelect) {
                 statusSelect.addEventListener('change', carregarPastorais);
+            }
+            // Busca por texto: recarregar lista ao digitar
+            const searchInput = document.querySelector('.search-box input');
+            if (searchInput) {
+                searchInput.addEventListener('input', carregarPastorais);
             }
             // remove listener de tipo inexistente
              document.getElementById('statusToggleModal').addEventListener('change', toggleStatus);
