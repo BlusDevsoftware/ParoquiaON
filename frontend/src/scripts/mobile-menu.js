@@ -19,10 +19,12 @@ function toggleMobileMenu(event) {
         menuContainer.classList.remove('show');
         menuFab.classList.remove('active');
         menuFab.innerHTML = '<i class="fas fa-bars"></i>';
+        document.body.classList.remove('menu-open');
     } else {
         menuContainer.classList.add('show');
         menuFab.classList.add('active');
         menuFab.innerHTML = '<i class="fas fa-times"></i>';
+        document.body.classList.add('menu-open');
     }
 }
 
@@ -42,6 +44,7 @@ function closeMobileMenuOnClickOutside(event) {
         menuContainer.classList.remove('show');
         menuFab.classList.remove('active');
         menuFab.innerHTML = '<i class="fas fa-bars"></i>';
+        document.body.classList.remove('menu-open');
     }
 }
 
@@ -77,6 +80,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // Marcar link ativo
     setActiveMobileMenuLink();
     
+    // Fechar menu ao clicar em um link
+    const mobileLinks = document.querySelectorAll('.mobile-menu-link');
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            const menuContainer = document.getElementById('mobileMenuContainer');
+            const menuFab = document.getElementById('mobileMenuFab');
+            if (menuContainer && menuFab) {
+                menuContainer.classList.remove('show');
+                menuFab.classList.remove('active');
+                menuFab.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.classList.remove('menu-open');
+            }
+        });
+    });
+
+    // Fechar com tecla ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const menuContainer = document.getElementById('mobileMenuContainer');
+            const menuFab = document.getElementById('mobileMenuFab');
+            if (menuContainer && menuFab && menuContainer.classList.contains('show')) {
+                menuContainer.classList.remove('show');
+                menuFab.classList.remove('active');
+                menuFab.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.classList.remove('menu-open');
+            }
+        }
+    });
+
     // Fechar menu ao redimensionar a janela
     window.addEventListener('resize', function() {
         if (window.innerWidth > 768) {
@@ -87,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 menuContainer.classList.remove('show');
                 menuFab.classList.remove('active');
                 menuFab.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.classList.remove('menu-open');
             }
         }
     });

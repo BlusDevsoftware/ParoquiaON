@@ -321,6 +321,9 @@
             color: #495057;
             font-size: 14px;
             margin-bottom: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 5;
         }
 
         .grid-row {
@@ -1598,7 +1601,7 @@ async function editarPastoral(id) {
                 if (selectRespEdit) selectRespEdit.value = pastoral.responsavel_id || '';
                 form.contato.value = pastoral.contato || '';
                 form.tipo.value = pastoral.tipo || '';
-                form.observacao.value = pastoral.observacao || '';
+                form.observacao.value = pastoral.descricao || '';
                 // Atualizar contador
                 atualizarContador(form.observacao);
                 // Atualizar status
