@@ -314,6 +314,8 @@
             height: calc(100% - var(--header-height) - var(--header-spacing));
             margin-top: var(--header-spacing);
             overflow-y: auto;
+            /* Reserva espaço estável para a barra de rolagem e evita shift no cabeçalho */
+            scrollbar-gutter: stable both-edges;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -335,6 +337,8 @@
             border: none;
             border-bottom: none; /* sem linha inferior */
             min-height: 54px; /* define a altura usada pelo cálculo acima */
+            /* padding-right dinâmico para compensar a largura do scrollbar das linhas */
+            padding-right: calc(16px + var(--scrollbar-width, 0px));
         }
 
         /* Alinhamento dos títulos por coluna para casar com as linhas */
@@ -1848,6 +1852,25 @@ async function visualizarPastoral(id) {
             const searchInput = document.querySelector('.search-box input');
             if (searchInput) {
                 searchInput.addEventListener('input', carregarPastorais);
+            }
+
+            // Compensar a largura do scrollbar das linhas no cabeçalho
+            const gridEl = document.getElementById('pastorais-grid');
+            const rowsEl = document.getElementById('pastorais-rows');
+            function syncHeaderScrollbarPadding() {
+                if (!gridEl || !rowsEl) return;
+                const scrollbarWidth = rowsEl.offsetWidth - rowsEl.clientWidth;
+                gridEl.style.setProperty('--scrollbar-width', `${Math.max(0, scrollbarWidth)}px`);
+            }
+            // calcular no load e ao redimensionar
+            syncHeaderScrollbarPadding();
+            window.addEventListener('resize', syncHeaderScrollbarPadding);
+            // após cada carregamento, sincronizar novamente
+            const originalCarregarPastorais = carregarPastorais;
+            carregarPastorais = async function() {
+                const result = await originalCarregarPastorais.apply(this, arguments);
+                syncHeaderScrollbarPadding();
+                return result;
             }
             // remove listener de tipo inexistente
              document.getElementById('statusToggleModal').addEventListener('change', toggleStatus);
