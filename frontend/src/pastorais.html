@@ -853,6 +853,12 @@
                 width: 48px !important;
                 height: 48px !important;
             }
+            .row-card > div:nth-child(2) {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+            }
         }
         
         @media (max-width: 480px) {
@@ -892,6 +898,12 @@
             .row-card > div:first-child > div {
                 width: 44px !important;
                 height: 44px !important;
+            }
+            .row-card > div:nth-child(2) {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
             }
         }
 
