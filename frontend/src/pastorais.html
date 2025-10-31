@@ -923,8 +923,14 @@
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
-        .row-card:hover { background: #f9fafb; }
+        .row-card:hover { 
+            background: #f9fafb; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
         /* Garantir cor consistente (sem listras alternadas herdadas) */
         .rows .row-card { background: #ffffff !important; }
         .rows .row-card:nth-child(odd),
