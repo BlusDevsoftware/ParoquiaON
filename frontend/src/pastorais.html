@@ -680,7 +680,10 @@
         .main-content {
             margin-top: 75px;
             background: #ffffff;
-            min-height: calc(100vh - 75px);
+            height: calc(100vh - 75px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         /* Barra de pesquisa centralizada (responsiva) */
@@ -688,11 +691,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            gap: 16px;
             padding: 16px 20px;
             background: #ffffff;
-            position: sticky;
-            top: 80px; /* fica logo abaixo do menu fixo */
-            z-index: 900; /* acima dos cards */
+            position: relative;
         }
         .search-box-hero {
             width: 100%;
@@ -718,17 +720,71 @@
             color: #0f172a;
         }
         .search-box-hero input::placeholder { color: #94a3b8; }
+        
+        /* Botão Nova Pastoral */
+        .btn-nova-pastoral {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: #1e3a8a;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .btn-nova-pastoral:hover {
+            background: #2740a6;
+            transform: translateY(calc(-50% - 1px));
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+        }
+        .btn-nova-pastoral:active {
+            transform: translateY(-50%);
+            box-shadow: 0 1px 3px rgba(30, 58, 138, 0.2);
+        }
+        .btn-nova-pastoral i {
+            font-size: 14px;
+        }
 
         @media (max-width: 768px) {
-            .search-wrapper { padding: 12px 12px; }
-            .search-box-hero { padding: 10px 12px; }
+            .top-header { padding: 0 12px; }
+            .search-wrapper { 
+                padding: 12px 12px; 
+                flex-wrap: wrap;
+            }
+            .search-box-hero { 
+                padding: 10px 12px; 
+                width: 100%;
+                max-width: none;
+            }
             .search-box-hero input { font-size: 14px; }
+            .btn-nova-pastoral {
+                position: static;
+                transform: none;
+                width: 100%;
+                justify-content: center;
+                margin-top: 8px;
+            }
         }
 
         /* Lista (títulos + cards) */
         .list-container {
-            padding: 0 0 16px 0;
+            padding: 0;
+            margin: 0;
             background: #ffffff;
+            flex: 1 1 auto;
+            overflow-y: auto;
+            position: relative;
+            width: 100%;
+            max-width: 100%;
         }
         .pastorais-header {
             display: grid;
@@ -776,9 +832,13 @@
         body {
             margin: 0; /* remove margem padrão do navegador */
             overflow-x: hidden;
-            overflow-y: auto;
+            overflow-y: hidden; /* rolagem apenas dentro da lista */
             background: #ffffff;
         }
+        /* Garantir cálculo de largura sem causar overflow e travar largura ao viewport */
+        html, body { width: 100%; max-width: 100%; }
+        *, *::before, *::after { box-sizing: border-box; }
+        .top-header, .main-content, .search-wrapper, .list-container { width: 100%; max-width: 100%; }
     </style>
 </head>
 <body>
@@ -823,10 +883,14 @@
     <div class="main-content">
         <div class="search-wrapper">
             <div class="search-box-hero">
-                    <i class="fas fa-search"></i>
+                <i class="fas fa-search"></i>
                 <input id="searchPastorais" type="text" placeholder="Buscar pastoral, responsável ou tipo..." aria-label="Buscar pastorais" />
-                </div>
-                    </div>
+            </div>
+            <button class="btn-nova-pastoral" onclick="novaPastoral()" title="Cadastrar nova pastoral">
+                <i class="fas fa-plus"></i>
+                <span>Nova Pastoral</span>
+            </button>
+        </div>
                     
         <div class="list-container">
             <div id="loader-pastorais" class="loader-overlay-pastorais" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,.9); align-items:center; justify-content:center;">
