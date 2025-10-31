@@ -285,121 +285,6 @@
             background-color: #e0e0e0;
         }
 
-        /* Estilos para o grid de pastorais - Baseado no communities-grid */
-        .cards-container {
-            margin-top: 20px;
-            /* Remover espaçamento lateral e ocupar toda a largura */
-            margin-left: 0;
-            margin-right: 0;
-            padding-left: 0;
-            padding-right: 0;
-            width: 100%;
-            /* Ocupar exatamente o espaço restante da tela */
-            height: calc(100vh - 200px);
-            position: relative;
-        }
-
-        .pastorais-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 0; /* sem espaço entre título e área rolável */
-            padding: 8px 0; /* sem espaçamento lateral */
-            /* Ocupar todo o espaço do container */
-            height: 100%;
-            position: relative;
-            border-radius: 0; /* sem bordas arredondadas */
-            background: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden; /* a rolagem fica no corpo de linhas */
-        }
-
-        .pastorais-rows {
-            /* altura é 100% menos a altura do cabeçalho e o espaçamento desejado */
-            --header-height: 54px;
-            --header-spacing: 8px;
-            height: calc(100% - var(--header-height) - var(--header-spacing));
-            margin-top: var(--header-spacing);
-            overflow-y: auto;
-            /* Reserva espaço estável para a barra de rolagem e evita shift no cabeçalho */
-            scrollbar-gutter: stable both-edges;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        /* Estilo do cabeçalho e linhas da lista */
-        .grid-header {
-            display: grid;
-            grid-template-columns: 56px 1fr 1fr 100px 120px auto; /* 6 colunas: Foto, Nome, Responsável, Tipo, Status, Ações */
-            gap: 16px;
-            padding: 14px 16px;
-            align-items: center;
-            background: #f8f9fa;
-            border-radius: 0; /* sem bordas arredondadas */
-            font-weight: 600;
-            color: #495057;
-            font-size: 14px;
-            margin: 0; /* sem espaçamento abaixo do cabeçalho */
-            border: none;
-            border-bottom: none; /* sem linha inferior */
-            min-height: 54px; /* define a altura usada pelo cálculo acima */
-            /* padding-right dinâmico para compensar a largura do scrollbar das linhas */
-            padding-right: calc(16px + var(--scrollbar-width, 0px));
-        }
-
-        /* Alinhamento dos títulos por coluna para casar com as linhas */
-        .grid-header > div:nth-child(1) { text-align: center; }
-        .grid-header > div:nth-child(4) { text-align: center; }
-        .grid-header > div:nth-child(5) { text-align: center; }
-        .grid-header > div:nth-child(6) { text-align: center; }
-
-        .grid-row {
-            display: grid;
-            grid-template-columns: 56px 1fr 1fr 100px 120px auto; /* 6 colunas para casar com o cabeçalho */
-            gap: 16px;
-            padding: 12px 16px;
-            border: 1px solid #eef1f6;
-            border-radius: 0; /* sem bordas arredondadas */
-            align-items: center;
-            background: #fff;
-            transition: background-color .15s ease, box-shadow .15s ease;
-        }
-
-        /* Alinhar células das linhas para casar com os títulos */
-        .grid-row > div:nth-child(1) {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .grid-row > div:nth-child(4) { text-align: center; }
-        .grid-row > div:nth-child(5) {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Centralizar exatamente a célula de Status sob o título da coluna */
-        .grid-row > div:nth-child(5) {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .grid-row:nth-child(odd) {
-            background: #fafbff;
-        }
-
-        .grid-row:hover {
-            background: #f5f8ff;
-            box-shadow: 0 1px 4px rgba(30,58,138,0.06);
-        }
-
-        .grid-cell-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            align-items: center;
-        }
 
         /* Botões de ação da lista (padrão visual unificado) */
         .btn-icon {
@@ -511,221 +396,8 @@
             text-align: center;
         }
 
-        /* Scroll personalizado para a tabela completa */
-        .table-scroll {
-            /* Ocupar exatamente o espaço restante da tela */
-            height: calc(100vh - 300px);
-            overflow-y: auto;
-            overflow-x: auto;
-            position: relative;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
-            background: #fff;
-            margin-bottom: 16px;
-            padding-bottom: 24px;
-            flex: 1 1 auto;
-        }
 
-        .table-scroll table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0;
-            table-layout: auto;
-            min-width: 800px;
-        }
-
-        .table-scroll thead {
-            background: #f8f9fa;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .table-scroll thead th {
-            padding: 15px 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #495057;
-            border-bottom: 2px solid #dee2e6;
-            white-space: nowrap;
-            background: #f8f9fa;
-        }
-
-        /* Larguras específicas para cada coluna */
-        .table-scroll th:nth-child(1), /* Código */
-        .table-scroll td:nth-child(1) {
-            width: 80px;
-            min-width: 80px;
-        }
-
-        .table-scroll th:nth-child(2), /* Código CRM */
-        .table-scroll td:nth-child(2) {
-            width: 120px;
-            min-width: 120px;
-        }
-
-        .table-scroll th:nth-child(3), /* Nome/Razão Social */
-        .table-scroll td:nth-child(3) {
-            width: 300px;
-            min-width: 300px;
-        }
-
-        .table-scroll th:nth-child(4), /* CNPJ/CPF */
-        .table-scroll td:nth-child(4) {
-            width: 150px;
-            min-width: 150px;
-        }
-
-                 .table-scroll th:nth-child(5), /* Status */
-         .table-scroll td:nth-child(5) {
-             width: 100px;
-             min-width: 100px;
-         }
-         
-         .table-scroll th:nth-child(6), /* Ações */
-         .table-scroll td:nth-child(6) {
-             width: 120px;
-             min-width: 120px;
-         }
-
-        .table-scroll tbody tr {
-            border-bottom: 1px solid #e9ecef;
-            transition: background-color 0.2s ease;
-        }
-
-        .table-scroll tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .table-scroll tbody td {
-            padding: 12px;
-            vertical-align: middle;
-            color: #495057;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .table-scroll::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        .table-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        .table-scroll::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        .table-scroll::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-
-        /* Responsividade para o grid de pastorais */
-        @media (max-width: 768px) {
-            .cards-container {
-                height: calc(100vh - 180px);
-            }
-            
-            .pastorais-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
-                padding: 12px;
-                margin: 0;
-                width: 100%;
-                height: 100%;
-                box-sizing: border-box;
-            }
-
-            .pastoral-card {
-                padding: 18px;
-            }
-        }
-
-        /* Responsividade para tablets (769px - 1024px) */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .pastorais-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                gap: 15px;
-                padding: 15px;
-                height: 100%;
-            }
-
-            .pastoral-card {
-                padding: 18px;
-            }
-        }
-
-        /* Responsividade para tablets grandes (769px - 1024px) */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .pastorais-grid {
-                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-                gap: 20px;
-                padding: 20px;
-                height: 100%;
-            }
-
-            .cards-container {
-                height: calc(100vh - 220px);
-            }
-        }
-
-        /* Scroll personalizado para o grid */
-        .pastorais-grid::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .pastorais-grid::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        .pastorais-grid::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-
-        /* Botões de ação – igual à aba Colaboradores */
-        .action-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 6px;
-            margin: 0 2px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            width: 30px;
-            height: 30px;
-            display: inline-block;
-            vertical-align: middle;
-            text-align: center;
-            line-height: 18px;
-        }
-        .view-btn { background-color: #0d6efd; color: #fff; }
-        .edit-btn { background-color: #198754; color: #fff; }
-        .delete-btn { background-color: #dc3545; color: #fff; }
-        .action-btn:hover { opacity: 0.8; }
-        .action-btn i { font-size: 14px; }
-        .actions {
-            white-space: nowrap;
-            text-align: center;
-            vertical-align: middle;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        /* Altura consistente das linhas para alinhar com Colaboradores */
-        .table-scroll tbody tr { height: 72px; }
-                 /* Remover linha (border-bottom) sob a coluna Ações */
-         .table-scroll td:nth-child(6) {
-             border-bottom: none !important;
-         }
-         
-         /* Estilos para a coluna de Status - Mesmo padrão da aba de colaboradores */
+        /* Estilos para a coluna de Status */
          .status {
              padding: 4px 8px;
              border-radius: 4px;
@@ -1084,8 +756,15 @@
             border: 1px solid #eef1f6;
             border-radius: 8px;
             background: #ffffff;
+            overflow: hidden; /* garante que o fundo/hover respeite o raio */
+            background-clip: padding-box; /* evita bleed do background nos cantos */
         }
         .row-card:hover { background: #f9fafb; }
+        /* Garantir cor consistente (sem listras alternadas herdadas) */
+        .rows .row-card { background: #ffffff !important; }
+        .rows .row-card:nth-child(odd),
+        .rows .row-card:nth-child(even) { background: #ffffff !important; }
+
         .row-card .status { padding: 4px 8px; border-radius: 0; font-size: 12px; }
         .row-card .status.ativo { background: #1e3a8a; color: #fff; }
         .row-card .status.inativo { background: #dc2626; color: #fff; }
@@ -1413,90 +1092,6 @@
         // Cache de pessoas para exibir nome do responsável
         let pessoasById = {};
 
-        // Cria uma linha (lista) para o grid de pastorais (4 colunas)
-        function createPastoralRow(pastoral) {
-            const nome = pastoral?.nome || 'Sem nome';
-            const responsavelId = pastoral?.responsavel_id;
-            const responsavelNome = (responsavelId && pessoasById[responsavelId]?.nome) ? pessoasById[responsavelId].nome : '-';
-            const tipo = pastoral?.tipo || '-';
-            const ativo = pastoral?.ativo !== false;
-            const statusText = ativo ? 'Ativo' : 'Inativo';
-            const statusClass = ativo ? 'ativo' : 'inativo';
-            const foto = pastoral?.foto || '';
-            const id = pastoral?.id ?? '';
-            const row = document.createElement('div');
-            row.className = 'grid-row';
-            row.innerHTML = `
-                <div>
-                    ${foto ? `<img src="${foto}" alt="Foto" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #e6e9ef;" />` : `<div style="width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;">${(nome||'?').charAt(0).toUpperCase()}</div>`}
-                </div>
-                <div>${nome}</div>
-                <div>${responsavelNome}</div>
-                <div style="text-align: center; width: 100px;">${tipo}</div>
-                <div style="text-align: center; width: 120px;">
-                    <span class="status ${statusClass}">${statusText}</span>
-                </div>
-                <div class="grid-cell-actions">
-                    <button class="btn-icon btn-edit" title="Editar" onclick="editarPastoral?.('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button class="btn-icon btn-duplicate" title="Duplicar" onclick="duplicarPastoral?.('${id}')"><i class="fa-regular fa-copy"></i></button>
-                    <button class="btn-icon btn-delete" title="Excluir" onclick="excluirPastoral?.('${id}')"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `;
-            return row;
-        }
-
-        // Função para carregar pastorais (cards)
-        async function carregarPastorais() {
-            try {
-                // Mostrar spinner ao iniciar carregamento
-                mostrarSpinner();
-                
-                const { data, error } = await api.get(endpoints.pastorais.list);
-                if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
-                // Capturar filtros
-                const filtro = 'todos';
-                const searchInput = document.querySelector('.search-box input');
-                const termo = (searchInput && searchInput.value ? searchInput.value : '').trim().toLowerCase();
-
-                const listaFiltrada = lista.filter(p => {
-                    // filtro por status
-                    const ativo = p?.ativo !== false;
-                    const statusOk = (filtro === 'todos') ? true : (filtro === 'ativo' ? ativo : !ativo);
-                    if (!statusOk) return false;
-                    // filtro por texto (nome, tipo, responsável)
-                    if (!termo) return true;
-                    const nome = (p?.nome || '').toLowerCase();
-                    const tipo = (p?.tipo || '').toLowerCase();
-                    const respNome = (p?.responsavel_id && pessoasById[p.responsavel_id]?.nome) ? String(pessoasById[p.responsavel_id].nome).toLowerCase() : '';
-                    return nome.includes(termo) || tipo.includes(termo) || respNome.includes(termo);
-                });
-                const rowsContainer = document.getElementById('pastoraisRows');
-                if (!rowsContainer) return;
-                // limpar linhas existentes
-                rowsContainer.innerHTML = '';
-
-                if (listaFiltrada.length === 0) {
-                    const empty = document.createElement('div');
-                    empty.style.gridColumn = '1 / -1';
-                    empty.style.textAlign = 'center';
-                    empty.style.padding = '24px';
-                    empty.style.color = '#666';
-                    empty.innerHTML = '<i class="fas fa-church" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhuma pastoral encontrada';
-                    rowsContainer.appendChild(empty);
-                } else {
-                    listaFiltrada.forEach(p => rowsContainer.appendChild(createPastoralRow(p)));
-                }
-                
-                // Ocultar spinner após carregar com sucesso
-                ocultarSpinner();
-            } catch (error) {
-                console.error('Erro ao carregar pastorais:', error);
-                alert('Erro ao carregar pastorais');
-                // Ocultar spinner mesmo em caso de erro
-                ocultarSpinner();
-            }
-        }
 
         // Função para abrir modal de nova pastoral (customizado)
         // Função para preview da imagem
@@ -1681,7 +1276,7 @@ async function salvarPastoral(event) {
                     window.showSuccessModal();
                 }
                 closeModal();
-                carregarPastorais();
+                if (window.carregarPastorais) window.carregarPastorais();
             } catch (error) {
                 console.error('Erro ao salvar pastoral:', error);
                 alert('Erro ao salvar pastoral');
@@ -1790,12 +1385,10 @@ async function visualizarPastoral(id) {
                         }
                     }
                 } catch (_) { pessoasById = {}; }
-
-                // Carregar dados das pastorais (já com nomes resolvidos)
-                await carregarPastorais();
                 
                 // Ocultar spinner centralizado quando tudo carregar
                 ocultarSpinner();
+                // Carregamento de dados agora é feito pelo script IIFE no final do arquivo
             } catch (error) {
                 console.error('Erro ao inicializar página:', error);
                 // Ocultar spinner mesmo em caso de erro
@@ -1804,30 +1397,8 @@ async function visualizarPastoral(id) {
             document.getElementById('pastoralForm').addEventListener('submit', salvarPastoral);
             // Filtro de status: recarregar lista ao mudar
             // status filter removido
-            // Busca por texto: recarregar lista ao digitar
-            const searchInput = document.querySelector('.search-box input');
-            if (searchInput) {
-                searchInput.addEventListener('input', carregarPastorais);
-            }
+            // Busca por texto agora é gerenciada pelo script IIFE no final do arquivo
 
-            // Compensar a largura do scrollbar das linhas no cabeçalho
-            const gridEl = document.getElementById('pastorais-grid');
-            const rowsEl = document.getElementById('pastorais-rows');
-            function syncHeaderScrollbarPadding() {
-                if (!gridEl || !rowsEl) return;
-                const scrollbarWidth = rowsEl.offsetWidth - rowsEl.clientWidth;
-                gridEl.style.setProperty('--scrollbar-width', `${Math.max(0, scrollbarWidth)}px`);
-            }
-            // calcular no load e ao redimensionar
-            syncHeaderScrollbarPadding();
-            window.addEventListener('resize', syncHeaderScrollbarPadding);
-            // após cada carregamento, sincronizar novamente
-            const originalCarregarPastorais = carregarPastorais;
-            carregarPastorais = async function() {
-                const result = await originalCarregarPastorais.apply(this, arguments);
-                syncHeaderScrollbarPadding();
-                return result;
-            }
             // remove listener de tipo inexistente
             const _toggleEl = document.getElementById('statusToggleModal');
             if (_toggleEl) _toggleEl.addEventListener('change', toggleStatus);
@@ -1838,7 +1409,7 @@ async function visualizarPastoral(id) {
                     await window.bloqueioExclusao.deleteWithCheck(
                         'pastorais',
                         codigoParaExcluir,
-                        () => { closeDeleteModal(); carregarPastorais(); window.showDeleteSuccessModal(); }
+                        () => { closeDeleteModal(); if (window.carregarPastorais) window.carregarPastorais(); window.showDeleteSuccessModal(); }
                     );
                 } catch (error) {
                     console.error('Erro ao excluir pastoral:', error);
@@ -1994,6 +1565,8 @@ async function visualizarPastoral(id) {
           // status e botão de nova pastoral removidos do layout
           carregar();
         });
+        // Expor função globalmente para compatibilidade com código antigo
+        window.carregarPastorais = carregar;
       })();
     </script>
 
