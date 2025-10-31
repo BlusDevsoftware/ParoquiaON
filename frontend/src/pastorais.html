@@ -337,6 +337,12 @@
             min-height: 54px; /* define a altura usada pelo cálculo acima */
         }
 
+        /* Alinhamento dos títulos por coluna para casar com as linhas */
+        .grid-header > div:nth-child(1) { text-align: center; }
+        .grid-header > div:nth-child(4) { text-align: center; }
+        .grid-header > div:nth-child(5) { text-align: center; }
+        .grid-header > div:nth-child(6) { text-align: center; }
+
         .grid-row {
             display: grid;
             grid-template-columns: 56px 1fr 1fr 100px 120px auto; /* 6 colunas para casar com o cabeçalho */
@@ -347,6 +353,19 @@
             align-items: center;
             background: #fff;
             transition: background-color .15s ease, box-shadow .15s ease;
+        }
+
+        /* Alinhar células das linhas para casar com os títulos */
+        .grid-row > div:nth-child(1) {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .grid-row > div:nth-child(4) { text-align: center; }
+        .grid-row > div:nth-child(5) {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         /* Centralizar exatamente a célula de Status sob o título da coluna */
@@ -1067,9 +1086,9 @@
                     <div>Foto</div>
                     <div>Nome da Pastoral</div>
                     <div>Responsável</div>
-                    <div style="text-align: center; width: 100px;">Tipo</div>
-                    <div style="text-align: center; width: 120px;">Status</div>
-                    <div style="text-align: center;">Ações</div>
+                    <div>Tipo</div>
+                    <div>Status</div>
+                    <div>Ações</div>
                 </div>
                 <div id="pastorais-rows" class="pastorais-rows">
                     <!-- Linhas das pastorais serão carregadas dinamicamente via JavaScript -->
