@@ -412,165 +412,6 @@
             width: 16px;
             color: #007bff;
         }
-
-        @media (max-width: 768px) {
-            .top-header { 
-                padding: 0; 
-                height: 60px;
-            }
-            .header-left { 
-                padding-left: 12px; 
-                gap: 0;
-                flex: 0 0 auto;
-            }
-            .logo-section {
-                font-size: 18px;
-                gap: 8px;
-            }
-            .hamburger-menu {
-                display: flex;
-                width: 36px;
-                height: 36px;
-                font-size: 18px;
-            }
-            .nav-links {
-                display: none;
-            }
-            .header-right { 
-                padding-right: 12px; 
-                gap: 12px;
-            }
-            .header-icon {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
-            .user-avatar {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
-            .search-wrapper { 
-                padding: 12px 16px; 
-                flex-wrap: nowrap;
-                justify-content: center;
-            }
-            .search-box-hero { 
-                padding: 10px 12px; 
-                width: 100%;
-                max-width: calc(100% - 120px);
-                min-width: 0;
-                flex: 1;
-                height: 44px;
-                box-sizing: border-box;
-            }
-            .search-box-hero input { 
-                font-size: 14px; 
-                min-width: 0;
-            }
-            .btn-novo-usuario {
-                position: absolute;
-                right: 16px;
-                top: 50%;
-                transform: translateY(-50%);
-                width: auto;
-                padding: 0 14px;
-                height: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 12px;
-                margin-top: 0;
-                flex-shrink: 0;
-                box-sizing: border-box;
-            }
-            .btn-novo-usuario span {
-                display: none;
-            }
-            .btn-novo-usuario i {
-                margin: 0;
-                font-size: 14px;
-            }
-            .main-content {
-                margin-top: 60px;
-                height: calc(100vh - 60px);
-            }
-            .list-container {
-                padding: 0 16px 16px 16px;
-            }
-            .row-card {
-                padding: 10px 10px;
-                grid-template-columns: 48px 1fr auto !important;
-            }
-            .row-card > div:nth-child(3),
-            .row-card > div:nth-child(4),
-            .row-card > div:nth-child(5) {
-                display: none;
-            }
-            .row-card > div:first-child img,
-            .row-card > div:first-child > div {
-                width: 48px !important;
-                height: 48px !important;
-            }
-            .row-card > div:nth-child(2) {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                min-width: 0;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .search-wrapper {
-                padding: 12px 12px;
-            }
-            .search-box-hero {
-                max-width: calc(100% - 100px);
-                padding: 8px 10px;
-                height: 40px;
-            }
-            .search-box-hero input {
-                font-size: 13px;
-            }
-            .btn-novo-usuario {
-                right: 12px;
-                padding: 0 12px;
-                height: 40px;
-                font-size: 11px;
-            }
-            .btn-novo-usuario i {
-                font-size: 13px;
-            }
-            .list-container {
-                padding: 0 12px 16px 12px;
-            }
-            .row-card {
-                padding: 8px 8px;
-                grid-template-columns: 44px 1fr auto !important;
-            }
-            .row-card > div:nth-child(3),
-            .row-card > div:nth-child(4),
-            .row-card > div:nth-child(5) {
-                display: none;
-            }
-            .row-card > div:first-child img,
-            .row-card > div:first-child > div {
-                width: 44px !important;
-                height: 44px !important;
-            }
-            .row-card > div:nth-child(2) {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                min-width: 0;
-            }
-        }
-            border: 1px solid #e5e7eb;
-            align-items: center;
-            transition: all 0.2s ease;
-            color: #495057;
-            font-size: 14px;
-        }
         .grid-row:nth-child(odd) { background: #fafbff; }
         .grid-row:hover { background: #f5f8ff; box-shadow: 0 1px 4px rgba(30,58,138,0.06); }
         .grid-row > div:nth-child(4) { display: flex; justify-content: center; align-items: center; }
@@ -979,6 +820,159 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .top-header { 
+                padding: 0; 
+                height: 60px;
+            }
+            .header-left { 
+                padding-left: 12px; 
+                gap: 0;
+                flex: 0 0 auto;
+            }
+            .logo-section {
+                font-size: 18px;
+                gap: 8px;
+            }
+            .hamburger-menu {
+                display: flex;
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .header-right { 
+                padding-right: 12px; 
+                gap: 12px;
+            }
+            .header-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .search-wrapper { 
+                padding: 12px 16px; 
+                flex-wrap: nowrap;
+                justify-content: center;
+            }
+            .search-box-hero { 
+                padding: 10px 12px; 
+                width: 100%;
+                max-width: calc(100% - 120px);
+                min-width: 0;
+                flex: 1;
+                height: 44px;
+                box-sizing: border-box;
+            }
+            .search-box-hero input { 
+                font-size: 14px; 
+                min-width: 0;
+            }
+            .btn-novo-usuario {
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: auto;
+                padding: 0 14px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                margin-top: 0;
+                flex-shrink: 0;
+                box-sizing: border-box;
+            }
+            .btn-novo-usuario span {
+                display: none;
+            }
+            .btn-novo-usuario i {
+                margin: 0;
+                font-size: 14px;
+            }
+            .main-content {
+                margin-top: 60px;
+                height: calc(100vh - 60px);
+            }
+            .list-container {
+                padding: 0 16px 16px 16px;
+            }
+            .row-card {
+                padding: 10px 10px;
+                grid-template-columns: 48px 1fr auto !important;
+            }
+            .row-card > div:nth-child(3),
+            .row-card > div:nth-child(4),
+            .row-card > div:nth-child(5) {
+                display: none;
+            }
+            .row-card > div:first-child img,
+            .row-card > div:first-child > div {
+                width: 48px !important;
+                height: 48px !important;
+            }
+            .row-card > div:nth-child(2) {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .search-wrapper {
+                padding: 12px 12px;
+            }
+            .search-box-hero {
+                max-width: calc(100% - 100px);
+                padding: 8px 10px;
+                height: 40px;
+            }
+            .search-box-hero input {
+                font-size: 13px;
+            }
+            .btn-novo-usuario {
+                right: 12px;
+                padding: 0 12px;
+                height: 40px;
+                font-size: 11px;
+            }
+            .btn-novo-usuario i {
+                font-size: 13px;
+            }
+            .list-container {
+                padding: 0 12px 16px 12px;
+            }
+            .row-card {
+                padding: 8px 8px;
+                grid-template-columns: 44px 1fr auto !important;
+            }
+            .row-card > div:nth-child(3),
+            .row-card > div:nth-child(4),
+            .row-card > div:nth-child(5) {
+                display: none;
+            }
+            .row-card > div:first-child img,
+            .row-card > div:first-child > div {
+                width: 44px !important;
+                height: 44px !important;
+            }
+            .row-card > div:nth-child(2) {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+            }
         }
 
         /* Ajustar main-content para compensar header fixo */
@@ -1955,55 +1949,6 @@
         });
     </script>
     <script src="scripts/navigation.js"></script>
-
-    <!-- Menu Mobile -->
-    <button class="mobile-menu-fab" id="mobileMenuFab">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <div class="mobile-menu-container" id="mobileMenuContainer">
-        <div class="mobile-menu-links">
-            <a href="index.html" class="mobile-menu-link">
-                <i class="fas fa-home"></i> Minha Comunidade
-            </a>
-            <a href="agenda.html" class="mobile-menu-link">
-                <i class="fas fa-calendar"></i> Agenda
-            </a>
-            <a href="comunidades.html" class="mobile-menu-link">
-                <i class="fas fa-users"></i> Comunidades
-            </a>
-            <a href="pastorais.html" class="mobile-menu-link">
-                <i class="fas fa-church"></i> Pastorais
-            </a>
-            <a href="pilares.html" class="mobile-menu-link">
-                <i class="fas fa-layer-group"></i> Pilares
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="locais.html" class="mobile-menu-link">
-                <i class="fas fa-map-marker-alt"></i> Locais
-            </a>
-            <a href="acoes.html" class="mobile-menu-link">
-                <i class="fas fa-tasks"></i> Ações
-            </a>
-            <a href="pessoas.html" class="mobile-menu-link">
-                <i class="fas fa-user-friends"></i> Pessoas
-            </a>
-            <a href="usuarios.html" class="mobile-menu-link">
-                <i class="fas fa-user-shield"></i> Usuários
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="dinamico.html" class="mobile-menu-link">
-                <i class="fas fa-chart-line"></i> Dinâmico <span style="font-size: 11px; color: #fbbf24; font-weight: bold;">BETA</span>
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="perfil.html" class="mobile-menu-link">
-                <i class="fas fa-user-circle"></i> Perfil
-            </a>
-        </div>
-    </div>
-
-    <!-- Scripts do Menu Mobile -->
-    <script src="scripts/mobile-menu.js"></script>
 </body>
 </html>
 
