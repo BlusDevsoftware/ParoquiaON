@@ -278,202 +278,158 @@
         .btn-loading { opacity: .85; pointer-events: none; }
         .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .9s linear infinite; display: inline-block; }
 
-        /* Estilos para o grid de pessoas - Baseado no communities-grid */
-        .cards-container {
-            margin-top: 20px;
-            /* Ocupar exatamente o espaço restante da tela */
-            height: calc(100vh - 200px);
-            position: relative;
-        }
-
-        .pessoas-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 8px;
-            overflow-y: auto;
-            height: 100%;
-            position: relative;
-            border-radius: 8px;
-            background: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .grid-header {
-            display: grid;
-            grid-template-columns: 56px 1fr 200px 1fr 120px auto;
-            gap: 16px;
-            padding: 12px 16px;
-            align-items: center;
-            border: 1px solid #e6e9ef;
-            background: #f8f9fa;
-            border-radius: 8px;
-            font-weight: 600;
-            color: #495057;
-            font-size: 14px;
-        }
-        .grid-row {
-            display: grid;
-            grid-template-columns: 56px 1fr 200px 1fr 120px auto;
-            gap: 16px;
-            padding: 12px 16px;
-            border: 1px solid #eef1f6;
-            border-radius: 8px;
-            align-items: center;
-            background: #fff;
-            transition: background-color .15s ease, box-shadow .15s ease;
-        }
-        .grid-row:nth-child(odd) { background: #fafbff; }
-        .grid-row:hover { background: #f5f8ff; box-shadow: 0 1px 4px rgba(30,58,138,0.06); }
-        .grid-row > div:nth-child(4) { display: flex; justify-content: center; align-items: center; }
-        .grid-cell-actions { display: flex; gap: 8px; justify-content: center; align-items: center; }
-        .btn-icon { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%); color: #334155; transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease; box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06); }
-        .btn-icon i { font-size: 15px; color: currentColor; }
-        .btn-icon:hover { transform: translateY(-1px); background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); color: #1e3a8a; box-shadow: 0 2px 6px rgba(30, 64, 175, 0.18); border-color: rgba(30, 58, 138, 0.22); }
-        .btn-icon:active { transform: translateY(0); box-shadow: 0 1px 3px rgba(2, 6, 23, 0.12) inset; }
-        .btn-icon.btn-edit, .btn-icon.btn-duplicate { background: #1e3a8a; color: #fff; border-color: #1e3a8a; box-shadow: 0 1px 2px rgba(30,58,138,0.25); }
-        .btn-icon.btn-edit:hover, .btn-icon.btn-duplicate:hover { background: #2740a6; color: #fff; border-color: #2740a6; box-shadow: 0 2px 8px rgba(30,58,138,0.35); }
-        .btn-icon.btn-delete { background: #b91c1c; color: #fff; border-color: #b91c1c; box-shadow: 0 1px 2px rgba(185,28,28,0.25); }
-        .btn-icon.btn-delete:hover { background: #991b1b; color: #fff; border-color: #991b1b; box-shadow: 0 2px 8px rgba(185,28,28,0.35); }
-
-        .pessoa-card {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .pessoa-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .pessoa-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .pessoa-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin: 0;
-        }
-
-        .pessoa-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .pessoa-actions button {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-edit {
-            background: #007bff;
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background: #0056b3;
-        }
-
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background: #c82333;
-        }
-
-        .pessoa-info {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .pessoa-info p {
-            margin: 4px 0;
-        }
-
-        .pessoa-info i {
-            margin-right: 8px;
-            width: 16px;
-            color: #007bff;
-        }
-
         /* Responsividade para o grid de pessoas */
         @media (max-width: 768px) {
-            .cards-container {
-                height: calc(100vh - 180px);
+            .top-header { 
+                padding: 0; 
+                height: 60px;
             }
-            
-            .pessoas-grid {
-                grid-template-columns: 1fr;
+            .header-left { 
+                padding-left: 12px; 
+                gap: 0;
+                flex: 0 0 auto;
+            }
+            .logo-section {
+                font-size: 18px;
+            gap: 8px;
+            }
+            .hamburger-menu {
+                display: flex;
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .header-right { 
+                padding-right: 12px; 
                 gap: 12px;
-                padding: 12px;
-                margin: 0;
+            }
+            .header-icon {
+                width: 36px;
+                height: 36px;
+            font-size: 14px;
+        }
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .search-wrapper { 
+            padding: 12px 16px;
+                flex-wrap: nowrap;
+                justify-content: center;
+            }
+            .search-box-hero { 
+                padding: 10px 12px; 
                 width: 100%;
-                height: 100%;
+                max-width: calc(100% - 120px);
+                min-width: 0;
+                flex: 1;
+                height: 44px;
                 box-sizing: border-box;
             }
-
-            .pessoa-card {
-                padding: 18px;
+            .search-box-hero input { 
+                font-size: 14px; 
+                min-width: 0;
+            }
+            .btn-nova-pessoa {
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: auto;
+                padding: 0 14px;
+                height: 44px;
+            display: flex;
+            align-items: center;
+                justify-content: center;
+            font-size: 12px;
+                margin-top: 0;
+                flex-shrink: 0;
+                box-sizing: border-box;
+            }
+            .btn-nova-pessoa span {
+                display: none;
+            }
+            .btn-nova-pessoa i {
+                margin: 0;
+                font-size: 14px;
+            }
+            .main-content {
+                margin-top: 60px;
+                height: calc(100vh - 60px);
+            }
+            .list-container {
+                padding: 0 16px 16px 16px;
+            }
+            .row-card {
+                padding: 10px 10px;
+                grid-template-columns: 48px 1fr auto !important;
+            }
+            .row-card > div:nth-child(3),
+            .row-card > div:nth-child(4),
+            .row-card > div:nth-child(5) {
+                display: none;
+            }
+            .row-card > div:first-child img,
+            .row-card > div:first-child > div {
+                width: 48px !important;
+                height: 48px !important;
+            }
+            .row-card > div:nth-child(2) {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
             }
         }
-
-        /* Responsividade para tablets (769px - 1024px) */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .pessoas-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                gap: 15px;
-                padding: 15px;
-                height: 100%;
+        
+        @media (max-width: 480px) {
+            .search-wrapper {
+                padding: 12px 12px;
             }
-
-            .pessoa-card {
-                padding: 18px;
+            .search-box-hero {
+                max-width: calc(100% - 100px);
+                padding: 8px 10px;
+                height: 40px;
             }
-        }
-
-        /* Responsividade para tablets grandes (769px - 1024px) */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .pessoas-grid {
-                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-                gap: 20px;
-                padding: 20px;
-                height: 100%;
+            .search-box-hero input {
+                font-size: 13px;
             }
-
-            .cards-container {
-                height: calc(100vh - 220px);
+            .btn-nova-pessoa {
+                right: 12px;
+                padding: 0 12px;
+                height: 40px;
+                font-size: 11px;
             }
-        }
-
-        /* Scroll personalizado para o grid */
-        .pessoas-grid::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .pessoas-grid::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        .pessoas-grid::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
+            .btn-nova-pessoa i {
+                font-size: 13px;
+            }
+            .list-container {
+                padding: 0 12px 16px 12px;
+            }
+            .row-card {
+                padding: 8px 8px;
+                grid-template-columns: 44px 1fr auto !important;
+            }
+            .row-card > div:nth-child(3),
+            .row-card > div:nth-child(4),
+            .row-card > div:nth-child(5) {
+                display: none;
+            }
+            .row-card > div:first-child img,
+            .row-card > div:first-child > div {
+                width: 44px !important;
+                height: 44px !important;
+            }
+            .row-card > div:nth-child(2) {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+            }
         }
 
         /* Spinner de carregamento - IDÊNTICO AO DA ABA DE COLABORADORES */
@@ -726,7 +682,7 @@
             z-index: 1000;
             background: #1e3a8a;
             color: white;
-            padding: 0 30px;
+            padding: 0; /* sem espaçamento lateral */
             height: 80px;
             display: flex;
             align-items: center;
@@ -739,12 +695,152 @@
             align-items: center;
             gap: 60px;
             flex: 1;
+            padding-left: 16px;
         }
 
         .logo-section {
             display: flex;
             align-items: center;
             gap: 12px;
+        }
+        
+        /* Menu Hamburger - Oculto por padrão (desktop) */
+        .hamburger-menu {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        
+        .hamburger-menu:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .hamburger-menu:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Menu Lateral Mobile */
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .mobile-menu-overlay.show {
+            opacity: 1;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            z-index: 1501;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+        }
+        
+        .mobile-menu.open {
+            left: 0;
+        }
+        
+        .mobile-menu-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .mobile-menu-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .mobile-menu-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        
+        .mobile-menu-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-menu-links {
+            padding: 0;
+            list-style: none;
+            margin: 0;
+        }
+        
+        .mobile-menu-links li {
+            border-bottom: none;
+        }
+        
+        .mobile-menu-links a {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        
+        .mobile-menu-links a:hover,
+        .mobile-menu-links a.active {
+            background: #f0f4ff;
+            color: #1e3a8a;
+        }
+        
+        .mobile-menu-links a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .mobile-menu-links .beta-tag {
+            background: #ff9800;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            text-transform: uppercase;
         }
 
         .nav-links {
@@ -912,13 +1008,170 @@
 
         /* Ajustar main-content para compensar header fixo */
         .main-content {
-            margin-top: 75px;
+            margin: 75px 0 0 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            background: #ffffff;
+            height: calc(100vh - 75px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
+
+        /* Barra de pesquisa centralizada (responsiva) */
+        .search-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0; /* remover padding lateral */
+            background: #ffffff;
+            position: relative;
+        }
+        .search-box-hero {
+            width: 100%;
+            max-width: 720px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff; /* sem fundo cinza */
+            border: 1px solid #e6e9ef;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+        .search-box-hero i {
+            color: #64748b;
+            font-size: 16px;
+        }
+        .search-box-hero input {
+            flex: 1 1 auto;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 15px;
+            color: #0f172a;
+        }
+        .search-box-hero input::placeholder { color: #94a3b8; }
+        
+        /* Botão Nova Pessoa */
+        .btn-nova-pessoa {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: #1e3a8a;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .btn-nova-pessoa:hover {
+            background: #2740a6;
+            transform: translateY(calc(-50% - 1px));
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+        }
+        .btn-nova-pessoa:active {
+            transform: translateY(-50%);
+            box-shadow: 0 1px 3px rgba(30, 58, 138, 0.2);
+        }
+        .btn-nova-pessoa i {
+            font-size: 14px;
+        }
+
+        /* Lista (títulos + cards) */
+        .list-container {
+            padding: 0 24px 16px 24px;
+            margin: 0;
+            background: #ffffff;
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .pessoas-header {
+            display: grid;
+            grid-template-columns: 56px 1fr 200px 1fr 120px auto;
+            gap: 16px;
+            padding: 14px 0;
+            background: #ffffff; /* sem fundo cinza */
+            color: #495057;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .pessoas-header > div:nth-child(1),
+        .pessoas-header > div:nth-child(5) { text-align: center; }
+
+        .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 8px 0 0 0; /* respiro superior sem cabeçalho */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .row-card {
+            display: grid;
+            grid-template-columns: 56px 1fr 200px 1fr 120px auto;
+            gap: 16px;
+            align-items: center;
+            padding: 12px 12px;
+            margin: 0;
+            border: 1px solid #eef1f6;
+            border-radius: 8px;
+            background: #ffffff;
+            overflow: hidden; /* garante que o fundo/hover respeite o raio */
+            background-clip: padding-box; /* evita bleed do background nos cantos */
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        }
+        .row-card:hover { 
+            background: #f0f4ff; 
+            box-shadow: 0 6px 16px rgba(30, 58, 138, 0.15), 0 2px 8px rgba(30, 58, 138, 0.1);
+            transform: translateY(-2px);
+            cursor: pointer;
+        }
+        /* Garantir cor consistente (sem listras alternadas herdadas) */
+        .rows .row-card { background: #ffffff !important; }
+        .rows .row-card:nth-child(odd),
+        .rows .row-card:nth-child(even) { background: #ffffff !important; }
+
+        .row-card .status { padding: 4px 8px; border-radius: 0; font-size: 12px; }
+        .row-card .status.ativo { background: #1e3a8a; color: #fff; }
+        .row-card .status.inativo { background: #dc2626; color: #fff; }
 
         /* Evitar scroll desnecessário no body */
         body {
+            margin: 0; /* remove margem padrão do navegador */
             overflow-x: hidden;
-            overflow-y: hidden;
+            overflow-y: hidden; /* rolagem apenas dentro da lista */
+            background: #ffffff;
+        }
+        /* Garantir cálculo de largura sem causar overflow e travar largura ao viewport */
+        html, body { width: 100%; max-width: 100%; }
+        *, *::before, *::after { box-sizing: border-box; }
+        .top-header, .main-content, .search-wrapper, .list-container { width: 100%; max-width: 100%; }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+            padding-right: 16px;
         }
     </style>
 </head>
@@ -927,6 +1180,9 @@
     <div class="top-header">
         <div class="header-left">
             <div class="logo-section">
+                <button class="hamburger-menu" id="hamburgerMenu" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <span style="font-size: 20px; font-weight: 600;">ParoquiaON</span>
             </div>
             <div class="nav-links">
@@ -959,53 +1215,51 @@
         </div>
     </div>
 
+    <!-- Menu Lateral Mobile -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3>Menu</h3>
+            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Fechar menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-menu-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Minha Comunidade</a></li>
+            <li><a href="agenda.html"><i class="fas fa-calendar"></i> Agenda</a></li>
+            <li><a href="comunidades.html"><i class="fas fa-users"></i> Comunidades</a></li>
+            <li><a href="pastorais.html"><i class="fas fa-church"></i> Pastorais</a></li>
+            <li><a href="pilares.html"><i class="fas fa-layer-group"></i> Pilares</a></li>
+            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i> Locais</a></li>
+            <li><a href="acoes.html"><i class="fas fa-tasks"></i> Ações</a></li>
+            <li><a href="pessoas.html" class="active"><i class="fas fa-user-friends"></i> Pessoas</a></li>
+            <li><a href="usuarios.html"><i class="fas fa-user-cog"></i> Usuários</a></li>
+            <li><a href="perfil.html"><i class="fas fa-user-circle"></i> Perfil</a></li>
+            <li><a href="recebimento.html"><i class="fas fa-file-invoice-dollar"></i> Recebimento</a></li>
+            <li><a href="conferencia.html"><i class="fas fa-clipboard-check"></i> Conferência</a></li>
+            <li><a href="dinamico.html"><i class="fas fa-chart-line"></i> Dinâmico <span class="beta-tag">beta</span></a></li>
+        </ul>
+    </div>
+
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Filters -->
-        <div class="filters-container" style="display:flex; align-items:center; justify-content:space-between; gap:12px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); padding: 16px 20px; margin-bottom: 20px;">
-            <div class="filters-left" style="display:flex; flex-direction:column;">
-                <span style="font-size:18px; font-weight:600; color:#333;">Pessoas</span>
-                <span style="font-size:12px; color:#666; margin-top:2px;">Gerencie todas as pessoas cadastradas</span>
-            </div>
-            <div class="filters-right" style="display:flex; align-items:center; gap:8px;">
-                <div class="search-box">
+        <div class="search-wrapper">
+            <div class="search-box-hero">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Buscar pessoa...">
+                <input id="searchPessoas" type="text" placeholder="Buscar pessoa..." aria-label="Buscar pessoas" />
                 </div>
-                <div class="filter-options">
-                    <select style="min-width:120px;">
-                        <option value="">Status</option>
-                        <option value="ativo">Ativo</option>
-                        <option value="inativo">Inativo</option>
-                    </select>
-                </div>
-                <button class="btn-primary" onclick="openPessoaModal()" style="background:#1e3a8a; border-color:#1e3a8a;">
+            <button class="btn-nova-pessoa" onclick="openPessoaModal()" title="Cadastrar nova pessoa">
                     <i class="fas fa-plus"></i>
-                    Nova Pessoa
+                <span>Nova Pessoa</span>
                 </button>
-            </div>
         </div>
 
-        <!-- Cards Grid -->
-        <div class="cards-container">
-            <!-- Spinner de Carregamento -->
-            <div id="loader-pessoas" class="loader-overlay-pessoas">
+        <div class="list-container">
+            <div id="loader-pessoas" class="loader-overlay-pessoas" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,.9); align-items:center; justify-content:center;">
                 <div class="spinner-main"></div>
                 <div class="loading-text">Carregando pessoas...</div>
             </div>
-            
-            <div id="pessoas-grid" class="pessoas-grid">
-                <!-- Cabeçalho do Grid -->
-                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 56px 1fr 200px 1fr 120px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
-                    <div>Foto</div>
-                    <div>Nome</div>
-                    <div>Telefone</div>
-                    <div>Endereço</div>
-                    <div>Status</div>
-                    <div>Ações</div>
-                </div>
-                <!-- Cards das pessoas serão carregados dinamicamente via JavaScript -->
-            </div>
+            <div id="pessoasRows" class="rows"></div>
         </div>
     </div>
 
@@ -1286,9 +1540,27 @@
             }, 300);
         }
 
-        // Listar pessoas via API e renderizar no grid de cards
-        const gridPessoas = document.getElementById('pessoas-grid');
+        // Listar pessoas via API e renderizar em linhas
+        const pessoasRows = document.getElementById('pessoasRows');
         const loaderPessoas = document.getElementById('loader-pessoas');
+
+        // Spinner local deste módulo e export para window
+        function mostrarSpinner() { 
+            if (loaderPessoas) {
+                loaderPessoas.style.display = 'flex';
+                requestAnimationFrame(() => {
+                    loaderPessoas.style.opacity = '1';
+                });
+            }
+        }
+        function ocultarSpinner() { 
+            if (loaderPessoas) {
+                loaderPessoas.style.opacity = '0';
+                setTimeout(() => {
+                    if (loaderPessoas) loaderPessoas.style.display = 'none';
+                }, 200);
+            }
+        }
 
         function createPessoaRow(pessoa) {
             const nome = pessoa?.nome || 'Sem nome';
@@ -1298,55 +1570,122 @@
             const statusText = ativo ? 'Ativo' : 'Inativo';
             const statusClass = ativo ? 'ativo' : 'inativo';
             const id = pessoa?.id ?? pessoa?.codigo ?? '';
-            const row = document.createElement('div');
-            row.className = 'grid-row';
-            row.innerHTML = `
-                <div>${pessoa?.foto ? `<img src="${pessoa.foto}" alt="Foto" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #e6e9ef;" />` : `<div style="width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;">${(nome||'?').charAt(0).toUpperCase()}</div>`}</div>
+            const el = document.createElement('div');
+            el.className = 'row-card';
+            el.innerHTML = `
+                <div>
+                    ${pessoa?.foto ? `<img src="${pessoa.foto}" alt="Foto" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #e6e9ef;" />` : `<div style="width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;">${(nome||'?').charAt(0).toUpperCase()}</div>`}
+                </div>
                 <div>${nome}</div>
                 <div>${telefone}</div>
                 <div>${endereco}</div>
-                <div><span class="status ${statusClass}">${statusText}</span></div>
-                <div class="grid-cell-actions">
-                    <button class="btn-icon btn-edit" title="Editar" onclick="editarPessoa('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button class="btn-icon btn-duplicate" title="Duplicar" onclick="duplicarPessoa('${id}')"><i class="fa-regular fa-copy"></i></button>
-                    <button class="btn-icon btn-delete" title="Excluir" onclick="excluirPessoa('${id}')"><i class="fa-solid fa-trash"></i></button>
+                <div style="text-align:center;"><span class="status ${statusClass}">${statusText}</span></div>
+                <div class="actions" style="white-space: nowrap; min-width: 110px; height: 100%; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <button class="action-btn view-btn" onclick="visualizarPessoa?.('${id}')" title="Visualizar"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit-btn" onclick="editarPessoa?.('${id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete-btn" onclick="excluirPessoa?.('${id}')" title="Excluir"><i class="fas fa-trash"></i></button>
                 </div>
             `;
-            return row;
+            return el;
         }
 
         async function carregarPessoas() {
             try {
-                if (loaderPessoas) loaderPessoas.style.display = 'flex';
-                if (!gridPessoas) return;
-
-                const header = gridPessoas.querySelector('.grid-header');
-                Array.from(gridPessoas.children).forEach(el => { if (!el.classList.contains('grid-header')) el.remove(); });
+                mostrarSpinner();
+                if (!pessoasRows) return;
+                pessoasRows.innerHTML = '';
 
                 const { data, error } = await window.api.get(window.endpoints.pessoas.list);
                 if (error) throw error;
                 const lista = Array.isArray(data) ? data : [];
 
-                if (lista.length === 0) {
+                // Aplicar busca se existir
+                const searchInput = document.getElementById('searchPessoas');
+                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+                let listaFiltrada = lista;
+                if (searchTerm) {
+                    listaFiltrada = lista.filter(p => {
+                        const nome = (p?.nome || '').toLowerCase();
+                        const telefone = (p?.telefone || '').toLowerCase();
+                        const endereco = (p?.endereco || '').toLowerCase();
+                        return nome.includes(searchTerm) || telefone.includes(searchTerm) || endereco.includes(searchTerm);
+                    });
+                }
+
+                if (listaFiltrada.length === 0) {
                     const empty = document.createElement('div');
-                    empty.style.gridColumn = '1 / -1';
                     empty.style.textAlign = 'center';
-                    empty.style.padding = '24px';
+                    empty.style.padding = '40px 24px';
                     empty.style.color = '#666';
-                    empty.innerHTML = '<i class="fas fa-user" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px"></i>Nenhuma pessoa encontrada';
-                    gridPessoas.appendChild(empty);
+                    empty.innerHTML = '<i class="fas fa-user" style="font-size:48px;opacity:.3;display:block;margin-bottom:16px"></i><p style="font-size:16px;margin:0;">Nenhuma pessoa encontrada</p>';
+                    pessoasRows.appendChild(empty);
                 } else {
-                    lista.forEach(p => gridPessoas.appendChild(createPessoaRow(p)));
+                    listaFiltrada.forEach(p => pessoasRows.appendChild(createPessoaRow(p)));
                 }
             } catch (e) {
                 console.error('Erro ao carregar pessoas:', e);
             } finally {
-                if (loaderPessoas) loaderPessoas.style.display = 'none';
+                requestAnimationFrame(() => {
+                ocultarSpinner();
+                });
             }
         }
 
+        // Funções para controlar menu mobile
+        function openMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.style.display = 'block';
+                menu.classList.add('open');
+                setTimeout(() => overlay.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.classList.remove('show');
+                menu.classList.remove('open');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 300);
+            }
+        }
+
+        // Disponibiliza funções para outros módulos/handlers
+        window.carregarPessoas = carregarPessoas;
+        window.pessoasMostrarSpinner = mostrarSpinner;
+        window.pessoasOcultarSpinner = ocultarSpinner;
+
         // Toggle de status no modal
         document.addEventListener('DOMContentLoaded', function() {
+            // Menu Mobile
+            const hamburgerBtn = document.getElementById('hamburgerMenu');
+            const closeBtn = document.getElementById('mobileMenuClose');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', openMobileMenu);
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeMobileMenu);
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', closeMobileMenu);
+            }
+
+            // Busca
+            const searchInput = document.getElementById('searchPessoas');
+            if (searchInput) {
+                searchInput.addEventListener('input', carregarPessoas);
+            }
+
             // Salva placeholder da imagem para resets futuros
             const pp = document.getElementById('photoPreview');
             if (pp) { pp.dataset.placeholder = pp.src; }
@@ -1417,6 +1756,16 @@
                 }
             } catch (e) {
                 alert('Erro ao duplicar pessoa');
+            }
+        }
+        window.excluirPessoa = function(id) { window.openDeletePessoaModal(id); }
+        window.visualizarPessoa = async function(id) {
+            try {
+                const { data: pessoa, error } = await api.get(window.endpoints.pessoas.get(id));
+                if (error) throw error;
+                window.openPessoaModal('Visualizar Pessoa', pessoa, 'visualizar');
+            } catch (error) {
+                alert('Erro ao visualizar pessoa');
             }
         }
 

@@ -413,76 +413,158 @@
             color: #007bff;
         }
 
-        /* Responsividade para o grid de usuários */
         @media (max-width: 768px) {
-            .cards-container {
-                height: calc(100vh - 180px);
+            .top-header { 
+                padding: 0; 
+                height: 60px;
             }
-            
-            .usuarios-grid {
-                grid-template-columns: 1fr;
+            .header-left { 
+                padding-left: 12px; 
+                gap: 0;
+                flex: 0 0 auto;
+            }
+            .logo-section {
+                font-size: 18px;
+                gap: 8px;
+            }
+            .hamburger-menu {
+                display: flex;
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .header-right { 
+                padding-right: 12px; 
                 gap: 12px;
-                padding: 12px;
-                margin: 0;
+            }
+            .header-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .search-wrapper { 
+                padding: 12px 16px; 
+                flex-wrap: nowrap;
+                justify-content: center;
+            }
+            .search-box-hero { 
+                padding: 10px 12px; 
                 width: 100%;
-                height: 100%;
+                max-width: calc(100% - 120px);
+                min-width: 0;
+                flex: 1;
+                height: 44px;
                 box-sizing: border-box;
             }
-
-            .usuario-card {
-                padding: 18px;
+            .search-box-hero input { 
+                font-size: 14px; 
+                min-width: 0;
+            }
+            .btn-novo-usuario {
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: auto;
+                padding: 0 14px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                margin-top: 0;
+                flex-shrink: 0;
+                box-sizing: border-box;
+            }
+            .btn-novo-usuario span {
+                display: none;
+            }
+            .btn-novo-usuario i {
+                margin: 0;
+                font-size: 14px;
+            }
+            .main-content {
+                margin-top: 60px;
+                height: calc(100vh - 60px);
+            }
+            .list-container {
+                padding: 0 16px 16px 16px;
+            }
+            .row-card {
+                padding: 10px 10px;
+                grid-template-columns: 48px 1fr auto !important;
+            }
+            .row-card > div:nth-child(3),
+            .row-card > div:nth-child(4),
+            .row-card > div:nth-child(5) {
+                display: none;
+            }
+            .row-card > div:first-child img,
+            .row-card > div:first-child > div {
+                width: 48px !important;
+                height: 48px !important;
+            }
+            .row-card > div:nth-child(2) {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
             }
         }
-
-        /* Responsividade para tablets (769px - 1024px) */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .usuarios-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                gap: 15px;
-                padding: 15px;
-                height: 100%;
+        
+        @media (max-width: 480px) {
+            .search-wrapper {
+                padding: 12px 12px;
             }
-
-            .usuario-card {
-                padding: 18px;
+            .search-box-hero {
+                max-width: calc(100% - 100px);
+                padding: 8px 10px;
+                height: 40px;
+            }
+            .search-box-hero input {
+                font-size: 13px;
+            }
+            .btn-novo-usuario {
+                right: 12px;
+                padding: 0 12px;
+                height: 40px;
+                font-size: 11px;
+            }
+            .btn-novo-usuario i {
+                font-size: 13px;
+            }
+            .list-container {
+                padding: 0 12px 16px 12px;
+            }
+            .row-card {
+                padding: 8px 8px;
+                grid-template-columns: 44px 1fr auto !important;
+            }
+            .row-card > div:nth-child(3),
+            .row-card > div:nth-child(4),
+            .row-card > div:nth-child(5) {
+                display: none;
+            }
+            .row-card > div:first-child img,
+            .row-card > div:first-child > div {
+                width: 44px !important;
+                height: 44px !important;
+            }
+            .row-card > div:nth-child(2) {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
             }
         }
-
-        /* Responsividade para tablets grandes (769px - 1024px) */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .usuarios-grid {
-                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-                gap: 20px;
-                padding: 20px;
-                height: 100%;
-            }
-
-            .cards-container {
-                height: calc(100vh - 220px);
-            }
-        }
-
-        /* Scroll personalizado para o grid */
-        .usuarios-grid::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .usuarios-grid::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        .usuarios-grid::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-
-        .grid-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 120px auto;
-            gap: 16px;
-            padding: 12px 16px;
-            background: white;
-            border-radius: 8px;
             border: 1px solid #e5e7eb;
             align-items: center;
             transition: all 0.2s ease;
@@ -575,7 +657,7 @@
             z-index: 1000;
             background: #1e3a8a;
             color: white;
-            padding: 0 30px;
+            padding: 0; /* sem espaçamento lateral */
             height: 80px;
             display: flex;
             align-items: center;
@@ -588,12 +670,152 @@
             align-items: center;
             gap: 60px;
             flex: 1;
+            padding-left: 16px;
         }
 
         .logo-section {
             display: flex;
             align-items: center;
             gap: 12px;
+        }
+        
+        /* Menu Hamburger - Oculto por padrão (desktop) */
+        .hamburger-menu {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        
+        .hamburger-menu:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .hamburger-menu:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Menu Lateral Mobile */
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .mobile-menu-overlay.show {
+            opacity: 1;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            z-index: 1501;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+        }
+        
+        .mobile-menu.open {
+            left: 0;
+        }
+        
+        .mobile-menu-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .mobile-menu-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .mobile-menu-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        
+        .mobile-menu-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-menu-links {
+            padding: 0;
+            list-style: none;
+            margin: 0;
+        }
+        
+        .mobile-menu-links li {
+            border-bottom: none;
+        }
+        
+        .mobile-menu-links a {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        
+        .mobile-menu-links a:hover,
+        .mobile-menu-links a.active {
+            background: #f0f4ff;
+            color: #1e3a8a;
+        }
+        
+        .mobile-menu-links a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .mobile-menu-links .beta-tag {
+            background: #ff9800;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            text-transform: uppercase;
         }
 
         .nav-links {
@@ -761,13 +983,170 @@
 
         /* Ajustar main-content para compensar header fixo */
         .main-content {
-            margin-top: 75px;
+            margin: 75px 0 0 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            background: #ffffff;
+            height: calc(100vh - 75px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
+
+        /* Barra de pesquisa centralizada (responsiva) */
+        .search-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0; /* remover padding lateral */
+            background: #ffffff;
+            position: relative;
+        }
+        .search-box-hero {
+            width: 100%;
+            max-width: 720px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff; /* sem fundo cinza */
+            border: 1px solid #e6e9ef;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+        .search-box-hero i {
+            color: #64748b;
+            font-size: 16px;
+        }
+        .search-box-hero input {
+            flex: 1 1 auto;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 15px;
+            color: #0f172a;
+        }
+        .search-box-hero input::placeholder { color: #94a3b8; }
+        
+        /* Botão Novo Usuário */
+        .btn-novo-usuario {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: #1e3a8a;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .btn-novo-usuario:hover {
+            background: #2740a6;
+            transform: translateY(calc(-50% - 1px));
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+        }
+        .btn-novo-usuario:active {
+            transform: translateY(-50%);
+            box-shadow: 0 1px 3px rgba(30, 58, 138, 0.2);
+        }
+        .btn-novo-usuario i {
+            font-size: 14px;
+        }
+
+        /* Lista (títulos + cards) */
+        .list-container {
+            padding: 0 24px 16px 24px;
+            margin: 0;
+            background: #ffffff;
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .usuarios-header {
+            display: grid;
+            grid-template-columns: 56px 1fr 1fr 1fr 120px auto;
+            gap: 16px;
+            padding: 14px 0;
+            background: #ffffff; /* sem fundo cinza */
+            color: #495057;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .usuarios-header > div:nth-child(1),
+        .usuarios-header > div:nth-child(5) { text-align: center; }
+
+        .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 8px 0 0 0; /* respiro superior sem cabeçalho */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .row-card {
+            display: grid;
+            grid-template-columns: 56px 1fr 1fr 1fr 120px auto;
+            gap: 16px;
+            align-items: center;
+            padding: 12px 12px;
+            margin: 0;
+            border: 1px solid #eef1f6;
+            border-radius: 8px;
+            background: #ffffff;
+            overflow: hidden; /* garante que o fundo/hover respeite o raio */
+            background-clip: padding-box; /* evita bleed do background nos cantos */
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        }
+        .row-card:hover { 
+            background: #f0f4ff; 
+            box-shadow: 0 6px 16px rgba(30, 58, 138, 0.15), 0 2px 8px rgba(30, 58, 138, 0.1);
+            transform: translateY(-2px);
+            cursor: pointer;
+        }
+        /* Garantir cor consistente (sem listras alternadas herdadas) */
+        .rows .row-card { background: #ffffff !important; }
+        .rows .row-card:nth-child(odd),
+        .rows .row-card:nth-child(even) { background: #ffffff !important; }
+
+        .row-card .status { padding: 4px 8px; border-radius: 0; font-size: 12px; }
+        .row-card .status.ativo { background: #1e3a8a; color: #fff; }
+        .row-card .status.inativo { background: #dc2626; color: #fff; }
 
         /* Evitar scroll desnecessário no body */
         body {
+            margin: 0; /* remove margem padrão do navegador */
             overflow-x: hidden;
-            overflow-y: hidden;
+            overflow-y: hidden; /* rolagem apenas dentro da lista */
+            background: #ffffff;
+        }
+        /* Garantir cálculo de largura sem causar overflow e travar largura ao viewport */
+        html, body { width: 100%; max-width: 100%; }
+        *, *::before, *::after { box-sizing: border-box; }
+        .top-header, .main-content, .search-wrapper, .list-container { width: 100%; max-width: 100%; }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+            padding-right: 16px;
         }
     </style>
 </head>
@@ -776,6 +1155,9 @@
     <div class="top-header">
         <div class="header-left">
             <div class="logo-section">
+                <button class="hamburger-menu" id="hamburgerMenu" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <span style="font-size: 20px; font-weight: 600;">ParoquiaON</span>
             </div>
             <div class="nav-links">
@@ -808,59 +1190,51 @@
         </div>
     </div>
 
+    <!-- Menu Lateral Mobile -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3>Menu</h3>
+            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Fechar menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-menu-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Minha Comunidade</a></li>
+            <li><a href="agenda.html"><i class="fas fa-calendar"></i> Agenda</a></li>
+            <li><a href="comunidades.html"><i class="fas fa-users"></i> Comunidades</a></li>
+            <li><a href="pastorais.html"><i class="fas fa-church"></i> Pastorais</a></li>
+            <li><a href="pilares.html"><i class="fas fa-layer-group"></i> Pilares</a></li>
+            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i> Locais</a></li>
+            <li><a href="acoes.html"><i class="fas fa-tasks"></i> Ações</a></li>
+            <li><a href="pessoas.html"><i class="fas fa-user-friends"></i> Pessoas</a></li>
+            <li><a href="usuarios.html" class="active"><i class="fas fa-user-cog"></i> Usuários</a></li>
+            <li><a href="perfil.html"><i class="fas fa-user-circle"></i> Perfil</a></li>
+            <li><a href="recebimento.html"><i class="fas fa-file-invoice-dollar"></i> Recebimento</a></li>
+            <li><a href="conferencia.html"><i class="fas fa-clipboard-check"></i> Conferência</a></li>
+            <li><a href="dinamico.html"><i class="fas fa-chart-line"></i> Dinâmico <span class="beta-tag">beta</span></a></li>
+        </ul>
+    </div>
+
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Filters -->
-        <div class="filters-container" style="display:flex; align-items:center; justify-content:space-between; gap:12px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); padding: 16px 20px; margin-bottom: 20px;">
-            <div class="filters-left" style="display:flex; flex-direction:column;">
-                <span style="font-size:18px; font-weight:600; color:#333;">Usuários</span>
-                <span style="font-size:12px; color:#666; margin-top:2px;">Gerencie todos os usuários do sistema</span>
-            </div>
-            <div class="filters-right" style="display:flex; align-items:center; gap:8px;">
-                <div class="search-box">
+        <div class="search-wrapper">
+            <div class="search-box-hero">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Buscar usuário...">
+                <input id="searchUsuarios" type="text" placeholder="Buscar usuário..." aria-label="Buscar usuários" />
                 </div>
-                <div class="filter-options">
-                    <select style="min-width:120px;">
-                        <option value="">Perfil</option>
-                        <option value="admin">Administrador</option>
-                        <option value="user">Usuário</option>
-                        <option value="moderator">Moderador</option>
-                    </select>
-                    <select style="min-width:120px;">
-                        <option value="">Status</option>
-                        <option value="ativo">Ativo</option>
-                        <option value="inativo">Inativo</option>
-                    </select>
-                </div>
-                <button class="btn-primary" onclick="openUsuarioModal()" style="background:#1e3a8a; border-color:#1e3a8a;">
+            <button class="btn-novo-usuario" onclick="openUsuarioModal()" title="Cadastrar novo usuário">
                     <i class="fas fa-plus"></i>
-                    Novo Usuário
+                <span>Novo Usuário</span>
                 </button>
-            </div>
         </div>
 
-        <!-- Cards Grid -->
-        <div class="cards-container">
-            <!-- Spinner de Carregamento -->
-            <div id="loader-usuarios" class="loader-overlay-usuarios">
+        <div class="list-container">
+            <div id="loader-usuarios" class="loader-overlay-usuarios" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,.9); align-items:center; justify-content:center;">
                 <div class="spinner-main"></div>
                 <div class="loading-text">Carregando usuários...</div>
             </div>
-
-            <div id="usuarios-grid" class="usuarios-grid">
-                <!-- Cabeçalho do Grid -->
-                <div class="grid-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 120px auto; gap: 16px; padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 14px;">
-                    <div>Email</div>
-                    <div>Login</div>
-                    <div>Perfil</div>
-                    <div>Status</div>
-                    <div>Ações</div>
-                </div>
-                
-                <!-- Usuários serão carregados aqui via JavaScript -->
-            </div>
+            <div id="usuariosRows" class="rows"></div>
         </div>
     </div>
 
@@ -1214,9 +1588,27 @@
             }, 300);
         }
 
-        // Listar usuários via API e renderizar no grid de cards
-        const gridUsuarios = document.getElementById('usuarios-grid');
+        // Listar usuários via API e renderizar em linhas
+        const usuariosRows = document.getElementById('usuariosRows');
         const loaderUsuarios = document.getElementById('loader-usuarios');
+
+        // Spinner local deste módulo e export para window
+        function mostrarSpinner() { 
+            if (loaderUsuarios) {
+                loaderUsuarios.style.display = 'flex';
+                requestAnimationFrame(() => {
+                    loaderUsuarios.style.opacity = '1';
+                });
+            }
+        }
+        function ocultarSpinner() { 
+            if (loaderUsuarios) {
+                loaderUsuarios.style.opacity = '0';
+                setTimeout(() => {
+                    if (loaderUsuarios) loaderUsuarios.style.display = 'none';
+                }, 200);
+            }
+        }
 
         function createUsuarioRow(usuario) {
             const email = usuario?.email || '-';
@@ -1226,79 +1618,77 @@
             const statusText = ativo ? 'Ativo' : 'Inativo';
             const statusClass = ativo ? 'ativo' : 'inativo';
             const id = usuario?.id ?? usuario?.codigo ?? '';
-            const row = document.createElement('div');
-            row.className = 'grid-row';
-            row.innerHTML = `
+            const el = document.createElement('div');
+            el.className = 'row-card';
+            el.innerHTML = `
+                <div>
+                    <div style="width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;">${(login||email||'?').charAt(0).toUpperCase()}</div>
+                </div>
                 <div>${email}</div>
                 <div>${login}</div>
                 <div>${perfilNome}</div>
-                <div><span class="status ${statusClass}">${statusText}</span></div>
-                <div class="grid-cell-actions">
-                    <button class="btn-icon" title="Visualizar" onclick="visualizarUsuario('${id}')"><i class="fas fa-eye"></i></button>
-                    <button class="btn-icon btn-edit" title="Editar" onclick="editarUsuario('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button class="btn-icon btn-delete" title="Excluir" onclick="openDeleteUsuarioModal('${id}')"><i class="fa-solid fa-trash"></i></button>
+                <div style="text-align:center;"><span class="status ${statusClass}">${statusText}</span></div>
+                <div class="actions" style="white-space: nowrap; min-width: 110px; height: 100%; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <button class="action-btn view-btn" onclick="visualizarUsuario?.('${id}')" title="Visualizar"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit-btn" onclick="editarUsuario?.('${id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete-btn" onclick="openDeleteUsuarioModal?.('${id}')" title="Excluir"><i class="fas fa-trash"></i></button>
                 </div>
             `;
-            return row;
+            return el;
         }
 
         async function carregarUsuarios() {
             try {
                 mostrarSpinner();
-                const grid = document.getElementById('usuarios-grid');
-                if (!grid) {
-                    console.error('Grid de usuários não encontrado.');
-                    return;
-                }
+                if (!usuariosRows) return;
+                usuariosRows.innerHTML = '';
 
-                const { data: usuarios, error } = await window.api.get(window.endpoints.usuarios.list);
+                const { data, error } = await window.api.get(window.endpoints.usuarios.list);
                 if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
 
-                // Limpar grid (mantendo cabeçalho)
-                const header = grid.querySelector('.grid-header');
-                grid.innerHTML = '';
-                if (header) grid.appendChild(header);
-                
-                if (!usuarios || usuarios.length === 0) {
-                    const emptyRow = document.createElement('div');
-                    emptyRow.className = 'grid-row';
-                    emptyRow.style.gridColumn = '1 / -1';
-                    emptyRow.style.textAlign = 'center';
-                    emptyRow.style.padding = '40px';
-                    emptyRow.style.color = '#6c757d';
-                    emptyRow.textContent = 'Nenhum usuário encontrado';
-                    grid.appendChild(emptyRow);
-                    return;
+                // Aplicar busca se existir
+                const searchInput = document.getElementById('searchUsuarios');
+                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+                let listaFiltrada = lista;
+                if (searchTerm) {
+                    listaFiltrada = lista.filter(u => {
+                        const email = (u?.email || '').toLowerCase();
+                        const login = (u?.login || '').toLowerCase();
+                        const perfilNome = (u?.perfilNome || '').toLowerCase();
+                        return email.includes(searchTerm) || login.includes(searchTerm) || perfilNome.includes(searchTerm);
+                    });
                 }
 
-                // Renderizar usuários
-                usuarios.forEach(usuario => {
-                    const row = createUsuarioRow(usuario);
-                    grid.appendChild(row);
-                });
+                if (listaFiltrada.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.style.textAlign = 'center';
+                    empty.style.padding = '40px 24px';
+                    empty.style.color = '#666';
+                    empty.innerHTML = '<i class="fas fa-user-cog" style="font-size:48px;opacity:.3;display:block;margin-bottom:16px"></i><p style="font-size:16px;margin:0;">Nenhum usuário encontrado</p>';
+                    usuariosRows.appendChild(empty);
+                } else {
+                    listaFiltrada.forEach(u => usuariosRows.appendChild(createUsuarioRow(u)));
+                }
             } catch (e) {
                 console.error('Erro ao carregar usuários:', e);
                 if (typeof mostrarToast === 'function') {
                     mostrarToast('Erro ao carregar usuários', 'error');
                 }
             } finally {
+                requestAnimationFrame(() => {
                 ocultarSpinner();
+                });
             }
         }
 
-        // Funções de spinner
-        function mostrarSpinner() {
-            const spinner = document.getElementById('loader-usuarios');
-            if (spinner) spinner.style.display = 'flex';
-        }
-
-        function ocultarSpinner() {
-            const spinner = document.getElementById('loader-usuarios');
-            if (spinner) spinner.style.display = 'none';
-        }
+        // Disponibiliza funções para outros módulos/handlers
+        window.carregarUsuarios = carregarUsuarios;
+        window.usuariosMostrarSpinner = mostrarSpinner;
+        window.usuariosOcultarSpinner = ocultarSpinner;
 
         // Funções de ação
-        async function visualizarUsuario(id) {
+        window.visualizarUsuario = async function(id) {
             try {
                 const { data: usuario, error } = await window.api.get(window.endpoints.usuarios.get(id));
                 if (error) throw error;
@@ -1330,7 +1720,55 @@
         }
 
         // Toggle de status no modal
+        // Funções para controlar menu mobile
+        function openMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.style.display = 'block';
+                menu.classList.add('open');
+                setTimeout(() => overlay.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.classList.remove('show');
+                menu.classList.remove('open');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 300);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Menu Mobile
+            const hamburgerBtn = document.getElementById('hamburgerMenu');
+            const closeBtn = document.getElementById('mobileMenuClose');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', openMobileMenu);
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeMobileMenu);
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', closeMobileMenu);
+            }
+
+            // Busca
+            const searchInput = document.getElementById('searchUsuarios');
+            if (searchInput) {
+                searchInput.addEventListener('input', carregarUsuarios);
+            }
+
             const statusToggle = document.getElementById('statusToggleUsuarioModal');
             const statusInput = document.getElementById('statusUsuario');
             const statusLabel = document.querySelector('#usuarioModal .status-label-modal');
@@ -1568,3 +2006,4 @@
     <script src="scripts/mobile-menu.js"></script>
 </body>
 </html>
+
