@@ -841,6 +841,17 @@
             }
             .row-card {
                 padding: 10px 10px;
+                grid-template-columns: 48px 1fr auto !important;
+            }
+            .row-card > div:nth-child(3),
+            .row-card > div:nth-child(4),
+            .row-card > div:nth-child(5) {
+                display: none;
+            }
+            .row-card > div:first-child img,
+            .row-card > div:first-child > div {
+                width: 48px !important;
+                height: 48px !important;
             }
         }
         
@@ -870,6 +881,17 @@
             }
             .row-card {
                 padding: 8px 8px;
+                grid-template-columns: 44px 1fr auto !important;
+            }
+            .row-card > div:nth-child(3),
+            .row-card > div:nth-child(4),
+            .row-card > div:nth-child(5) {
+                display: none;
+            }
+            .row-card > div:first-child img,
+            .row-card > div:first-child > div {
+                width: 44px !important;
+                height: 44px !important;
             }
         }
 
@@ -924,10 +946,11 @@
             max-width: 100%;
             box-sizing: border-box;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-            transition: transform 0.2s ease, background 0.2s ease;
+            transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
         }
         .row-card:hover { 
             background: #f0f4ff; 
+            box-shadow: 0 6px 16px rgba(30, 58, 138, 0.15), 0 2px 8px rgba(30, 58, 138, 0.1);
             transform: translateY(-2px);
             cursor: pointer;
         }
@@ -1672,7 +1695,6 @@ async function visualizarPastoral(id) {
           const foto = p && p.foto ? p.foto : '';
           const el = document.createElement('div');
           el.className = 'row-card';
-          el.style.gridTemplateColumns = '56px 1fr 1fr 140px 120px auto';
           el.innerHTML = `
             <div>
               ${foto ? `<img src="${foto}" alt="Foto" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #e6e9ef;" />` : `<div style="width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;">${(nome||'?').charAt(0).toUpperCase()}</div>`}
