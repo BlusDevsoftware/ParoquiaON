@@ -288,6 +288,12 @@
         /* Estilos para o grid de pastorais - Baseado no communities-grid */
         .cards-container {
             margin-top: 20px;
+            /* Remover espaçamento lateral e ocupar toda a largura */
+            margin-left: 0;
+            margin-right: 0;
+            padding-left: 0;
+            padding-right: 0;
+            width: 100%;
             /* Ocupar exatamente o espaço restante da tela */
             height: calc(100vh - 200px);
             position: relative;
@@ -297,11 +303,11 @@
             display: flex;
             flex-direction: column;
             gap: 0; /* sem espaço entre título e área rolável */
-            padding: 8px;
+            padding: 8px 0; /* sem espaçamento lateral */
             /* Ocupar todo o espaço do container */
             height: 100%;
             position: relative;
-            border-radius: 8px;
+            border-radius: 0; /* sem bordas arredondadas */
             background: #fff;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden; /* a rolagem fica no corpo de linhas */
@@ -329,7 +335,7 @@
             padding: 14px 16px;
             align-items: center;
             background: #f8f9fa;
-            border-radius: 8px; /* cantos arredondados para melhor harmonização */
+            border-radius: 0; /* sem bordas arredondadas */
             font-weight: 600;
             color: #495057;
             font-size: 14px;
@@ -353,7 +359,7 @@
             gap: 16px;
             padding: 12px 16px;
             border: 1px solid #eef1f6;
-            border-radius: 8px;
+            border-radius: 0; /* sem bordas arredondadas */
             align-items: center;
             background: #fff;
             transition: background-color .15s ease, box-shadow .15s ease;
@@ -1001,12 +1007,92 @@
         /* Ajustar main-content para compensar header fixo */
         .main-content {
             margin-top: 75px;
+            background: #ffffff;
+            min-height: calc(100vh - 75px);
         }
+
+        /* Barra de pesquisa centralizada (responsiva) */
+        .search-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px 20px;
+            background: #ffffff;
+        }
+        .search-box-hero {
+            width: 100%;
+            max-width: 720px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff; /* sem fundo cinza */
+            border: 1px solid #e6e9ef;
+            border-radius: 0; /* sem bordas arredondadas para seguir padrão atual */
+            padding: 12px 14px;
+        }
+        .search-box-hero i {
+            color: #64748b;
+            font-size: 16px;
+        }
+        .search-box-hero input {
+            flex: 1 1 auto;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 15px;
+            color: #0f172a;
+        }
+        .search-box-hero input::placeholder { color: #94a3b8; }
+
+        @media (max-width: 768px) {
+            .search-wrapper { padding: 12px 12px; }
+            .search-box-hero { padding: 10px 12px; }
+            .search-box-hero input { font-size: 14px; }
+        }
+
+        /* Lista (títulos + cards) */
+        .list-container {
+            padding: 0 0 16px 0;
+            background: #ffffff;
+        }
+        .pastorais-header {
+            display: grid;
+            grid-template-columns: 56px 1fr 1fr 140px 120px;
+            gap: 16px;
+            padding: 14px 0;
+            background: #ffffff; /* sem fundo cinza */
+            color: #495057;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .pastorais-header > div:nth-child(1),
+        .pastorais-header > div:nth-child(4),
+        .pastorais-header > div:nth-child(5) { text-align: center; }
+
+        .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .row-card {
+            display: grid;
+            grid-template-columns: 56px 1fr 1fr 140px 120px;
+            gap: 16px;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eef1f6;
+        }
+        .row-card:hover { background: #f9fafb; }
+        .row-card .status { padding: 4px 8px; border-radius: 0; font-size: 12px; }
+        .row-card .status.ativo { background: #1e3a8a; color: #fff; }
+        .row-card .status.inativo { background: #dc2626; color: #fff; }
 
         /* Evitar scroll desnecessário no body */
         body {
+            margin: 0; /* remove margem padrão do navegador */
             overflow-x: hidden;
-            overflow-y: hidden;
+            overflow-y: auto;
+            background: #ffffff;
         }
     </style>
 </head>
@@ -1050,63 +1136,43 @@
 
     <!-- Main Content -->
     <div class="main-content">
-            <!-- Filters -->
-            <div class="filters-container" style="display:flex; align-items:center; justify-content:space-between; gap:12px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); padding: 16px 20px; margin-bottom: 20px;">
-                <div class="filters-left" style="display:flex; flex-direction:column;">
-                    <span style="font-size:18px; font-weight:600; color:#333;">Pastorais</span>
-                    <span style="font-size:12px; color:#666; margin-top:2px;">Gerencie todas as suas pastorais cadastradas</span>
-                </div>
-                <div class="filters-right" style="display:flex; align-items:center; gap:8px;">
-                <div class="search-box">
+        <div class="search-wrapper">
+            <div class="search-box-hero">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Buscar pastoral...">
+                <input id="searchPastorais" type="text" placeholder="Buscar pastoral, responsável ou tipo..." aria-label="Buscar pastorais" />
                 </div>
-                    <div class="status-filter">
-                        <select id="statusFilter" aria-label="Filtrar por status">
-                            <option value="todos" selected>Status</option>
-                            <option value="ativo">Ativo</option>
-                            <option value="inativo">Inativo</option>
-                        </select>
                     </div>
                     
-                <button class="btn-primary" onclick="novaPastoral()" style="background:#1e3a8a; border-color:#1e3a8a;">
-                    <i class="fas fa-plus"></i>
-                    Nova Pastoral
-                </button>
-                </div>
-            </div>
-
-            <!-- Cards Grid -->
-            <div class="cards-container">
-                <!-- Spinner de Carregamento -->
-                <div id="loader-pastorais" class="loader-overlay-pastorais">
+        <div class="list-container">
+            <div id="loader-pastorais" class="loader-overlay-pastorais" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,.9); align-items:center; justify-content:center;">
                     <div class="spinner-main"></div>
                     <div class="loading-text">Carregando pastorais...</div>
                 </div>
-                
-            <div id="pastorais-grid" class="pastorais-grid">
-                <!-- Cabeçalho do Grid -->
-                <div class="grid-header">
+            <div class="pastorais-header">
                     <div>Foto</div>
                     <div>Nome da Pastoral</div>
                     <div>Responsável</div>
-                    <div>Tipo</div>
-                    <div>Status</div>
-                    <div>Ações</div>
+                <div>Tipo</div>
+                <div>Status</div>
                 </div>
-                <div id="pastorais-rows" class="pastorais-rows">
-                    <!-- Linhas das pastorais serão carregadas dinamicamente via JavaScript -->
-                </div>
+            <div class="pastorais-header" style="display:none"></div>
+            <div class="pastorais-header" style="grid-template-columns: 56px 1fr 1fr 140px 120px auto; background:#ffffff; padding:0; margin:0; border:none;">
+                <div style="visibility:hidden">.</div>
+                <div style="visibility:hidden">.</div>
+                <div style="visibility:hidden">.</div>
+                <div style="visibility:hidden">.</div>
+                <div style="visibility:hidden">.</div>
             </div>
+            <div id="pastoraisRows" class="rows"></div>
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal" id="pastoralModal">
-        <div class="modal-content" style="max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
-                         <div class="modal-header">
-                 <h2 id="modalTitle"><i class="fas fa-church"></i> Nova Pastoral</h2>
-                 <div class="modal-header-actions">
+    <!-- Modal principal (criar/editar/visualizar) -->
+    <div class="modal" id="pastoralModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; border-radius: 8px;">
+            <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display:flex; align-items:center; justify-content:space-between;">
+                <h2 id="modalTitle" style="margin:0; font-size: 1.5em; color:#333; display:flex; align-items:center; gap:10px;"><i class="fas fa-church"></i> Nova Pastoral</h2>
+                <div class="modal-header-actions" style="display:flex; align-items:center; gap:10px;">
                      <div class="status-toggle-modal">
                          <label class="switch-modal">
                              <input type="checkbox" id="statusToggleModal" checked>
@@ -1114,19 +1180,15 @@
                          </label>
                          <span class="status-label-modal">Ativo</span>
                      </div>
-                    <button class="close-modal" onclick="closeModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button class="close-modal" onclick="closeModal()" style="background:none; border:none; font-size:1.5em; color:#666; cursor:pointer;">&times;</button>
                  </div>
              </div>
-            <div class="modal-body">
+            <div class="modal-body" style="padding:20px;">
                 <form id="pastoralForm">
-                    <div class="form-section">
-                        <h3 class="section-title"><i class="fas fa-church"></i> Dados da Pastoral</h3>
                     <div class="form-row">
-                            <div class="form-group" style="flex: 1 1 100%; align-items: center;">
-                                <div class="foto-container" style="justify-content: center; display:flex; align-items:center; gap:16px;">
-                                    <img id="fotoPreview" class="foto-preview" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0yMCA4MEMyMCA3MC4zNTg5IDI3LjM1ODkgNjMgMzcgNjNINjNDNzIuNjQxMSA2MyA4MCA3MC4zNTg5IDgwIDgwVjEwMEgyMFY4MFoiIGZpbGw9IiNDQ0NDQ0MiLz4KPC9zdmc+" alt="Pré-visualização" style="width:180px;height:180px;border-radius:12px;object-fit:cover;border:1px solid #ddd;background:#f5f5f5;cursor:pointer;" onclick="document.getElementById('fotoInput').click()">
+                        <div class="form-group" style="flex:1 1 100%;">
+                            <div class="foto-container" style="justify-content:center; display:flex; align-items:center; gap:16px;">
+                                <img id="fotoPreview" class="foto-preview" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0yMCA4MEMyMCA3MC4zNTg5IDI3LjM1ODkgNjMgMzcgNjNINjNDNzIuNjQxMSA2MyA4MCA3MC4zNTg5IDgwIDgwVjEwMEgyMFY4MFoiIGZpbGw9IiNDQ0NDQ0MiLz4KPC9zdmc+" alt="Pré-visualização" style="width:160px;height:160px;border-radius:12px;object-fit:cover;border:1px solid #ddd;background:#f5f5f5;cursor:pointer;" onclick="document.getElementById('fotoInput').click()">
                                     <input type="file" id="fotoInput" accept="image/*" style="display:none">
                                 </div>
                                 <input type="hidden" name="foto" value="">
@@ -1137,12 +1199,9 @@
                             <label for="nome"><i class="fas fa-church"></i> Nome da Pastoral</label>
                             <input type="text" id="nome" name="nome" required autocomplete="name" placeholder="Digite o nome da pastoral">
                         </div>
-                        
                         <div class="form-group">
                             <label for="responsavel_id"><i class="fas fa-user-tie"></i> Responsável</label>
-                            <select id="responsavel_id" name="responsavel_id">
-                                <option value="">Selecione...</option>
-                            </select>
+                            <select id="responsavel_id" name="responsavel_id"><option value="">Selecione...</option></select>
                         </div>
                     </div>
                          <div class="form-row">
@@ -1153,135 +1212,48 @@
                              <div class="form-group">
                                  <label for="tipo"><i class="fas fa-tag"></i> Tipo</label>
                                  <input type="text" id="tipo" name="tipo" autocomplete="off" placeholder="Tipo da pastoral" value="Geral">
-                             </div>
                          </div>
                      </div>
                      <div class="form-row">
-                         <div class="form-group">
+                        <div class="form-group" style="width:100%">
                              <label for="observacao"><i class="fas fa-sticky-note"></i> Observação</label>
                              <textarea id="observacao" name="observacao" maxlength="100" rows="3" placeholder="Digite observações sobre a pastoral..." oninput="atualizarContador(this)"></textarea>
-                             <div class="char-counter">
-                                 <span id="charCount">0</span>/100 caracteres
+                            <div class="char-counter"><span id="charCount">0</span>/100 caracteres</div>
                              </div>
                          </div>
-                     </div>
-                     
-                     <!-- Campo hidden para status -->
                     <input type="hidden" id="status" name="status" value="Ativo">
-
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="closeModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500;">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                        <button type="submit" class="btn-primary" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; background:#1e3a8a; border-color:#1e3a8a;">
-                            <i class="fas fa-save"></i> Salvar
-                        </button>
+                    <div class="form-actions" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                        <button type="button" class="btn-secondary" onclick="closeModal()"><i class="fas fa-times"></i> Cancelar</button>
+                        <button type="submit" class="btn-primary" style="background:#1e3a8a; border-color:#1e3a8a;"><i class="fas fa-save"></i> Salvar</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Confirmação de Exclusão -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content delete-confirmation">
-            <div class="modal-header delete-header">
-                <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
-                <button class="close-modal" onclick="closeDeleteModal()" style="font-size: 1.5em;">&times;</button>
+    <!-- Modal confirmação exclusão -->
+    <div id="deleteModal" class="modal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,.5); z-index:1000; align-items:center; justify-content:center;">
+        <div class="modal-content delete-confirmation" style="background:#fff; max-width:420px; width:92%; border-radius:8px; overflow:hidden;">
+            <div class="modal-header delete-header" style="padding: 20px 24px; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between;">
+                <h2 style="margin:0; color:#dc3545; font-size:1.2em; display:flex; align-items:center; gap:8px;"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
+                <button class="close-modal" onclick="closeDeleteModal()" style="font-size: 1.5em; background:none; border:none; color:#666; cursor:pointer;">&times;</button>
             </div>
-            <div class="modal-body" style="padding: 0 24px; background: #fff;">
-                <div class="delete-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
+            <div class="modal-body" style="padding: 16px 24px;">
+                <div class="delete-message" style="text-align:center; font-size:16px; margin-bottom:6px;">Tem certeza que deseja excluir esta pastoral?</div>
+                <div class="delete-warning" style="text-align:center; color:#888;">Esta ação não pode ser desfeita.</div>
                 </div>
-                <div class="delete-message">
-                    Tem certeza que deseja excluir esta pastoral?
-                </div>
-                <div class="delete-warning">
-                    Esta ação não pode ser desfeita.
-                </div>
-            </div>
-            <div class="form-actions delete-actions">
-                <button class="btn-secondary" onclick="closeDeleteModal()">
-                    <i class="fas fa-times"></i>
-                    Cancelar
-                </button>
-                <button id="confirmDeleteBtn" class="btn-danger">
-                    <i class="fas fa-trash"></i>
-                    Excluir
-                </button>
+            <div class="form-actions delete-actions" style="display:flex; justify-content:center; gap:12px; padding: 0 0 20px;">
+                <button class="btn-secondary" onclick="closeDeleteModal()"><i class="fas fa-times"></i> Cancelar</button>
+                <button id="confirmDeleteBtn" class="btn-danger"><i class="fas fa-trash"></i> Excluir</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Sucesso - Cadastro -->
-    <div id="successModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
-        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
-            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
-                <h2 style="margin: 0; font-size: 1.3em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Cadastro Realizado!</h2>
-                <button class="close-modal" onclick="closeSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
-            </div>
-            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
-                <i class="fas fa-check-circle" style="font-size: 3em; color: #4CAF50; margin-bottom: 16px;"></i>
-                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Pastoral cadastrada com sucesso!</div>
-                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
-                    A pastoral foi adicionada ao sistema e já está disponível para uso.
-                </div>
-                <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
-                    <div style="margin-bottom: 8px;"><strong>Status:</strong> Ativo</div>
-                    <div style="margin-bottom: 8px;"><strong>Data de Cadastro:</strong> <span id="dataCadastro"></span></div>
-                    <div><strong>Sistema:</strong> ParoquiaON</div>
-                </div>
-                <div style="display: flex; justify-content: center; gap: 12px;">
-                    <button class="btn-secondary" onclick="closeSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
-    <!-- Modal de Sucesso - Atualização -->
-    <div id="updateSuccessModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
-        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
-            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
-                <h2 style="margin: 0; font-size: 1.3em; color: #2196F3; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-sync-alt"></i> Dados Atualizados!</h2>
-                <button class="close-modal" onclick="closeUpdateSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
-            </div>
-            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
-                <i class="fas fa-sync-alt" style="font-size: 3em; color: #2196F3; margin-bottom: 16px;"></i>
-                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Dados atualizados com sucesso!</div>
-                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
-                    As informações da pastoral foram atualizadas no sistema.
-                </div>
-                <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
-                    <div style="margin-bottom: 8px;"><strong>Status:</strong> <span id="statusAtualizado"></span></div>
-                    <div style="margin-bottom: 8px;"><strong>Data de Atualização:</strong> <span id="dataAtualizacao"></span></div>
-                    <div><strong>Sistema:</strong> ParoquiaON</div>
-                </div>
-                <div style="display: flex; justify-content: center; gap: 12px;">
-                    <button class="btn-secondary" onclick="closeUpdateSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
-    <!-- Modal de Sucesso - Exclusão -->
-    <div id="deleteSuccessModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
-        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
-            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
-                <h2 style="margin: 0; font-size: 1.3em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Pastoral Excluída!</h2>
-                <button class="close-modal" onclick="closeDeleteSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
-            </div>
-            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
-                <i class="fas fa-check-circle" style="font-size: 3em; color: #4CAF50; margin-bottom: 16px;"></i>
-                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Pastoral excluída com sucesso!</div>
-                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
-                    O registro foi removido do sistema.
-                </div>
-                <div style="display: flex; justify-content: center; gap: 12px;">
-                    <button class="btn-secondary" onclick="closeDeleteSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <script src="scripts/config/api.js"></script>
     <script>
@@ -1495,8 +1467,7 @@
                 if (error) throw error;
                 const lista = Array.isArray(data) ? data : [];
                 // Capturar filtros
-                const statusSelect = document.getElementById('statusFilter');
-                const filtro = statusSelect ? statusSelect.value : 'todos';
+                const filtro = 'todos';
                 const searchInput = document.querySelector('.search-box input');
                 const termo = (searchInput && searchInput.value ? searchInput.value : '').trim().toLowerCase();
 
@@ -1512,7 +1483,7 @@
                     const respNome = (p?.responsavel_id && pessoasById[p.responsavel_id]?.nome) ? String(pessoasById[p.responsavel_id].nome).toLowerCase() : '';
                     return nome.includes(termo) || tipo.includes(termo) || respNome.includes(termo);
                 });
-                const rowsContainer = document.getElementById('pastorais-rows');
+                const rowsContainer = document.getElementById('pastoraisRows');
                 if (!rowsContainer) return;
                 // limpar linhas existentes
                 rowsContainer.innerHTML = '';
@@ -1844,10 +1815,7 @@ async function visualizarPastoral(id) {
             }
             document.getElementById('pastoralForm').addEventListener('submit', salvarPastoral);
             // Filtro de status: recarregar lista ao mudar
-            const statusSelect = document.getElementById('statusFilter');
-            if (statusSelect) {
-                statusSelect.addEventListener('change', carregarPastorais);
-            }
+            // status filter removido
             // Busca por texto: recarregar lista ao digitar
             const searchInput = document.querySelector('.search-box input');
             if (searchInput) {
@@ -1873,8 +1841,10 @@ async function visualizarPastoral(id) {
                 return result;
             }
             // remove listener de tipo inexistente
-             document.getElementById('statusToggleModal').addEventListener('change', toggleStatus);
-            document.getElementById('confirmDeleteBtn').onclick = async function() {
+            const _toggleEl = document.getElementById('statusToggleModal');
+            if (_toggleEl) _toggleEl.addEventListener('change', toggleStatus);
+            const _confirmBtn = document.getElementById('confirmDeleteBtn');
+            if (_confirmBtn) _confirmBtn.onclick = async function() {
                 if (!codigoParaExcluir) return;
                 try {
                     await window.bloqueioExclusao.deleteWithCheck(
@@ -1949,54 +1919,96 @@ async function visualizarPastoral(id) {
 
     <script src="scripts/navigation.js"></script>
 
-    <!-- Menu Mobile -->
-    <button class="mobile-menu-fab" id="mobileMenuFab">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <div class="mobile-menu-container" id="mobileMenuContainer">
-        <div class="mobile-menu-links">
-            <a href="index.html" class="mobile-menu-link">
-                <i class="fas fa-home"></i> Minha Comunidade
-            </a>
-            <a href="agenda.html" class="mobile-menu-link">
-                <i class="fas fa-calendar"></i> Agenda
-            </a>
-            <a href="comunidades.html" class="mobile-menu-link">
-                <i class="fas fa-users"></i> Comunidades
-            </a>
-            <a href="pastorais.html" class="mobile-menu-link">
-                <i class="fas fa-church"></i> Pastorais
-            </a>
-            <a href="pilares.html" class="mobile-menu-link">
-                <i class="fas fa-layer-group"></i> Pilares
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="locais.html" class="mobile-menu-link">
-                <i class="fas fa-map-marker-alt"></i> Locais
-            </a>
-            <a href="acoes.html" class="mobile-menu-link">
-                <i class="fas fa-tasks"></i> Ações
-            </a>
-            <a href="pessoas.html" class="mobile-menu-link">
-                <i class="fas fa-user-friends"></i> Pessoas
-            </a>
-            <a href="usuarios.html" class="mobile-menu-link">
-                <i class="fas fa-user-shield"></i> Usuários
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="dinamico.html" class="mobile-menu-link">
-                <i class="fas fa-chart-line"></i> Dinâmico <span style="font-size: 11px; color: #fbbf24; font-weight: bold;">BETA</span>
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="perfil.html" class="mobile-menu-link">
-                <i class="fas fa-user-circle"></i> Perfil
-            </a>
+    <script>
+      (function(){
+        let pessoasById = {};
+        function actionButtons(id) {
+          return `
+            <div style="display:flex; gap:8px; justify-content:center;">
+              <button class="btn-icon btn-edit" title="Editar" onclick="editarPastoral?.('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button class="btn-icon btn-duplicate" title="Duplicar" onclick="duplicarPastoral?.('${id}')"><i class="fa-regular fa-copy"></i></button>
+              <button class="btn-icon btn-delete" title="Excluir" onclick="excluirPastoral?.('${id}')"><i class="fa-solid fa-trash"></i></button>
+            </div>`;
+        }
+        function createRow(p) {
+          const nome = p && p.nome ? p.nome : '-';
+          const respNome = (p && p.responsavel_id && pessoasById[p.responsavel_id] && pessoasById[p.responsavel_id].nome) ? pessoasById[p.responsavel_id].nome : '-';
+          const tipo = p && p.tipo ? p.tipo : '-';
+          const ativo = !(p && p.ativo === false);
+          const statusText = ativo ? 'Ativo' : 'Inativo';
+          const statusClass = ativo ? 'ativo' : 'inativo';
+          const foto = p && p.foto ? p.foto : '';
+          const el = document.createElement('div');
+          el.className = 'row-card';
+          el.style.gridTemplateColumns = '56px 1fr 1fr 140px 120px auto';
+          el.innerHTML = `
+            <div>
+              ${foto ? `<img src="${foto}" alt="Foto" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #e6e9ef;" />` : `<div style="width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;">${(nome||'?').charAt(0).toUpperCase()}</div>`}
         </div>
-    </div>
+            <div>${nome}</div>
+            <div>${respNome}</div>
+            <div style="text-align:center;">${tipo}</div>
+            <div style="text-align:center;"><span class="status ${statusClass}">${statusText}</span></div>
+            ${actionButtons(p?.id ?? '')}
+          `;
+          return el;
+        }
+        function showLoader(show) {
+          const el = document.getElementById('loader-pastorais');
+          if (!el) return;
+          el.style.display = show ? 'flex' : 'none';
+        }
+        async function carregar() {
+          const rows = document.getElementById('pastoraisRows');
+          if (!rows) return;
+          rows.innerHTML = '';
+          showLoader(true);
+          try {
+            const pessoasResp = await window.api.get(window.endpoints.pessoas.list);
+            const pessoas = Array.isArray(pessoasResp.data) ? pessoasResp.data : [];
+            pessoasById = pessoas.reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
+          } catch(_) { pessoasById = {}; }
+          let lista = [];
+          try {
+            const pastResp = await window.api.get(window.endpoints.pastorais.list);
+            lista = Array.isArray(pastResp.data) ? pastResp.data : [];
+          } catch(e) {
+            console.error('Falha ao carregar pastorais', e);
+          }
+          const termo = (document.getElementById('searchPastorais')?.value || '').trim().toLowerCase();
+          const filtro = 'todos';
+          const filtrada = lista.filter(p => {
+            const ativo = p?.ativo !== false;
+            const statusOk = filtro === 'todos' ? true : (filtro === 'ativo' ? ativo : !ativo);
+            if (!statusOk) return false;
+            if (!termo) return true;
+            const n = (p?.nome || '').toLowerCase();
+            const t = (p?.tipo || '').toLowerCase();
+            const r = (p?.responsavel_id && pessoasById[p.responsavel_id]?.nome) ? String(pessoasById[p.responsavel_id].nome).toLowerCase() : '';
+            return n.includes(termo) || t.includes(termo) || r.includes(termo);
+          });
+          if (filtrada.length === 0) {
+            const empty = document.createElement('div');
+            empty.style.textAlign = 'center';
+            empty.style.color = '#666';
+            empty.style.padding = '16px 0';
+            empty.textContent = 'Nenhuma pastoral encontrada';
+            rows.appendChild(empty);
+            showLoader(false);
+            return;
+          }
+          filtrada.forEach(p => rows.appendChild(createRow(p)));
+          showLoader(false);
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+          const input = document.getElementById('searchPastorais');
+          if (input) input.addEventListener('input', carregar);
+          // status e botão de nova pastoral removidos do layout
+          carregar();
+        });
+      })();
+    </script>
 
-    <!-- Scripts do Menu Mobile -->
-    <script src="scripts/mobile-menu.js"></script>
 </body>
 </html> 
 
