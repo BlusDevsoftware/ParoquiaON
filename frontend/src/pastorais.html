@@ -1073,6 +1073,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            padding-top: 8px; /* respiro superior sem cabeçalho */
         }
         .row-card {
             display: grid;
@@ -1148,21 +1149,6 @@
                     <div class="spinner-main"></div>
                     <div class="loading-text">Carregando pastorais...</div>
                 </div>
-            <div class="pastorais-header">
-                    <div>Foto</div>
-                    <div>Nome da Pastoral</div>
-                    <div>Responsável</div>
-                <div>Tipo</div>
-                <div>Status</div>
-                </div>
-            <div class="pastorais-header" style="display:none"></div>
-            <div class="pastorais-header" style="grid-template-columns: 56px 1fr 1fr 140px 120px auto; background:#ffffff; padding:0; margin:0; border:none;">
-                <div style="visibility:hidden">.</div>
-                <div style="visibility:hidden">.</div>
-                <div style="visibility:hidden">.</div>
-                <div style="visibility:hidden">.</div>
-                <div style="visibility:hidden">.</div>
-            </div>
             <div id="pastoraisRows" class="rows"></div>
         </div>
     </div>
