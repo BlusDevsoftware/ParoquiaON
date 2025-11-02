@@ -68,22 +68,29 @@
         
         // Função para renderizar comunidades em cards
         function renderizarComunidades(comunidades) {
-            const grid = document.getElementById('communities-grid');
-            if (!grid) return;
+            const container = document.querySelector('.list-container');
+            if (!container) return;
+            
+            // Remover loader e cards existentes, mantendo apenas o loader se existir
+            const loader = document.getElementById('loader-comunidades');
+            const existingCards = container.querySelectorAll('.community-card');
+            existingCards.forEach(card => card.remove());
             
             if (comunidades.length === 0) {
-                grid.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
-                        <i class="fas fa-users" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-                        <h3>Nenhuma comunidade encontrada</h3>
-                        <p>Clique em "Nova Comunidade" para cadastrar a primeira comunidade.</p>
-                    </div>
+                const emptyDiv = document.createElement('div');
+                emptyDiv.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;';
+                emptyDiv.innerHTML = `
+                    <i class="fas fa-users" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                    <h3>Nenhuma comunidade encontrada</h3>
+                    <p>Clique em "Nova Comunidade" para cadastrar a primeira comunidade.</p>
                 `;
+                container.appendChild(emptyDiv);
                 return;
             }
             
-            const FALLBACK_IMG = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjQwIiBjeT0iMjgiIHI9IjEyIiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0xNiA2NEMxNiA1Ni4yODcxIDIyLjI4NzEgNTAgMzAgNTBINDBDNDcuNzEyOSA1MCA1NCA1Ni4yODcxIDU0IDY0VjgwSDE2VjY0WiIgZmlsbD0iI0NDQ0NDQyIvPgo8L3N2Zz4=';
-            grid.innerHTML = comunidades.map(comunidade => {
+            const FALLBACK_IMG = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjQwIiBjeT0iMjgiIHI9IjEyIiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0xNiA2NCMxNiA1Ni4yODcxIDIyLjI4NzEgNTAgMzAgNTBINDBDNDcuNzEyOSA1MCA1NCA1Ni4yODcxIDU0IDY0VjgwSDE2VjY0WiIgZmlsbD0iI0NDQ0NDQyIvPgo8L3N2Zz4=';
+            
+            comunidades.forEach(comunidade => {
                 const fotoUrl = comunidade.foto && typeof comunidade.foto === 'string' && comunidade.foto.trim() !== ''
                     ? comunidade.foto
                     : FALLBACK_IMG;
@@ -91,38 +98,44 @@
                 const secretario = Array.isArray(comunidade.responsaveis) && comunidade.responsaveis[0]
                     ? `${comunidade.responsaveis[0].nome || ''}${comunidade.responsaveis[0].funcao ? ' - ' + comunidade.responsaveis[0].funcao : ''}`
                     : (comunidade.secretario || '');
-                return `
-                <div class="community-card" data-id="${comunidade.id}" style="overflow:hidden; border-radius:5px; padding:12px 6px 6px 6px; height:355px; border-top: 4px solid ${comunidade.cor || '#1e3a8a'}">
-                    <div class="community-image" style="width:100%; height:150px; overflow:hidden; background:#f0f0f0; border-radius:5px; position:relative;">
-                        <img src="${fotoUrl}" alt="Foto da Comunidade" style="width:100%; height:100%; object-fit:cover; display:block;">
-                    </div>
-                    <div class="community-header" style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-                        <h3 style="margin:0; font-size:16px;">${comunidade.nome || 'Sem nome'}</h3>
-                        <span class="status-badge ${comunidade.status === 'Ativo' ? 'active' : 'inactive'}">
-                            ${comunidade.status || 'Ativo'}
-                        </span>
-                    </div>
-                    <div class="community-info" style="margin-top:8px; font-size:10px; line-height:1.5;">
-                        <p style="margin:6px 0;"><i class="fas fa-phone"></i> ${comunidade.telefone || 'Não informado'}</p>
-                        ${membros > 0 ? `<p style="margin:6px 0;"><i class="fas fa-users"></i> ${membros} membros</p>` : ''}
-                        ${secretario ? `<p style="margin:6px 0;"><i class="fas fa-user"></i> Secretário: ${secretario}</p>` : ''}
-                        <p style="margin:6px 0;"><i class="fas fa-map-marker-alt"></i> ${comunidade.endereco || 'Não informado'}</p>
-                        <p style="margin:6px 0;"><i class="fas fa-calendar"></i> ${formatarData(comunidade.data_fundacao)}</p>
-                    </div>
-                    
-                    <div class="community-actions" style="margin-top:8px; display:flex; gap:6px;">
-                        <button class="btn-secondary" style="padding:4px 8px; font-size:10px;" onclick="visualizarComunidade(${comunidade.id})">
-                            <i class="fas fa-eye"></i> Visualizar
-                        </button>
-                        <button class="btn-primary" style="padding:4px 8px; font-size:10px;" onclick="editarComunidade(${comunidade.id})">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn-delete" style="padding:4px 8px; font-size:10px;" onclick="excluirComunidade(${comunidade.id})">
-                            <i class="fas fa-trash"></i> Excluir
-                        </button>
-                    </div>
-                </div>`;
-            }).join('');
+                
+                const cardHtml = `
+                    <div class="community-card" data-id="${comunidade.id}" style="overflow:hidden; border-radius:5px; padding:12px 6px 6px 6px; height:355px; border-top: 4px solid ${comunidade.cor || '#1e3a8a'}">
+                        <div class="community-image" style="width:100%; height:150px; overflow:hidden; background:#f0f0f0; border-radius:5px; position:relative;">
+                            <img src="${fotoUrl}" alt="Foto da Comunidade" style="width:100%; height:100%; object-fit:cover; display:block;">
+                        </div>
+                        <div class="community-header" style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                            <h3 style="margin:0; font-size:16px;">${comunidade.nome || 'Sem nome'}</h3>
+                            <span class="status-badge ${comunidade.status === 'Ativo' ? 'active' : 'inactive'}">
+                                ${comunidade.status || 'Ativo'}
+                            </span>
+                        </div>
+                        <div class="community-info" style="margin-top:8px; font-size:10px; line-height:1.5;">
+                            <p style="margin:6px 0;"><i class="fas fa-phone"></i> ${comunidade.telefone || 'Não informado'}</p>
+                            ${membros > 0 ? `<p style="margin:6px 0;"><i class="fas fa-users"></i> ${membros} membros</p>` : ''}
+                            ${secretario ? `<p style="margin:6px 0;"><i class="fas fa-user"></i> Secretário: ${secretario}</p>` : ''}
+                            <p style="margin:6px 0;"><i class="fas fa-map-marker-alt"></i> ${comunidade.endereco || 'Não informado'}</p>
+                            <p style="margin:6px 0;"><i class="fas fa-calendar"></i> ${formatarData(comunidade.data_fundacao)}</p>
+                        </div>
+                        
+                        <div class="community-actions" style="margin-top:8px; display:flex; gap:6px;">
+                            <button class="btn-secondary" style="padding:4px 8px; font-size:10px;" onclick="visualizarComunidade(${comunidade.id})">
+                                <i class="fas fa-eye"></i> Visualizar
+                            </button>
+                            <button class="btn-primary" style="padding:4px 8px; font-size:10px;" onclick="editarComunidade(${comunidade.id})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn-delete" style="padding:4px 8px; font-size:10px;" onclick="excluirComunidade(${comunidade.id})">
+                                <i class="fas fa-trash"></i> Excluir
+                            </button>
+                        </div>
+                    </div>`;
+                
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = cardHtml.trim();
+                const card = tempDiv.firstElementChild;
+                container.appendChild(card);
+            });
         }
         
         // Função para formatar data
@@ -1437,7 +1450,7 @@
         /* Garantir cálculo de largura sem causar overflow e travar largura ao viewport */
         html, body { width: 100%; max-width: 100%; }
         *, *::before, *::after { box-sizing: border-box; }
-        .top-header, .main-content, .search-wrapper, .cards-container { width: 100%; max-width: 100%; }
+        .top-header, .main-content, .search-wrapper, .list-container { width: 100%; max-width: 100%; }
 
         .toast {
             background: white;
@@ -2291,14 +2304,11 @@
             border: 1px dashed #ddd;
         }
 
-        /* Estilos para cards das comunidades - Seguindo padrão das outras abas */
-        .cards-container {
-            background: #ffffff;
-            border-radius: 0;
-            box-shadow: none;
-            overflow: hidden;
-            margin-top: 0;
+        /* Lista (títulos + cards) */
+        .list-container {
             padding: 0 24px 16px 24px;
+            margin: 0;
+            background: #ffffff;
             flex: 1 1 auto;
             overflow-y: auto;
             overflow-x: hidden;
@@ -2306,20 +2316,10 @@
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
-        }
-
-        .communities-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 8px;
-            padding: 8px 0 0 0;
-            overflow-y: visible;
-            /* Ocupar todo o espaço do container */
-            min-height: 100%;
-            position: relative;
-            border-radius: 0;
-            background: #ffffff;
-            flex: 1 1 auto;
+            padding: 8px 24px 16px 24px;
         }
 
         .community-card {
@@ -2648,7 +2648,7 @@
             .btn-nova-comunidade i {
                 font-size: 13px;
             }
-            .cards-container {
+            .list-container {
                 padding: 0 12px 16px 12px;
             }
 
@@ -2697,7 +2697,7 @@
                 margin: 0;
             }
 
-            .cards-container {
+            .list-container {
                 margin-top: 0;
                 margin-left: 0;
                 margin-right: 0;
@@ -2708,13 +2708,10 @@
                 padding: 0 12px 16px 12px;
             }
 
-            .communities-grid {
+            .list-container {
                 grid-template-columns: 1fr;
                 gap: 12px;
-                padding: 8px 0 0 0;
-                margin: 0;
-                width: 100%;
-                box-sizing: border-box;
+                padding: 8px 12px 16px 12px;
             }
 
             /* Ajustar cards para mobile */
@@ -2840,16 +2837,16 @@
                 min-width: 140px;
             }
 
-            .cards-container {
+            .list-container {
                 margin-top: 0;
                 border-radius: 0;
                 box-shadow: none;
             }
 
-            .communities-grid {
+            .list-container {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
                 gap: 15px;
-                padding: 8px 0 0 0;
+                padding: 8px 16px 16px 16px;
             }
 
             .community-card {
@@ -2869,22 +2866,16 @@
 
         /* Responsividade para tablets grandes (769px - 1024px) */
         @media (min-width: 769px) and (max-width: 1024px) {
-            .communities-grid {
+            .list-container {
                 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
                 gap: 20px;
-                padding: 20px;
-                height: 100%;
+                padding: 8px 24px 16px 24px;
             }
 
-            .cards-container {
-                height: calc(100vh - 220px);
-                border-radius: 0;
-                box-shadow: none;
-            }
         }
 
         /* Scroll personalizado para o grid */
-        .communities-grid::-webkit-scrollbar {
+        .list-container::-webkit-scrollbar {
             width: 8px;
         }
 
@@ -2990,17 +2981,16 @@
             }
 
         /* Melhorias de scroll para mobile */
-            .cards-container {
+            .list-container {
                 padding: 0 16px 16px 16px;
                 border-radius: 0;
                 box-shadow: none;
                 margin-top: 0;
                 -webkit-overflow-scrolling: touch;
             }
-            .communities-grid {
+            .list-container {
                 -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
                 scroll-behavior: smooth;
-                padding: 8px 0 0 0;
             }
 
             /* Melhorar área de toque para botões */
@@ -3022,12 +3012,12 @@
             }
         }
 
-        .communities-grid::-webkit-scrollbar-thumb {
+        .list-container::-webkit-scrollbar-thumb {
             background: #c1c1c1;
             border-radius: 4px;
         }
 
-        .communities-grid::-webkit-scrollbar-thumb:hover {
+        .list-container::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
     </style>
@@ -3111,17 +3101,13 @@
             </button>
         </div>
 
-        <!-- Cards Container -->
-        <div class="cards-container">
+        <div class="list-container">
             <!-- Spinner de Carregamento - DENTRO DO CONTAINER -->
-                <div id="loader-comunidades" class="loader-overlay-colaboradores">
-                    <div class="spinner-main"></div>
-                    <div class="loading-text">Carregando comunidades...</div>
-                </div>
-                
-                    <div id="communities-grid" class="communities-grid">
-                        <!-- Cards das comunidades serão carregados dinamicamente via JavaScript -->
+            <div id="loader-comunidades" class="loader-overlay-colaboradores">
+                <div class="spinner-main"></div>
+                <div class="loading-text">Carregando comunidades...</div>
             </div>
+            <!-- Cards das comunidades serão carregados dinamicamente via JavaScript -->
         </div>
     </div>
 
@@ -3615,23 +3601,32 @@
         }
 
         function renderCommunities(communities) {
-            const grid = document.getElementById('communities-grid');
-            grid.innerHTML = '';
+            const container = document.querySelector('.list-container');
+            if (!container) return;
+            
+            // Remover cards existentes
+            const existingCards = container.querySelectorAll('.community-card');
+            existingCards.forEach(card => card.remove());
+            
+            const emptyDiv = container.querySelector('div[style*="grid-column"]');
+            if (emptyDiv) emptyDiv.remove();
 
             if (communities.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-                        <i class="fas fa-church" style="font-size: 3em; color: #ccc; margin-bottom: 15px;"></i>
-                        <h3 style="color: #666; margin-bottom: 10px;">Nenhuma comunidade cadastrada</h3>
-                        <p style="color: #999;">Clique em "Nova Comunidade" para começar</p>
-                    </div>
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 40px;';
+                emptyState.innerHTML = `
+                    <i class="fas fa-church" style="font-size: 3em; color: #ccc; margin-bottom: 15px;"></i>
+                    <h3 style="color: #666; margin-bottom: 10px;">Nenhuma comunidade cadastrada</h3>
+                    <p style="color: #999;">Clique em "Nova Comunidade" para começar</p>
                 `;
+                container.appendChild(emptyState);
                 return;
             }
 
             communities.forEach(community => {
                 const card = createCommunityCard(community);
-                grid.appendChild(card);
+                container.appendChild(card);
             });
         }
 
