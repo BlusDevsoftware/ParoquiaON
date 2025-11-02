@@ -2616,7 +2616,7 @@
                 font-size: 13px;
             }
             .list-container {
-                padding: 0 10px 16px 10px;
+                padding: 0 6px 16px 6px;
                 grid-template-columns: repeat(2, 1fr) !important;
                 gap: 10px;
             }
@@ -2825,7 +2825,7 @@
                 height: calc(100vh - 60px);
             }
             .list-container {
-                padding: 0 10px 16px 10px;
+                padding: 0 6px 16px 6px;
                 grid-template-columns: repeat(2, 1fr) !important;
                 gap: 12px;
             }
@@ -2927,7 +2927,21 @@
         /* Garantir cálculo de largura sem causar overflow e travar largura ao viewport */
         html, body { width: 100%; max-width: 100%; }
         *, *::before, *::after { box-sizing: border-box; }
-        .top-header, .main-content, .search-wrapper, .list-container { width: 100%; max-width: 100%; }
+        .top-header, .main-content, .search-wrapper { width: 100%; max-width: 100%; }
+        
+        @media (max-width: 768px) {
+            .list-container {
+                width: calc(100% - 12px);
+                max-width: calc(100% - 12px);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .list-container {
+                width: calc(100% - 12px);
+                max-width: calc(100% - 12px);
+            }
+        }
     </style>
 </head>
 <body>
