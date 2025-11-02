@@ -1429,14 +1429,15 @@
 
         /* Evitar scroll desnecessário no body */
         body {
+            margin: 0; /* remove margem padrão do navegador */
             overflow-x: hidden;
-            overflow-y: hidden;
+            overflow-y: hidden; /* rolagem apenas dentro da lista */
+            background: #ffffff;
         }
-
-        /* Permitir scroll apenas no communities-grid */
-        .communities-grid {
-            overflow-y: auto;
-        }
+        /* Garantir cálculo de largura sem causar overflow e travar largura ao viewport */
+        html, body { width: 100%; max-width: 100%; }
+        *, *::before, *::after { box-sizing: border-box; }
+        .top-header, .main-content, .search-wrapper, .cards-container { width: 100%; max-width: 100%; }
 
         .toast {
             background: white;
@@ -2292,7 +2293,7 @@
 
         /* Estilos para cards das comunidades - Seguindo padrão das outras abas */
         .cards-container {
-            background: white;
+            background: #ffffff;
             border-radius: 0;
             box-shadow: none;
             overflow: hidden;
@@ -2317,7 +2318,7 @@
             min-height: 100%;
             position: relative;
             border-radius: 0;
-            background: #fff;
+            background: #ffffff;
             flex: 1 1 auto;
         }
 
@@ -2697,22 +2698,22 @@
             }
 
             .cards-container {
-                margin-top: 10px;
+                margin-top: 0;
                 margin-left: 0;
                 margin-right: 0;
-                height: calc(100vh - 180px);
-                border-radius: 8px;
+                border-radius: 0;
+                box-shadow: none;
                 width: 100%;
                 box-sizing: border-box;
+                padding: 0 12px 16px 12px;
             }
 
             .communities-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
-                padding: 12px;
+                padding: 8px 0 0 0;
                 margin: 0;
                 width: 100%;
-                height: 100%;
                 box-sizing: border-box;
             }
 
@@ -2840,15 +2841,15 @@
             }
 
             .cards-container {
-                margin-top: 10px;
-                height: calc(100vh - 200px);
+                margin-top: 0;
+                border-radius: 0;
+                box-shadow: none;
             }
 
             .communities-grid {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
                 gap: 15px;
-                padding: 15px;
-                height: 100%;
+                padding: 8px 0 0 0;
             }
 
             .community-card {
@@ -2877,6 +2878,8 @@
 
             .cards-container {
                 height: calc(100vh - 220px);
+                border-radius: 0;
+                box-shadow: none;
             }
         }
 
@@ -2989,6 +2992,9 @@
         /* Melhorias de scroll para mobile */
             .cards-container {
                 padding: 0 16px 16px 16px;
+                border-radius: 0;
+                box-shadow: none;
+                margin-top: 0;
                 -webkit-overflow-scrolling: touch;
             }
             .communities-grid {
