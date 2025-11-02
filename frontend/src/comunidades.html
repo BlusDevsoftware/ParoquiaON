@@ -590,8 +590,7 @@
         
         // Função para buscar comunidades
         function buscarComunidades() {
-            const termoBusca = document.querySelector('.search-box input').value.toLowerCase().trim();
-            const statusFiltro = document.querySelector('.filter-options select').value;
+            const termoBusca = document.querySelector('#searchComunidades').value.toLowerCase().trim();
             
             let comunidadesFiltradas = [...comunidades];
             
@@ -599,15 +598,8 @@
             if (termoBusca) {
                 comunidadesFiltradas = comunidadesFiltradas.filter(comunidade => 
                     comunidade.nome.toLowerCase().includes(termoBusca) ||
-                    comunidade.secretario.toLowerCase().includes(termoBusca) ||
-                    comunidade.endereco.toLowerCase().includes(termoBusca)
-                );
-            }
-            
-            // Filtrar por status
-            if (statusFiltro) {
-                comunidadesFiltradas = comunidadesFiltradas.filter(comunidade => 
-                    comunidade.status === statusFiltro
+                    (comunidade.secretario && comunidade.secretario.toLowerCase().includes(termoBusca)) ||
+                    (comunidade.endereco && comunidade.endereco.toLowerCase().includes(termoBusca))
                 );
             }
             
@@ -621,15 +613,10 @@
                 console.log('🚀 Inicializando página de comunidades...');
                 
                 // Configurar eventos
-                const searchInput = document.querySelector('.search-box input');
-                const statusSelect = document.querySelector('.filter-options select');
+                const searchInput = document.querySelector('#searchComunidades');
                 
                 if (searchInput) {
                     searchInput.addEventListener('input', buscarComunidades);
-                }
-                
-                if (statusSelect) {
-                    statusSelect.addEventListener('change', buscarComunidades);
                 }
                 
                 // Carregar comunidades
@@ -770,8 +757,50 @@
             button.parentElement.remove();
         }
         
+        // Funções para controlar menu mobile
+        function openMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.style.display = 'block';
+                menu.classList.add('open');
+                setTimeout(() => overlay.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.classList.remove('show');
+                menu.classList.remove('open');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 300);
+            }
+        }
+
         // Inicializar quando a página carregar
         document.addEventListener('DOMContentLoaded', () => {
+            // Menu Mobile
+            const hamburgerBtn = document.getElementById('hamburgerMenu');
+            const closeBtn = document.getElementById('mobileMenuClose');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', openMobileMenu);
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeMobileMenu);
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', closeMobileMenu);
+            }
+            
             inicializarPagina();
             
             // Event listener para atualizar o label de cor em tempo real
@@ -992,7 +1021,7 @@
             z-index: 1000;
             background: #1e3a8a;
             color: white;
-            padding: 0 30px;
+            padding: 0; /* sem espaçamento lateral */
             height: 80px;
             display: flex;
             align-items: center;
@@ -1005,12 +1034,152 @@
             align-items: center;
             gap: 60px;
             flex: 1;
+            padding-left: 16px;
         }
 
         .logo-section {
             display: flex;
             align-items: center;
             gap: 12px;
+        }
+        
+        /* Menu Hamburger - Oculto por padrão (desktop) */
+        .hamburger-menu {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        
+        .hamburger-menu:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .hamburger-menu:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Menu Lateral Mobile */
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .mobile-menu-overlay.show {
+            opacity: 1;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            z-index: 1501;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+        }
+        
+        .mobile-menu.open {
+            left: 0;
+        }
+        
+        .mobile-menu-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .mobile-menu-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .mobile-menu-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        
+        .mobile-menu-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-menu-links {
+            padding: 0;
+            list-style: none;
+            margin: 0;
+        }
+        
+        .mobile-menu-links li {
+            border-bottom: none;
+        }
+        
+        .mobile-menu-links a {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        
+        .mobile-menu-links a:hover,
+        .mobile-menu-links a.active {
+            background: #f0f4ff;
+            color: #1e3a8a;
+        }
+        
+        .mobile-menu-links a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .mobile-menu-links .beta-tag {
+            background: #ff9800;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            text-transform: uppercase;
         }
 
         .nav-links {
@@ -1128,6 +1297,7 @@
             align-items: center;
             gap: 20px;
             flex-shrink: 0;
+            padding-right: 16px;
         }
 
         .header-icon {
@@ -1178,7 +1348,83 @@
 
         /* Ajustar main-content para compensar header fixo */
         .main-content {
-            margin-top: 75px;
+            margin: 75px 0 0 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            background: #ffffff;
+            height: calc(100vh - 75px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Barra de pesquisa centralizada (responsiva) */
+        .search-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0; /* remover padding lateral */
+            background: #ffffff;
+            position: relative;
+        }
+        .search-box-hero {
+            width: 100%;
+            max-width: 720px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff; /* sem fundo cinza */
+            border: 1px solid #e6e9ef;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+        .search-box-hero i {
+            color: #64748b;
+            font-size: 16px;
+        }
+        .search-box-hero input {
+            flex: 1 1 auto;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 15px;
+            color: #0f172a;
+        }
+        .search-box-hero input::placeholder { color: #94a3b8; }
+        
+        /* Botão Nova Comunidade */
+        .btn-nova-comunidade {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: #1e3a8a;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .btn-nova-comunidade:hover {
+            background: #2740a6;
+            transform: translateY(calc(-50% - 1px));
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+        }
+        .btn-nova-comunidade:active {
+            transform: translateY(-50%);
+            box-shadow: 0 1px 3px rgba(30, 58, 138, 0.2);
+        }
+        .btn-nova-comunidade i {
+            font-size: 14px;
         }
 
         /* Evitar scroll desnecessário no body */
@@ -2047,25 +2293,30 @@
         /* Estilos para cards das comunidades - Seguindo padrão das outras abas */
         .cards-container {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 0;
+            box-shadow: none;
             overflow: hidden;
-            margin-top: 10px;
-            /* Ocupar exatamente o espaço restante da tela */
-            height: calc(100vh - 200px);
+            margin-top: 0;
+            padding: 0 24px 16px 24px;
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
             position: relative;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         .communities-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 8px;
-            padding: 8px;
-            overflow-y: auto;
+            padding: 8px 0 0 0;
+            overflow-y: visible;
             /* Ocupar todo o espaço do container */
-            height: 100%;
+            min-height: 100%;
             position: relative;
-            border-radius: 8px;
+            border-radius: 0;
             background: #fff;
             flex: 1 1 auto;
         }
@@ -2374,6 +2625,30 @@
                 width: 100%;
                 margin-left: 0;
                 margin-right: 0;
+                height: calc(100vh - 60px);
+            }
+            .search-wrapper {
+                padding: 12px 12px;
+            }
+            .search-box-hero {
+                max-width: calc(100% - 100px);
+                padding: 8px 10px;
+                height: 40px;
+            }
+            .search-box-hero input {
+                font-size: 13px;
+            }
+            .btn-nova-comunidade {
+                right: 12px;
+                padding: 0 12px;
+                height: 40px;
+                font-size: 11px;
+            }
+            .btn-nova-comunidade i {
+                font-size: 13px;
+            }
+            .cards-container {
+                padding: 0 12px 16px 12px;
             }
 
             /* Header responsivo */
@@ -2628,15 +2903,98 @@
             }
         }
 
-        /* Melhorias de scroll para mobile */
         @media (max-width: 768px) {
+            .top-header { 
+                padding: 0; 
+                height: 60px;
+            }
+            .header-left { 
+                padding-left: 12px; 
+                gap: 0;
+                flex: 0 0 auto;
+            }
+            .logo-section {
+                font-size: 18px;
+                gap: 8px;
+            }
+            .hamburger-menu {
+                display: flex;
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .header-right { 
+                padding-right: 12px; 
+                gap: 12px;
+            }
+            .header-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .search-wrapper { 
+                padding: 12px 16px; 
+                flex-wrap: nowrap;
+                justify-content: center;
+            }
+            .search-box-hero { 
+                padding: 10px 12px; 
+                width: 100%;
+                max-width: calc(100% - 120px);
+                min-width: 0;
+                flex: 1;
+                height: 44px;
+                box-sizing: border-box;
+            }
+            .search-box-hero input { 
+                font-size: 14px; 
+                min-width: 0;
+            }
+            .btn-nova-comunidade {
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: auto;
+                padding: 0 14px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                margin-top: 0;
+                flex-shrink: 0;
+                box-sizing: border-box;
+            }
+            .btn-nova-comunidade span {
+                display: none;
+            }
+            .btn-nova-comunidade i {
+                margin: 0;
+                font-size: 14px;
+            }
+            .main-content {
+                margin-top: 60px;
+                height: calc(100vh - 60px);
+            }
+
+        /* Melhorias de scroll para mobile */
+            .cards-container {
+                padding: 0 16px 16px 16px;
+                -webkit-overflow-scrolling: touch;
+            }
             .communities-grid {
                 -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
                 scroll-behavior: smooth;
-            }
-
-            .cards-container {
-                -webkit-overflow-scrolling: touch;
+                padding: 8px 0 0 0;
             }
 
             /* Melhorar área de toque para botões */
@@ -2649,8 +3007,7 @@
             }
 
             /* Melhorar área de toque para inputs */
-            .search-box input,
-            .filter-options select,
+            .search-box-hero input,
             .form-group input,
             .form-group select,
             .form-group textarea {
@@ -2674,6 +3031,9 @@
     <div class="top-header">
         <div class="header-left">
             <div class="logo-section">
+                <button class="hamburger-menu" id="hamburgerMenu" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <span style="font-size: 20px; font-weight: 600;">ParoquiaON</span>
             </div>
             <div class="nav-links">
@@ -2706,32 +3066,44 @@
         </div>
     </div>
 
+    <!-- Menu Lateral Mobile -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3>Menu</h3>
+            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Fechar menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-menu-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Minha Comunidade</a></li>
+            <li><a href="agenda.html"><i class="fas fa-calendar"></i> Agenda</a></li>
+            <li><a href="comunidades.html" class="active"><i class="fas fa-users"></i> Comunidades</a></li>
+            <li><a href="pastorais.html"><i class="fas fa-church"></i> Pastorais</a></li>
+            <li><a href="pilares.html"><i class="fas fa-layer-group"></i> Pilares</a></li>
+            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i> Locais</a></li>
+            <li><a href="acoes.html"><i class="fas fa-tasks"></i> Ações</a></li>
+            <li><a href="pessoas.html"><i class="fas fa-user-friends"></i> Pessoas</a></li>
+            <li><a href="usuarios.html"><i class="fas fa-user-cog"></i> Usuários</a></li>
+            <li><a href="perfil.html"><i class="fas fa-user-circle"></i> Perfil</a></li>
+            <li><a href="recebimento.html"><i class="fas fa-file-invoice-dollar"></i> Recebimento</a></li>
+            <li><a href="conferencia.html"><i class="fas fa-clipboard-check"></i> Conferência</a></li>
+            <li><a href="dinamico.html"><i class="fas fa-chart-line"></i> Dinâmico <span class="beta-tag">beta</span></a></li>
+        </ul>
+    </div>
+
     <!-- Main Content -->
     <div class="main-content">
-            <!-- Filters -->
-            <div class="filters-container" style="display:flex; align-items:center; justify-content:space-between; gap:12px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); padding: 16px 20px; margin-bottom: 20px;">
-                <div class="filters-left" style="display:flex; flex-direction:column;">
-                    <span style="font-size:18px; font-weight:600; color:#333;">Comunidade</span>
-                    <span style="font-size:12px; color:#666; margin-top:2px;">Gerencie todas as suas comunidades cadastradas</span>
-                </div>
-                <div class="filters-right" style="display:flex; align-items:center; gap:8px;">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Buscar comunidade...">
-                    </div>
-                    <div class="filter-options">
-                        <select style="min-width:120px;">
-                            <option value="">Status</option>
-                            <option value="ativo">Ativo</option>
-                            <option value="inativo">Inativo</option>
-                        </select>
-                    </div>
-                    <button class="btn-primary" onclick="openModal()" style="background:#1e3a8a; border-color:#1e3a8a;">
-                        <i class="fas fa-plus"></i>
-                        Nova Comunidade
-                    </button>
-                </div>
+        <div class="search-wrapper">
+            <div class="search-box-hero">
+                <i class="fas fa-search"></i>
+                <input id="searchComunidades" type="text" placeholder="Buscar comunidade..." aria-label="Buscar comunidades" />
             </div>
+            <button class="btn-nova-comunidade" onclick="openModal()" title="Cadastrar nova comunidade">
+                <i class="fas fa-plus"></i>
+                <span>Nova Comunidade</span>
+            </button>
+        </div>
 
         <!-- Cards Container -->
         <div class="cards-container">
@@ -3266,54 +3638,5 @@
         
     </script>
     <script src="scripts/navigation.js"></script>
-
-    <!-- Menu Mobile -->
-    <button class="mobile-menu-fab" id="mobileMenuFab">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <div class="mobile-menu-container" id="mobileMenuContainer">
-        <div class="mobile-menu-links">
-            <a href="index.html" class="mobile-menu-link">
-                <i class="fas fa-home"></i> Minha Comunidade
-            </a>
-            <a href="agenda.html" class="mobile-menu-link">
-                <i class="fas fa-calendar"></i> Agenda
-            </a>
-            <a href="comunidades.html" class="mobile-menu-link">
-                <i class="fas fa-users"></i> Comunidades
-            </a>
-            <a href="pastorais.html" class="mobile-menu-link">
-                <i class="fas fa-church"></i> Pastorais
-            </a>
-            <a href="pilares.html" class="mobile-menu-link">
-                <i class="fas fa-layer-group"></i> Pilares
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="locais.html" class="mobile-menu-link">
-                <i class="fas fa-map-marker-alt"></i> Locais
-            </a>
-            <a href="acoes.html" class="mobile-menu-link">
-                <i class="fas fa-tasks"></i> Ações
-            </a>
-            <a href="pessoas.html" class="mobile-menu-link">
-                <i class="fas fa-user-friends"></i> Pessoas
-            </a>
-            <a href="usuarios.html" class="mobile-menu-link">
-                <i class="fas fa-user-shield"></i> Usuários
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="dinamico.html" class="mobile-menu-link">
-                <i class="fas fa-chart-line"></i> Dinâmico <span style="font-size: 11px; color: #fbbf24; font-weight: bold;">BETA</span>
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="perfil.html" class="mobile-menu-link">
-                <i class="fas fa-user-circle"></i> Perfil
-            </a>
-        </div>
-    </div>
-
-    <!-- Scripts do Menu Mobile -->
-    <script src="scripts/mobile-menu.js"></script>
 </body>
 </html>
