@@ -2596,14 +2596,18 @@
             html, body {
                 overflow-x: hidden;
                 width: 100%;
-                margin: 0;
-                padding: 0;
+                max-width: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
             .main-content {
                 overflow-x: hidden;
                 margin-top: 60px;
                 height: calc(100vh - 60px);
+                padding: 0 !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
             }
 
             /* Header responsivo */
@@ -2646,12 +2650,12 @@
 
             /* Barra de pesquisa */
             .search-wrapper {
-                padding: 16px 4px;
+                padding: 16px 0;
             }
             .search-box-hero { 
                 padding: 10px 12px; 
                 width: 100%;
-                max-width: calc(100% - 100px);
+                max-width: calc(100% - 90px);
                 min-width: 0;
                 flex: 1;
                 height: 40px;
@@ -2663,11 +2667,11 @@
             }
             .btn-nova-comunidade {
                 position: absolute;
-                right: 4px;
+                right: 0;
                 top: 50%;
                 transform: translateY(-50%);
                 width: auto;
-                padding: 0 14px;
+                padding: 0 12px;
                 height: 40px;
                 display: flex;
                 align-items: center;
@@ -2685,17 +2689,17 @@
                 font-size: 14px;
             }
 
-            /* Lista de cards */
+            /* Lista de cards - zero padding lateral */
             .list-container {
-                padding: 0 4px 16px 4px;
+                padding: 0 0 16px 0 !important;
                 grid-template-columns: repeat(2, 1fr) !important;
-                gap: 8px;
+                gap: 4px;
             }
             
             /* Cards */
             .community-card {
                 padding: 10px;
-                margin: 0;
+                margin: 0 !important;
                 width: 100%;
                 box-sizing: border-box;
                 height: auto;
@@ -2756,18 +2760,20 @@
         /* Media Query: Mobile pequeno (max-width: 480px) */
         @media (max-width: 480px) {
             /* Corrigir barra branca à esquerda */
-            body {
-                margin: 0;
-                padding: 0;
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
                 overflow-x: hidden;
+                width: 100%;
+                max-width: 100%;
             }
 
             .main-content {
                 margin-top: 60px;
-                padding: 0;
+                padding: 0 !important;
                 width: 100%;
-                margin-left: 0;
-                margin-right: 0;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
                 height: calc(100vh - 60px);
             }
 
@@ -2783,10 +2789,10 @@
 
             /* Barra de pesquisa */
             .search-wrapper {
-                padding: 12px 4px;
+                padding: 12px 0;
             }
             .search-box-hero {
-                max-width: calc(100% - 90px);
+                max-width: calc(100% - 80px);
                 padding: 8px 10px;
                 height: 40px;
             }
@@ -2794,7 +2800,7 @@
                 font-size: 13px;
             }
             .btn-nova-comunidade {
-                right: 4px;
+                right: 0;
                 padding: 0 12px;
                 height: 40px;
                 font-size: 11px;
@@ -2803,17 +2809,17 @@
                 font-size: 13px;
             }
 
-            /* Lista de cards */
+            /* Lista de cards - zero padding lateral */
             .list-container {
-                padding: 0 4px 16px 4px;
+                padding: 0 0 16px 0 !important;
                 grid-template-columns: repeat(2, 1fr) !important;
-                gap: 8px;
+                gap: 4px;
             }
 
             /* Ajustar cards para mobile pequeno */
             .community-card {
                 padding: 8px;
-                margin: 0;
+                margin: 0 !important;
                 width: 100%;
                 box-sizing: border-box;
                 height: auto;
