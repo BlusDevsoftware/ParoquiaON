@@ -2582,6 +2582,180 @@
             font-weight: 500;
         }
 
+        /* Scroll personalizado para o grid */
+        .list-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        /* Media Query: Tablets e Mobile (max-width: 768px) */
+        @media (max-width: 768px) {
+            * {
+                box-sizing: border-box;
+            }
+
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .main-content {
+                overflow-x: hidden;
+                margin-top: 60px;
+                height: calc(100vh - 60px);
+            }
+
+            /* Header responsivo */
+            .top-header { 
+                padding: 0; 
+                height: 60px;
+            }
+            .header-left { 
+                padding-left: 12px; 
+                gap: 0;
+                flex: 0 0 auto;
+            }
+            .logo-section {
+                font-size: 18px;
+                gap: 8px;
+            }
+            .hamburger-menu {
+                display: flex;
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .header-right { 
+                padding-right: 12px; 
+                gap: 12px;
+            }
+            .header-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+
+            /* Barra de pesquisa */
+            .search-wrapper {
+                padding: 16px 12px;
+            }
+            .search-box-hero { 
+                padding: 10px 12px; 
+                width: 100%;
+                max-width: calc(100% - 120px);
+                min-width: 0;
+                flex: 1;
+                height: 40px;
+                box-sizing: border-box;
+            }
+            .search-box-hero input { 
+                font-size: 14px; 
+                min-width: 0;
+            }
+            .btn-nova-comunidade {
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: auto;
+                padding: 0 14px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                margin-top: 0;
+                flex-shrink: 0;
+                box-sizing: border-box;
+            }
+            .btn-nova-comunidade span {
+                display: none;
+            }
+            .btn-nova-comunidade i {
+                margin: 0;
+                font-size: 14px;
+            }
+
+            /* Lista de cards */
+            .list-container {
+                padding: 0 6px 16px 6px;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px;
+                width: calc(100% - 12px);
+                max-width: calc(100% - 12px);
+            }
+            
+            /* Cards */
+            .community-card {
+                padding: 10px;
+                margin: 0;
+                width: 100%;
+                box-sizing: border-box;
+                height: auto;
+                min-height: auto;
+            }
+            
+            .community-image {
+                height: 100px !important;
+            }
+            
+            .community-header h3 {
+                font-size: 16px !important;
+            }
+            
+            .community-info {
+                font-size: 12px !important;
+                margin-top: 8px;
+            }
+            
+            .community-info p {
+                margin: 4px 0 !important;
+                font-size: 11px !important;
+            }
+            
+            .community-actions {
+                margin-top: 10px;
+                display: flex;
+                gap: 6px;
+                flex-direction: row;
+            }
+            
+            .community-actions button {
+                flex: 1;
+                padding: 6px 8px;
+                font-size: 10px;
+                min-height: 36px;
+                touch-action: manipulation;
+            }
+
+            /* Melhorar área de toque para botões */
+            .btn-primary,
+            .btn-secondary,
+            .btn-delete {
+                min-height: 44px;
+                touch-action: manipulation;
+            }
+
+            /* Melhorar área de toque para inputs */
+            .search-box-hero input,
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                min-height: 44px;
+                touch-action: manipulation;
+            }
+        }
+
+        /* Media Query: Mobile pequeno (max-width: 480px) */
         @media (max-width: 480px) {
             /* Corrigir barra branca à esquerda */
             body {
@@ -2597,6 +2771,21 @@
                 margin-left: 0;
                 margin-right: 0;
                 height: calc(100vh - 60px);
+            }
+
+            /* Header responsivo */
+            .top-header {
+                padding: 0;
+                height: 60px;
+                width: 100%;
+                margin: 0;
+                left: 0;
+                right: 0;
+            }
+
+            /* Barra de pesquisa */
+            .search-wrapper {
+                padding: 12px 12px;
             }
             .search-box-hero {
                 max-width: calc(100% - 100px);
@@ -2615,23 +2804,17 @@
             .btn-nova-comunidade i {
                 font-size: 13px;
             }
+
+            /* Lista de cards */
             .list-container {
                 padding: 0 6px 16px 6px;
                 grid-template-columns: repeat(2, 1fr) !important;
                 gap: 10px;
+                width: calc(100% - 12px);
+                max-width: calc(100% - 12px);
             }
 
-            /* Header responsivo */
-            .top-header {
-                padding: 0;
-                height: 60px;
-                width: 100%;
-                margin: 0;
-                left: 0;
-                right: 0;
-            }
-
-            /* Ajustar cards para mobile pequeno - 2 colunas lado a lado */
+            /* Ajustar cards para mobile pequeno */
             .community-card {
                 padding: 8px;
                 margin: 0;
@@ -2715,182 +2898,6 @@
             }
         }
 
-        /* Responsividade para tablets pequenos (481px - 768px) - removido para usar mesmo padrão mobile */
-
-
-        /* Scroll personalizado para o grid */
-        .list-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        /* Prevenir overflow horizontal em mobile */
-        @media (max-width: 768px) {
-            * {
-                box-sizing: border-box;
-            }
-
-            html, body {
-                overflow-x: hidden;
-                width: 100%;
-                margin: 0;
-                padding: 0;
-            }
-
-            .main-content {
-                overflow-x: hidden;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .search-wrapper {
-                padding: 12px 12px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .top-header { 
-                padding: 0; 
-                height: 60px;
-            }
-            .header-left { 
-                padding-left: 12px; 
-                gap: 0;
-                flex: 0 0 auto;
-            }
-            .logo-section {
-                font-size: 18px;
-                gap: 8px;
-            }
-            .hamburger-menu {
-                display: flex;
-                width: 36px;
-                height: 36px;
-                font-size: 18px;
-            }
-            .nav-links {
-                display: none;
-            }
-            .header-right { 
-                padding-right: 12px; 
-                gap: 12px;
-            }
-            .header-icon {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
-            .user-avatar {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
-            .search-box-hero { 
-                padding: 10px 12px; 
-                width: 100%;
-                max-width: calc(100% - 120px);
-                min-width: 0;
-                flex: 1;
-                height: 40px;
-                box-sizing: border-box;
-            }
-            .search-box-hero input { 
-                font-size: 14px; 
-                min-width: 0;
-            }
-            .btn-nova-comunidade {
-                position: absolute;
-                right: 16px;
-                top: 50%;
-                transform: translateY(-50%);
-                width: auto;
-                padding: 0 14px;
-                height: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 12px;
-                margin-top: 0;
-                flex-shrink: 0;
-                box-sizing: border-box;
-            }
-            .btn-nova-comunidade span {
-                display: none;
-            }
-            .btn-nova-comunidade i {
-                margin: 0;
-                font-size: 14px;
-            }
-            .main-content {
-                margin-top: 60px;
-                height: calc(100vh - 60px);
-            }
-            .list-container {
-                padding: 0 6px 16px 6px;
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 12px;
-            }
-            
-            /* Ajustar cards para mobile - 2 colunas lado a lado */
-            .community-card {
-                padding: 10px;
-                margin: 0;
-                width: 100%;
-                box-sizing: border-box;
-                height: auto;
-                min-height: auto;
-            }
-            
-            .community-image {
-                height: 100px !important;
-            }
-            
-            .community-header h3 {
-                font-size: 16px !important;
-            }
-            
-            .community-info {
-                font-size: 12px !important;
-                margin-top: 8px;
-            }
-            
-            .community-info p {
-                margin: 4px 0 !important;
-                font-size: 11px !important;
-            }
-            
-            .community-actions {
-                margin-top: 10px;
-                display: flex;
-                gap: 6px;
-                flex-direction: row;
-            }
-            
-            .community-actions button {
-                flex: 1;
-                padding: 6px 8px;
-                font-size: 10px;
-                min-height: 36px;
-                touch-action: manipulation;
-            }
-
-            /* Melhorar área de toque para botões */
-            .btn-primary,
-            .btn-secondary,
-            .btn-delete {
-                min-height: 44px;
-                touch-action: manipulation;
-            }
-
-            /* Melhorar área de toque para inputs */
-            .search-box-hero input,
-            .form-group input,
-            .form-group select,
-            .form-group textarea {
-                min-height: 44px;
-                touch-action: manipulation;
-            }
-        }
-
         /* Lista (títulos + cards) */
         .list-container {
             padding: 0 24px 16px 24px;
@@ -2928,20 +2935,6 @@
         html, body { width: 100%; max-width: 100%; }
         *, *::before, *::after { box-sizing: border-box; }
         .top-header, .main-content, .search-wrapper { width: 100%; max-width: 100%; }
-        
-        @media (max-width: 768px) {
-            .list-container {
-                width: calc(100% - 12px);
-                max-width: calc(100% - 12px);
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .list-container {
-                width: calc(100% - 12px);
-                max-width: calc(100% - 12px);
-            }
-        }
     </style>
 </head>
 <body>
