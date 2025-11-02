@@ -161,6 +161,9 @@
         .btn-secondary:hover {
             background-color: #e0e0e0;
         }
+        /* Estado de carregamento do botão */
+        .btn-loading { opacity: .85; pointer-events: none; }
+        .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .9s linear infinite; display: inline-block; }
         .actions {
             white-space: nowrap !important;
             min-width: 110px;
@@ -169,34 +172,74 @@
             align-items: center;
             justify-content: center;
         }
-        .action-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
-            margin: 0 1px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            width: 30px;
-            height: 30px;
+        /* Botões de ação da lista (padrão visual unificado) */
+        .btn-icon {
+            width: 36px;
+            height: 36px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+            color: #334155;
+            transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease;
+            box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06);
+            cursor: pointer;
         }
-        .view-btn {
-            background-color: #0d6efd;
-            color: white;
+        .btn-icon i { font-size: 15px; color: currentColor; }
+        .btn-icon:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+            color: #1e3a8a;
+            box-shadow: 0 2px 6px rgba(30, 64, 175, 0.18);
+            border-color: rgba(30, 58, 138, 0.22);
         }
-        .edit-btn {
-            background-color: #198754;
-            color: white;
+        .btn-icon:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(2, 6, 23, 0.12) inset;
         }
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
+        .btn-icon:focus-visible {
+            outline: 3px solid rgba(59, 130, 246, 0.35);
+            outline-offset: 2px;
         }
-        .action-btn:hover {
-            opacity: 0.8;
+
+        /* Variações por ação (azul menu: #1e3a8a) */
+        .btn-icon.btn-edit,
+        .btn-icon.btn-view {
+            background: #1e3a8a;
+            color: #ffffff;
+            border-color: #1e3a8a;
+            box-shadow: 0 1px 2px rgba(30, 58, 138, 0.25);
+        }
+        .btn-icon.btn-edit:hover,
+        .btn-icon.btn-view:hover {
+            background: #2740a6;
+            color: #ffffff;
+            border-color: #2740a6;
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.35);
+        }
+        .btn-icon.btn-edit:active,
+        .btn-icon.btn-view:active {
+            background: #1b3780;
+            border-color: #1b3780;
+        }
+
+        .btn-icon.btn-delete {
+            background: #b91c1c;
+            color: #ffffff;
+            border-color: #b91c1c;
+            box-shadow: 0 1px 2px rgba(185, 28, 28, 0.25);
+        }
+        .btn-icon.btn-delete:hover {
+            background: #991b1b;
+            color: #ffffff;
+            border-color: #991b1b;
+            box-shadow: 0 2px 8px rgba(185, 28, 28, 0.35);
+        }
+        .btn-icon.btn-delete:active {
+            background: #7f1d1d;
+            border-color: #7f1d1d;
         }
         .modal-header-actions {
             display: flex;
@@ -1029,15 +1072,17 @@
             position: relative;
         }
         .search-box-hero {
-            width: 100%;
-            max-width: 720px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #ffffff; /* sem fundo cinza */
-            border: 1px solid #e6e9ef;
-            border-radius: 8px;
-            padding: 12px 14px;
+            width: 100% !important;
+            max-width: 720px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            background: #ffffff !important; /* sem fundo cinza */
+            border: 1px solid #e6e9ef !important;
+            border-radius: 8px !important;
+            padding: 12px 14px !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
         }
         .search-box-hero i {
             color: #64748b;
@@ -1055,23 +1100,27 @@
         
         /* Botão Nova Pessoa */
         .btn-nova-pessoa {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 20px;
-            background: #1e3a8a;
-            color: #ffffff;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            padding: 12px 20px !important;
+            background: #1e3a8a !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 6px !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            white-space: nowrap !important;
+            position: absolute !important;
+            right: 12px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+            width: auto !important;
+            height: auto !important;
         }
         .btn-nova-pessoa:hover {
             background: #2740a6;
@@ -1571,10 +1620,10 @@
                 <div>${telefone}</div>
                 <div>${endereco}</div>
                 <div style="text-align:center;"><span class="status ${statusClass}">${statusText}</span></div>
-                <div class="actions" style="white-space: nowrap; min-width: 110px; height: 100%; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                    <button class="action-btn view-btn" onclick="visualizarPessoa?.('${id}')" title="Visualizar"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn edit-btn" onclick="editarPessoa?.('${id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete-btn" onclick="excluirPessoa?.('${id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                <div style="display:flex; gap:8px; justify-content:center;">
+                    <button class="btn-icon btn-view" onclick="visualizarPessoa?.('${id}')" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
+                    <button class="btn-icon btn-edit" onclick="editarPessoa?.('${id}')" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon btn-delete" onclick="excluirPessoa?.('${id}')" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;
             return el;

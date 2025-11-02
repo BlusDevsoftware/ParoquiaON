@@ -173,34 +173,77 @@
             align-items: center;
             justify-content: center;
         }
-        .action-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
-            margin: 0 1px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            width: 30px;
-            height: 30px;
+        /* Botões de ação da lista (padrão visual unificado) */
+        .btn-icon {
+            width: 36px;
+            height: 36px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+            color: #334155;
+            transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease;
+            box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06);
+            cursor: pointer;
         }
-        .view-btn {
-            background-color: #0d6efd;
-            color: white;
+        .btn-icon i { font-size: 15px; color: currentColor; }
+        .btn-icon:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+            color: #1e3a8a;
+            box-shadow: 0 2px 6px rgba(30, 64, 175, 0.18);
+            border-color: rgba(30, 58, 138, 0.22);
         }
-        .edit-btn {
-            background-color: #198754;
-            color: white;
+        .btn-icon:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(2, 6, 23, 0.12) inset;
         }
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
+        .btn-icon:focus-visible {
+            outline: 3px solid rgba(59, 130, 246, 0.35);
+            outline-offset: 2px;
         }
-        .action-btn:hover {
-            opacity: 0.8;
+
+        /* Variações por ação (azul menu: #1e3a8a) */
+        .btn-icon.btn-edit,
+        .btn-icon.btn-view,
+        .btn-icon.btn-duplicate {
+            background: #1e3a8a;
+            color: #ffffff;
+            border-color: #1e3a8a;
+            box-shadow: 0 1px 2px rgba(30, 58, 138, 0.25);
+        }
+        .btn-icon.btn-edit:hover,
+        .btn-icon.btn-view:hover,
+        .btn-icon.btn-duplicate:hover {
+            background: #2740a6;
+            color: #ffffff;
+            border-color: #2740a6;
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.35);
+        }
+        .btn-icon.btn-edit:active,
+        .btn-icon.btn-view:active,
+        .btn-icon.btn-duplicate:active {
+            background: #1b3780;
+            border-color: #1b3780;
+        }
+
+        .btn-icon.btn-delete {
+            background: #b91c1c;
+            color: #ffffff;
+            border-color: #b91c1c;
+            box-shadow: 0 1px 2px rgba(185, 28, 28, 0.25);
+        }
+        .btn-icon.btn-delete:hover {
+            background: #991b1b;
+            color: #ffffff;
+            border-color: #991b1b;
+            box-shadow: 0 2px 8px rgba(185, 28, 28, 0.35);
+        }
+        .btn-icon.btn-delete:active {
+            background: #7f1d1d;
+            border-color: #7f1d1d;
         }
         .modal-header-actions {
             display: flex;
@@ -327,14 +370,6 @@
         .grid-row:hover { background: #f5f8ff; box-shadow: 0 1px 4px rgba(30,58,138,0.06); }
         .grid-row > div:nth-child(4) { display: flex; justify-content: center; align-items: center; }
         .grid-cell-actions { display: flex; gap: 8px; justify-content: center; align-items: center; }
-        .btn-icon { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%); color: #334155; transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease; box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06); }
-        .btn-icon i { font-size: 15px; color: currentColor; }
-        .btn-icon:hover { transform: translateY(-1px); background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); color: #1e3a8a; box-shadow: 0 2px 6px rgba(30, 64, 175, 0.18); border-color: rgba(30, 58, 138, 0.22); }
-        .btn-icon:active { transform: translateY(0); box-shadow: 0 1px 3px rgba(2, 6, 23, 0.12) inset; }
-        .btn-icon.btn-edit, .btn-icon.btn-duplicate { background: #1e3a8a; color: #fff; border-color: #1e3a8a; box-shadow: 0 1px 2px rgba(30,58,138,0.25); }
-        .btn-icon.btn-edit:hover, .btn-icon.btn-duplicate:hover { background: #2740a6; color: #fff; border-color: #2740a6; box-shadow: 0 2px 8px rgba(30,58,138,0.35); }
-        .btn-icon.btn-delete { background: #b91c1c; color: #fff; border-color: #b91c1c; box-shadow: 0 1px 2px rgba(185,28,28,0.25); }
-        .btn-icon.btn-delete:hover { background: #991b1b; color: #fff; border-color: #991b1b; box-shadow: 0 2px 8px rgba(185,28,28,0.35); }
 
         .usuario-card {
             background: white;
@@ -416,12 +451,6 @@
         .grid-row:hover { background: #f5f8ff; box-shadow: 0 1px 4px rgba(30,58,138,0.06); }
         .grid-row > div:nth-child(4) { display: flex; justify-content: center; align-items: center; }
         .grid-cell-actions { display: flex; gap: 8px; justify-content: center; align-items: center; }
-        .btn-icon { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%); color: #334155; transition: transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s thorough, border-color .15s ease; box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06); }
-        .btn-icon i { font-size: 15px; color: currentColor; }
-        .btn-icon:hover { transform: translateY(-1px); background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%); box-shadow: 0 4px 8px rgba(2, 6, 23, 0.1); border-color: rgba(0,0,0,0.1); }
-        .btn-edit:hover { color: #059669; border-color: rgba(5,150,105,0.2); background: linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 100%); }
-        .btn-duplicate:hover { color: #7c3aed; border-color: rgba(124,58,237,0.2); background: linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%); }
-        .btn-delete:hover { color: #dc2626; border-color: rgba(220,38,38,0.2); background: linear-gradient(180deg, #fef2f2 0%, #fee2e2 100%); }
 
         /* Spinner de carregamento - IDÊNTICO AO DA ABA DE COLABORADORES */
         @keyframes spin {
@@ -1622,10 +1651,10 @@
                 <div>${login}</div>
                 <div>${perfilNome}</div>
                 <div style="text-align:center;"><span class="status ${statusClass}">${statusText}</span></div>
-                <div class="actions" style="white-space: nowrap; min-width: 110px; height: 100%; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                    <button class="action-btn view-btn" onclick="visualizarUsuario?.('${id}')" title="Visualizar"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn edit-btn" onclick="editarUsuario?.('${id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete-btn" onclick="openDeleteUsuarioModal?.('${id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                <div style="display:flex; gap:8px; justify-content:center;">
+                    <button class="btn-icon btn-view" onclick="visualizarUsuario?.('${id}')" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
+                    <button class="btn-icon btn-edit" onclick="editarUsuario?.('${id}')" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon btn-delete" onclick="openDeleteUsuarioModal?.('${id}')" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;
             return el;
