@@ -1378,7 +1378,7 @@
             justify-content: center;
             align-items: center;
             gap: 16px;
-            padding: 16px 0; /* remover padding lateral */
+            padding: 16px 0;
             background: #ffffff;
             position: relative;
         }
@@ -1439,18 +1439,6 @@
         .btn-nova-comunidade i {
             font-size: 14px;
         }
-
-        /* Evitar scroll desnecessário no body */
-        body {
-            margin: 0; /* remove margem padrão do navegador */
-            overflow-x: hidden;
-            overflow-y: hidden; /* rolagem apenas dentro da lista */
-            background: #ffffff;
-        }
-        /* Garantir cálculo de largura sem causar overflow e travar largura ao viewport */
-        html, body { width: 100%; max-width: 100%; }
-        *, *::before, *::after { box-sizing: border-box; }
-        .top-header, .main-content, .search-wrapper, .list-container { width: 100%; max-width: 100%; }
 
         .toast {
             background: white;
@@ -2304,22 +2292,6 @@
             border: 1px dashed #ddd;
         }
 
-        /* Lista (títulos + cards) */
-        .list-container {
-            padding: 0 24px 16px 24px;
-            margin: 0;
-            background: #ffffff;
-            flex: 1 1 auto;
-            overflow-y: auto;
-            overflow-x: hidden;
-            position: relative;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 8px;
-        }
 
         .community-card {
             background: white;
@@ -2610,7 +2582,6 @@
             font-weight: 500;
         }
 
-        /* Responsividade para celular - Telas pequenas (até 480px) */
         @media (max-width: 480px) {
             /* Corrigir barra branca à esquerda */
             body {
@@ -2626,9 +2597,6 @@
                 margin-left: 0;
                 margin-right: 0;
                 height: calc(100vh - 60px);
-            }
-            .search-wrapper {
-                padding: 12px 12px;
             }
             .search-box-hero {
                 max-width: calc(100% - 100px);
@@ -2649,11 +2617,13 @@
             }
             .list-container {
                 padding: 0 12px 16px 12px;
+                grid-template-columns: 1fr !important;
+                gap: 10px;
             }
 
             /* Header responsivo */
             .top-header {
-                padding: 10px 15px;
+                padding: 0;
                 height: 60px;
                 width: 100%;
                 margin: 0;
@@ -2661,90 +2631,49 @@
                 right: 0;
             }
 
-
-            .search-box {
-                max-width: none;
-                width: 100%;
-                margin: 0;
-            }
-
-            .search-box input {
-                font-size: 16px; /* Evita zoom no iOS */
-                padding: 12px 12px 12px 40px;
-                width: 100%;
-                box-sizing: border-box;
-                height: 44px;
-            }
-
-            .filter-options {
-                width: 100%;
-                margin: 0;
-            }
-
-            .filter-options select {
-                width: 100%;
-                padding: 12px;
-                font-size: 16px;
-                box-sizing: border-box;
-            }
-
-            .btn-primary {
-                width: 100%;
-                padding: 12px;
-                font-size: 16px;
-                justify-content: center;
-                margin: 0;
-            }
-
-            .list-container {
-                margin-top: 0;
-                margin-left: 0;
-                margin-right: 0;
-                border-radius: 0;
-                box-shadow: none;
-                width: 100%;
-                box-sizing: border-box;
-                padding: 0 24px 16px 24px;
-            }
-
-            .list-container {
-                grid-template-columns: 1fr;
-                gap: 12px;
-                padding: 8px 24px 16px 24px;
-            }
-
-            /* Ajustar cards para mobile */
+            /* Ajustar cards para mobile pequeno - mais compactos */
             .community-card {
-                padding: 15px;
+                padding: 10px;
                 margin: 0;
                 width: 100%;
                 box-sizing: border-box;
+                height: auto;
+                min-height: auto;
             }
-
-            .community-card h3 {
-                font-size: 18px;
-                margin-bottom: 8px;
+            
+            .community-image {
+                height: 100px !important;
             }
-
+            
+            .community-header h3 {
+                font-size: 14px !important;
+                margin-top: 6px !important;
+            }
+            
             .community-info {
-                gap: 8px;
+                font-size: 11px !important;
+                margin-top: 6px;
             }
-
+            
             .community-info p {
-                font-size: 14px;
-                margin: 4px 0;
+                margin: 3px 0 !important;
+                font-size: 10px !important;
+                line-height: 1.4;
             }
-
+            
             .community-actions {
-                flex-direction: column;
-                gap: 8px;
-                margin-top: 12px;
+                margin-top: 8px;
+                display: flex;
+                gap: 4px;
+                flex-direction: row;
             }
-
+            
             .community-actions button {
-                width: 100%;
-                padding: 10px;
-                font-size: 14px;
+                flex: 1;
+                padding: 5px 6px;
+                font-size: 9px;
+                min-height: 32px;
+                touch-action: manipulation;
             }
 
             /* Modal responsivo */
@@ -2786,92 +2715,8 @@
             }
         }
 
-        /* Responsividade para tablets pequenos (481px - 768px) */
-        @media (min-width: 481px) and (max-width: 768px) {
-            /* Header responsivo para tablets */
-            .top-header {
-                padding: 12px 20px;
-                height: 70px;
-            }
+        /* Responsividade para tablets pequenos (481px - 768px) - removido para usar mesmo padrão mobile */
 
-            .header-left {
-                gap: 30px;
-            }
-
-            .logo-section h1 {
-                font-size: 20px;
-            }
-
-            .nav-links {
-                gap: 20px;
-            }
-
-            .nav-link {
-                font-size: 15px;
-                padding: 10px 15px;
-            }
-
-            .header-icon {
-                width: 40px;
-                height: 40px;
-            }
-
-            .main-content {
-                margin-top: 70px;
-                padding: 15px;
-            }
-
-
-            .search-box {
-                flex: 1;
-                min-width: 200px;
-            }
-
-            .filter-options {
-                flex-shrink: 0;
-            }
-
-            .btn-primary {
-                flex-shrink: 0;
-                min-width: 140px;
-            }
-
-            .list-container {
-                margin-top: 0;
-                border-radius: 0;
-                box-shadow: none;
-            }
-
-            .list-container {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                gap: 15px;
-                padding: 8px 16px 16px 16px;
-            }
-
-            .community-card {
-                padding: 18px;
-            }
-
-            .community-actions {
-                flex-direction: row;
-                gap: 10px;
-            }
-
-            .community-actions button {
-                flex: 1;
-                padding: 10px;
-            }
-        }
-
-        /* Responsividade para tablets grandes (769px - 1024px) */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .list-container {
-                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-                gap: 20px;
-                padding: 8px 24px 16px 24px;
-            }
-
-        }
 
         /* Scroll personalizado para o grid */
         .list-container::-webkit-scrollbar {
@@ -2893,6 +2738,12 @@
 
             .main-content {
                 overflow-x: hidden;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-wrapper {
+                padding: 12px 12px;
             }
         }
 
@@ -2933,18 +2784,13 @@
                 height: 36px;
                 font-size: 14px;
             }
-            .search-wrapper { 
-                padding: 12px 16px; 
-                flex-wrap: nowrap;
-                justify-content: center;
-            }
             .search-box-hero { 
                 padding: 10px 12px; 
                 width: 100%;
                 max-width: calc(100% - 120px);
                 min-width: 0;
                 flex: 1;
-                height: 44px;
+                height: 40px;
                 box-sizing: border-box;
             }
             .search-box-hero input { 
@@ -2958,7 +2804,7 @@
                 transform: translateY(-50%);
                 width: auto;
                 padding: 0 14px;
-                height: 44px;
+                height: 40px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -2980,15 +2826,59 @@
             }
             .list-container {
                 padding: 0 16px 16px 16px;
+                grid-template-columns: 1fr !important;
+                gap: 12px;
+            }
+            
+            /* Ajustar cards para mobile - 1 coluna */
+            .community-card {
+                padding: 12px;
+                margin: 0;
+                width: 100%;
+                box-sizing: border-box;
+                height: auto;
+                min-height: auto;
+            }
+            
+            .community-image {
+                height: 120px !important;
+            }
+            
+            .community-header h3 {
+                font-size: 16px !important;
+            }
+            
+            .community-info {
+                font-size: 12px !important;
+                margin-top: 8px;
+            }
+            
+            .community-info p {
+                margin: 4px 0 !important;
+                font-size: 11px !important;
+            }
+            
+            .community-actions {
+                margin-top: 10px;
+                display: flex;
+                gap: 6px;
+                flex-direction: row;
+            }
+            
+            .community-actions button {
+                flex: 1;
+                padding: 6px 8px;
+                font-size: 10px;
+                min-height: 36px;
+                touch-action: manipulation;
             }
 
             /* Melhorar área de toque para botões */
-            .community-actions button,
             .btn-primary,
             .btn-secondary,
             .btn-delete {
-                min-height: 44px; /* Tamanho mínimo recomendado para touch */
-                touch-action: manipulation; /* Evita zoom duplo toque */
+                min-height: 44px;
+                touch-action: manipulation;
             }
 
             /* Melhorar área de toque para inputs */
@@ -3001,6 +2891,23 @@
             }
         }
 
+        /* Lista (títulos + cards) */
+        .list-container {
+            padding: 0 24px 16px 24px;
+            margin: 0;
+            background: #ffffff;
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 8px;
+        }
+
         .list-container::-webkit-scrollbar-thumb {
             background: #c1c1c1;
             border-radius: 4px;
@@ -3009,6 +2916,18 @@
         .list-container::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
+
+        /* Evitar scroll desnecessário no body */
+        body {
+            margin: 0; /* remove margem padrão do navegador */
+            overflow-x: hidden;
+            overflow-y: hidden; /* rolagem apenas dentro da lista */
+            background: #ffffff;
+        }
+        /* Garantir cálculo de largura sem causar overflow e travar largura ao viewport */
+        html, body { width: 100%; max-width: 100%; }
+        *, *::before, *::after { box-sizing: border-box; }
+        .top-header, .main-content, .search-wrapper, .list-container { width: 100%; max-width: 100%; }
     </style>
 </head>
 <body>
