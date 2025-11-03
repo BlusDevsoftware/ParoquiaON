@@ -1102,6 +1102,8 @@
             overflow-y: hidden; /* rolagem apenas dentro da lista */
             background: #ffffff;
         }
+        /* Bloquear scroll quando modal estiver aberto */
+        html.modal-open, body.modal-open { overflow: hidden !important; }
         /* Garantir cálculo de largura sem causar overflow e travar largura ao viewport */
         html, body { width: 100%; max-width: 100%; }
         *, *::before, *::after { box-sizing: border-box; }
