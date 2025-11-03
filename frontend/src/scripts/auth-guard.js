@@ -2,9 +2,16 @@
  * Sistema de Proteção de Rotas - Auth Guard (cópia para /src/scripts)
  */
 
-// Early redirect: se não autenticado e não for a tela de login, redireciona
+// Desabilitar autenticação (toggle temporário)
+const AUTH_DISABLED = true;
+
+// Early redirect: se não autenticado e não for a tela de login, redireciona (desativado se AUTH_DISABLED)
 (function earlyAuthRedirect(){
     try {
+        if (AUTH_DISABLED) {
+            console.log('[AuthGuard] Login system disabled - no redirects to login page');
+            return;
+        }
         const loginPage = 'login.html';
         const currentPage = window.location.pathname.split('/').pop();
         if (currentPage === loginPage) return;
@@ -56,13 +63,16 @@ class AuthGuard {
     }
 
     async checkAuthentication() {
+        if (AUTH_DISABLED) {
+            console.log('[AuthGuard] Login system disabled - authentication check bypassed');
+            return true;
+        }
         const onLogin = window.location.pathname.split('/').pop() === this.LOGIN_PAGE;
         const hasSession = this.isAuthenticated();
         if (!hasSession) {
             if (!this.isLoginPage()) this.redirectToLogin();
             return false;
         }
-        // Valida token com backend (opcional, silencioso)
         try {
             const ok = await this.validateToken();
             if (!ok) {
@@ -91,6 +101,10 @@ class AuthGuard {
     }
 
     redirectToLogin() {
+        if (AUTH_DISABLED) {
+            console.log('[AuthGuard] Login system disabled - redirect to login blocked');
+            return;
+        }
         const pathname = window.location.pathname || '/index.html';
         const isVercel = /vercel\.app$/i.test(window.location.hostname);
         const loginTarget = isVercel ? '/login' : 'login.html';
