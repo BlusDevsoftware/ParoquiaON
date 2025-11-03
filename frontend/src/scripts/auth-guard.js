@@ -2,12 +2,19 @@
  * Sistema de Proteção de Rotas - Auth Guard (cópia para /src/scripts)
  */
 
-// Early redirect disabled - login system removed
+// Early redirect: se não autenticado e não for a tela de login, redireciona
 (function earlyAuthRedirect(){
     try {
-        // Login system disabled - no redirects
-        console.log('[AuthGuard] Login system disabled - no redirects to login page');
-        return;
+        const loginPage = 'login.html';
+        const currentPage = window.location.pathname.split('/').pop();
+        if (currentPage === loginPage) return;
+        const token = sessionStorage.getItem('token');
+        const user = sessionStorage.getItem('user');
+        if (!token || !user) {
+            console.log('[AuthGuard] Não autenticado - redirecionando para login');
+            const redirectUrl = `${loginPage}?redirect=${encodeURIComponent(window.location.pathname.split('/').pop() || 'index.html')}`;
+            window.location.href = redirectUrl;
+        }
     } catch(_) {}
 })();
 
@@ -44,8 +51,21 @@ class AuthGuard {
     }
 
     async checkAuthentication() {
-        // Login system disabled - always return true
-        console.log('[AuthGuard] Login system disabled - authentication check bypassed');
+        const onLogin = window.location.pathname.split('/').pop() === this.LOGIN_PAGE;
+        const hasSession = this.isAuthenticated();
+        if (!hasSession) {
+            if (!onLogin) this.redirectToLogin();
+            return false;
+        }
+        // Valida token com backend (opcional, silencioso)
+        try {
+            const ok = await this.validateToken();
+            if (!ok) {
+                this.logout();
+                if (!onLogin) this.redirectToLogin();
+                return false;
+            }
+        } catch(_) {}
         return true;
     }
 
@@ -66,9 +86,9 @@ class AuthGuard {
     }
 
     redirectToLogin() {
-        // Login system disabled - no redirects
-        console.log('[AuthGuard] Login system disabled - redirect to login blocked');
-        return;
+        const current = window.location.pathname.split('/').pop() || 'index.html';
+        const target = `${this.LOGIN_PAGE}?redirect=${encodeURIComponent(current)}`;
+        window.location.href = target;
     }
 
     logout() {
@@ -103,9 +123,13 @@ class AuthGuard {
     }
 
     redirectAfterLogin() {
-        // Login system disabled - redirect to index
-        console.log('[AuthGuard] Login system disabled - redirecting to index');
-        window.location.href = 'index.html';
+        const params = new URLSearchParams(window.location.search);
+        const next = params.get('redirect');
+        window.location.href = next || 'index.html';
+    }
+
+    async protectPage() {
+        return this.checkAuthentication();
     }
 
     getAuthHeaders() {
