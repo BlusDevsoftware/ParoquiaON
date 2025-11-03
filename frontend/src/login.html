@@ -64,9 +64,9 @@
             <!-- Formulário de Login Normal -->
             <form action="/login" method="POST" class="login-form" id="loginForm">
                 <div class="form-group">
-                    <label for="usuario">Usuário</label>
+                    <label for="usuario">Usuário ou E-mail</label>
                     <div class="input-group">
-                        <input type="text" id="usuario" name="usuario" placeholder="Digite seu usuário" required>
+                        <input type="text" id="usuario" name="usuario" placeholder="Digite seu usuário ou e-mail" required>
                         <i class="input-icon fas fa-user"></i>
                     </div>
                 </div>
@@ -271,7 +271,7 @@
         document.querySelector('.login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('usuario').value;
+            const identificador = document.getElementById('usuario').value;
             const senha = document.getElementById('senha').value;
             const btnEntrar = document.querySelector('.btn-entrar');
             const btnText = document.querySelector('.btn-text');
@@ -291,22 +291,22 @@
             btnText.textContent = 'Entrando...';
             
             try {
-                console.log('Tentando fazer login...', { email });
+                console.log('Tentando fazer login...', { identificador });
                 const response = await fetch('https://api-paroquiaon.vercel.app/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ email, senha })
+                    body: JSON.stringify({ email: identificador, emailOrUsername: identificador, senha })
                 });
 
                 console.log('Status da resposta:', response.status);
                 if (response.ok) {
                     const data = await response.json();
-                    
-                    // Verificar se é primeiro acesso (senha temporária)
-                    if (data.requiresPasswordChange) {
-                        switchToPasswordChange(email);
+                    // Sinalizações possíveis de primeiro acesso
+                    const mustChange = !!(data.requiresPasswordChange || data.firstLogin || data.primeiroAcesso || data.passwordChangeRequired || data.user?.mustChangePassword);
+                    if (mustChange) {
+                        switchToPasswordChange(identificador);
                         return;
                     }
                     
@@ -318,8 +318,15 @@
                     const target = getFirstAllowedPage(data.user && data.user.permissoes);
                     setTimeout(() => { window.location.href = target; }, 250);
                 } else {
-                    const errorData = await response.json();
-                    
+                    let errorData;
+                    try { errorData = await response.json(); } catch(_) { errorData = {}; }
+                    // Primeiro acesso sinalizado via erro
+                    const msg = (errorData && (errorData.message || errorData.error || '')) || '';
+                    const looksFirstLogin = /primeiro acesso|alterar senha|senha temporária|password change required/i.test(msg);
+                    if ((response.status === 428 || response.status === 403) && looksFirstLogin) {
+                        switchToPasswordChange(identificador);
+                        return;
+                    }
                     // Tratamento específico para colaborador inativo
                     if (response.status === 403 && errorData.error && errorData.error.includes('inativo')) {
                         errorMessage.innerHTML = `
@@ -332,7 +339,7 @@
                         errorMessage.style.borderColor = '#f5c6cb';
                         errorMessage.style.color = '#721c24';
                     } else {
-                        errorMessage.textContent = errorData.message || errorData.error || 'Credenciais inválidas';
+                        errorMessage.textContent = msg || 'Credenciais inválidas';
                     }
                     
                     errorMessage.style.display = 'block';
@@ -413,7 +420,7 @@
                                 headers: {
                                     'Content-Type': 'application/json'
                                 },
-                                body: JSON.stringify({ email: currentUserEmail, senha: novaSenha })
+                                body: JSON.stringify({ email: currentUserEmail, emailOrUsername: currentUserEmail, senha: novaSenha })
                             });
                             
                             if (loginResponse.ok) {
