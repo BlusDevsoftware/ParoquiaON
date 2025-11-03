@@ -146,6 +146,7 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
 function sectionKeyToTitle(sectionKey) {
     const map = {
         'dashboard': 'Minha Comunidade',
+        'minha_comunidade': 'Minha Comunidade',
         'usuarios': 'Usuários',
         'pessoas': 'Pessoas',
         'comunidades': 'Comunidades',
