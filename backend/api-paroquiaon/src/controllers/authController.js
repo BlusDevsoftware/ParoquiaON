@@ -40,16 +40,27 @@ const login = async (req, res) => {
             .from('usuarios')
             .select(baseSelect)
             .eq('email', identificador)
-            .eq('ativo', true)
             .maybeSingle();
 
         const usuario = resp.data || null;
         const usuarioError = resp.error || null;
 
+        if (usuarioError) {
+            console.error('Supabase error fetching user by email:', usuarioError);
+        }
+
         if (usuarioError || !usuario) {
             return res.status(401).json({
                 error: 'Credenciais inválidas',
                 code: 'INVALID_CREDENTIALS'
+            });
+        }
+
+        // Checar ativo no app layer para evitar falhas do filtro no PostgREST
+        if (usuario.ativo === false) {
+            return res.status(403).json({
+                error: 'Usuário inativo',
+                code: 'USER_INACTIVE'
             });
         }
 
