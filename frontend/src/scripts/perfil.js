@@ -239,11 +239,13 @@ window.perfisMemoria = [];
 
 // Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA DE COLABORADORES
 function mostrarSpinner() {
-    document.getElementById('loader-usuarios').style.display = 'flex';
+    const el = document.getElementById('loader-perfis') || document.getElementById('loader-usuarios');
+    if (el) el.style.display = 'flex';
 }
 
 function ocultarSpinner() {
-    document.getElementById('loader-usuarios').style.display = 'none';
+    const el = document.getElementById('loader-perfis') || document.getElementById('loader-usuarios');
+    if (el) el.style.display = 'none';
 }
 
 // Função para mostrar modal de sucesso
