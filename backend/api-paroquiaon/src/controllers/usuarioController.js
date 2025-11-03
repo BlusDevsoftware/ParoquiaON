@@ -56,20 +56,23 @@ async function listarUsuarios(req, res) {
                     perfilNome = perfil?.nome || null;
                 }
                 
-                // Buscar nome da pessoa se pessoa_id existir
+                // Buscar dados da pessoa se pessoa_id existir
                 if (usuario.pessoa_id) {
                     const { data: pessoa } = await supabase
                         .from('pessoas')
-                        .select('nome')
+                        .select('nome, foto')
                         .eq('id', usuario.pessoa_id)
                         .single();
                     pessoaNome = pessoa?.nome || null;
+                    // Anexa foto da pessoa para uso como avatar
+                    usuario.pessoaFoto = pessoa?.foto || null;
                 }
                 
                 return {
                     ...usuario,
                     perfilNome,
-                    pessoaNome
+                    pessoaNome,
+                    pessoaFoto: usuario.pessoaFoto || null
                 };
             })
         );
