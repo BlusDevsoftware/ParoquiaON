@@ -21,6 +21,7 @@
 class AuthGuard {
     constructor() {
         this.LOGIN_PAGE = 'login.html';
+        this.LOGIN_PATHS = ['login.html', 'login', '/login'];
         this.TOKEN_KEY = 'token';
         this.USER_KEY = 'user';
         this.init();
@@ -32,10 +33,14 @@ class AuthGuard {
         }
     }
 
+    isLoginPage() {
+        const pathname = window.location.pathname || '';
+        const last = pathname.split('/').pop();
+        return this.LOGIN_PATHS.some(p => pathname.endsWith(p) || last === p);
+    }
+
     isProtectedPage() {
-        const currentPage = window.location.pathname.split('/').pop();
-        // Protect all pages except the login page
-        return currentPage !== this.LOGIN_PAGE;
+        return !this.isLoginPage();
     }
 
     isAuthenticated() {
@@ -54,7 +59,7 @@ class AuthGuard {
         const onLogin = window.location.pathname.split('/').pop() === this.LOGIN_PAGE;
         const hasSession = this.isAuthenticated();
         if (!hasSession) {
-            if (!onLogin) this.redirectToLogin();
+            if (!this.isLoginPage()) this.redirectToLogin();
             return false;
         }
         // Valida token com backend (opcional, silencioso)
@@ -62,7 +67,7 @@ class AuthGuard {
             const ok = await this.validateToken();
             if (!ok) {
                 this.logout();
-                if (!onLogin) this.redirectToLogin();
+                if (!this.isLoginPage()) this.redirectToLogin();
                 return false;
             }
         } catch(_) {}
@@ -86,8 +91,12 @@ class AuthGuard {
     }
 
     redirectToLogin() {
-        const current = window.location.pathname.split('/').pop() || 'index.html';
-        const target = `${this.LOGIN_PAGE}?redirect=${encodeURIComponent(current)}`;
+        const pathname = window.location.pathname || '/index.html';
+        const isVercel = /vercel\.app$/i.test(window.location.hostname);
+        const loginTarget = isVercel ? '/login' : 'login.html';
+        const current = pathname && pathname !== '/' ? pathname : 'index.html';
+        const joiner = loginTarget.includes('?') ? '&' : '?';
+        const target = `${loginTarget}${joiner}redirect=${encodeURIComponent(current)}`;
         window.location.href = target;
     }
 
