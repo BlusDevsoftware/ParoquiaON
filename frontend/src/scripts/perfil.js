@@ -473,8 +473,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Mostrar spinner centralizado ao iniciar
         mostrarSpinner();
         
-        // Carregar dados de perfis via API
-        await carregarPerfis();
+        // Carregar dados de perfis via API (tabela legacy ou grid nova)
+        if (typeof window.carregarPerfisGrid === 'function') {
+            await window.carregarPerfisGrid();
+        } else {
+            await carregarPerfis();
+        }
         
         // Ocultar spinner centralizado quando tudo carregar
         ocultarSpinner();
@@ -760,7 +764,11 @@ async function salvarPerfil(e) {
             window.showSuccessModal();
         }
         closePerfilModal();
-        await carregarPerfis();
+        if (typeof window.carregarPerfisGrid === 'function') {
+            await window.carregarPerfisGrid();
+        } else {
+            await carregarPerfis();
+        }
     } catch (error) {
         console.error('❌ FRONTEND - Erro ao salvar perfil:', error);
         console.error('❌ FRONTEND - Detalhes do erro:', error.response || error);
