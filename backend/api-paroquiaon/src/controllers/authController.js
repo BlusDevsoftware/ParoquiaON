@@ -24,6 +24,8 @@ const login = async (req, res) => {
                 email,
                 login,
                 senha,
+                senha_temporaria,
+                trocar_senha_proximo_login,
                 ativo,
                 ultimo_login,
                 perfis (
@@ -47,7 +49,7 @@ const login = async (req, res) => {
             .select(baseSelect)
             .eq('email', identificador)
             .eq('ativo', true)
-            .single();
+            .maybeSingle();
 
         if (!resp.error && resp.data) {
             usuario = resp.data;
@@ -58,12 +60,21 @@ const login = async (req, res) => {
                 .select(baseSelect)
                 .eq('login', identificador)
                 .eq('ativo', true)
-                .single();
+                .maybeSingle();
             usuario = resp.data || null;
             usuarioError = resp.error || null;
         }
 
+        // Log para debug (remover em produção)
+        console.log('🔍 Login attempt:', { 
+            identificador, 
+            usuarioFound: !!usuario,
+            error: usuarioError?.message || null,
+            hasTempPassword: !!usuario?.senha_temporaria
+        });
+
         if (usuarioError || !usuario) {
+            console.log('❌ Usuário não encontrado ou erro:', usuarioError);
             return res.status(401).json({
                 error: 'Credenciais inválidas',
                 code: 'INVALID_CREDENTIALS'
@@ -100,8 +111,23 @@ const login = async (req, res) => {
         }
 
         // Verificar senha normal (hash)
+        if (!usuario.senha) {
+            console.log('❌ Usuário sem senha cadastrada');
+            return res.status(401).json({
+                error: 'Credenciais inválidas',
+                code: 'INVALID_CREDENTIALS'
+            });
+        }
+
         const senhaValida = await bcrypt.compare(senha, usuario.senha);
+        console.log('🔐 Verificação de senha:', { 
+            senhaHashExists: !!usuario.senha,
+            senhaValida,
+            senhaLength: senha?.length || 0
+        });
+
         if (!senhaValida) {
+            console.log('❌ Senha inválida');
             return res.status(401).json({
                 error: 'Credenciais inválidas',
                 code: 'INVALID_CREDENTIALS'
