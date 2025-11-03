@@ -1572,15 +1572,22 @@
             return el;
         }
 
+        let perfisGridLoadVersion = 0;
+
         async function carregarPerfisGrid() {
+            const version = ++perfisGridLoadVersion;
             try {
                 perfisMostrarSpinner();
                 if (!perfisRows) return;
-                perfisRows.innerHTML = '';
 
                 const { data, error } = await window.api.get(window.endpoints.perfis.list);
                 if (error) throw error;
                 const lista = Array.isArray(data) ? data : [];
+
+                // Se outra chamada mais recente foi iniciada, abortar esta renderização
+                if (version !== perfisGridLoadVersion) {
+                    return;
+                }
 
                 // Aplicar busca se existir
                 const searchInput = document.getElementById('searchPerfis');
@@ -1592,6 +1599,9 @@
                         return nome.includes(searchTerm);
                     });
                 }
+
+                // Limpar somente antes de renderizar (após validar versão)
+                perfisRows.innerHTML = '';
 
                 if (listaFiltrada.length === 0) {
                     const empty = document.createElement('div');
