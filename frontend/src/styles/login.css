@@ -18,6 +18,37 @@ body {
     overflow-y: auto; /* permite rolagem quando o conteúdo for maior */
 }
 
+/* Remover rolagem apenas na página de login */
+html.login-page, body.login-page {
+    height: 100vh;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
+}
+
+/* Mobile: garantir que não haja scroll também em telas pequenas */
+@media (max-width: 768px) {
+    html.login-page, body.login-page {
+        height: 100dvh; /* viewport dinâmica em mobile */
+        overflow: hidden !important;
+        overscroll-behavior: none;
+        touch-action: none;
+    }
+
+    /* Fixar o body para impedir qualquer rolagem (iOS/Android) */
+    body.login-page {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+    }
+
+    .login-container {
+        height: 100%;
+        max-height: 100%;
+        overflow: hidden;
+    }
+}
+
 /* Formas decorativas */
 .shape {
     position: absolute;
