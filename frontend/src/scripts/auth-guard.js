@@ -3,7 +3,7 @@
  */
 
 // Desabilitar autenticação (toggle temporário)
-const AUTH_DISABLED = false;
+const AUTH_DISABLED = true;
 
 // Early redirect: se não autenticado e não for a tela de login, redireciona (desativado se AUTH_DISABLED)
 (function earlyAuthRedirect(){
@@ -121,6 +121,17 @@ class AuthGuard {
     }
 
     getCurrentUser() {
+        if (AUTH_DISABLED) {
+            // Retorna usuário padrão quando autenticação está desabilitada
+            return {
+                id: 1,
+                email: 'admin@paroquia.com',
+                login: 'admin',
+                nome: 'Administrador',
+                perfil: 'Administrador',
+                permissoes: {} // Permissões vazias - pode ajustar conforme necessário
+            };
+        }
         try {
             const userData = sessionStorage.getItem(this.USER_KEY);
             return userData ? JSON.parse(userData) : null;
@@ -152,6 +163,10 @@ class AuthGuard {
     }
 
     async protectPage() {
+        if (AUTH_DISABLED) {
+            console.log('[AuthGuard] Login system disabled - page protection bypassed');
+            return true;
+        }
         return this.checkAuthentication();
     }
 
