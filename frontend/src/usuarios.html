@@ -1286,10 +1286,7 @@
                             <label><i class="fas fa-envelope"></i> Email</label>
                             <input type="email" id="emailUsuario" name="emailUsuario" required placeholder="usuario@exemplo.com">
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-user"></i> Login</label>
-                            <input type="text" id="loginUsuario" name="loginUsuario" required placeholder="Digite o login">
-                        </div>
+                        <!-- Campo Login removido -->
                     </div>
 
                     <div class="form-row">
@@ -1571,7 +1568,6 @@
             // Preencher dados se for edição ou visualização
             if (usuario) {
                 form.emailUsuario.value = usuario.email || '';
-                form.loginUsuario.value = usuario.login || '';
                 if (usuario.perfil_id != null) form.perfilUsuario.value = String(usuario.perfil_id);
                 if (usuario.pessoa_id != null) form.pessoaUsuario.value = String(usuario.pessoa_id);
                 form.dataset.id = usuario.id || '';
@@ -1660,7 +1656,7 @@
 
         function createUsuarioRow(usuario) {
             const email = usuario?.email || '-';
-            const login = usuario?.login || '-';
+            const login = '-';
             const perfilNome = usuario?.perfilNome || '-';
             const ativo = usuario?.ativo !== false && (usuario?.status ? String(usuario.status).toLowerCase() === 'ativo' : true);
             const statusText = ativo ? 'Ativo' : 'Inativo';
@@ -1673,7 +1669,7 @@
                     <div style="width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;">${(login||email||'?').charAt(0).toUpperCase()}</div>
                 </div>
                 <div>${email}</div>
-                <div>${login}</div>
+                <div>-</div>
                 <div>${perfilNome}</div>
                 <div style="text-align:center;"><span class="status ${statusClass}">${statusText}</span></div>
                 <div style="display:flex; gap:8px; justify-content:center;">
@@ -1702,9 +1698,8 @@
                 if (searchTerm) {
                     listaFiltrada = lista.filter(u => {
                         const email = (u?.email || '').toLowerCase();
-                        const login = (u?.login || '').toLowerCase();
                         const perfilNome = (u?.perfilNome || '').toLowerCase();
-                        return email.includes(searchTerm) || login.includes(searchTerm) || perfilNome.includes(searchTerm);
+                        return email.includes(searchTerm) || perfilNome.includes(searchTerm);
                     });
                 }
 
@@ -1901,7 +1896,7 @@
                 openUsuarioModal('Novo Usuário');
                 const form = document.getElementById('usuarioForm');
                 form.emailUsuario.value = usuario?.email || '';
-                form.loginUsuario.value = `${usuario?.login || ''}_copia`;
+                // login removido
                 form.perfilUsuario.value = usuario?.perfil_id || '';
                 form.pessoaUsuario.value = usuario?.pessoa_id || '';
             } catch (e) {
@@ -1925,7 +1920,7 @@
             const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
             const payload = {
                 email: form.emailUsuario.value,
-                login: form.loginUsuario.value,
+                // login removido
                 perfil_id: form.perfilUsuario.value ? Number(form.perfilUsuario.value) : null,
                 pessoa_id: form.pessoaUsuario.value ? Number(form.pessoaUsuario.value) : null,
                 ativo: form.statusUsuario.value === 'ativo',
@@ -1941,13 +1936,12 @@
                 const currentId = isUpdate ? (Number(form.dataset.id) || String(form.dataset.id)) : null;
                 const lower = s => (s || '').trim().toLowerCase();
                 const dupEmail = payload.email ? lista.find(u => lower(u.email) === lower(payload.email) && (currentId == null || String(u.id ?? u.codigo) !== String(currentId))) : null;
-                const dupLogin = payload.login ? lista.find(u => lower(u.login) === lower(payload.login) && (currentId == null || String(u.id ?? u.codigo) !== String(currentId))) : null;
-                if (dupEmail || dupLogin) {
+                if (dupEmail) {
                     const ul = document.getElementById('duplicateUsuarioList');
                     if (ul) {
                         const items = [];
                         if (dupEmail) items.push('<li>Email já utilizado</li>');
-                        if (dupLogin) items.push('<li>Login (usuário) já utilizado</li>');
+                        // validação de login removida
                         ul.innerHTML = items.join('');
                     }
                     const modal = document.getElementById('duplicateUsuarioModal');
@@ -1969,9 +1963,8 @@
                     const { data: createData, error } = await window.api.post(window.endpoints.usuarios.create, createPayload);
                     if (error) throw error;
                     // Mostrar modal com credenciais geradas
-                    const login = payload.login;
                     const senhaTemporaria = createData?.senha_temporaria || createData?.senhaTemporaria || tempPass || 'Gerada pelo sistema';
-                    window.showSuccessModal(login, senhaTemporaria);
+                    window.showSuccessModal(payload.email, senhaTemporaria);
                 }
                 closeUsuarioModal();
                 carregarUsuarios();

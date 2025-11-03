@@ -18,16 +18,14 @@ function validarUsuario(dados, isUpdate = false) {
     
     if (!isUpdate) {
         if (!dados.email) erros.push('Email é obrigatório');
-        if (!dados.login) erros.push('Login é obrigatório');
+        // login não é mais obrigatório
     }
     
     if (dados.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) {
         erros.push('Email deve ter formato válido');
     }
     
-    if (dados.login && dados.login.length < 3) {
-        erros.push('Login deve ter pelo menos 3 caracteres');
-    }
+    // remover validação de login
     
     return erros;
 }
@@ -132,18 +130,7 @@ async function criarUsuario(req, res) {
             });
         }
         
-        // Verificar se login já existe
-        const { data: loginExistente, error: loginError } = await supabase
-            .from('usuarios')
-            .select('id')
-            .eq('login', dados.login)
-            .single();
-            
-        if (loginExistente) {
-            return res.status(400).json({ 
-                error: 'Login já está em uso' 
-            });
-        }
+        // não validar mais duplicidade de login
         
         // Gerar senha temporária e criptografar
         const senhaTemporaria = gerarSenhaTemporaria();
@@ -152,7 +139,6 @@ async function criarUsuario(req, res) {
         // Preparar dados básicos
         const dadosBasicos = {
             email: dados.email,
-            login: dados.login,
             senha: senhaCriptografada,
             pessoa_id: dados.pessoa_id || null,
             perfil_id: dados.perfil_id || null,
@@ -234,21 +220,7 @@ async function atualizarUsuario(req, res) {
             }
         }
         
-        // Verificar se login já existe (exceto para o próprio usuário)
-        if (dados.login) {
-            const { data: loginExistente, error: loginError } = await supabase
-                .from('usuarios')
-                .select('id')
-                .eq('login', dados.login)
-                .neq('id', id)
-                .single();
-                
-            if (loginExistente) {
-                return res.status(400).json({ 
-                    error: 'Login já está em uso' 
-                });
-            }
-        }
+        // não validar mais duplicidade de login em updates
         
         const { data, error } = await supabase
             .from('usuarios')
