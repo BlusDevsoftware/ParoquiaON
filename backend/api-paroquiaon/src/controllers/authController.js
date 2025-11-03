@@ -4,19 +4,20 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'paroquiaon-secret-key';
 
-// Função para fazer login
+// Função para fazer login (suporta email ou login e primeiro acesso com senha temporária)
 const login = async (req, res) => {
     try {
-        const { email, senha } = req.body;
+        const { email, emailOrUsername, senha } = req.body;
 
-        if (!email || !senha) {
+        const identificador = (emailOrUsername || email || '').trim();
+        if (!identificador || !senha) {
             return res.status(400).json({
                 error: 'Email e senha são obrigatórios',
                 code: 'MISSING_CREDENTIALS'
             });
         }
 
-        // Buscar usuário por email
+        // Buscar usuário por email OU login e incluir possíveis campos de primeiro acesso
         const { data: usuario, error: usuarioError } = await supabase
             .from('usuarios')
             .select(`
@@ -24,6 +25,8 @@ const login = async (req, res) => {
                 email,
                 login,
                 senha,
+                senha_temporaria,
+                trocar_senha_proximo_login,
                 ativo,
                 ultimo_login,
                 perfis (
@@ -38,7 +41,7 @@ const login = async (req, res) => {
                     email
                 )
             `)
-            .eq('email', email)
+            .or(`email.eq.${identificador},login.eq.${identificador}`)
             .eq('ativo', true)
             .single();
 
@@ -49,7 +52,36 @@ const login = async (req, res) => {
             });
         }
 
-        // Verificar senha
+        // Verificar primeiro acesso (senha temporária ou flag para trocar)
+        const hasTemp = !!usuario.senha_temporaria;
+        const mustChange = !!usuario.trocar_senha_proximo_login;
+
+        if (hasTemp || mustChange) {
+            // Se o usuário enviou a senha temporária correta, retornar sinalização de troca de senha
+            if (hasTemp && senha && String(senha) === String(usuario.senha_temporaria)) {
+                return res.status(200).json({
+                    success: true,
+                    requiresPasswordChange: true,
+                    user: {
+                        id: usuario.id,
+                        email: usuario.email,
+                        login: usuario.login,
+                        nome: usuario.pessoas?.nome,
+                        telefone: usuario.pessoas?.telefone,
+                        perfil: usuario.perfis?.nome,
+                        permissoes: usuario.perfis?.permissoes || {}
+                    }
+                });
+            }
+
+            // Caso tenha flag de trocar senha mas a senha enviada não é a temporária
+            return res.status(428).json({
+                error: 'Primeiro acesso: é necessário alterar a senha temporária',
+                code: 'PASSWORD_CHANGE_REQUIRED'
+            });
+        }
+
+        // Verificar senha normal (hash)
         const senhaValida = await bcrypt.compare(senha, usuario.senha);
         if (!senhaValida) {
             return res.status(401).json({
