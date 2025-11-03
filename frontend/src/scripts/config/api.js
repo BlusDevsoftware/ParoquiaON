@@ -174,7 +174,8 @@ const endpoints = {
     create: '/usuarios',
     get: (id) => `/usuarios/${id}`,
     update: (id) => `/usuarios/${id}`,
-    delete: (id) => `/usuarios/${id}`
+    delete: (id) => `/usuarios/${id}`,
+    resetPassword: (id) => `/usuarios/${id}/reset-password`
   },
 
   // Perfis

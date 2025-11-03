@@ -1269,9 +1269,6 @@
             <div class="modal-header">
                 <h2 id="usuarioModalTitle"><i class="fas fa-user-cog"></i> Novo Usuário</h2>
                 <div class="modal-header-actions">
-                    <button type="button" id="resetSenhaBtn" class="btn-secondary" title="Resetar senha do usuário" style="display:none">
-                        <i class="fas fa-key"></i> Resetar Senha
-                    </button>
                     <div class="status-toggle-modal">
                         <label class="switch-modal">
                             <input type="checkbox" id="statusToggleUsuarioModal" checked>
@@ -1319,6 +1316,9 @@
 
                     <input type="hidden" id="statusUsuario" name="statusUsuario" value="ativo">
                     <div class="form-actions">
+                        <button type="button" id="resetSenhaBtn" class="btn-secondary" title="Resetar senha do usuário" style="display:none">
+                            <i class="fas fa-key"></i> Resetar Senha
+                        </button>
                         <button type="button" class="btn-secondary" onclick="closeUsuarioModal()">Cancelar</button>
                         <button type="submit" class="btn-primary">Salvar</button>
                     </div>
@@ -1448,6 +1448,12 @@
         </div>
     </div>
     <script type="module">
+        function generateTemporaryPassword(length = 10) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%';
+            let out = '';
+            for (let i = 0; i < length; i++) out += chars[Math.floor(Math.random() * chars.length)];
+            return out;
+        }
         async function carregarPessoasParaUsuarios() {
             try {
                 const select = document.getElementById('pessoaUsuario');
@@ -1854,10 +1860,10 @@
                         resetBtn.disabled = true;
                         const original = resetBtn.innerHTML;
                         resetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetando...';
-                        const payload = { id, email, login };
-                        const { data, error } = await window.api.post(window.endpoints.auth.resetPassword, payload);
+                        const tempPass = generateTemporaryPassword();
+                        const updatePayload = { senha_temporaria: tempPass, trocar_senha_proximo_login: true };
+                        const { error } = await window.api.put(window.endpoints.usuarios.update(id), updatePayload);
                         if (error) throw error;
-                        const tempPass = data?.senha_temporaria || data?.senhaTemporaria || data?.temporaryPassword || 'Gerada';
                         window.showSuccessModal(login || email || '', tempPass);
                     } catch (e) {
                         alert('Erro ao resetar senha');
@@ -1958,11 +1964,13 @@
                     if (error) throw error;
                     window.showUpdateSuccessModal(payload.ativo ? 'Ativo' : 'Inativo');
                 } else {
-                    const { data: createData, error } = await window.api.post(window.endpoints.usuarios.create, payload);
+                    const tempPass = generateTemporaryPassword();
+                    const createPayload = { ...payload, senha_temporaria: tempPass, trocar_senha_proximo_login: true };
+                    const { data: createData, error } = await window.api.post(window.endpoints.usuarios.create, createPayload);
                     if (error) throw error;
                     // Mostrar modal com credenciais geradas
                     const login = payload.login;
-                    const senhaTemporaria = createData?.senha_temporaria || createData?.senhaTemporaria || 'Gerada pelo sistema';
+                    const senhaTemporaria = createData?.senha_temporaria || createData?.senhaTemporaria || tempPass || 'Gerada pelo sistema';
                     window.showSuccessModal(login, senhaTemporaria);
                 }
                 closeUsuarioModal();
