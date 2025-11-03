@@ -17,10 +17,9 @@ const login = async (req, res) => {
             });
         }
 
-        // Buscar usuário por email OU login e incluir possíveis campos de primeiro acesso
-        const { data: usuario, error: usuarioError } = await supabase
-            .from('usuarios')
-            .select(`
+        // Buscar usuário pelo identificador de forma determinística:
+        // 1) Tenta por email exato; 2) Se não encontrar, tenta por login exato
+        const baseSelect = `
                 id,
                 email,
                 login,
@@ -37,11 +36,32 @@ const login = async (req, res) => {
                     nome,
                     telefone,
                     email
-                )
-            `)
-            .or(`email.eq.${identificador},login.eq.${identificador}`)
+                )`;
+
+        let usuario = null;
+        let usuarioError = null;
+
+        // Tenta por email
+        let resp = await supabase
+            .from('usuarios')
+            .select(baseSelect)
+            .eq('email', identificador)
             .eq('ativo', true)
             .single();
+
+        if (!resp.error && resp.data) {
+            usuario = resp.data;
+        } else {
+            // Se não achou por email, tenta por login
+            resp = await supabase
+                .from('usuarios')
+                .select(baseSelect)
+                .eq('login', identificador)
+                .eq('ativo', true)
+                .single();
+            usuario = resp.data || null;
+            usuarioError = resp.error || null;
+        }
 
         if (usuarioError || !usuario) {
             return res.status(401).json({
