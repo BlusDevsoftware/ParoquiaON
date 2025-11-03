@@ -36,17 +36,35 @@ const login = async (req, res) => {
                 perfil_id,
                 pessoa_id`;
 
-        const resp = await supabase
+        let resp = await supabase
             .from('usuarios')
             .select(baseSelect)
             .eq('email', identificador)
             .maybeSingle();
 
-        const usuario = resp.data || null;
-        const usuarioError = resp.error || null;
+        let usuario = resp.data || null;
+        let usuarioError = resp.error || null;
 
         if (usuarioError) {
             console.error('Supabase error fetching user by email:', usuarioError);
+        }
+
+        // Fallback para PostgREST 400: tentar com limit(1) e array
+        if ((usuarioError && (usuarioError.code === 'PGRST100' || usuarioError.message)) || (!usuario && !usuarioError)) {
+            try {
+                const respArr = await supabase
+                    .from('usuarios')
+                    .select(baseSelect)
+                    .eq('email', identificador)
+                    .order('id', { ascending: true })
+                    .limit(1);
+                if (!respArr.error && Array.isArray(respArr.data) && respArr.data.length > 0) {
+                    usuario = respArr.data[0];
+                    usuarioError = null;
+                }
+            } catch (e) {
+                console.error('Fallback fetch error:', e);
+            }
         }
 
         if (usuarioError || !usuario) {
