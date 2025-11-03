@@ -199,8 +199,11 @@ function openPerfilModal() {
     document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-user-shield"></i> Novo Perfil';
     
     // Para novos perfis, NÃO preencher o código - deixar vazio para o backend gerar
-    form.codigo.value = '';
-    // Campo codigo_perfil foi removido do formulário
+    const codigoInput = (form && (form.elements['codigo'] || form.querySelector('[name="codigo"], [name="codigo_perfil"]')));
+    if (codigoInput) {
+        codigoInput.value = '';
+    }
+    // Campo codigo/codigo_perfil pode não existir no formulário atual
     // Renderiza matriz de permissões (modo de edição para novo perfil)
     renderPermissionsMatrix({}, true);
     modal.style.display = 'flex';
