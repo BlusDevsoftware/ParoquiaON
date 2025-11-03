@@ -28,23 +28,13 @@ const login = async (req, res) => {
         const baseSelect = `
                 id,
                 email,
-                login,
                 senha,
                 senha_temporaria,
                 trocar_senha_proximo_login,
                 ativo,
                 ultimo_login,
-                perfis (
-                    id,
-                    nome,
-                    permissoes
-                ),
-                pessoas (
-                    id,
-                    nome,
-                    telefone,
-                    email
-                )`;
+                perfil_id,
+                pessoa_id`;
 
         const resp = await supabase
             .from('usuarios')
@@ -75,11 +65,8 @@ const login = async (req, res) => {
                     user: {
                         id: usuario.id,
                         email: usuario.email,
-                        login: usuario.login,
-                        nome: usuario.pessoas?.nome,
-                        telefone: usuario.pessoas?.telefone,
-                        perfil: usuario.perfis?.nome,
-                        permissoes: usuario.perfis?.permissoes || {}
+                        perfil_id: usuario.perfil_id ?? null,
+                        pessoa_id: usuario.pessoa_id ?? null
                     }
                 });
             }
@@ -111,7 +98,7 @@ const login = async (req, res) => {
             .eq('id', usuario.id);
 
         const token = jwt.sign(
-            { userId: usuario.id, email: usuario.email, perfil: usuario.perfis?.nome },
+            { userId: usuario.id, email: usuario.email, perfil_id: usuario.perfil_id ?? null },
             JWT_SECRET,
             { expiresIn: '24h' }
         );
@@ -122,11 +109,8 @@ const login = async (req, res) => {
             user: {
                 id: usuario.id,
                 email: usuario.email,
-                login: usuario.login,
-                nome: usuario.pessoas?.nome,
-                telefone: usuario.pessoas?.telefone,
-                perfil: usuario.perfis?.nome,
-                permissoes: usuario.perfis?.permissoes || {}
+                perfil_id: usuario.perfil_id ?? null,
+                pessoa_id: usuario.pessoa_id ?? null
             }
         });
     } catch (error) {
