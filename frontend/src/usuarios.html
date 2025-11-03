@@ -1863,7 +1863,7 @@
                         const original = resetBtn.innerHTML;
                         resetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetando...';
                         const tempPass = generateTemporaryPassword();
-                        const updatePayload = { senha_temporaria: tempPass, trocar_senha_proximo_login: true };
+                        const updatePayload = { senha_temporaria: tempPass };
                         const { error } = await window.api.put(window.endpoints.usuarios.update(id), updatePayload);
                         if (error) throw error;
                         window.showSuccessModal(login || email || '', tempPass);
@@ -1966,7 +1966,7 @@
                     window.showUpdateSuccessModal(payload.ativo ? 'Ativo' : 'Inativo');
                 } else {
                     const tempPass = generateTemporaryPassword();
-                    const createPayload = { ...payload, senha_temporaria: tempPass, trocar_senha_proximo_login: true };
+                    const createPayload = { ...payload, senha_temporaria: tempPass };
                     const { data: createData, error } = await window.api.post(window.endpoints.usuarios.create, createPayload);
                     if (error) throw error;
                     // Mostrar modal com credenciais geradas
