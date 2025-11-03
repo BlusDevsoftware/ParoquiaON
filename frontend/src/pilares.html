@@ -1367,8 +1367,8 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal" id="pilarModal">
-        <div class="modal-content">
+    <div class="modal" id="pilarModal" style="overflow: hidden;">
+        <div class="modal-content" style="max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
             <div class="modal-header">
                 <h2 id="modalTitle"><i class="fas fa-columns"></i> Novo Pilar</h2>
                 <div class="modal-header-actions">
@@ -1382,7 +1382,7 @@
                     <button class="close-modal" onclick="closeModal()">&times;</button>
                 </div>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="overflow-y: auto;">
                 <form id="pilarForm">
                     <div class="form-row">
                         <div class="form-group">
@@ -1406,13 +1406,13 @@
     </div>
 
     <!-- Modal de Confirmação de Exclusão -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content delete-confirmation">
+    <div id="deleteModal" class="modal" style="overflow: hidden;">
+        <div class="modal-content delete-confirmation" style="max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
             <div class="modal-header delete-header">
                 <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
                 <button class="close-modal" onclick="closeDeleteModal()" style="font-size: 1.5em;">&times;</button>
             </div>
-            <div class="modal-body" style="padding: 0 24px; background: #fff;">
+            <div class="modal-body" style="padding: 0 24px; background: #fff; overflow-y: auto;">
                 <div class="delete-icon">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
@@ -1533,6 +1533,7 @@
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
             document.body.style.overflow = 'hidden';
+            try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
         }
 
         // Função para fechar o modal
@@ -1549,7 +1550,8 @@
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
+                document.body.style.overflow = '';
+                try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
             }, 300);
         }
 
@@ -1629,6 +1631,7 @@
                 setTimeout(() => modal.classList.add('show'), 10);
                 document.body.style.overflow = 'hidden';
                 try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
+                try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
             } catch (error) {
                 console.error('Erro ao carregar pilar:', error);
                 alert('Erro ao carregar pilar');
@@ -1672,6 +1675,7 @@
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('show'), 10);
                 document.body.style.overflow = 'hidden';
+                try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
                 
                 // Ao fechar, reabilitar campos e mostrar botões
                 form.onsubmit = (e) => {
