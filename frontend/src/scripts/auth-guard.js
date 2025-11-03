@@ -3,7 +3,7 @@
  */
 
 // Desabilitar autenticação (toggle temporário)
-const AUTH_DISABLED = true;
+const AUTH_DISABLED = false;
 
 // Early redirect: se não autenticado e não for a tela de login, redireciona (desativado se AUTH_DISABLED)
 (function earlyAuthRedirect(){

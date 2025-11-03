@@ -4,12 +4,120 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'paroquiaon-secret-key';
 
-// Login temporariamente desativado
+// Login reativado: email-only; força troca se tiver senha temporária/flag
 const login = async (req, res) => {
-    return res.status(503).json({
-        error: 'Login temporariamente desativado',
-        code: 'LOGIN_DISABLED'
-    });
+    try {
+        const { email, emailOrUsername, senha } = req.body;
+
+        const identificador = (emailOrUsername || email || '').trim();
+        if (!identificador || !senha) {
+            return res.status(400).json({
+                error: 'Email e senha são obrigatórios',
+                code: 'MISSING_CREDENTIALS'
+            });
+        }
+
+        // Apenas email permitido
+        if (!identificador.includes('@')) {
+            return res.status(400).json({
+                error: 'Informe um email válido para login',
+                code: 'EMAIL_REQUIRED'
+            });
+        }
+
+        const baseSelect = `
+                id,
+                email,
+                login,
+                senha,
+                senha_temporaria,
+                trocar_senha_proximo_login,
+                ativo,
+                ultimo_login,
+                perfis (
+                    id,
+                    nome,
+                    permissoes
+                ),
+                pessoas (
+                    id,
+                    nome,
+                    telefone,
+                    email
+                )`;
+
+        const resp = await supabase
+            .from('usuarios')
+            .select(baseSelect)
+            .eq('email', identificador)
+            .eq('ativo', true)
+            .maybeSingle();
+
+        const usuario = resp.data || null;
+        const usuarioError = resp.error || null;
+
+        if (usuarioError || !usuario) {
+            return res.status(401).json({
+                error: 'Credenciais inválidas',
+                code: 'INVALID_CREDENTIALS'
+            });
+        }
+
+        const hasTemp = !!usuario.senha_temporaria;
+        const mustChange = !!usuario.trocar_senha_proximo_login;
+
+        // Política: se houver senha temporária ou flag de troca, sempre exigir troca (sem validar senha temporária aqui)
+        if (hasTemp || mustChange) {
+            return res.status(428).json({
+                error: 'Primeiro acesso: é necessário alterar a senha temporária',
+                code: 'PASSWORD_CHANGE_REQUIRED'
+            });
+        }
+
+        // Login normal por senha (bcrypt)
+        if (!usuario.senha) {
+            return res.status(401).json({
+                error: 'Credenciais inválidas',
+                code: 'INVALID_CREDENTIALS'
+            });
+        }
+
+        const senhaValida = await bcrypt.compare(senha, usuario.senha);
+        if (!senhaValida) {
+            return res.status(401).json({
+                error: 'Credenciais inválidas',
+                code: 'INVALID_CREDENTIALS'
+            });
+        }
+
+        await supabase
+            .from('usuarios')
+            .update({ ultimo_login: new Date().toISOString() })
+            .eq('id', usuario.id);
+
+        const token = jwt.sign(
+            { userId: usuario.id, email: usuario.email, perfil: usuario.perfis?.nome },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        return res.json({
+            success: true,
+            token,
+            user: {
+                id: usuario.id,
+                email: usuario.email,
+                login: usuario.login,
+                nome: usuario.pessoas?.nome,
+                telefone: usuario.pessoas?.telefone,
+                perfil: usuario.perfis?.nome,
+                permissoes: usuario.perfis?.permissoes || {}
+            }
+        });
+    } catch (error) {
+        console.error('Erro no login:', error);
+        return res.status(500).json({ error: 'Erro interno do servidor', code: 'INTERNAL_ERROR' });
+    }
 };
 
 // Função para verificar token
