@@ -1065,6 +1065,8 @@
             overflow-y: hidden; /* rolagem apenas dentro da lista */
             background: #ffffff;
         }
+        /* Bloquear scroll quando modal estiver aberto */
+        html.modal-open, body.modal-open { overflow: hidden !important; }
         /* Garantir cálculo de largura sem causar overflow e travar largura ao viewport */
         html, body { width: 100%; max-width: 100%; }
         *, *::before, *::after { box-sizing: border-box; }
@@ -1313,8 +1315,8 @@
     </div>
 
     <!-- Modal de Cadastro/Edição/Visualização de Serviço -->
-    <div class="modal" id="servicoModal">
-        <div class="modal-content">
+    <div class="modal" id="servicoModal" style="overflow: hidden;">
+        <div class="modal-content" style="max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
             <div class="modal-header">
                 <h2 id="servicoModalTitle"><i class="fas fa-map-marker-alt"></i> Novo Local</h2>
                 <div class="modal-header-actions">
@@ -1328,7 +1330,7 @@
                     <button class="close-modal" onclick="closeServicoModal()">&times;</button>
                 </div>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="overflow-y: auto;">
                 <form id="servicoForm">
                     <div class="form-row">
                         <div class="form-group">
@@ -1354,13 +1356,13 @@
         </div>
     </div>
     <!-- Modal de Exclusão de Serviço -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content delete-confirmation">
+    <div id="deleteModal" class="modal" style="overflow: hidden;">
+        <div class="modal-content delete-confirmation" style="max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
             <div class="modal-header delete-header">
                 <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
                 <button class="close-modal" onclick="closeDeleteModal()" style="font-size: 1.5em;">&times;</button>
             </div>
-            <div class="modal-body" style="padding: 0 24px; background: #fff;">
+            <div class="modal-body" style="padding: 0 24px; background: #fff; overflow-y: auto;">
                 <div class="delete-icon">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
@@ -1567,13 +1569,15 @@
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
             document.body.style.overflow = 'hidden';
+            try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
         }
         window.closeServicoModal = function() {
             const modal = document.getElementById('servicoModal');
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
+                document.body.style.overflow = '';
+                try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
             }, 300);
         }
         window.openDeleteModal = function(codigo) {
@@ -1581,6 +1585,7 @@
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
             document.body.style.overflow = 'hidden';
+            try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
             // Salvar código para exclusão
             modal.dataset.codigo = codigo;
         }
@@ -1589,7 +1594,8 @@
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
+                document.body.style.overflow = '';
+                try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
             }, 300);
         }
 
@@ -1607,6 +1613,7 @@
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('show'), 10);
                 document.body.style.overflow = 'hidden';
+                try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
                 try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
             }
         }
