@@ -158,6 +158,7 @@
         // Variáveis globais para controle de estado
         let currentUserEmail = '';
         let isFirstLogin = false;
+        let lastEnteredPassword = '';
 
         // Função para validar força da senha
         function validatePasswordStrength(password) {
@@ -273,6 +274,7 @@
             
             const identificador = document.getElementById('usuario').value;
             const senha = document.getElementById('senha').value;
+            lastEnteredPassword = senha;
             const btnEntrar = document.querySelector('.btn-entrar');
             const btnText = document.querySelector('.btn-text');
             const btnIcon = document.querySelector('.btn-icon');
@@ -402,7 +404,8 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ 
-                        email: currentUserEmail, 
+                        emailOrUsername: currentUserEmail,
+                        senhaTemporaria: lastEnteredPassword,
                         novaSenha: novaSenha 
                     })
                 });
