@@ -55,7 +55,7 @@ const login = async (req, res) => {
             .select(baseSelect)
             .eq('email', identificador)
             .eq('ativo', true)
-            .single();
+            .maybeSingle();
 
         usuario = resp.data || null;
         usuarioError = resp.error || null;
