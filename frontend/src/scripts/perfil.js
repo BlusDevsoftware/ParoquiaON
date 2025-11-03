@@ -218,7 +218,7 @@ function closePerfilModal() {
     if (!modal) return;
     modal.style.opacity = '0';
         modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        document.body.style.overflow = '';
         try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
 }
 
@@ -226,7 +226,7 @@ function closeViewModal() {
     // Esta função pode ser removida se o mesmo modal for usado para visualizar e editar
     const modal = document.getElementById('viewModal'); // Verifique se este modal ainda existe no HTML
     if (modal) modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
+    document.body.style.overflow = '';
     try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
 }
 
@@ -236,7 +236,7 @@ function closeDeleteModal() {
         modal.classList.remove('show');
         setTimeout(() => {
             modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
+            document.body.style.overflow = '';
             try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
         }, 300);
     }
@@ -278,7 +278,7 @@ window.closeSuccessModal = function() {
     modal.classList.remove('show');
     setTimeout(() => {
         modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        document.body.style.overflow = '';
         try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
     }, 300);
 }
@@ -310,7 +310,7 @@ window.closeUpdateSuccessModal = function() {
     modal.classList.remove('show');
     setTimeout(() => {
         modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        document.body.style.overflow = '';
         try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
     }, 300);
 }
