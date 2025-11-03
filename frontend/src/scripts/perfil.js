@@ -207,6 +207,7 @@ function openPerfilModal() {
     modal.classList.remove('show');
     modal.style.opacity = '1';
     document.body.style.overflow = 'hidden';
+    try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
 }
 
 function closePerfilModal() {
@@ -215,6 +216,7 @@ function closePerfilModal() {
     modal.style.opacity = '0';
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
+        try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
 }
 
 function closeViewModal() {
@@ -222,6 +224,7 @@ function closeViewModal() {
     const modal = document.getElementById('viewModal'); // Verifique se este modal ainda existe no HTML
     if (modal) modal.style.display = 'none';
     document.body.style.overflow = 'auto';
+    try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
 }
 
 function closeDeleteModal() {
@@ -231,6 +234,7 @@ function closeDeleteModal() {
         setTimeout(() => {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
+            try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
         }, 300);
     }
 }
@@ -261,6 +265,7 @@ window.showSuccessModal = function() {
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
     document.body.style.overflow = 'hidden';
+    try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
 }
 
 // Função para fechar modal de sucesso
@@ -271,6 +276,7 @@ window.closeSuccessModal = function() {
     setTimeout(() => {
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
+        try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
     }, 300);
 }
 
@@ -291,6 +297,7 @@ window.showUpdateSuccessModal = function(status) {
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
     document.body.style.overflow = 'hidden';
+    try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
 }
 
 // Função para fechar modal de sucesso de atualização
@@ -301,6 +308,7 @@ window.closeUpdateSuccessModal = function() {
     setTimeout(() => {
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
+        try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
     }, 300);
 }
 
@@ -387,7 +395,8 @@ async function visualizarPerfil(id) {
         const modal = document.getElementById('perfilModal');
         modal.style.display = 'flex';
         modal.style.opacity = '1';
-        document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
     } catch (error) {
         console.error('Erro ao visualizar perfil:', error);
         mostrarToast('Erro ao visualizar perfil', 'error');
@@ -420,7 +429,8 @@ async function editarPerfil(id) {
         const modal = document.getElementById('perfilModal');
         modal.style.display = 'flex';
         modal.style.opacity = '1';
-        document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
     } catch (error) {
         console.error('Erro ao editar perfil:', error);
         mostrarToast('Erro ao editar perfil', 'error');
@@ -448,7 +458,8 @@ function confirmarExclusaoPerfil(id) {
         });
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);
-        document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
     } catch (error) {
         console.error('Erro ao preparar exclusão do perfil:', error);
     }

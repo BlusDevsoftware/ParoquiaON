@@ -1306,6 +1306,16 @@
             flex-shrink: 0;
             padding-right: 16px;
         }
+
+        /* Evitar qualquer scroll quando um modal estiver aberto */
+        html.modal-open, body.modal-open {
+            height: 100vh;
+            overflow: hidden !important;
+            touch-action: none;
+        }
+        body.modal-open .list-container {
+            overflow: hidden !important;
+        }
     </style>
 </head>
 <body>
