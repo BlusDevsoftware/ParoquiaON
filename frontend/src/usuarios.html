@@ -1264,8 +1264,8 @@
     </div>
 
     <!-- Modal de Cadastro/Edição/Visualização de Usuário -->
-    <div class="modal" id="usuarioModal">
-        <div class="modal-content">
+    <div class="modal" id="usuarioModal" style="overflow: hidden;">
+        <div class="modal-content" style="max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
             <div class="modal-header">
                 <h2 id="usuarioModalTitle"><i class="fas fa-user-cog"></i> Novo Usuário</h2>
                 <div class="modal-header-actions">
@@ -1279,7 +1279,7 @@
                     <button class="close-modal" onclick="closeUsuarioModal()">&times;</button>
                 </div>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="overflow-y: auto;">
                 <form id="usuarioForm">
                     <div class="form-row">
                         <div class="form-group">
@@ -1325,13 +1325,13 @@
     </div>
 
     <!-- Modal de Exclusão de Usuário -->
-    <div id="deleteUsuarioModal" class="modal">
-        <div class="modal-content delete-confirmation">
+    <div id="deleteUsuarioModal" class="modal" style="overflow: hidden;">
+        <div class="modal-content delete-confirmation" style="max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
             <div class="modal-header delete-header">
                 <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
                 <button class="close-modal" onclick="closeDeleteUsuarioModal()" style="font-size: 1.5em;">&times;</button>
             </div>
-            <div class="modal-body" style="padding: 0 24px; background: #fff;">
+            <div class="modal-body" style="padding: 0 24px; background: #fff; overflow-y: auto;">
                 <div class="delete-icon">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
@@ -1428,13 +1428,13 @@
         </div>
     </div>
     <!-- Modal de Erro - Duplicidade de Usuário/Email -->
-    <div id="duplicateUsuarioModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
-        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 96%; box-shadow: 0 8px 32px rgba(244,67,54,0.13); padding: 0;">
+    <div id="duplicateUsuarioModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center; overflow: hidden;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 96%; max-height: 90vh; box-shadow: 0 8px 32px rgba(244,67,54,0.13); padding: 0; display: flex; flex-direction: column; overflow: hidden;">
             <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
                 <h2 style="margin: 0; font-size: 1.3em; color: #dc3545; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-circle"></i> Não foi possível salvar</h2>
                 <button class="close-modal" onclick="closeDuplicateUsuarioModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
             </div>
-            <div class="modal-body" style="padding: 24px 36px 24px 36px;">
+            <div class="modal-body" style="padding: 24px 36px 24px 36px; overflow-y: auto;">
                 <div style="font-size: 1em; color: #666; margin-bottom: 16px;">Já existe um usuário cadastrado utilizando os dados informados:</div>
                 <ul id="duplicateUsuarioList" style="margin: 0 0 16px 18px; color: #333;">
                 </ul>
@@ -1587,6 +1587,7 @@
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
             document.body.style.overflow = 'hidden';
+            try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
         }
 
         window.closeUsuarioModal = function() {
@@ -1594,7 +1595,8 @@
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
+                document.body.style.overflow = '';
+                try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
             }, 300);
         }
 
@@ -1603,6 +1605,7 @@
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
             document.body.style.overflow = 'hidden';
+            try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
             modal.dataset.codigo = codigo;
         }
 
@@ -1611,7 +1614,8 @@
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
+                document.body.style.overflow = '';
+                try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
             }, 300);
         }
 
@@ -1908,6 +1912,7 @@
                         modal.style.display = 'flex';
                         setTimeout(() => modal.classList.add('show'), 10);
                         document.body.style.overflow = 'hidden';
+                        try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
                     }
                     return; // bloqueia envio
                 }
@@ -1958,7 +1963,8 @@
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
+                document.body.style.overflow = '';
+                try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
             }, 300);
         }
 
