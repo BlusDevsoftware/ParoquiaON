@@ -25,8 +25,6 @@ const login = async (req, res) => {
                 email,
                 login,
                 senha,
-                senha_temporaria,
-                trocar_senha_proximo_login,
                 ativo,
                 ultimo_login,
                 perfis (
@@ -53,8 +51,8 @@ const login = async (req, res) => {
         }
 
         // Verificar primeiro acesso (senha temporária ou flag para trocar)
-        const hasTemp = !!usuario.senha_temporaria;
-        const mustChange = !!usuario.trocar_senha_proximo_login;
+        const hasTemp = !!usuario.senha_temporaria; // pode não existir no schema atual
+        const mustChange = !!usuario.trocar_senha_proximo_login; // pode não existir no schema atual
 
         if (hasTemp || mustChange) {
             // Se o usuário enviou a senha temporária correta, retornar sinalização de troca de senha
