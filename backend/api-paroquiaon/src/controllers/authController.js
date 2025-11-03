@@ -17,8 +17,15 @@ const login = async (req, res) => {
             });
         }
 
-        // Buscar usuário pelo identificador de forma determinística:
-        // 1) Tenta por email exato; 2) Se não encontrar, tenta por login exato
+        // Autenticação somente por email
+        if (!identificador.includes('@')) {
+            return res.status(400).json({
+                error: 'Informe um email válido para login',
+                code: 'EMAIL_REQUIRED'
+            });
+        }
+
+        // Buscar usuário apenas por email (forma determinística)
         const baseSelect = `
                 id,
                 email,
@@ -43,30 +50,18 @@ const login = async (req, res) => {
         let usuario = null;
         let usuarioError = null;
 
-        // Tenta por email
-        let resp = await supabase
+        const resp = await supabase
             .from('usuarios')
             .select(baseSelect)
             .eq('email', identificador)
             .eq('ativo', true)
-            .maybeSingle();
+            .single();
 
-        if (!resp.error && resp.data) {
-            usuario = resp.data;
-        } else {
-            // Se não achou por email, tenta por login
-            resp = await supabase
-                .from('usuarios')
-                .select(baseSelect)
-                .eq('login', identificador)
-                .eq('ativo', true)
-                .maybeSingle();
-            usuario = resp.data || null;
-            usuarioError = resp.error || null;
-        }
+        usuario = resp.data || null;
+        usuarioError = resp.error || null;
 
         // Log para debug (remover em produção)
-        console.log('🔍 Login attempt:', { 
+        console.log('🔍 Login attempt (email-only):', { 
             identificador, 
             usuarioFound: !!usuario,
             error: usuarioError?.message || null,
