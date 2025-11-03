@@ -679,6 +679,13 @@ function atualizarTabela(usuarios) {
 // Salvar perfil (criar/atualizar) contra a API
 async function salvarPerfil(e) {
     const form = e.target;
+    // Estado de carregamento no botão Salvar
+    const submitBtn = form.querySelector('.form-actions .btn-primary');
+    const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-spinner"></span>&nbsp;Salvando...';
+    }
     const data = new FormData(form);
     const nome = data.get('nome');
     const permissoesMapa = form._permissoesAtual || {};
@@ -774,6 +781,12 @@ async function salvarPerfil(e) {
         console.error('❌ FRONTEND - Erro ao salvar perfil:', error);
         console.error('❌ FRONTEND - Detalhes do erro:', error.response || error);
         mostrarToast('Erro ao salvar perfil', 'error');
+    } finally {
+        // Restaurar estado do botão
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHtml || '<i class="fas fa-save"></i> Salvar';
+        }
     }
 }
 

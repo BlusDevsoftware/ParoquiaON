@@ -477,6 +477,18 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Spinner pequeno para botões (padrão usado nas outras abas) */
+        .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .9s linear infinite;
+            display: inline-block;
+            vertical-align: -3px;
+        }
+
         /* Loader específico para a tabela de usuários */
         .loader-overlay-usuarios {
             display: none;
