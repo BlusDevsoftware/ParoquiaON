@@ -1130,6 +1130,7 @@
         }
         /* Bloquear scroll quando modal estiver aberto */
         html.modal-open, body.modal-open { overflow: hidden !important; }
+        body.modal-open .list-container { overflow: hidden !important; }
         /* Garantir cálculo de largura sem causar overflow e travar largura ao viewport */
         html, body { width: 100%; max-width: 100%; }
         *, *::before, *::after { box-sizing: border-box; }
@@ -1569,6 +1570,7 @@ function novaPastoral() {
     const modal = document.getElementById('pastoralModal');
             const modalTitle = document.getElementById('modalTitle');
             modalTitle.innerHTML = '<i class="fas fa-church"></i> Nova Pastoral';
+            try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
             document.body.style.overflow = 'hidden';
@@ -1624,7 +1626,8 @@ function novaPastoral() {
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
+                document.body.style.overflow = '';
+                try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
             }, 300);
         }
 
@@ -1655,6 +1658,7 @@ async function editarPastoral(id) {
     const modal = document.getElementById('pastoralModal');
                 const modalTitle = document.getElementById('modalTitle');
                 modalTitle.innerHTML = '<i class="fas fa-church"></i> Editar Pastoral';
+                try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('show'), 10);
                 document.body.style.overflow = 'hidden';
@@ -1733,6 +1737,7 @@ async function salvarPastoral(event) {
         function excluirPastoral(id) {
             codigoParaExcluir = id;
             const modal = document.getElementById('deleteModal');
+            try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
             document.body.style.overflow = 'hidden';
@@ -1742,7 +1747,8 @@ async function salvarPastoral(event) {
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
+                document.body.style.overflow = '';
+                try { document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open'); } catch(_) {}
             }, 300);
         }
 
@@ -1793,6 +1799,7 @@ async function visualizarPastoral(id) {
                 const formActions = form.querySelector('.form-actions');
                 if (formActions) formActions.style.display = 'none';
                 // Abrir modal
+                try { document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open'); } catch(_) {}
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('show'), 10);
                 document.body.style.overflow = 'hidden';
