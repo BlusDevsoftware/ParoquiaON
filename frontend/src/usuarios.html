@@ -1269,6 +1269,9 @@
             <div class="modal-header">
                 <h2 id="usuarioModalTitle"><i class="fas fa-user-cog"></i> Novo Usuário</h2>
                 <div class="modal-header-actions">
+                    <button type="button" id="resetSenhaBtn" class="btn-secondary" title="Resetar senha do usuário" style="display:none">
+                        <i class="fas fa-key"></i> Resetar Senha
+                    </button>
                     <div class="status-toggle-modal">
                         <label class="switch-modal">
                             <input type="checkbox" id="statusToggleUsuarioModal" checked>
@@ -1572,6 +1575,9 @@
                 if (statusToggle) statusToggle.checked = status === 'Ativo';
                 if (statusInput) statusInput.value = status === 'Ativo' ? 'ativo' : 'inativo';
                 if (statusLabel) statusLabel.textContent = status === 'Ativo' ? 'Ativo' : 'Inativo';
+                // Exibir botão de reset de senha apenas em edição
+                const resetBtn = document.getElementById('resetSenhaBtn');
+                if (resetBtn) resetBtn.style.display = '';
             }
             
             // Modo visualização: desabilitar campos e esconder botões
@@ -1581,6 +1587,11 @@
             const formActions = form.querySelector('.form-actions');
             if (formActions) {
                 formActions.style.display = (modo === 'visualizar') ? 'none' : '';
+            }
+            // Em novo/visualizar esconder reset
+            if (!usuario || modo !== 'editar') {
+                const resetBtn = document.getElementById('resetSenhaBtn');
+                if (resetBtn) resetBtn.style.display = 'none';
             }
             
             // Exibir modal
@@ -1828,6 +1839,32 @@
                     const modal = document.getElementById('deleteUsuarioModal');
                     const id = modal.dataset.codigo;
                     window.bloqueioExclusao.deleteWithCheck('usuarios', id, () => { closeDeleteUsuarioModal(); carregarUsuarios(); });
+                });
+            }
+
+            // Reset de senha (gera temporária)
+            const resetBtn = document.getElementById('resetSenhaBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', async function() {
+                    try {
+                        const form = document.getElementById('usuarioForm');
+                        const id = form?.dataset?.id;
+                        const email = form?.emailUsuario?.value;
+                        const login = form?.loginUsuario?.value;
+                        resetBtn.disabled = true;
+                        const original = resetBtn.innerHTML;
+                        resetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetando...';
+                        const payload = { id, email, login };
+                        const { data, error } = await window.api.post(window.endpoints.auth.resetPassword, payload);
+                        if (error) throw error;
+                        const tempPass = data?.senha_temporaria || data?.senhaTemporaria || data?.temporaryPassword || 'Gerada';
+                        window.showSuccessModal(login || email || '', tempPass);
+                    } catch (e) {
+                        alert('Erro ao resetar senha');
+                    } finally {
+                        resetBtn.disabled = false;
+                        resetBtn.innerHTML = '<i class="fas fa-key"></i> Resetar Senha';
+                    }
                 });
             }
         });

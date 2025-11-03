@@ -109,7 +109,9 @@ const endpoints = {
     login: '/auth/login',
     logout: '/auth/logout',
     register: '/auth/register',
-    refresh: '/auth/refresh'
+    refresh: '/auth/refresh',
+    resetPassword: '/auth/reset-password',
+    changePassword: '/auth/change-password'
   },
 
   // Comunidades
