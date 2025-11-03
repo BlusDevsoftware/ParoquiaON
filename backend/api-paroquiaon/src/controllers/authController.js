@@ -66,8 +66,23 @@ const login = async (req, res) => {
         const hasTemp = !!usuario.senha_temporaria;
         const mustChange = !!usuario.trocar_senha_proximo_login;
 
-        // Política: se houver senha temporária ou flag de troca, sempre exigir troca (sem validar senha temporária aqui)
+        // Primeiro acesso: se senha enviada = temporária, sinaliza troca com 200; senão 428
         if (hasTemp || mustChange) {
+            if (hasTemp && String(senha) === String(usuario.senha_temporaria)) {
+                return res.status(200).json({
+                    success: true,
+                    requiresPasswordChange: true,
+                    user: {
+                        id: usuario.id,
+                        email: usuario.email,
+                        login: usuario.login,
+                        nome: usuario.pessoas?.nome,
+                        telefone: usuario.pessoas?.telefone,
+                        perfil: usuario.perfis?.nome,
+                        permissoes: usuario.perfis?.permissoes || {}
+                    }
+                });
+            }
             return res.status(428).json({
                 error: 'Primeiro acesso: é necessário alterar a senha temporária',
                 code: 'PASSWORD_CHANGE_REQUIRED'
