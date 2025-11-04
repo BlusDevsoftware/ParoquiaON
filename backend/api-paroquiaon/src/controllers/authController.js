@@ -197,6 +197,36 @@ const verifyToken = async (req, res) => {
         }
 
         if (usuarioError || !usuario) {
+            // Fallback: tentar por email do token (caso userId não corresponda em alguma migração)
+            try {
+                let respByEmail = await supabase
+                    .from('usuarios')
+                    .select(baseSelect)
+                    .eq('email', decoded.email || '')
+                    .maybeSingle();
+                let byEmail = respByEmail.data || null;
+                let byEmailErr = respByEmail.error || null;
+                if ((!byEmail && !byEmailErr)) {
+                    const arr = await supabase
+                        .from('usuarios')
+                        .select(baseSelect)
+                        .eq('email', decoded.email || '')
+                        .order('id', { ascending: true })
+                        .limit(1);
+                    if (!arr.error && Array.isArray(arr.data) && arr.data.length > 0) {
+                        byEmail = arr.data[0];
+                        byEmailErr = null;
+                    }
+                }
+                if (byEmail) {
+                    usuario = byEmail;
+                }
+            } catch (e) {
+                console.warn('Fallback by email falhou:', e);
+            }
+        }
+
+        if (!usuario) {
             return res.status(401).json({ error: 'Usuário não encontrado', code: 'USER_NOT_FOUND' });
         }
 
