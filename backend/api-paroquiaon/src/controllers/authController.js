@@ -236,14 +236,14 @@ const verifyToken = async (req, res) => {
             try {
                 let perfResp = await supabase
                     .from('perfis')
-                    .select('id,nome')
+                    .select('*')
                     .eq('id', usuario.perfil_id)
                     .maybeSingle();
                 let perfil = perfResp.data || null;
                 if ((!perfil && !perfResp.error)) {
                     const arr = await supabase
                         .from('perfis')
-                        .select('id,nome')
+                        .select('*')
                         .eq('id', usuario.perfil_id)
                         .order('id', { ascending: true })
                         .limit(1);
@@ -253,8 +253,17 @@ const verifyToken = async (req, res) => {
                 }
                 if (perfil) {
                     perfilNome = perfil.nome || null;
-                    // Permissões em colunas: frontend monta a partir do registro quando necessário
-                    permissoes = {};
+                    // Montar objeto de permissões a partir das colunas booleanas/numericas/string verdadeiras
+                    const built = {};
+                    Object.entries(perfil).forEach(([key, value]) => {
+                        if (['id', 'nome', 'status', 'created_at', 'updated_at', 'descricao'].includes(key)) return;
+                        const v = value;
+                        const truthy = (typeof v === 'boolean' && v === true)
+                            || (typeof v === 'number' && v === 1)
+                            || (typeof v === 'string' && (v === '1' || v.toLowerCase() === 'true' || v.toLowerCase() === 't'));
+                        if (truthy) built[key] = true;
+                    });
+                    permissoes = built;
                 }
             } catch (e) {
                 console.warn('Falha ao buscar perfil (best-effort):', e);

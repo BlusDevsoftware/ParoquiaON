@@ -15,8 +15,22 @@ class AuthGuard {
         this.LOGIN_PATHS = ['login.html', 'login', '/login'];
         this.TOKEN_KEY = 'token';
         this.USER_KEY = 'user';
-        // Permissões desabilitadas: nenhum bloqueio por página
-        this.PAGE_PERMISSION_MAP = {};
+        // Mapa página -> flag de permissão necessária
+        this.PAGE_PERMISSION_MAP = {
+            'pastorais.html': 'pastorais_ver',
+            'pilares.html': 'pilares_ver',
+            'locais.html': 'locais_ver',
+            'acoes.html': 'acoes_ver',
+            'pessoas.html': 'pessoas_ver',
+            'usuarios.html': 'usuarios_ver',
+            'perfil.html': 'perfis_ver',
+            'recebimento.html': 'relatorios_ver',
+            'conferencia.html': 'relatorios_ver',
+            'dinamico.html': 'relatorios_ver',
+            'manutencao-bd.html': 'configuracoes_manutencao_ver',
+            'sincronizar.html': 'configuracoes_sincronizar_ver',
+            'index.html': 'minha_comunidade_ver'
+        };
         this.init();
     }
 
@@ -66,7 +80,8 @@ class AuthGuard {
                 if (!this.isLoginPage()) this.redirectToLogin();
                 return false;
             }
-            // Bloqueio por permissão desativado
+            // Bloqueio por permissão da página
+            this.enforcePagePermission();
         } catch(_) {}
         return true;
     }
@@ -142,15 +157,42 @@ class AuthGuard {
     // Verifica a permissão exigida para a página atual e redireciona se não tiver
     enforcePagePermission() {
         const current = (window.location.pathname || '').split('/').pop() || 'index.html';
-        // Não checa login.html
-        if (this.isLoginPage()) return;
-        // Permissões desabilitadas: não fazer nada
+        if (this.isLoginPage()) return true;
+        const required = this.PAGE_PERMISSION_MAP[current];
+        if (!required) return true;
+        if (!this.hasPermission(required)) {
+            const user = this.getCurrentUser();
+            const next = this.getFirstAllowedPage(user && user.permissoes);
+            if (next) {
+                window.location.replace(next);
+            } else {
+                this.redirectToLogin();
+            }
+            return false;
+        }
         return true;
     }
 
     // Calcula a primeira página que o usuário tem permissão de ver
     getFirstAllowedPage(permissoes) {
-        // Permissões desabilitadas: sem cálculo de primeira página
+        if (!permissoes || typeof permissoes !== 'object') return null;
+        const order = [
+            'index.html',
+            'pessoas.html',
+            'usuarios.html',
+            'perfil.html',
+            'pastorais.html',
+            'pilares.html',
+            'locais.html',
+            'acoes.html',
+            'recebimento.html',
+            'conferencia.html',
+            'dinamico.html'
+        ];
+        for (const page of order) {
+            const flag = this.PAGE_PERMISSION_MAP[page];
+            if (!flag || this.hasPermission(flag)) return page;
+        }
         return null;
     }
 
@@ -197,8 +239,10 @@ class AuthGuard {
     getToken() { return sessionStorage.getItem(this.TOKEN_KEY); }
 
     hasPermission(flagOrSection, action) {
-        // Permissões desabilitadas: sempre permitir
-        return true;
+        const user = this.getCurrentUser();
+        const perms = (user && user.permissoes) || {};
+        if (!flagOrSection) return true;
+        return perms[flagOrSection] === true;
     }
 
     redirectAfterLogin() {

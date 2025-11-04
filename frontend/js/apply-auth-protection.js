@@ -41,8 +41,8 @@ function applyAuthProtection() {
 
         // Atualizar informações do usuário na interface
         updateUserInfo();
-        // Permissões desabilitadas: não aplicar restrições na UI nem bloquear página
-        try { /* applyPermissionsToUI desabilitado */ } catch (_) {}
+        // Aplicar permissões à UI
+        try { applyPermissionsToUI(); } catch (_) {}
         const required = null;
 
         // Exibir conteúdo após validações
@@ -147,20 +147,22 @@ function updateUserInfo() {
 function applyPermissionsToUI() {
     const user = window.authGuard ? window.authGuard.getCurrentUser() : null;
     if (!user || !user.permissoes) return;
-    // Permissões desabilitadas
-    const can = (flag) => true;
+    const can = (flag) => {
+        if (!flag) return true;
+        return user.permissoes && user.permissoes[flag] === true;
+    };
 
     const menuMap = [
-        { selector: 'a[href="pastorais.html"]', flag: 'cadastros_pastorais_ver' },
-        { selector: 'a[href="pilares.html"]', flag: 'cadastros_pilares_ver' },
-        { selector: 'a[href="locais.html"]', flag: 'cadastros_locais_ver' },
-        { selector: 'a[href="acoes.html"]', flag: 'cadastros_acoes_ver' },
-        { selector: 'a[href="pessoas.html"]', flag: 'cadastros_pessoas_ver' },
-        { selector: 'a[href="usuarios.html"]', flag: 'cadastros_usuarios_ver' },
-        { selector: 'a[href="perfil.html"]', flag: 'cadastros_perfis_ver' },
-        { selector: 'a[href="recebimento.html"]', flag: 'relatorios_recebimento_ver' },
-        { selector: 'a[href="conferencia.html"]', flag: 'relatorios_conferencia_ver' },
-        { selector: 'a[href="dinamico.html"]', flag: 'relatorios_dinamico_ver' },
+        { selector: 'a[href="pastorais.html"]', flag: 'pastorais_ver' },
+        { selector: 'a[href="pilares.html"]', flag: 'pilares_ver' },
+        { selector: 'a[href="locais.html"]', flag: 'locais_ver' },
+        { selector: 'a[href="acoes.html"]', flag: 'acoes_ver' },
+        { selector: 'a[href="pessoas.html"]', flag: 'pessoas_ver' },
+        { selector: 'a[href="usuarios.html"]', flag: 'usuarios_ver' },
+        { selector: 'a[href="perfil.html"]', flag: 'perfis_ver' },
+        { selector: 'a[href="recebimento.html"]', flag: 'relatorios_ver' },
+        { selector: 'a[href="conferencia.html"]', flag: 'relatorios_ver' },
+        { selector: 'a[href="dinamico.html"]', flag: 'relatorios_ver' },
         { selector: 'a[href="manutencao-bd.html"]', flag: 'configuracoes_manutencao_ver' },
         { selector: 'a[href="sincronizar.html"]', flag: 'configuracoes_sincronizar_ver' },
     ];
