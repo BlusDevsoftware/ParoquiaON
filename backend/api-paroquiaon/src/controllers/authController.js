@@ -7,9 +7,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'paroquiaon-secret-key';
 // Login reativado: email-only; força troca se tiver senha temporária/flag
 const login = async (req, res) => {
     try {
-        const { email, emailOrUsername, senha } = req.body;
+        const { email, senha } = req.body;
 
-        const identificador = (emailOrUsername || email || '').trim();
+        const identificador = (email || '').trim();
         if (!identificador || !senha) {
             return res.status(400).json({
                 error: 'Email e senha são obrigatórios',
@@ -30,7 +30,6 @@ const login = async (req, res) => {
                 email,
                 senha,
                 senha_temporaria,
-                trocar_senha_proximo_login,
                 ativo,
                 ultimo_login,
                 perfil_id,
@@ -83,11 +82,10 @@ const login = async (req, res) => {
         }
 
         const hasTemp = !!usuario.senha_temporaria;
-        const mustChange = !!usuario.trocar_senha_proximo_login;
 
         // Primeiro acesso: se senha enviada = temporária, sinaliza troca com 200; senão 428
-        if (hasTemp || mustChange) {
-            if (hasTemp && String(senha) === String(usuario.senha_temporaria)) {
+        if (hasTemp) {
+            if (String(senha) === String(usuario.senha_temporaria)) {
                 return res.status(200).json({
                     success: true,
                     requiresPasswordChange: true,
@@ -228,6 +226,121 @@ const verifyToken = async (req, res) => {
         return res.status(401).json({
             error: 'Token inválido',
             code: 'TOKEN_ERROR'
+        });
+    }
+};
+
+// Função para alterar senha no primeiro acesso (com senha temporária)
+const changePasswordFirstLogin = async (req, res) => {
+    try {
+        const { email, senhaTemporaria, novaSenha } = req.body;
+
+        if (!email || !senhaTemporaria || !novaSenha) {
+            return res.status(400).json({
+                error: 'Email, senha temporária e nova senha são obrigatórios',
+                code: 'MISSING_FIELDS'
+            });
+        }
+
+        // Validar formato de e-mail
+        if (!email.includes('@')) {
+            return res.status(400).json({
+                error: 'Informe um email válido',
+                code: 'INVALID_EMAIL'
+            });
+        }
+
+        // Buscar usuário por email
+        let resp = await supabase
+            .from('usuarios')
+            .select('id, email, senha_temporaria, ativo')
+            .eq('email', email)
+            .eq('ativo', true)
+            .maybeSingle();
+
+        let usuario = resp.data || null;
+        let usuarioError = resp.error || null;
+
+        if (usuarioError) {
+            console.error('Supabase error fetching user by email:', usuarioError);
+        }
+
+        // Fallback para PostgREST 400: tentar com limit(1) e array
+        if ((usuarioError && (usuarioError.code === 'PGRST100' || usuarioError.message)) || (!usuario && !usuarioError)) {
+            try {
+                const respArr = await supabase
+                    .from('usuarios')
+                    .select('id, email, senha_temporaria, ativo')
+                    .eq('email', email)
+                    .eq('ativo', true)
+                    .order('id', { ascending: true })
+                    .limit(1);
+                if (!respArr.error && Array.isArray(respArr.data) && respArr.data.length > 0) {
+                    usuario = respArr.data[0];
+                    usuarioError = null;
+                }
+            } catch (e) {
+                console.error('Fallback fetch error:', e);
+            }
+        }
+
+        if (usuarioError || !usuario) {
+            return res.status(404).json({
+                error: 'Usuário não encontrado',
+                code: 'USER_NOT_FOUND'
+            });
+        }
+
+        // Validar senha temporária
+        if (!usuario.senha_temporaria || String(usuario.senha_temporaria) !== String(senhaTemporaria)) {
+            return res.status(400).json({
+                error: 'Senha temporária inválida',
+                code: 'INVALID_TEMP_PASSWORD'
+            });
+        }
+
+        // Validar força da nova senha
+        const passwordValidation = validatePasswordStrength(novaSenha);
+        if (passwordValidation.strength < 4) {
+            return res.status(400).json({
+                error: 'A senha não atende aos requisitos mínimos de segurança',
+                code: 'WEAK_PASSWORD',
+                requirements: passwordValidation.requirements
+            });
+        }
+
+        // Hash da nova senha
+        const saltRounds = 12;
+        const novaSenhaHash = await bcrypt.hash(novaSenha, saltRounds);
+
+        // Atualizar senha e limpar senha temporária
+        const { error: updateError } = await supabase
+            .from('usuarios')
+            .update({
+                senha: novaSenhaHash,
+                senha_temporaria: null
+            })
+            .eq('id', usuario.id);
+
+        if (updateError) {
+            console.error('Erro ao atualizar senha:', updateError);
+            return res.status(500).json({
+                error: 'Erro ao atualizar senha',
+                code: 'UPDATE_FAILED'
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: 'Senha alterada com sucesso',
+            code: 'PASSWORD_CHANGED'
+        });
+
+    } catch (error) {
+        console.error('Erro no change-password (primeiro acesso):', error);
+        return res.status(500).json({
+            error: 'Erro interno do servidor',
+            code: 'INTERNAL_ERROR'
         });
     }
 };
@@ -423,6 +536,7 @@ function validatePasswordStrength(password) {
 module.exports = {
     login,
     verifyToken,
+    changePasswordFirstLogin,
     alterarSenha,
     resetarSenha,
     logout
