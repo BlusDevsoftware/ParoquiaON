@@ -136,7 +136,6 @@ const criarRegistro = async (req, res) => {
                 
             case 'perfis':
                 dadosParaInserir.ativo = true;
-                dadosParaInserir.permissoes = dados.permissoes || {};
                 break;
         }
 
@@ -185,7 +184,6 @@ const atualizarRegistro = async (req, res) => {
                 break;
                 
             case 'perfis':
-                dadosParaAtualizar.permissoes = dados.permissoes || {};
                 break;
         }
 

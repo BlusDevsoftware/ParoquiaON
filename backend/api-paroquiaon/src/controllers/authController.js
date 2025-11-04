@@ -236,14 +236,14 @@ const verifyToken = async (req, res) => {
             try {
                 let perfResp = await supabase
                     .from('perfis')
-                    .select('id,nome,permissoes')
+                    .select('id,nome')
                     .eq('id', usuario.perfil_id)
                     .maybeSingle();
                 let perfil = perfResp.data || null;
                 if ((!perfil && !perfResp.error)) {
                     const arr = await supabase
                         .from('perfis')
-                        .select('id,nome,permissoes')
+                        .select('id,nome')
                         .eq('id', usuario.perfil_id)
                         .order('id', { ascending: true })
                         .limit(1);
@@ -253,7 +253,8 @@ const verifyToken = async (req, res) => {
                 }
                 if (perfil) {
                     perfilNome = perfil.nome || null;
-                    permissoes = perfil.permissoes || {};
+                    // Permissões em colunas: frontend monta a partir do registro quando necessário
+                    permissoes = {};
                 }
             } catch (e) {
                 console.warn('Falha ao buscar perfil (best-effort):', e);

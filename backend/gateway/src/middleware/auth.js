@@ -31,8 +31,7 @@ const authMiddleware = async (req, res, next) => {
                 ultimo_login,
                 perfis (
                     id,
-                    nome,
-                    permissoes
+                    nome
                 ),
                 pessoas (
                     id,
@@ -59,7 +58,7 @@ const authMiddleware = async (req, res, next) => {
             login: user.login,
             perfil: user.perfis,
             pessoa: user.pessoas,
-            permissions: user.perfis?.permissoes || {}
+            permissions: {}
         };
 
         next();
