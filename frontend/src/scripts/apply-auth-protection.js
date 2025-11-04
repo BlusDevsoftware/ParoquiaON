@@ -1,3 +1,21 @@
+// Função para aguardar elemento estar disponível
+function aguardarElemento(seletor, timeout = 3000) {
+    return new Promise((resolve, reject) => {
+        const inicio = Date.now();
+        const check = () => {
+            const elemento = document.querySelector(seletor);
+            if (elemento) {
+                resolve(elemento);
+            } else if (Date.now() - inicio < timeout) {
+                setTimeout(check, 100);
+            } else {
+                reject(new Error(`Elemento ${seletor} não encontrado após ${timeout}ms`));
+            }
+        };
+        check();
+    });
+}
+
 // Aplicar proteção de autenticação e ajustar UI por permissões
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔒 Aplicando proteção de autenticação...');
@@ -8,11 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
         Promise.resolve(maybePromise).then(function() {
             try { 
                 aplicarPermissoesNoMenu();
-                // Aguardar um pouco para garantir que o template do menu foi carregado
-                setTimeout(function() {
-                    atualizarAvatarUsuario();
-                    configurarDropdownAvatar();
-                }, 100);
+                // Aguardar elementos estarem disponíveis e tentar várias vezes
+                tentarAtualizarAvatar();
             } catch (e) {
                 console.error('Erro ao aplicar proteção:', e);
             }
@@ -20,11 +35,112 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.log('⚠️ Sistema de autenticação não disponível - acesso livre');
         // Tentar configurar mesmo sem auth guard (pode ser modo desenvolvimento)
-        setTimeout(function() {
-            configurarDropdownAvatar();
-        }, 100);
+        tentarAtualizarAvatar();
     }
 });
+
+// Função para tentar atualizar avatar várias vezes até conseguir
+function tentarAtualizarAvatar() {
+    let tentativas = 0;
+    const maxTentativas = 10;
+    
+    const tentar = () => {
+        tentativas++;
+        const avatar = document.getElementById('userAvatar');
+        const avatarDropdown = document.querySelector('.user-avatar-dropdown');
+        
+        if (avatar && avatarDropdown) {
+            atualizarAvatarUsuario();
+            configurarDropdownAvatar();
+        } else if (tentativas < maxTentativas) {
+            setTimeout(tentar, 200);
+        } else {
+            console.warn('⚠️ Não foi possível encontrar elementos do avatar após várias tentativas');
+            // Tentar criar estrutura se não existir
+            criarEstruturaAvatarSeNecessario();
+        }
+    };
+    
+    tentar();
+}
+
+// Função para criar estrutura do avatar se não existir
+function criarEstruturaAvatarSeNecessario() {
+    const headerRight = document.querySelector('.header-right');
+    if (!headerRight) return;
+    
+    // Verificar se já existe estrutura completa
+    let avatarDropdown = document.querySelector('.user-avatar-dropdown');
+    if (!avatarDropdown) {
+        // Procurar avatar simples
+        const avatarSimples = document.querySelector('.user-avatar:not(#userAvatar)');
+        if (avatarSimples) {
+            // Criar estrutura completa
+            avatarDropdown = document.createElement('div');
+            avatarDropdown.className = 'user-avatar-dropdown';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'user-avatar';
+            avatar.id = 'userAvatar';
+            avatar.textContent = avatarSimples.textContent || 'A';
+            
+            const dropdownMenu = document.createElement('div');
+            dropdownMenu.className = 'user-dropdown-menu';
+            dropdownMenu.id = 'userDropdownMenu';
+            
+            const dropdownHeader = document.createElement('div');
+            dropdownHeader.className = 'user-dropdown-header';
+            
+            const dropdownAvatar = document.createElement('div');
+            dropdownAvatar.className = 'user-dropdown-avatar';
+            dropdownAvatar.id = 'userDropdownAvatar';
+            dropdownAvatar.textContent = avatarSimples.textContent || 'A';
+            
+            const dropdownInfo = document.createElement('div');
+            dropdownInfo.className = 'user-dropdown-info';
+            
+            const dropdownName = document.createElement('div');
+            dropdownName.className = 'user-dropdown-name';
+            dropdownName.id = 'userDropdownName';
+            dropdownName.textContent = 'Usuário';
+            
+            const dropdownEmail = document.createElement('div');
+            dropdownEmail.className = 'user-dropdown-email';
+            dropdownEmail.id = 'userDropdownEmail';
+            dropdownEmail.textContent = 'usuario@email.com';
+            
+            dropdownInfo.appendChild(dropdownName);
+            dropdownInfo.appendChild(dropdownEmail);
+            dropdownHeader.appendChild(dropdownAvatar);
+            dropdownHeader.appendChild(dropdownInfo);
+            
+            const divider = document.createElement('div');
+            divider.className = 'user-dropdown-divider';
+            
+            const logoutBtn = document.createElement('a');
+            logoutBtn.href = '#';
+            logoutBtn.className = 'user-dropdown-item logout';
+            logoutBtn.id = 'logoutBtn';
+            logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i><span>Sair</span>';
+            
+            dropdownMenu.appendChild(dropdownHeader);
+            dropdownMenu.appendChild(divider);
+            dropdownMenu.appendChild(logoutBtn);
+            
+            avatarDropdown.appendChild(avatar);
+            avatarDropdown.appendChild(dropdownMenu);
+            
+            // Substituir avatar simples pela estrutura completa
+            avatarSimples.parentNode.replaceChild(avatarDropdown, avatarSimples);
+            
+            console.log('✅ Estrutura do avatar criada dinamicamente');
+            
+            // Atualizar e configurar
+            atualizarAvatarUsuario();
+            configurarDropdownAvatar();
+        }
+    }
+}
 
 // Atualizar avatar do usuário no menu superior
 function atualizarAvatarUsuario() {
