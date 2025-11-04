@@ -20,15 +20,16 @@ class AuthGuard {
         this.PAGE_PERMISSION_MAP = {
             'index.html': 'minha_comunidade_ver',
             'agenda.html': 'agenda_ver',
-            'comunidades.html': 'cadastros_comunidades_ver',
-            'pastorais.html': 'cadastros_pastorais_ver',
-            'pilares.html': 'cadastros_pilares_ver',
-            'locais.html': 'cadastros_locais_ver',
-            'acoes.html': 'cadastros_acoes_ver',
-            'pessoas.html': 'cadastros_pessoas_ver',
-            'usuarios.html': 'cadastros_usuarios_ver',
-            'perfil.html': 'cadastros_perfis_ver',
-            'dinamico.html': 'relatorios_dinamico_ver',
+            'comunidades.html': 'comunidades_ver',
+            'pastorais.html': 'pastorais_ver',
+            'pilares.html': 'pilares_ver',
+            'locais.html': 'locais_ver',
+            'acoes.html': 'acoes_ver',
+            'pessoas.html': 'pessoas_ver',
+            'usuarios.html': 'usuarios_ver',
+            // 'perfil.html' sem flag específica no backend -> não restringir
+            'relatorios.html': 'relatorios_ver',
+            'dinamico.html': 'relatorios_ver',
             'manutencao-bd.html': 'configuracoes_manutencao_ver'
         };
         this.init();
@@ -128,11 +129,11 @@ class AuthGuard {
                                     // Extrair permissões de colunas booleanas/numericas do perfil
                                     const perms = {};
                                     Object.entries(perfil).forEach(([key, value]) => {
-                                        if (typeof value === 'boolean' && value === true) {
-                                            perms[key] = true;
-                                        } else if (typeof value === 'number' && value === 1) {
-                                            perms[key] = true;
-                                        }
+                                        const v = value;
+                                        const truthy = (typeof v === 'boolean' && v === true)
+                                            || (typeof v === 'number' && v === 1)
+                                            || (typeof v === 'string' && (v === '1' || v.toLowerCase() === 'true' || v.toLowerCase() === 't'));
+                                        if (truthy) perms[key] = true;
                                     });
                                     if (Object.keys(perms).length > 0) {
                                         user = { ...user, permissoes: perms };
@@ -180,15 +181,15 @@ class AuthGuard {
         const order = [
             { url: 'index.html', flag: 'minha_comunidade_ver' },
             { url: 'agenda.html', flag: 'agenda_ver' },
-            { url: 'comunidades.html', flag: 'cadastros_comunidades_ver' },
-            { url: 'pastorais.html', flag: 'cadastros_pastorais_ver' },
-            { url: 'pilares.html', flag: 'cadastros_pilares_ver' },
-            { url: 'locais.html', flag: 'cadastros_locais_ver' },
-            { url: 'acoes.html', flag: 'cadastros_acoes_ver' },
-            { url: 'pessoas.html', flag: 'cadastros_pessoas_ver' },
-            { url: 'usuarios.html', flag: 'cadastros_usuarios_ver' },
-            { url: 'perfil.html', flag: 'cadastros_perfis_ver' },
-            { url: 'dinamico.html', flag: 'relatorios_dinamico_ver' },
+            { url: 'comunidades.html', flag: 'comunidades_ver' },
+            { url: 'pastorais.html', flag: 'pastorais_ver' },
+            { url: 'pilares.html', flag: 'pilares_ver' },
+            { url: 'locais.html', flag: 'locais_ver' },
+            { url: 'acoes.html', flag: 'acoes_ver' },
+            { url: 'pessoas.html', flag: 'pessoas_ver' },
+            { url: 'usuarios.html', flag: 'usuarios_ver' },
+            { url: 'relatorios.html', flag: 'relatorios_ver' },
+            { url: 'dinamico.html', flag: 'relatorios_ver' },
             { url: 'manutencao-bd.html', flag: 'configuracoes_manutencao_ver' }
         ];
         for (const item of order) {
