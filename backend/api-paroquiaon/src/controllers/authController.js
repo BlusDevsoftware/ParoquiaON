@@ -157,23 +157,15 @@ const verifyToken = async (req, res) => {
         const decoded = jwt.verify(token, JWT_SECRET);
 
         // Buscar usuário atualizado (maybeSingle + fallback limit(1))
+        // Buscar apenas campos básicos para evitar bloqueios de RLS em joins
         const baseSelect = `
                 id,
                 email,
                 login,
                 ativo,
                 ultimo_login,
-                perfis (
-                    id,
-                    nome,
-                    permissoes
-                ),
-                pessoas (
-                    id,
-                    nome,
-                    telefone,
-                    email
-                )`;
+                perfil_id,
+                pessoa_id`;
 
         let resp = await supabase
             .from('usuarios')
@@ -208,16 +200,47 @@ const verifyToken = async (req, res) => {
             return res.status(401).json({ error: 'Usuário não encontrado', code: 'USER_NOT_FOUND' });
         }
 
+        // Buscar perfil em chamada separada (best-effort)
+        let perfilNome = null;
+        let permissoes = {};
+        if (usuario.perfil_id != null) {
+            try {
+                let perfResp = await supabase
+                    .from('perfis')
+                    .select('id,nome,permissoes')
+                    .eq('id', usuario.perfil_id)
+                    .maybeSingle();
+                let perfil = perfResp.data || null;
+                if ((!perfil && !perfResp.error)) {
+                    const arr = await supabase
+                        .from('perfis')
+                        .select('id,nome,permissoes')
+                        .eq('id', usuario.perfil_id)
+                        .order('id', { ascending: true })
+                        .limit(1);
+                    if (!arr.error && Array.isArray(arr.data) && arr.data.length > 0) {
+                        perfil = arr.data[0];
+                    }
+                }
+                if (perfil) {
+                    perfilNome = perfil.nome || null;
+                    permissoes = perfil.permissoes || {};
+                }
+            } catch (e) {
+                console.warn('Falha ao buscar perfil (best-effort):', e);
+            }
+        }
+
         return res.json({
             valid: true,
             user: {
                 id: usuario.id,
                 email: usuario.email,
                 login: usuario.login,
-                nome: usuario.pessoas?.nome,
-                telefone: usuario.pessoas?.telefone,
-                perfil: usuario.perfis?.nome,
-                permissoes: usuario.perfis?.permissoes || {}
+                perfil_id: usuario.perfil_id ?? null,
+                pessoa_id: usuario.pessoa_id ?? null,
+                perfil: perfilNome,
+                permissoes
             }
         });
 
