@@ -156,7 +156,10 @@ function sectionKeyToTitle(sectionKey) {
         'locais': 'Locais',
         'acoes': 'Ações',
         'agenda': 'Agenda',
-        'relatorios': 'Relatórios'
+        'relatorios': 'Relatórios',
+        'perfis': 'Perfis',
+        'configuracoes_manutencao': 'Configurações',
+        'configuracoes_sincronizar': 'Configurações'
     };
     return map[sectionKey] || sectionKey;
 }
@@ -166,7 +169,11 @@ function buildPermissionsMapFromProfile(profileObj) {
     console.log('🔍 DEBUG - buildPermissionsMapFromProfile - profileObj:', profileObj);
     
     Object.keys(profileObj).forEach(key => {
-        if (typeof profileObj[key] !== 'boolean') return;
+        const v = profileObj[key];
+        const truthy = (typeof v === 'boolean' && v === true)
+            || (typeof v === 'number' && v === 1)
+            || (typeof v === 'string' && (v === '1' || v.toLowerCase() === 'true' || v.toLowerCase() === 't'));
+        if (!truthy) return;
 
         const lastUnderscore = key.lastIndexOf('_');
         if (lastUnderscore <= 0) return;
@@ -179,9 +186,7 @@ function buildPermissionsMapFromProfile(profileObj) {
         const title = sectionKeyToTitle(mappedSectionKey);
         
         if (!mapa[title]) mapa[title] = [];
-        if (profileObj[key] === true) {
-            mapa[title].push(action);
-        }
+        mapa[title].push(action);
     });
     
     console.log('🔍 DEBUG - buildPermissionsMapFromProfile - mapa final:', mapa);
