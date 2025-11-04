@@ -155,6 +155,7 @@ function applyPermissionsToUI() {
     const menuMap = [
         { selector: 'a[href="pastorais.html"]', flag: 'pastorais_ver' },
         { selector: 'a[href="pilares.html"]', flag: 'pilares_ver' },
+        { selector: 'a[href="comunidades.html"]', flag: 'comunidades_ver' },
         { selector: 'a[href="locais.html"]', flag: 'locais_ver' },
         { selector: 'a[href="acoes.html"]', flag: 'acoes_ver' },
         { selector: 'a[href="pessoas.html"]', flag: 'pessoas_ver' },

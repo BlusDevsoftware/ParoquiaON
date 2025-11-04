@@ -19,6 +19,7 @@ class AuthGuard {
         this.PAGE_PERMISSION_MAP = {
             'pastorais.html': 'pastorais_ver',
             'pilares.html': 'pilares_ver',
+            'comunidades.html': 'comunidades_ver',
             'locais.html': 'locais_ver',
             'acoes.html': 'acoes_ver',
             'pessoas.html': 'pessoas_ver',
