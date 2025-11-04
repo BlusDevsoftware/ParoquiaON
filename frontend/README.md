@@ -22,7 +22,7 @@ frontend/
 
 - `index.html` - Página inicial
 - `usuarios.html` - Gerenciamento de usuários
-- `colaboradores.html` - Gerenciamento de colaboradores
+ 
 - `clientes.html` - Gerenciamento de clientes
 - `produtos.html` - Gerenciamento de produtos
 - `locais.html` - Gerenciamento de locais

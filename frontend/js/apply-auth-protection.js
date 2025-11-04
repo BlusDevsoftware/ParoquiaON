@@ -159,10 +159,9 @@ function applyPermissionsToUI() {
     const can = (flag) => window.authGuard.hasPermission(flag);
 
     const menuMap = [
-        { selector: 'a[href="colaboradores.html"]', flag: 'cadastros_colaboradores_ver' },
-        { selector: 'a[href="clientes.html"]', flag: 'cadastros_clientes_ver' },
-        { selector: 'a[href="produtos.html"]', flag: 'cadastros_produtos_ver' },
-        { selector: 'a[href="locais.html"]', flag: 'cadastros_servicos_ver' },
+        { selector: 'a[href="pastorais.html"]', flag: 'cadastros_pastorais_ver' },
+        { selector: 'a[href="pilares.html"]', flag: 'cadastros_pilares_ver' },
+        { selector: 'a[href="locais.html"]', flag: 'cadastros_locais_ver' },
         { selector: 'a[href="acoes.html"]', flag: 'cadastros_acoes_ver' },
         { selector: 'a[href="pessoas.html"]', flag: 'cadastros_pessoas_ver' },
         { selector: 'a[href="usuarios.html"]', flag: 'cadastros_usuarios_ver' },
@@ -187,10 +186,10 @@ function getRequiredPermissionForCurrentPage() {
     const file = (location.pathname.split('/').pop() || '').toLowerCase();
     const map = {
         'index.html': 'dashboard_ver',
-        'colaboradores.html': 'cadastros_colaboradores_ver',
-        'clientes.html': 'cadastros_clientes_ver',
-        'produtos.html': 'cadastros_produtos_ver',
-        'locais.html': 'cadastros_servicos_ver',
+        
+        'pastorais.html': 'cadastros_pastorais_ver',
+        'pilares.html': 'cadastros_pilares_ver',
+        'locais.html': 'cadastros_locais_ver',
         'acoes.html': 'cadastros_acoes_ver',
         'pessoas.html': 'cadastros_pessoas_ver',
         'usuarios.html': 'cadastros_usuarios_ver',
@@ -208,10 +207,10 @@ function getRequiredPermissionForCurrentPage() {
 function findFirstAllowedPage() {
     const candidates = [
         { url: 'index.html', flag: 'dashboard_ver' },
-        { url: 'colaboradores.html', flag: 'cadastros_colaboradores_ver' },
-        { url: 'clientes.html', flag: 'cadastros_clientes_ver' },
-        { url: 'produtos.html', flag: 'cadastros_produtos_ver' },
-        { url: 'locais.html', flag: 'cadastros_servicos_ver' },
+        
+        { url: 'pastorais.html', flag: 'cadastros_pastorais_ver' },
+        { url: 'pilares.html', flag: 'cadastros_pilares_ver' },
+        { url: 'locais.html', flag: 'cadastros_locais_ver' },
         { url: 'acoes.html', flag: 'cadastros_acoes_ver' },
         { url: 'pessoas.html', flag: 'cadastros_pessoas_ver' },
         { url: 'usuarios.html', flag: 'cadastros_usuarios_ver' },
