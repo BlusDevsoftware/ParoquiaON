@@ -161,7 +161,6 @@ const verifyToken = async (req, res) => {
         const baseSelect = `
                 id,
                 email,
-                login,
                 ativo,
                 ultimo_login,
                 perfil_id,
@@ -266,7 +265,6 @@ const verifyToken = async (req, res) => {
             user: {
                 id: usuario.id,
                 email: usuario.email,
-                login: usuario.login,
                 perfil_id: usuario.perfil_id ?? null,
                 pessoa_id: usuario.pessoa_id ?? null,
                 perfil: perfilNome,
