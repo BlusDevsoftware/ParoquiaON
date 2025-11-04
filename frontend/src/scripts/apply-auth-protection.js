@@ -16,9 +16,28 @@ function aguardarElemento(seletor, timeout = 3000) {
     });
 }
 
+// Cache de dados do usuário para exibição imediata
+let cachedUserData = null;
+
+// Carregar dados do cache imediatamente
+(function() {
+    try {
+        const userData = sessionStorage.getItem('user');
+        if (userData) {
+            cachedUserData = JSON.parse(userData);
+        }
+    } catch(e) {}
+})();
+
 // Aplicar proteção de autenticação e ajustar UI por permissões
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔒 Aplicando proteção de autenticação...');
+    
+    // Atualizar avatar IMEDIATAMENTE com dados do cache (sem esperar verifyToken)
+    requestAnimationFrame(function() {
+        atualizarAvatarImmediato();
+        configurarDropdownAvatar();
+    });
     
     if (typeof window.authGuard !== 'undefined') {
         console.log('✅ Sistema de autenticação disponível');
@@ -26,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
         Promise.resolve(maybePromise).then(function() {
             try { 
                 aplicarPermissoesNoMenu();
-                // Aguardar elementos estarem disponíveis e tentar várias vezes
-                tentarAtualizarAvatar();
+                // Atualizar novamente quando os dados atualizados chegarem do backend
+                atualizarAvatarUsuario();
             } catch (e) {
                 console.error('Erro ao aplicar proteção:', e);
             }
@@ -38,6 +57,90 @@ document.addEventListener('DOMContentLoaded', function() {
         tentarAtualizarAvatar();
     }
 });
+
+// Função para atualizar avatar imediatamente com dados do cache
+function atualizarAvatarImmediato() {
+    const user = cachedUserData || (window.authGuard ? window.authGuard.getCurrentUser() : null);
+    if (!user) return;
+    
+    const nome = user.nome || user.email || 'U';
+    const inicial = nome.charAt(0).toUpperCase();
+    const email = user.email || '';
+    const foto = user.foto || user.avatar || user.pessoa?.foto || null;
+    
+    // Atualizar elementos se existirem
+    const avatar = document.getElementById('userAvatar');
+    const dropdownAvatar = document.getElementById('userDropdownAvatar');
+    const dropdownName = document.getElementById('userDropdownName');
+    const dropdownEmail = document.getElementById('userDropdownEmail');
+    
+    if (avatar) {
+        // Sempre mostrar inicial primeiro (para evitar tela branca)
+        avatar.innerHTML = inicial;
+        avatar.style.background = '#ffffff';
+        avatar.style.color = '#1e3a8a';
+        
+        if (foto && foto.trim() !== '') {
+            // Pre-carregar imagem e substituir quando estiver pronta
+            const img = new Image();
+            img.onload = function() {
+                avatar.innerHTML = '';
+                avatar.style.background = '';
+                avatar.style.color = '';
+                const imgEl = document.createElement('img');
+                imgEl.src = foto;
+                imgEl.alt = nome;
+                imgEl.style.width = '100%';
+                imgEl.style.height = '100%';
+                imgEl.style.objectFit = 'cover';
+                imgEl.style.borderRadius = '50%';
+                avatar.appendChild(imgEl);
+            };
+            img.onerror = function() {
+                // Manter inicial se foto falhar
+                avatar.innerHTML = inicial;
+                avatar.style.background = '#ffffff';
+                avatar.style.color = '#1e3a8a';
+            };
+            img.src = foto;
+        }
+    }
+    
+    if (dropdownAvatar) {
+        // Sempre mostrar inicial primeiro (para evitar tela branca)
+        dropdownAvatar.innerHTML = inicial;
+        dropdownAvatar.style.background = '#1e3a8a';
+        dropdownAvatar.style.color = 'white';
+        
+        if (foto && foto.trim() !== '') {
+            // Pre-carregar imagem e substituir quando estiver pronta
+            const img = new Image();
+            img.onload = function() {
+                dropdownAvatar.innerHTML = '';
+                dropdownAvatar.style.background = '';
+                dropdownAvatar.style.color = '';
+                const imgEl = document.createElement('img');
+                imgEl.src = foto;
+                imgEl.alt = nome;
+                imgEl.style.width = '100%';
+                imgEl.style.height = '100%';
+                imgEl.style.objectFit = 'cover';
+                imgEl.style.borderRadius = '50%';
+                dropdownAvatar.appendChild(imgEl);
+            };
+            img.onerror = function() {
+                // Manter inicial se foto falhar
+                dropdownAvatar.innerHTML = inicial;
+                dropdownAvatar.style.background = '#1e3a8a';
+                dropdownAvatar.style.color = 'white';
+            };
+            img.src = foto;
+        }
+    }
+    
+    if (dropdownName) dropdownName.textContent = nome;
+    if (dropdownEmail) dropdownEmail.textContent = email;
+}
 
 // Função para tentar atualizar avatar várias vezes até conseguir
 function tentarAtualizarAvatar() {
@@ -50,10 +153,10 @@ function tentarAtualizarAvatar() {
         const avatarDropdown = document.querySelector('.user-avatar-dropdown');
         
         if (avatar && avatarDropdown) {
-            atualizarAvatarUsuario();
+            atualizarAvatarImmediato();
             configurarDropdownAvatar();
         } else if (tentativas < maxTentativas) {
-            setTimeout(tentar, 200);
+            setTimeout(tentar, 100); // Reduzido de 200ms para 100ms
         } else {
             console.warn('⚠️ Não foi possível encontrar elementos do avatar após várias tentativas');
             // Tentar criar estrutura se não existir
@@ -63,6 +166,14 @@ function tentarAtualizarAvatar() {
     
     tentar();
 }
+
+// Escutar atualizações de dados do usuário
+window.addEventListener('userDataUpdated', function(event) {
+    if (event.detail) {
+        cachedUserData = event.detail;
+        atualizarAvatarUsuario();
+    }
+});
 
 // Função para criar estrutura do avatar se não existir
 function criarEstruturaAvatarSeNecessario() {
@@ -142,51 +253,62 @@ function criarEstruturaAvatarSeNecessario() {
     }
 }
 
-// Atualizar avatar do usuário no menu superior
+// Atualizar avatar do usuário no menu superior (com dados atualizados do backend)
 function atualizarAvatarUsuario() {
     const user = window.authGuard ? window.authGuard.getCurrentUser() : null;
     if (!user) {
-        console.warn('Usuário não encontrado para atualizar avatar');
+        // Se não encontrou usuário, tentar atualizar com cache
+        atualizarAvatarImmediato();
         return;
     }
+    
+    // Atualizar cache
+    cachedUserData = user;
     
     const nome = user.nome || user.email || 'U';
     const inicial = nome.charAt(0).toUpperCase();
     const email = user.email || '';
     const foto = user.foto || user.avatar || user.pessoa?.foto || null;
     
-    console.log('Atualizando avatar:', { nome, email, temFoto: !!foto });
-    
-    // Função para atualizar avatar (com foto ou inicial)
+    // Função para atualizar avatar (com foto ou inicial) - versão otimizada
     function atualizarElementoAvatar(el, tamanho) {
-        if (!el) {
-            console.warn('Elemento de avatar não encontrado');
-            return;
-        }
+        if (!el) return;
+        
+        // Sempre mostrar inicial primeiro (para evitar tela branca)
+        el.innerHTML = inicial;
+        el.style.background = tamanho === 'small' ? '#ffffff' : '#1e3a8a';
+        el.style.color = tamanho === 'small' ? '#1e3a8a' : 'white';
+        
         if (foto && foto.trim() !== '') {
-            // Limpar conteúdo anterior
-            el.innerHTML = '';
-            el.style.background = '';
-            el.style.color = '';
+            // Verificar se já tem a mesma foto para evitar recarregamento desnecessário
+            const imgExistente = el.querySelector('img');
+            if (imgExistente && imgExistente.src === foto) {
+                return; // Já tem a foto correta, não precisa atualizar
+            }
             
-            const img = document.createElement('img');
-            img.src = foto;
-            img.alt = nome;
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'cover';
-            img.style.borderRadius = '50%';
+            // Pre-carregar imagem e substituir quando estiver pronta
+            const img = new Image();
+            img.onload = function() {
+                el.innerHTML = '';
+                el.style.background = '';
+                el.style.color = '';
+                const imgEl = document.createElement('img');
+                imgEl.src = foto;
+                imgEl.alt = nome;
+                imgEl.style.width = '100%';
+                imgEl.style.height = '100%';
+                imgEl.style.objectFit = 'cover';
+                imgEl.style.borderRadius = '50%';
+                el.appendChild(imgEl);
+            };
             img.onerror = function() {
-                console.warn('Erro ao carregar foto do usuário:', foto);
+                // Manter inicial se foto falhar
                 el.innerHTML = inicial;
                 el.style.background = tamanho === 'small' ? '#ffffff' : '#1e3a8a';
                 el.style.color = tamanho === 'small' ? '#1e3a8a' : 'white';
             };
-            el.appendChild(img);
+            img.src = foto;
         } else {
-            el.innerHTML = inicial;
-            el.style.background = tamanho === 'small' ? '#ffffff' : '#1e3a8a';
-            el.style.color = tamanho === 'small' ? '#1e3a8a' : 'white';
             // Remover imagens se houver
             const img = el.querySelector('img');
             if (img) img.remove();
@@ -197,16 +319,12 @@ function atualizarAvatarUsuario() {
     const avatar = document.getElementById('userAvatar');
     if (avatar) {
         atualizarElementoAvatar(avatar, 'small');
-    } else {
-        console.warn('Avatar principal não encontrado');
     }
     
     // Atualizar dropdown
     const dropdownAvatar = document.getElementById('userDropdownAvatar');
     if (dropdownAvatar) {
         atualizarElementoAvatar(dropdownAvatar, 'large');
-    } else {
-        console.warn('Avatar do dropdown não encontrado');
     }
     
     const dropdownName = document.getElementById('userDropdownName');
@@ -218,8 +336,6 @@ function atualizarAvatarUsuario() {
     if (dropdownEmail) {
         dropdownEmail.textContent = email;
     }
-    
-    console.log('✅ Avatar atualizado');
 }
 
 // Configurar dropdown do avatar

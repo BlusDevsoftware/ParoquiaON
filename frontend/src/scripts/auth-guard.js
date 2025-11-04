@@ -143,6 +143,8 @@ class AuthGuard {
                         } catch(_) {}
                     }
                     sessionStorage.setItem(this.USER_KEY, JSON.stringify(user));
+                    // Disparar evento para atualizar avatar imediatamente
+                    window.dispatchEvent(new CustomEvent('userDataUpdated', { detail: user }));
                 }
             } catch(_) {}
             return true;
