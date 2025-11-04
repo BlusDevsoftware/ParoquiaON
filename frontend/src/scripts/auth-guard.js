@@ -115,7 +115,22 @@ class AuthGuard {
             try {
                 const data = await response.json();
                 if (data && data.user) {
-                    sessionStorage.setItem(this.USER_KEY, JSON.stringify(data.user));
+                    let user = data.user;
+                    // Fallback: se não veio permissoes mas tem perfil_id, buscar do endpoint de perfis
+                    if ((!user.permissoes || typeof user.permissoes !== 'object') && (user.perfil_id !== null && user.perfil_id !== undefined)) {
+                        try {
+                            const perfResp = await fetch(`https://api-paroquiaon.vercel.app/api/perfis/${user.perfil_id}`, {
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            if (perfResp.ok) {
+                                const perfil = await perfResp.json();
+                                if (perfil && perfil.permissoes && typeof perfil.permissoes === 'object') {
+                                    user = { ...user, permissoes: perfil.permissoes };
+                                }
+                            }
+                        } catch(_) {}
+                    }
+                    sessionStorage.setItem(this.USER_KEY, JSON.stringify(user));
                 }
             } catch(_) {}
             return true;
