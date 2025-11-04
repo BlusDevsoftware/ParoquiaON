@@ -163,6 +163,11 @@ class AuthGuard {
         const requiredFlag = this.PAGE_PERMISSION_MAP[current];
         if (!requiredFlag) return; // Página não mapeada: não restringe
         const allowed = this.hasPermission(requiredFlag);
+        try {
+            const u = this.getCurrentUser();
+            const permsObj = (u && u.permissoes) ? Object.keys(u.permissoes).filter(k => u.permissoes[k] === true) : [];
+            console.log('[AuthGuard] Página:', current, '| Flag exigida:', requiredFlag, '| Tem permissão?', allowed, '| Perfil ID:', u && u.perfil_id, '| Permissões ativas:', permsObj.slice(0, 20));
+        } catch(_) {}
         if (!allowed) {
             const user = this.getCurrentUser();
             const target = this.getFirstAllowedPage(user && user.permissoes);
