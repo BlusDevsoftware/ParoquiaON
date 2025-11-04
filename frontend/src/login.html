@@ -234,6 +234,27 @@
                     updatePasswordStrength(this.value);
                 });
             }
+
+            // Exibir motivo do último erro de autenticação (se houver) após redirecionamento
+            try {
+                const last = sessionStorage.getItem('lastAuthError');
+                if (last) {
+                    const parsed = JSON.parse(last);
+                    console.warn('Último erro de autenticação:', parsed);
+                    // Opcional: mostrar texto breve na tela
+                    const em = document.querySelector('.error-message');
+                    if (em && !em.textContent) {
+                        if (parsed.status === 401 || parsed.status === 403) {
+                            em.textContent = 'Sessão inválida ou expirada. Faça login novamente.';
+                        } else {
+                            em.textContent = 'Falha temporária ao validar sessão. Tente novamente.';
+                        }
+                        em.style.display = 'block';
+                    }
+                    // Limpar após exibir
+                    sessionStorage.removeItem('lastAuthError');
+                }
+            } catch(_) {}
         });
 
         // Mapeamento de permissões para páginas

@@ -82,6 +82,13 @@ class AuthGuard {
                 let info = '';
                 try { info = await response.text(); } catch(_) {}
                 console.warn('[AuthGuard] verify failed:', response.status, info);
+                try {
+                    sessionStorage.setItem('lastAuthError', JSON.stringify({
+                        ts: Date.now(),
+                        status: response.status,
+                        body: info && info.slice ? info.slice(0, 2000) : String(info)
+                    }));
+                } catch(_) {}
                 // Só forçar logout quando for 401/403; outras falhas tratamos como temporárias
                 if (response.status === 401 || response.status === 403) return false;
                 return true;
@@ -89,6 +96,9 @@ class AuthGuard {
             return true;
         } catch {
             console.warn('[AuthGuard] verify request error - treating as temporary');
+            try {
+                sessionStorage.setItem('lastAuthError', JSON.stringify({ ts: Date.now(), status: 'network_error' }));
+            } catch(_) {}
             return true;
         }
     }
