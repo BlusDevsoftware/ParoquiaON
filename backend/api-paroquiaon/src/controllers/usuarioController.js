@@ -135,14 +135,14 @@ async function criarUsuario(req, res) {
         
         // não validar mais duplicidade de login
         
-        // Gerar senha temporária e criptografar
+        // Gerar senha temporária (armazenar em senha_temporaria para primeiro acesso)
         const senhaTemporaria = gerarSenhaTemporaria();
-        const senhaCriptografada = await bcrypt.hash(senhaTemporaria, 10);
         
         // Preparar dados básicos
         const dadosBasicos = {
             email: dados.email,
-            senha: senhaCriptografada,
+            senha: null,
+            senha_temporaria: senhaTemporaria,
             pessoa_id: dados.pessoa_id || null,
             perfil_id: dados.perfil_id || null,
             ativo: dados.ativo !== false, // default true
@@ -151,7 +151,7 @@ async function criarUsuario(req, res) {
             criado_por_nome: dados.criado_por_nome || null
         };
         
-        console.log('Dados preparados para inserção:', { ...dadosBasicos, senha: '[CRIPTOGRAFADA]' });
+        console.log('Dados preparados para inserção:', { ...dadosBasicos, senha: '[NULL]', senha_temporaria: '[GERADA]' });
         
         const { data, error } = await supabase
             .from('usuarios')
