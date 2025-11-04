@@ -124,8 +124,19 @@ class AuthGuard {
                             });
                             if (perfResp.ok) {
                                 const perfil = await perfResp.json();
-                                if (perfil && perfil.permissoes && typeof perfil.permissoes === 'object') {
-                                    user = { ...user, permissoes: perfil.permissoes };
+                                if (perfil && typeof perfil === 'object') {
+                                    // Extrair permissões de colunas booleanas/numericas do perfil
+                                    const perms = {};
+                                    Object.entries(perfil).forEach(([key, value]) => {
+                                        if (typeof value === 'boolean' && value === true) {
+                                            perms[key] = true;
+                                        } else if (typeof value === 'number' && value === 1) {
+                                            perms[key] = true;
+                                        }
+                                    });
+                                    if (Object.keys(perms).length > 0) {
+                                        user = { ...user, permissoes: perms };
+                                    }
                                 }
                             }
                         } catch(_) {}
