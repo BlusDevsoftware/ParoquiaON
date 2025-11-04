@@ -370,8 +370,10 @@
                     } catch (_) {}
                     sessionStorage.setItem('user', JSON.stringify(user));
                     
-                    // Redirecionar para primeira página permitida (ou ficar se nenhuma)
-                    const target = getFirstAllowedPage(user && user.permissoes) || 'index.html';
+                    // Permissões desabilitadas: respeitar redirect da URL ou ir para index.html
+                    const params = new URLSearchParams(window.location.search);
+                    const next = params.get('redirect');
+                    const target = next || 'index.html';
                     setTimeout(() => { window.location.href = target; }, 250);
                 } else {
                     let errorData;

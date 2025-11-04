@@ -15,23 +15,8 @@ class AuthGuard {
         this.LOGIN_PATHS = ['login.html', 'login', '/login'];
         this.TOKEN_KEY = 'token';
         this.USER_KEY = 'user';
-        // Mapeamento de permissão exigida por página
-        // Ajuste as chaves/flags conforme seu backend (devem bater com user.permissoes)
-        this.PAGE_PERMISSION_MAP = {
-            'index.html': 'minha_comunidade_ver',
-            'agenda.html': 'agenda_ver',
-            'comunidades.html': 'comunidades_ver',
-            'pastorais.html': 'pastorais_ver',
-            'pilares.html': 'pilares_ver',
-            'locais.html': 'locais_ver',
-            'acoes.html': 'acoes_ver',
-            'pessoas.html': 'pessoas_ver',
-            'usuarios.html': 'usuarios_ver',
-            // 'perfil.html' sem flag específica no backend -> não restringir
-            'relatorios.html': 'relatorios_ver',
-            'dinamico.html': 'relatorios_ver',
-            'manutencao-bd.html': 'configuracoes_manutencao_ver'
-        };
+        // Permissões desabilitadas: nenhum bloqueio por página
+        this.PAGE_PERMISSION_MAP = {};
         this.init();
     }
 
@@ -81,8 +66,7 @@ class AuthGuard {
                 if (!this.isLoginPage()) this.redirectToLogin();
                 return false;
             }
-            // Após validar token, checar autorização por página
-            this.enforcePagePermission();
+            // Bloqueio por permissão desativado
         } catch(_) {}
         return true;
     }
@@ -160,46 +144,13 @@ class AuthGuard {
         const current = (window.location.pathname || '').split('/').pop() || 'index.html';
         // Não checa login.html
         if (this.isLoginPage()) return;
-        const requiredFlag = this.PAGE_PERMISSION_MAP[current];
-        if (!requiredFlag) return; // Página não mapeada: não restringe
-        const allowed = this.hasPermission(requiredFlag);
-        try {
-            const u = this.getCurrentUser();
-            const permsObj = (u && u.permissoes) ? Object.keys(u.permissoes).filter(k => u.permissoes[k] === true) : [];
-            console.log('[AuthGuard] Página:', current, '| Flag exigida:', requiredFlag, '| Tem permissão?', allowed, '| Perfil ID:', u && u.perfil_id, '| Permissões ativas:', permsObj.slice(0, 20));
-        } catch(_) {}
-        if (!allowed) {
-            const user = this.getCurrentUser();
-            const target = this.getFirstAllowedPage(user && user.permissoes);
-            if (target && target !== current) {
-                window.location.href = target;
-            } else {
-                // Sem página permitida: não redireciona para evitar loop
-                console.warn('[AuthGuard] Sem permissão para a página atual e nenhuma alternativa disponível.');
-            }
-        }
+        // Permissões desabilitadas: não fazer nada
+        return true;
     }
 
     // Calcula a primeira página que o usuário tem permissão de ver
     getFirstAllowedPage(permissoes) {
-        if (!permissoes || typeof permissoes !== 'object') return null;
-        const order = [
-            { url: 'index.html', flag: 'minha_comunidade_ver' },
-            { url: 'agenda.html', flag: 'agenda_ver' },
-            { url: 'comunidades.html', flag: 'comunidades_ver' },
-            { url: 'pastorais.html', flag: 'pastorais_ver' },
-            { url: 'pilares.html', flag: 'pilares_ver' },
-            { url: 'locais.html', flag: 'locais_ver' },
-            { url: 'acoes.html', flag: 'acoes_ver' },
-            { url: 'pessoas.html', flag: 'pessoas_ver' },
-            { url: 'usuarios.html', flag: 'usuarios_ver' },
-            { url: 'relatorios.html', flag: 'relatorios_ver' },
-            { url: 'dinamico.html', flag: 'relatorios_ver' },
-            { url: 'manutencao-bd.html', flag: 'configuracoes_manutencao_ver' }
-        ];
-        for (const item of order) {
-            if (permissoes[item.flag]) return item.url;
-        }
+        // Permissões desabilitadas: sem cálculo de primeira página
         return null;
     }
 
@@ -246,17 +197,8 @@ class AuthGuard {
     getToken() { return sessionStorage.getItem(this.TOKEN_KEY); }
 
     hasPermission(flagOrSection, action) {
-        const user = this.getCurrentUser();
-        if (!user) return false;
-        const perms = user.permissoes || {};
-        if (typeof flagOrSection === 'string' && !action) {
-            return perms[flagOrSection] === true;
-        }
-        if (typeof flagOrSection === 'string' && typeof action === 'string') {
-            const key = `${flagOrSection}_${action}`;
-            return perms[key] === true;
-        }
-        return false;
+        // Permissões desabilitadas: sempre permitir
+        return true;
     }
 
     redirectAfterLogin() {

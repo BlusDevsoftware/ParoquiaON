@@ -41,19 +41,9 @@ function applyAuthProtection() {
 
         // Atualizar informações do usuário na interface
         updateUserInfo();
-        // Aplicar permissões na UI
-        try { applyPermissionsToUI(); } catch (_) {}
-
-        // Checar se o usuário tem permissão para a página atual
-        const required = getRequiredPermissionForCurrentPage();
-        if (required && !window.authGuard.hasPermission(required)) {
-            console.warn('Sem permissão para esta página:', required);
-            try { alert('Você não possui permissão para esta página.'); } catch(_) {}
-            // Redirecionar para primeira página permitida ou index
-            const first = (typeof findFirstAllowedPage === 'function' && findFirstAllowedPage()) || 'index.html';
-            try { window.location.replace(first); } catch(_) { window.location.href = first; }
-            return;
-        }
+        // Permissões desabilitadas: não aplicar restrições na UI nem bloquear página
+        try { /* applyPermissionsToUI desabilitado */ } catch (_) {}
+        const required = null;
 
         // Exibir conteúdo após validações
         try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
@@ -157,7 +147,8 @@ function updateUserInfo() {
 function applyPermissionsToUI() {
     const user = window.authGuard ? window.authGuard.getCurrentUser() : null;
     if (!user || !user.permissoes) return;
-    const can = (flag) => window.authGuard.hasPermission(flag);
+    // Permissões desabilitadas
+    const can = (flag) => true;
 
     const menuMap = [
         { selector: 'a[href="pastorais.html"]', flag: 'cadastros_pastorais_ver' },
@@ -197,47 +188,13 @@ function applyPermissionsToUI() {
 
 // Mapeia página -> flag de permissão necessária
 function getRequiredPermissionForCurrentPage() {
-    const file = (location.pathname.split('/').pop() || '').toLowerCase();
-    const map = {
-        'index.html': 'dashboard_ver',
-        
-        'pastorais.html': 'cadastros_pastorais_ver',
-        'pilares.html': 'cadastros_pilares_ver',
-        'locais.html': 'cadastros_locais_ver',
-        'acoes.html': 'cadastros_acoes_ver',
-        'pessoas.html': 'cadastros_pessoas_ver',
-        'usuarios.html': 'cadastros_usuarios_ver',
-        'perfil.html': 'cadastros_perfis_ver',
-        'recebimento.html': 'relatorios_recebimento_ver',
-        'conferencia.html': 'relatorios_conferencia_ver',
-        'dinamico.html': 'relatorios_dinamico_ver',
-        'manutencao-bd.html': 'configuracoes_manutencao_ver',
-        'sincronizar.html': 'configuracoes_sincronizar_ver'
-    };
-    return map[file];
+    // Permissões desabilitadas
+    return null;
 }
 
 // Encontra primeira página do menu que o usuário tem permissão para ver
 function findFirstAllowedPage() {
-    const candidates = [
-        { url: 'index.html', flag: 'dashboard_ver' },
-        
-        { url: 'pastorais.html', flag: 'cadastros_pastorais_ver' },
-        { url: 'pilares.html', flag: 'cadastros_pilares_ver' },
-        { url: 'locais.html', flag: 'cadastros_locais_ver' },
-        { url: 'acoes.html', flag: 'cadastros_acoes_ver' },
-        { url: 'pessoas.html', flag: 'cadastros_pessoas_ver' },
-        { url: 'usuarios.html', flag: 'cadastros_usuarios_ver' },
-        { url: 'perfil.html', flag: 'cadastros_perfis_ver' },
-        { url: 'recebimento.html', flag: 'relatorios_recebimento_ver' },
-        { url: 'conferencia.html', flag: 'relatorios_conferencia_ver' },
-        { url: 'dinamico.html', flag: 'relatorios_dinamico_ver' },
-        { url: 'manutencao-bd.html', flag: 'configuracoes_manutencao_ver' },
-        { url: 'sincronizar.html', flag: 'configuracoes_sincronizar_ver' }
-    ];
-    for (const c of candidates) {
-        if (window.authGuard.hasPermission(c.flag)) return c.url;
-    }
+    // Permissões desabilitadas
     return null;
 }
 
