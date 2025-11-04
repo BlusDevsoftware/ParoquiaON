@@ -47,10 +47,11 @@ function applyAuthProtection() {
         // Checar se o usuário tem permissão para a página atual
         const required = getRequiredPermissionForCurrentPage();
         if (required && !window.authGuard.hasPermission(required)) {
-            // Não redirecionar automaticamente; apenas exibe aviso e mantém na página
             console.warn('Sem permissão para esta página:', required);
             try { alert('Você não possui permissão para esta página.'); } catch(_) {}
-            try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
+            // Redirecionar para primeira página permitida ou index
+            const first = (typeof findFirstAllowedPage === 'function' && findFirstAllowedPage()) || 'index.html';
+            try { window.location.replace(first); } catch(_) { window.location.href = first; }
             return;
         }
 
@@ -179,6 +180,19 @@ function applyPermissionsToUI() {
             li.style.display = 'none';
         }
     });
+
+    // Ocultar qualquer elemento marcado com data-permission="flag" (genérico)
+    try {
+        const all = document.querySelectorAll('[data-permission]');
+        all.forEach(el => {
+            const flag = (el.getAttribute('data-permission') || '').trim();
+            if (!flag) return;
+            if (!can(flag)) {
+                const container = el.closest('li, .menu-item, .nav-item') || el;
+                container.style.display = 'none';
+            }
+        });
+    } catch(_) {}
 }
 
 // Mapeia página -> flag de permissão necessária
