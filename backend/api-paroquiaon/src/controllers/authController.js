@@ -146,25 +146,18 @@ const login = async (req, res) => {
     }
 };
 
-// Função para verificar token
+// Função para verificar token (robusta contra 300 do PostgREST)
 const verifyToken = async (req, res) => {
     try {
         const token = req.headers.authorization?.replace('Bearer ', '');
-        
         if (!token) {
-            return res.status(401).json({
-                error: 'Token não fornecido',
-                code: 'MISSING_TOKEN'
-            });
+            return res.status(401).json({ error: 'Token não fornecido', code: 'MISSING_TOKEN' });
         }
 
-        // Verificar token JWT
         const decoded = jwt.verify(token, JWT_SECRET);
-        
-        // Buscar usuário atualizado
-        const { data: usuario, error } = await supabase
-            .from('usuarios')
-            .select(`
+
+        // Buscar usuário atualizado (maybeSingle + fallback limit(1))
+        const baseSelect = `
                 id,
                 email,
                 login,
@@ -180,20 +173,42 @@ const verifyToken = async (req, res) => {
                     nome,
                     telefone,
                     email
-                )
-            `)
+                )`;
+
+        let resp = await supabase
+            .from('usuarios')
+            .select(baseSelect)
             .eq('id', decoded.userId)
             .eq('ativo', true)
-            .single();
+            .maybeSingle();
 
-        if (error || !usuario) {
-            return res.status(401).json({
-                error: 'Usuário não encontrado',
-                code: 'USER_NOT_FOUND'
-            });
+        let usuario = resp.data || null;
+        let usuarioError = resp.error || null;
+
+        // Fallback para possíveis retornos 300/array
+        if ((usuarioError && (usuarioError.code === 'PGRST100' || usuarioError.message)) || (!usuario && !usuarioError)) {
+            try {
+                const respArr = await supabase
+                    .from('usuarios')
+                    .select(baseSelect)
+                    .eq('id', decoded.userId)
+                    .eq('ativo', true)
+                    .order('id', { ascending: true })
+                    .limit(1);
+                if (!respArr.error && Array.isArray(respArr.data) && respArr.data.length > 0) {
+                    usuario = respArr.data[0];
+                    usuarioError = null;
+                }
+            } catch (e) {
+                console.error('Fallback fetch error (verify):', e);
+            }
         }
 
-        res.json({
+        if (usuarioError || !usuario) {
+            return res.status(401).json({ error: 'Usuário não encontrado', code: 'USER_NOT_FOUND' });
+        }
+
+        return res.json({
             valid: true,
             user: {
                 id: usuario.id,
@@ -208,25 +223,14 @@ const verifyToken = async (req, res) => {
 
     } catch (error) {
         console.error('Erro ao verificar token:', error);
-        
-        if (error.name === 'JsonWebTokenError') {
-            return res.status(401).json({
-                error: 'Token inválido',
-                code: 'INVALID_TOKEN'
-            });
-        }
-        
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                error: 'Token expirado',
-                code: 'TOKEN_EXPIRED'
-            });
-        }
 
-        return res.status(401).json({
-            error: 'Token inválido',
-            code: 'TOKEN_ERROR'
-        });
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ error: 'Token inválido', code: 'INVALID_TOKEN' });
+        }
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: 'Token expirado', code: 'TOKEN_EXPIRED' });
+        }
+        return res.status(401).json({ error: 'Token inválido', code: 'TOKEN_ERROR' });
     }
 };
 
