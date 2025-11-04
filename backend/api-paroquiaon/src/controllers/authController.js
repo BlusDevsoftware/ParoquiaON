@@ -270,6 +270,37 @@ const verifyToken = async (req, res) => {
             }
         }
 
+        // Buscar dados da pessoa (best-effort)
+        let pessoaNome = null;
+        let pessoaFoto = null;
+        if (usuario.pessoa_id != null) {
+            try {
+                let pessoaResp = await supabase
+                    .from('pessoas')
+                    .select('id, nome, foto')
+                    .eq('id', usuario.pessoa_id)
+                    .maybeSingle();
+                let pessoa = pessoaResp.data || null;
+                if ((!pessoa && !pessoaResp.error)) {
+                    const arr = await supabase
+                        .from('pessoas')
+                        .select('id, nome, foto')
+                        .eq('id', usuario.pessoa_id)
+                        .order('id', { ascending: true })
+                        .limit(1);
+                    if (!arr.error && Array.isArray(arr.data) && arr.data.length > 0) {
+                        pessoa = arr.data[0];
+                    }
+                }
+                if (pessoa) {
+                    pessoaNome = pessoa.nome || null;
+                    pessoaFoto = pessoa.foto || null;
+                }
+            } catch (e) {
+                console.warn('Falha ao buscar pessoa (best-effort):', e);
+            }
+        }
+
         return res.json({
             valid: true,
             user: {
@@ -278,6 +309,8 @@ const verifyToken = async (req, res) => {
                 perfil_id: usuario.perfil_id ?? null,
                 pessoa_id: usuario.pessoa_id ?? null,
                 perfil: perfilNome,
+                nome: pessoaNome,
+                foto: pessoaFoto,
                 permissoes
             }
         });
