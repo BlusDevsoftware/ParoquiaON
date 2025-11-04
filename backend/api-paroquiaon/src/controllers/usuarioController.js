@@ -141,7 +141,7 @@ async function criarUsuario(req, res) {
         // Preparar dados básicos
         const dadosBasicos = {
             email: dados.email,
-            senha: null,
+            senha: '',
             senha_temporaria: senhaTemporaria,
             pessoa_id: dados.pessoa_id || null,
             perfil_id: dados.perfil_id || null,
