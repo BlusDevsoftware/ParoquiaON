@@ -54,7 +54,7 @@
     <div class="login-container">
         <div class="login-box">
             <div class="login-header">
-                <h2>Bem vindo ao <span class="highlight">Gestor de Comissões</span></h2>
+                <h2>Bem vindo ao <span class="highlight">ParoquiaON</span></h2>
                 <p>Preencha os dados do login para acessar</p>
             </div>
             
@@ -64,10 +64,10 @@
             <!-- Formulário de Login Normal -->
             <form action="/login" method="POST" class="login-form" id="loginForm">
                 <div class="form-group">
-                    <label for="usuario">Usuário ou E-mail</label>
+                    <label for="usuario">E-mail</label>
                     <div class="input-group">
-                        <input type="text" id="usuario" name="usuario" placeholder="Digite seu usuário ou e-mail" required>
-                        <i class="input-icon fas fa-user"></i>
+                        <input type="email" id="usuario" name="usuario" placeholder="Digite seu e-mail" required>
+                        <i class="input-icon fas fa-envelope"></i>
                     </div>
                 </div>
                 <div class="form-group">
@@ -272,7 +272,7 @@
         document.querySelector('.login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const identificador = document.getElementById('usuario').value;
+            const email = document.getElementById('usuario').value.trim();
             const senha = document.getElementById('senha').value;
             lastEnteredPassword = senha;
             const btnEntrar = document.querySelector('.btn-entrar');
@@ -281,6 +281,14 @@
             const loadingSpinner = document.querySelector('.loading-spinner');
             const errorMessage = document.querySelector('.error-message');
             const successMessage = document.querySelector('.success-message');
+            
+            // Validação de e-mail
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorMessage.textContent = 'Por favor, informe um e-mail válido';
+                errorMessage.style.display = 'block';
+                return;
+            }
             
             // Reset messages
             errorMessage.style.display = 'none';
@@ -293,13 +301,13 @@
             btnText.textContent = 'Entrando...';
             
             try {
-                console.log('Tentando fazer login...', { identificador });
+                console.log('Tentando fazer login...', { email });
                 const response = await fetch('https://api-paroquiaon.vercel.app/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ email: identificador, emailOrUsername: identificador, senha })
+                    body: JSON.stringify({ email: email, senha: senha })
                 });
 
                 console.log('Status da resposta:', response.status);
@@ -308,7 +316,7 @@
                     // Sinalizações possíveis de primeiro acesso
                     const mustChange = !!(data.requiresPasswordChange || data.firstLogin || data.primeiroAcesso || data.passwordChangeRequired || data.user?.mustChangePassword);
                     if (mustChange) {
-                        switchToPasswordChange(identificador);
+                        switchToPasswordChange(email);
                         return;
                     }
                     
@@ -326,7 +334,7 @@
                     const msg = (errorData && (errorData.message || errorData.error || '')) || '';
                     const looksFirstLogin = /primeiro acesso|alterar senha|senha temporária|password change required/i.test(msg);
                     if ((response.status === 428 || response.status === 403) && looksFirstLogin) {
-                        switchToPasswordChange(identificador);
+                        switchToPasswordChange(email);
                         return;
                     }
                     // Tratamento específico para colaborador inativo
@@ -404,7 +412,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ 
-                        emailOrUsername: currentUserEmail,
+                        email: currentUserEmail,
                         senhaTemporaria: lastEnteredPassword,
                         novaSenha: novaSenha 
                     })
@@ -423,7 +431,7 @@
                                 headers: {
                                     'Content-Type': 'application/json'
                                 },
-                                body: JSON.stringify({ email: currentUserEmail, emailOrUsername: currentUserEmail, senha: novaSenha })
+                                body: JSON.stringify({ email: currentUserEmail, senha: novaSenha })
                             });
                             
                             if (loginResponse.ok) {
@@ -435,7 +443,7 @@
                                 const target = getFirstAllowedPage(data.user && data.user.permissoes);
                                 setTimeout(() => { window.location.href = target; }, 250);
                             } else {
-                                // Se falhar o login automático, voltar para tela de login
+                                // Se falhar o login automático, voltar para tela de login para novo login
                                 switchToLogin();
                             }
                         } catch (error) {
