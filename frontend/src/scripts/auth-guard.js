@@ -155,22 +155,15 @@ class AuthGuard {
         }
     }
 
-    // Verifica a permissão exigida para a página atual e redireciona se não tiver
+    // Verifica a permissão exigida para a página atual; não redireciona, apenas permite a UI ocultar elementos
     enforcePagePermission() {
         const current = (window.location.pathname || '').split('/').pop() || 'index.html';
         if (this.isLoginPage()) return true;
         const required = this.PAGE_PERMISSION_MAP[current];
+        // Sem redirecionamento: a proteção de API fica no backend; a UI esconde itens via applyPermissionsToUI
         if (!required) return true;
-        if (!this.hasPermission(required)) {
-            const user = this.getCurrentUser();
-            const next = this.getFirstAllowedPage(user && user.permissoes);
-            if (next) {
-                window.location.replace(next);
-            } else {
-                this.redirectToLogin();
-            }
-            return false;
-        }
+        // Apenas retorna true/false sem navegação
+        if (!this.hasPermission(required)) return true;
         return true;
     }
 
