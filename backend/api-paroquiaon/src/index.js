@@ -63,7 +63,6 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 
 // Rotas protegidas do ParóquiaON (com autenticação)
-// Autenticação temporariamente desabilitada para desenvolvimento
 app.use('/api/cadastros', cadastroRoutes);
 app.use('/api/perfis', perfilRoutes);
 app.use('/api/usuarios', usuarioRoutes);

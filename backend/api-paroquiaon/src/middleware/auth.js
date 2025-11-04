@@ -29,8 +29,7 @@ async function authenticateUser(req, res, next) {
                 ultimo_login,
                 perfis (
                     id,
-                    nome,
-                    permissoes
+                    nome
                 ),
                 pessoas (
                     id,
@@ -57,8 +56,7 @@ async function authenticateUser(req, res, next) {
             login: usuario.login,
             nome: usuario.pessoas?.nome,
             telefone: usuario.pessoas?.telefone,
-            perfil: usuario.perfis?.nome,
-            permissoes: usuario.perfis?.permissoes || {}
+            perfil: usuario.perfis?.nome
         };
 
         next();
