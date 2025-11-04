@@ -106,8 +106,8 @@ class AuthGuard {
             return;
         }
         const pathname = window.location.pathname || '/index.html';
-        const isVercel = /vercel\.app$/i.test(window.location.hostname);
-        const loginTarget = isVercel ? '/login' : 'login.html';
+        // Sempre usar login.html (rota estática) para evitar 404 em produção
+        const loginTarget = 'login.html';
         const current = pathname && pathname !== '/' ? pathname : 'index.html';
         const joiner = loginTarget.includes('?') ? '&' : '?';
         const target = `${loginTarget}${joiner}redirect=${encodeURIComponent(current)}`;
