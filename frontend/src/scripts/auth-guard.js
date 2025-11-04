@@ -6,24 +6,8 @@
 const AUTH_DISABLED = false;
 
 // Early redirect: se não autenticado e não for a tela de login, redireciona (desativado se AUTH_DISABLED)
-(function earlyAuthRedirect(){
-    try {
-        if (AUTH_DISABLED) {
-            console.log('[AuthGuard] Login system disabled - no redirects to login page');
-            return;
-        }
-        const loginPage = 'login.html';
-        const currentPage = window.location.pathname.split('/').pop();
-        if (currentPage === loginPage) return;
-        const token = sessionStorage.getItem('token');
-        const user = sessionStorage.getItem('user');
-        if (!token || !user) {
-            console.log('[AuthGuard] Não autenticado - redirecionando para login');
-            const redirectUrl = `${loginPage}?redirect=${encodeURIComponent(window.location.pathname.split('/').pop() || 'index.html')}`;
-            window.location.href = redirectUrl;
-        }
-    } catch(_) {}
-})();
+// Early redirect desativado para evitar loops em casos de erro temporário/latência
+// O fluxo normal usará AuthGuard.init() e validateToken()
 
 class AuthGuard {
     constructor() {
