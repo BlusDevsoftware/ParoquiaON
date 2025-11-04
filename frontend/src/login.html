@@ -332,12 +332,46 @@
                         return;
                     }
                     
-                    // Login normal (sessão apenas)
+                    // Login normal: salvar token e buscar perfil/permissões antes de redirecionar
                     sessionStorage.setItem('token', data.token);
-                    sessionStorage.setItem('user', JSON.stringify(data.user));
+                    let user = data.user || {};
+                    try {
+                        // Verificar token e obter user atualizado
+                        const verifyResp = await fetch('https://api-paroquiaon.vercel.app/api/auth/verify', {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${data.token}`, 'Content-Type': 'application/json' }
+                        });
+                        if (verifyResp.ok) {
+                            const verifyData = await verifyResp.json();
+                            if (verifyData && verifyData.user) {
+                                user = verifyData.user;
+                            }
+                        }
+                        // Se ainda sem permissoes e houver perfil_id, buscar perfil e montar a partir das colunas
+                        if ((!user.permissoes || typeof user.permissoes !== 'object') && (user.perfil_id !== null && user.perfil_id !== undefined)) {
+                            const perfResp = await fetch(`https://api-paroquiaon.vercel.app/api/perfis/${user.perfil_id}`, {
+                                headers: { 'Authorization': `Bearer ${data.token}` }
+                            });
+                            if (perfResp.ok) {
+                                const perfil = await perfResp.json();
+                                if (perfil && typeof perfil === 'object') {
+                                    const perms = {};
+                                    Object.entries(perfil).forEach(([key, value]) => {
+                                        const v = value;
+                                        const truthy = (typeof v === 'boolean' && v === true)
+                                            || (typeof v === 'number' && v === 1)
+                                            || (typeof v === 'string' && (v === '1' || v.toLowerCase() === 'true' || v.toLowerCase() === 't'));
+                                        if (truthy) perms[key] = true;
+                                    });
+                                    if (Object.keys(perms).length > 0) user.permissoes = perms;
+                                }
+                            }
+                        }
+                    } catch (_) {}
+                    sessionStorage.setItem('user', JSON.stringify(user));
                     
-                    // Redirecionar para primeira página permitida
-                    const target = getFirstAllowedPage(data.user && data.user.permissoes);
+                    // Redirecionar para primeira página permitida (ou ficar se nenhuma)
+                    const target = getFirstAllowedPage(user && user.permissoes) || 'index.html';
                     setTimeout(() => { window.location.href = target; }, 250);
                 } else {
                     let errorData;
