@@ -77,6 +77,7 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
         { titulo: 'Locais', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Ações', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Agenda', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Perfis', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Relatórios', acoes: ['ver','exportar'] }
     ];
     
@@ -760,6 +761,12 @@ async function salvarPerfil(e) {
     permissoes.agenda_criar = permissoesMapa['Agenda']?.includes('criar') || false;
     permissoes.agenda_editar = permissoesMapa['Agenda']?.includes('editar') || false;
     permissoes.agenda_excluir = permissoesMapa['Agenda']?.includes('excluir') || false;
+
+    // Perfis
+    permissoes.perfis_ver = permissoesMapa['Perfis']?.includes('ver') || false;
+    permissoes.perfis_criar = permissoesMapa['Perfis']?.includes('criar') || false;
+    permissoes.perfis_editar = permissoesMapa['Perfis']?.includes('editar') || false;
+    permissoes.perfis_excluir = permissoesMapa['Perfis']?.includes('excluir') || false;
 
     // Relatórios (agregados)
     permissoes.relatorios_ver = permissoesMapa['Relatórios']?.includes('ver') || false;
