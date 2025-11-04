@@ -19,6 +19,8 @@ class AuthGuard {
         // Ajuste as chaves/flags conforme seu backend (devem bater com user.permissoes)
         this.PAGE_PERMISSION_MAP = {
             'index.html': 'minha_comunidade_ver',
+            'agenda.html': 'agenda_ver',
+            'comunidades.html': 'cadastros_comunidades_ver',
             'pastorais.html': 'cadastros_pastorais_ver',
             'pilares.html': 'cadastros_pilares_ver',
             'locais.html': 'cadastros_locais_ver',
@@ -26,11 +28,8 @@ class AuthGuard {
             'pessoas.html': 'cadastros_pessoas_ver',
             'usuarios.html': 'cadastros_usuarios_ver',
             'perfil.html': 'cadastros_perfis_ver',
-            'recebimento.html': 'relatorios_recebimento_ver',
-            'conferencia.html': 'relatorios_conferencia_ver',
             'dinamico.html': 'relatorios_dinamico_ver',
-            'manutencao-bd.html': 'configuracoes_manutencao_ver',
-            'sincronizar.html': 'configuracoes_sincronizar_ver'
+            'manutencao-bd.html': 'configuracoes_manutencao_ver'
         };
         this.init();
     }
@@ -154,6 +153,8 @@ class AuthGuard {
         if (!permissoes || typeof permissoes !== 'object') return 'index.html';
         const order = [
             { url: 'index.html', flag: 'minha_comunidade_ver' },
+            { url: 'agenda.html', flag: 'agenda_ver' },
+            { url: 'comunidades.html', flag: 'cadastros_comunidades_ver' },
             { url: 'pastorais.html', flag: 'cadastros_pastorais_ver' },
             { url: 'pilares.html', flag: 'cadastros_pilares_ver' },
             { url: 'locais.html', flag: 'cadastros_locais_ver' },
@@ -161,11 +162,8 @@ class AuthGuard {
             { url: 'pessoas.html', flag: 'cadastros_pessoas_ver' },
             { url: 'usuarios.html', flag: 'cadastros_usuarios_ver' },
             { url: 'perfil.html', flag: 'cadastros_perfis_ver' },
-            { url: 'recebimento.html', flag: 'relatorios_recebimento_ver' },
-            { url: 'conferencia.html', flag: 'relatorios_conferencia_ver' },
             { url: 'dinamico.html', flag: 'relatorios_dinamico_ver' },
-            { url: 'manutencao-bd.html', flag: 'configuracoes_manutencao_ver' },
-            { url: 'sincronizar.html', flag: 'configuracoes_sincronizar_ver' }
+            { url: 'manutencao-bd.html', flag: 'configuracoes_manutencao_ver' }
         ];
         for (const item of order) {
             if (permissoes[item.flag]) return item.url;
