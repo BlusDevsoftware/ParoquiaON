@@ -15,6 +15,23 @@ class AuthGuard {
         this.LOGIN_PATHS = ['login.html', 'login', '/login'];
         this.TOKEN_KEY = 'token';
         this.USER_KEY = 'user';
+        // Mapeamento de permissão exigida por página
+        // Ajuste as chaves/flags conforme seu backend (devem bater com user.permissoes)
+        this.PAGE_PERMISSION_MAP = {
+            'index.html': 'minha_comunidade_ver',
+            'pastorais.html': 'cadastros_pastorais_ver',
+            'pilares.html': 'cadastros_pilares_ver',
+            'locais.html': 'cadastros_locais_ver',
+            'acoes.html': 'cadastros_acoes_ver',
+            'pessoas.html': 'cadastros_pessoas_ver',
+            'usuarios.html': 'cadastros_usuarios_ver',
+            'perfil.html': 'cadastros_perfis_ver',
+            'recebimento.html': 'relatorios_recebimento_ver',
+            'conferencia.html': 'relatorios_conferencia_ver',
+            'dinamico.html': 'relatorios_dinamico_ver',
+            'manutencao-bd.html': 'configuracoes_manutencao_ver',
+            'sincronizar.html': 'configuracoes_sincronizar_ver'
+        };
         this.init();
     }
 
@@ -64,6 +81,8 @@ class AuthGuard {
                 if (!this.isLoginPage()) this.redirectToLogin();
                 return false;
             }
+            // Após validar token, checar autorização por página
+            this.enforcePagePermission();
         } catch(_) {}
         return true;
     }
@@ -93,6 +112,13 @@ class AuthGuard {
                 if (response.status === 401 || response.status === 403) return false;
                 return true;
             }
+            // Se a verificação ok, atualizar o usuário/permissões na sessão (caso backend retorne)
+            try {
+                const data = await response.json();
+                if (data && data.user) {
+                    sessionStorage.setItem(this.USER_KEY, JSON.stringify(data.user));
+                }
+            } catch(_) {}
             return true;
         } catch {
             console.warn('[AuthGuard] verify request error - treating as temporary');
@@ -101,6 +127,50 @@ class AuthGuard {
             } catch(_) {}
             return true;
         }
+    }
+
+    // Verifica a permissão exigida para a página atual e redireciona se não tiver
+    enforcePagePermission() {
+        const current = (window.location.pathname || '').split('/').pop() || 'index.html';
+        // Não checa login.html
+        if (this.isLoginPage()) return;
+        const requiredFlag = this.PAGE_PERMISSION_MAP[current];
+        if (!requiredFlag) return; // Página não mapeada: não restringe
+        const allowed = this.hasPermission(requiredFlag);
+        if (!allowed) {
+            const user = this.getCurrentUser();
+            const target = this.getFirstAllowedPage(user && user.permissoes);
+            if (target && target !== current) {
+                window.location.href = target;
+            } else {
+                // Fallback: dashboard
+                window.location.href = 'index.html';
+            }
+        }
+    }
+
+    // Calcula a primeira página que o usuário tem permissão de ver
+    getFirstAllowedPage(permissoes) {
+        if (!permissoes || typeof permissoes !== 'object') return 'index.html';
+        const order = [
+            { url: 'index.html', flag: 'minha_comunidade_ver' },
+            { url: 'pastorais.html', flag: 'cadastros_pastorais_ver' },
+            { url: 'pilares.html', flag: 'cadastros_pilares_ver' },
+            { url: 'locais.html', flag: 'cadastros_locais_ver' },
+            { url: 'acoes.html', flag: 'cadastros_acoes_ver' },
+            { url: 'pessoas.html', flag: 'cadastros_pessoas_ver' },
+            { url: 'usuarios.html', flag: 'cadastros_usuarios_ver' },
+            { url: 'perfil.html', flag: 'cadastros_perfis_ver' },
+            { url: 'recebimento.html', flag: 'relatorios_recebimento_ver' },
+            { url: 'conferencia.html', flag: 'relatorios_conferencia_ver' },
+            { url: 'dinamico.html', flag: 'relatorios_dinamico_ver' },
+            { url: 'manutencao-bd.html', flag: 'configuracoes_manutencao_ver' },
+            { url: 'sincronizar.html', flag: 'configuracoes_sincronizar_ver' }
+        ];
+        for (const item of order) {
+            if (permissoes[item.flag]) return item.url;
+        }
+        return 'index.html';
     }
 
     redirectToLogin() {
