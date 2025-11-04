@@ -142,15 +142,15 @@ class AuthGuard {
             if (target && target !== current) {
                 window.location.href = target;
             } else {
-                // Fallback: dashboard
-                window.location.href = 'index.html';
+                // Sem página permitida: não redireciona para evitar loop
+                console.warn('[AuthGuard] Sem permissão para a página atual e nenhuma alternativa disponível.');
             }
         }
     }
 
     // Calcula a primeira página que o usuário tem permissão de ver
     getFirstAllowedPage(permissoes) {
-        if (!permissoes || typeof permissoes !== 'object') return 'index.html';
+        if (!permissoes || typeof permissoes !== 'object') return null;
         const order = [
             { url: 'index.html', flag: 'minha_comunidade_ver' },
             { url: 'agenda.html', flag: 'agenda_ver' },
@@ -168,7 +168,7 @@ class AuthGuard {
         for (const item of order) {
             if (permissoes[item.flag]) return item.url;
         }
-        return 'index.html';
+        return null;
     }
 
     redirectToLogin() {
