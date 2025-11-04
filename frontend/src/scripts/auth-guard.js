@@ -94,9 +94,18 @@ class AuthGuard {
                     'Content-Type': 'application/json'
                 }
             });
-            return response.ok;
+            if (!response.ok) {
+                let info = '';
+                try { info = await response.text(); } catch(_) {}
+                console.warn('[AuthGuard] verify failed:', response.status, info);
+                // Só forçar logout quando for 401/403; outras falhas tratamos como temporárias
+                if (response.status === 401 || response.status === 403) return false;
+                return true;
+            }
+            return true;
         } catch {
-            return false;
+            console.warn('[AuthGuard] verify request error - treating as temporary');
+            return true;
         }
     }
 
