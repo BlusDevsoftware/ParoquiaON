@@ -370,6 +370,120 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            /* Ajustes para igualar ao mobile de Pastorais */
+            .top-header { 
+                padding: 0; 
+                height: 60px; 
+            }
+            .nav-links { 
+                display: none; 
+            }
+            /* Esconder menu flutuante antigo no mobile */
+            .mobile-menu-fab,
+            .mobile-menu-container { display: none !important; }
+
+            /* Ocupa toda a largura no mobile (sem espaçamento lateral) */
+            .calendar-info-container {
+                margin: 0;
+                width: 100%;
+                border-left: none;
+                border-right: none;
+                border-radius: 0;
+            }
+            .weekly-calendar {
+                margin: 0;
+                width: 100%;
+                max-height: calc(100vh - 120px);
+                border-left: none;
+                border-right: none;
+                border-radius: 0;
+            }
+            .content-area { padding: 0; }
+            .main-area { width: 100vw; margin-left: 0; }
+
+            /* Esconder botão Criar do container superior no mobile */
+            .calendar-info-container .create-button { display: none !important; }
+
+            /* Esconder texto "Você está em:" no mobile */
+            .info-location-label { display: none !important; }
+
+            /* Remover Visão e Hoje no mobile */
+            .calendar-info-container .view-dropdown,
+            .calendar-info-container .info-today-btn { display: none !important; }
+
+            /* Comunidade ocupa 100% quando visão some */
+            .calendar-info-container .community-dropdown { width: 100% !important; }
+
+            /* Esconder seleção de comunidade no mobile */
+            .calendar-info-container .community-dropdown { display: none !important; }
+
+            /* FAB de criar evento no mobile */
+            .fab-create-event {
+                display: inline-flex;
+                position: fixed;
+                right: 16px;
+                bottom: 16px;
+                width: 56px;
+                height: 56px;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                border: none;
+                background: #1e3a8a;
+                color: #fff;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+                z-index: 1600;
+                cursor: pointer;
+                transition: transform .15s ease, box-shadow .15s ease;
+            }
+            .fab-create-event i { font-size: 20px; }
+            .fab-create-event:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(0,0,0,0.25); }
+            .fab-create-event:active { transform: translateY(0); box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+
+            /* Centralizar info-date no mobile */
+            .calendar-info-container .info-right { width: 100%; justify-content: center !important; }
+            .calendar-info-container .date-navigation { width: 100%; justify-content: center !important; }
+            .calendar-info-container .info-date { text-align: center !important; }
+
+            /* Reexibir comunidade e visão lado a lado (espaçamento mínimo) acima da data */
+            .calendar-info-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-auto-rows: minmax(40px, auto);
+                gap: 6px; /* espaçamento mínimo entre selects */
+                align-items: center;
+                grid-template-areas:
+                    "community view"
+                    "date date";
+            }
+            .calendar-info-container .info-left,
+            .calendar-info-container .info-right { width: 100%; display: contents; }
+            /* Mostrar comunidade e visão (sobrescreve ocultações anteriores) */
+            .calendar-info-container .community-dropdown {
+                display: flex !important;
+                width: 100% !important;
+                grid-area: community !important;
+            }
+            .calendar-info-container .view-dropdown {
+                display: flex !important;
+                width: 100% !important;
+                grid-area: view !important;
+            }
+            /* Data abaixo ocupando toda a largura */
+            .calendar-info-container .date-navigation { grid-area: date !important; }
+            /* Ajustes de tamanho/legibilidade do gatilho */
+            .calendar-info-container .community-dropdown-trigger,
+            .calendar-info-container .view-dropdown-trigger {
+                min-width: 0 !important;
+                max-width: 480px;
+                width: 100%;
+                padding: 8px 10px !important;
+                font-size: 14px !important;
+                box-sizing: border-box;
+            }
+            .calendar-info-container .community-dropdown-trigger i,
+            .calendar-info-container .view-dropdown-trigger i { font-size: 10px !important; }
         }
 
         .form-section {
@@ -1583,6 +1697,18 @@
             transition: all 0.3s ease;
             isolation: isolate;
         }
+        /* Override específico para mobile: container superior sem espaçamento lateral */
+        @media (max-width: 768px) {
+            .calendar-info-container {
+                margin: 0 !important;
+                width: 100% !important;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+        }
 
         .info-left {
             display: flex;
@@ -2098,6 +2224,85 @@
             margin: 8px 0;
         }
 
+        /* Menu Lateral Mobile (igual ao de Pastorais) */
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .mobile-menu-overlay.show { opacity: 1; }
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            z-index: 1501;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+        }
+        .mobile-menu.open { left: 0; }
+        .mobile-menu-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .mobile-menu-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .mobile-menu-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        .mobile-menu-close:hover { background: rgba(255, 255, 255, 0.1); }
+        .mobile-menu-links { padding: 0; list-style: none; margin: 0; }
+        .mobile-menu-links li { border-bottom: none; }
+        .mobile-menu-links a {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .mobile-menu-links a:hover,
+        .mobile-menu-links a.active {
+            background: #f0f4ff;
+            color: #1e3a8a;
+        }
+        .mobile-menu-links a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
         /* View Dropdown styles (igual ao dropdown de relatórios) */
         .view-dropdown {
             position: relative;
@@ -2292,6 +2497,17 @@
             scrollbar-width: none;  /* Firefox */
             width: calc(100% - 30px);
             transition: all 0.3s ease;
+        }
+
+        /* Override específico para mobile: ocupar 100% sem espaçamento lateral */
+        @media (max-width: 768px) {
+            .weekly-calendar {
+                margin: 0 !important;
+                width: 100% !important;
+                border-left: none;
+                border-right: none;
+                border-radius: 0;
+            }
         }
 
 
@@ -3430,6 +3646,69 @@
             }
         }
 
+        /* Override final para garantir comunidade, visão e hoje lado a lado no mobile */
+        @media (max-width: 768px) {
+            .calendar-info-container {
+                display: grid !important;
+                grid-template-columns: auto auto auto !important; /* comunidade | visão | hoje */
+                grid-auto-rows: minmax(40px, auto) !important;
+                gap: 10px !important; /* mínimo espaço entre controles */
+                align-items: center !important;
+                justify-content: center !important; /* centralizar trio de botões */
+                grid-template-areas: "community view today" "date date date" !important;
+            }
+            .calendar-info-container .info-left,
+            .calendar-info-container .info-right { width: 100% !important; display: contents !important; }
+            .calendar-info-container .community-dropdown {
+                display: flex !important;
+                width: auto !important; /* não ocupar 100% */
+                justify-content: center !important;
+                margin: 0 !important; /* remover margens residuais */
+                grid-area: community !important;
+            }
+            .calendar-info-container .view-dropdown {
+                display: flex !important;
+                width: auto !important; /* não ocupar 100% */
+                justify-content: center !important;
+                margin: 0 !important; /* remover margens residuais */
+                grid-area: view !important;
+            }
+            /* Mostrar botão Hoje ao lado, no mesmo alinhamento */
+            .calendar-info-container .info-today-btn {
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                grid-area: today !important;
+                margin: 0 !important;
+                width: auto !important;
+                min-width: 72px !important;
+                max-width: 110px !important;
+                padding: 6px 10px !important;
+                font-size: 12px !important;
+                line-height: 1.2 !important;
+                min-height: 32px !important;
+                white-space: nowrap;
+                align-self: center !important;
+                justify-self: center !important;
+            }
+            .calendar-info-container .date-navigation { grid-area: date !important; }
+            .calendar-info-container .community-dropdown-trigger,
+            .calendar-info-container .view-dropdown-trigger {
+                min-width: 120px !important;
+                max-width: 200px !important;
+                width: auto !important; /* largura apenas necessária */
+                padding: 6px 8px !important;
+                font-size: 12px !important;
+                line-height: 1.2 !important;
+                min-height: 32px !important;
+                box-sizing: border-box !important;
+                align-self: center !important;
+                justify-self: center !important;
+            }
+            .calendar-info-container .community-dropdown-trigger i,
+            .calendar-info-container .view-dropdown-trigger i { font-size: 9px !important; }
+        }
+
         @media (max-width: 480px) {
             .left-sidebar {
                 flex-direction: column;
@@ -3682,56 +3961,36 @@
         </div>
     </div>
 
-    <!-- Botão Flutuante Mobile -->
-    <button class="mobile-menu-fab" id="mobileMenuFab">
-        <i class="fas fa-bars"></i>
-    </button>
+    <!-- FAB criar evento - visível apenas no mobile pelo CSS -->
+    <button class="fab-create-event" onclick="openEventModal()" aria-label="Criar evento" title="Criar evento"><i class="fas fa-plus"></i></button>
 
-    <!-- Menu Flutuante Mobile -->
-    <div class="mobile-menu-container" id="mobileMenuContainer">
-        <div class="mobile-menu-links">
-            <a href="index.html" class="mobile-menu-link">
-                <i class="fas fa-home"></i> Minha Comunidade
-            </a>
-            <a href="agenda.html" class="mobile-menu-link active">
-                <i class="fas fa-calendar"></i> Agenda
-            </a>
-            <a href="comunidades.html" class="mobile-menu-link">
-                <i class="fas fa-users"></i> Comunidades
-            </a>
-            <a href="pastorais.html" class="mobile-menu-link">
-                <i class="fas fa-church"></i> Pastorais
-            </a>
-            <a href="pilares.html" class="mobile-menu-link">
-                <i class="fas fa-layer-group"></i> Pilares
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="locais.html" class="mobile-menu-link">
-                <i class="fas fa-map-marker-alt"></i> Locais
-            </a>
-            <a href="acoes.html" class="mobile-menu-link">
-                <i class="fas fa-tasks"></i> Ações
-            </a>
-            <a href="pessoas.html" class="mobile-menu-link">
-                <i class="fas fa-user-friends"></i> Pessoas
-            </a>
-            <a href="usuarios.html" class="mobile-menu-link">
-                <i class="fas fa-user-shield"></i> Usuários
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="dinamico.html" class="mobile-menu-link">
-                <i class="fas fa-chart-line"></i> Dinâmico <span style="font-size: 11px; color: #fbbf24; font-weight: bold;">BETA</span>
-            </a>
-            <div class="mobile-menu-divider"></div>
-            <a href="perfil.html" class="mobile-menu-link">
-                <i class="fas fa-user-circle"></i> Perfil
-            </a>
+    <!-- Menu Lateral Mobile (igual Pastorais) -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3>Menu</h3>
+            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Fechar menu">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
+        <ul class="mobile-menu-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Minha Comunidade</a></li>
+            <li><a href="agenda.html" class="active"><i class="fas fa-calendar"></i> Agenda</a></li>
+            <li><a href="comunidades.html"><i class="fas fa-users"></i> Comunidades</a></li>
+            <li><a href="pastorais.html"><i class="fas fa-church"></i> Pastorais</a></li>
+            <li><a href="pilares.html"><i class="fas fa-layer-group"></i> Pilares</a></li>
+            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i> Locais</a></li>
+            <li><a href="acoes.html"><i class="fas fa-tasks"></i> Ações</a></li>
+            <li><a href="pessoas.html"><i class="fas fa-user-friends"></i> Pessoas</a></li>
+            <li><a href="usuarios.html"><i class="fas fa-user-cog"></i> Usuários</a></li>
+            <li><a href="perfil.html"><i class="fas fa-user-circle"></i> Perfil</a></li>
+            <li><a href="dinamico.html"><i class="fas fa-chart-line"></i> Dinâmico <span class="beta-tag">beta</span></a></li>
+        </ul>
     </div>
 
     <!-- Container de modais removido - modais não disponíveis -->
 
-    <!-- Scripts -->
+    <!-- Scripts de autenticação -->
     <script src="scripts/auth-guard.js"></script>
     <script src="scripts/apply-auth-protection.js"></script>
     <script src="scripts/navigation.js"></script>
@@ -6386,14 +6645,39 @@
 
             const isMobile = window.innerWidth <= 768;
             if (isMobile) {
-                // No mobile o padrão já é escondido; "open" exibe
-                const opened = sidebar.classList.toggle('open');
-                if (headerHamburger) headerHamburger.innerHTML = opened ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+                // Em mobile, seguir padrão da aba Pastorais: abrir menu lateral de navegação
+                openMobileMenu();
             } else {
-                // No desktop, usar classe "collapsed" para esconder completamente
+                // No desktop, usar classe "collapsed" para esconder completamente a sidebar
                 const collapsed = sidebar.classList.toggle('collapsed');
                 if (headerHamburger) headerHamburger.innerHTML = collapsed ? '<i class="fas fa-bars"></i>' : '<i class="fas fa-bars"></i>';
             }
+        }
+
+        // Menu mobile no padrão de Pastorais
+        function openMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (!overlay || !menu) return;
+            overlay.style.display = 'block';
+            // garantir repaint antes de adicionar a classe de transição
+            requestAnimationFrame(() => {
+                overlay.classList.add('show');
+                menu.classList.add('open');
+            });
+            try { document.body.style.overflow = 'hidden'; } catch(_) {}
+        }
+
+        function closeMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (!overlay || !menu) return;
+            overlay.classList.remove('show');
+            menu.classList.remove('open');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                try { document.body.style.overflow = ''; } catch(_) {}
+            }, 300);
         }
 
         // Função para toggle do menu mobile
@@ -6429,6 +6713,14 @@
                     toggleMobileMenu(event);
                 });
             }
+        });
+
+        // Listeners do menu mobile (padrão Pastorais)
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const closeBtn = document.getElementById('mobileMenuClose');
+            if (overlay) overlay.addEventListener('click', closeMobileMenu);
+            if (closeBtn) closeBtn.addEventListener('click', closeMobileMenu);
         });
 
         // Fechar menu mobile ao clicar fora
