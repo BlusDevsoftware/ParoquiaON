@@ -4129,8 +4129,8 @@
                 status: 'agendado'
             };
 
-            if (!formData.titulo || !formData.comunidade || !formData.pastoral || !formData.pilares ||
-                !formData.local || !formData.acao || !formData.dataInicio || horarios.length === 0) {
+            // Validação: apenas título, comunidade, data de início e horários são obrigatórios
+            if (!formData.titulo || !formData.comunidade || !formData.dataInicio || horarios.length === 0) {
                 if (typeof showToast === 'function') showToast('Preencha campos obrigatórios e adicione um horário.', 'error');
                 return;
             }
@@ -4159,12 +4159,12 @@
                     objetivo: formData.objetivo || '',
                     data_inicio: formatLocalDateTime(startDate),
                     data_fim: formatLocalDateTime(endDate),
-                    local_id: parseInt(formData.local),
-                    acao_id: parseInt(formData.acao),
+                    local_id: formData.local ? parseInt(formData.local) : null,
+                    acao_id: formData.acao ? parseInt(formData.acao) : null,
                     responsavel_id: null,
                     comunidade_id: parseInt(formData.comunidade),
-                    pastoral_id: parseInt(formData.pastoral),
-                    pilar_id: parseInt(formData.pilares),
+                    pastoral_id: formData.pastoral ? parseInt(formData.pastoral) : null,
+                    pilar_id: formData.pilares ? parseInt(formData.pilares) : null,
                     status_id: (AC && typeof AC.getStatusIdByName === 'function') ? AC.getStatusIdByName(formData.status) : 1,
                     evento_paroquial: formData.eventoParoquial || false
                 });
