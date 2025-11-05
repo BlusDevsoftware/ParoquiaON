@@ -143,8 +143,11 @@ class AuthGuard {
                         } catch(_) {}
                     }
                     sessionStorage.setItem(this.USER_KEY, JSON.stringify(user));
-                    // Disparar evento para atualizar avatar imediatamente
-                    window.dispatchEvent(new CustomEvent('userDataUpdated', { detail: user }));
+                    
+                    // Atualizar cache do usuário (incluindo foto) para uso rápido em outras páginas
+                    if (typeof window.atualizarCacheUsuario === 'function') {
+                        window.atualizarCacheUsuario(user);
+                    }
                 }
             } catch(_) {}
             return true;
@@ -210,6 +213,9 @@ class AuthGuard {
         sessionStorage.removeItem(this.TOKEN_KEY);
         sessionStorage.removeItem(this.USER_KEY);
         sessionStorage.removeItem('redirectAfterLogin');
+        // Limpar cache do usuário
+        sessionStorage.removeItem('paroquiaon_user_cache');
+        sessionStorage.removeItem('paroquiaon_user_photo_cache');
     }
 
     getCurrentUser() {
