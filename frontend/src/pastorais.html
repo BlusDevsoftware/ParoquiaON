@@ -1963,6 +1963,8 @@ async function visualizarPastoral(id) {
     <script>
       (function(){
         let pessoasById = {};
+        let lastQueryId = 0; // evita renderizações fora de ordem
+        let debounceTimer = null; // debounce para a busca
         function actionButtons(id) {
           return `
             <div style="display:flex; gap:8px; justify-content:center;">
@@ -2008,6 +2010,7 @@ async function visualizarPastoral(id) {
           }
         }
         async function carregar() {
+          const myId = ++lastQueryId;
           const rows = document.getElementById('pastoraisRows');
           if (!rows) return;
           rows.innerHTML = '';
@@ -2036,6 +2039,9 @@ async function visualizarPastoral(id) {
             const r = (p?.responsavel_id && pessoasById[p.responsavel_id]?.nome) ? String(pessoasById[p.responsavel_id].nome).toLowerCase() : '';
             return n.includes(termo) || t.includes(termo) || r.includes(termo);
           });
+          // Evita renderização se uma busca mais recente já foi iniciada
+          if (myId !== lastQueryId) { return; }
+
           if (filtrada.length === 0) {
             const empty = document.createElement('div');
             empty.style.textAlign = 'center';
@@ -2049,6 +2055,8 @@ async function visualizarPastoral(id) {
             });
             return;
           }
+          // Evita renderização se uma busca mais recente já foi iniciada
+          if (myId !== lastQueryId) { return; }
           filtrada.forEach(p => rows.appendChild(createRow(p)));
           // Garantir renderização antes de esconder spinner
           requestAnimationFrame(() => {
@@ -2057,7 +2065,10 @@ async function visualizarPastoral(id) {
         }
         document.addEventListener('DOMContentLoaded', () => {
           const input = document.getElementById('searchPastorais');
-          if (input) input.addEventListener('input', carregar);
+          if (input) input.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(carregar, 250);
+          });
           // status e botão de nova pastoral removidos do layout
           carregar();
         });
