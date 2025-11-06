@@ -1436,7 +1436,7 @@
         </div>
     </div>
 
-    <script src="scripts/bloqueio_exclusao.js"></script>
+    
     <script type="module">
         // Handlers de foto no padrão da aba Pastorais
         function inicializarFotoHandlersPessoa() {
@@ -1761,10 +1761,17 @@
             // Confirmar exclusão
             const confirmDeleteBtn = document.getElementById('confirmDeletePessoaBtn');
             if (confirmDeleteBtn) {
-                confirmDeleteBtn.addEventListener('click', function() {
+                confirmDeleteBtn.addEventListener('click', async function() {
                     const modal = document.getElementById('deletePessoaModal');
                     const id = modal.dataset.codigo;
-                    window.bloqueioExclusao.deleteWithCheck('pessoas', id, () => { closeDeletePessoaModal(); carregarPessoas(); });
+                    try {
+                        await window.api.delete(window.endpoints.pessoas.delete(id));
+                        closeDeletePessoaModal();
+                        carregarPessoas();
+                    } catch (e) {
+                        console.error('Erro ao excluir pessoa:', e);
+                        if (typeof mostrarToast === 'function') mostrarToast('Erro ao excluir pessoa', 'error');
+                    }
                 });
             }
         });

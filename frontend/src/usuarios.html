@@ -15,7 +15,7 @@
     <script src="scripts/auth-guard.js"></script>
     <script src="scripts/apply-auth-protection.js"></script>
     <script src="scripts/config/api.js"></script>
-    <script src="scripts/bloqueio_exclusao.js"></script>
+    
     <style>
         /* Copiado e adaptado de pilares.html para padronização */
         .modal {
@@ -1853,10 +1853,17 @@
             // Confirmar exclusão
             const confirmDeleteBtn = document.getElementById('confirmDeleteUsuarioBtn');
             if (confirmDeleteBtn) {
-                confirmDeleteBtn.addEventListener('click', function() {
+                confirmDeleteBtn.addEventListener('click', async function() {
                     const modal = document.getElementById('deleteUsuarioModal');
                     const id = modal.dataset.codigo;
-                    window.bloqueioExclusao.deleteWithCheck('usuarios', id, () => { closeDeleteUsuarioModal(); carregarUsuarios(); });
+                    try {
+                        await window.api.delete(window.endpoints.usuarios.delete(id));
+                        closeDeleteUsuarioModal();
+                        carregarUsuarios();
+                    } catch (e) {
+                        console.error('Erro ao excluir usuário:', e);
+                        if (typeof mostrarToast === 'function') mostrarToast('Erro ao excluir usuário', 'error');
+                    }
                 });
             }
 

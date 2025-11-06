@@ -1435,7 +1435,7 @@
         </div>
     </div>
 
-    <script src="scripts/bloqueio_exclusao.js"></script>
+    
     <script type="module">
         // Listar locais via API e renderizar em linhas
         const locaisRows = document.getElementById('locaisRows');
@@ -1814,11 +1814,9 @@
             const modal = document.getElementById('deleteModal');
             const id = modal.dataset.codigo;
             try {
-                await window.bloqueioExclusao.deleteWithCheck(
-                    'locais',
-                    id,
-                    () => { closeDeleteModal(); carregarLocais(); }
-                );
+                await window.api.delete(window.endpoints.locais.delete(id));
+                closeDeleteModal();
+                carregarLocais();
             } catch (error) {
                 console.error('Erro ao excluir local:', error);
             }

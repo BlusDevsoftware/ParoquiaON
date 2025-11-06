@@ -14,7 +14,7 @@
     <script src="scripts/auth-guard.js"></script>
     <script src="scripts/apply-auth-protection.js"></script>
     
-    <script src="scripts/bloqueio_exclusao.js"></script>
+    
     <style>
         .modal {
             display: none;
@@ -1888,11 +1888,10 @@ async function visualizarPastoral(id) {
             if (_confirmBtn) _confirmBtn.onclick = async function() {
                 if (!codigoParaExcluir) return;
                 try {
-                    await window.bloqueioExclusao.deleteWithCheck(
-                        'pastorais',
-                        codigoParaExcluir,
-                        () => { closeDeleteModal(); if (window.carregarPastorais) window.carregarPastorais(); window.showDeleteSuccessModal(); }
-                    );
+                    await window.api.delete(window.endpoints.pastorais.delete(codigoParaExcluir));
+                    closeDeleteModal();
+                    if (window.carregarPastorais) window.carregarPastorais();
+                    window.showDeleteSuccessModal();
                 } catch (error) {
                     console.error('Erro ao excluir pastoral:', error);
                 } finally {

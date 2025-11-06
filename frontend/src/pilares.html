@@ -16,7 +16,7 @@
     <script src="scripts/apply-auth-protection.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="scripts/config/api.js"></script>
-    <script src="scripts/bloqueio_exclusao.js"></script>
+    
     <script src="scripts/navigation.js"></script>
     <style>
         /* Estilos do modal e botões padronizados */
@@ -1838,12 +1838,10 @@
             document.getElementById('confirmDeleteBtn').onclick = async function() {
                 if (!codigoParaExcluir) return;
                 try {
-                    const result = await window.bloqueioExclusao.deleteWithCheck(
-                        'pilares',
-                        codigoParaExcluir,
-                        () => { closeDeleteModal(); carregarPilares(); window.showDeleteSuccessModal(); }
-                    );
-                    if (!result || result.blocked) return;
+                    await window.api.delete(window.endpoints.pilares.delete(codigoParaExcluir));
+                    closeDeleteModal();
+                    carregarPilares();
+                    window.showDeleteSuccessModal();
                 } catch (error) {
                     console.error('Erro ao excluir pilar:', error);
                 } finally {

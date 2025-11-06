@@ -1210,7 +1210,7 @@
             </div>
         </div>
     </div>
-    <script src="scripts/bloqueio_exclusao.js"></script>
+    
     <script type="module">
         // Funções globais para modais
         window.openAcaoModal = function(titulo = 'Nova Ação', acao = null, modo = 'novo') {
@@ -1516,11 +1516,9 @@
                     const modal = document.getElementById('deleteAcaoModal');
                     const id = modal.dataset.codigo;
                     try {
-                        await window.bloqueioExclusao.deleteWithCheck(
-                            'acoes',
-                            id,
-                            () => { closeDeleteAcaoModal(); carregarAcoes(); }
-                        );
+                        await window.api.delete(window.endpoints.acoes.delete(id));
+                        closeDeleteAcaoModal();
+                        carregarAcoes();
                     } catch (error) {
                         console.error('Erro ao excluir ação:', error);
                     }
