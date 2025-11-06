@@ -1116,6 +1116,8 @@
     </script>
     <script type="module">
         const pilaresRows = document.getElementById('pilaresRows');
+        let lastQueryId = 0; // evita renderizações fora de ordem
+        let debounceTimer = null; // debounce para a busca
         const loaderPilares = document.getElementById('loader-pilares');
 
         // Spinner local deste módulo e export para window
@@ -1166,6 +1168,7 @@
         }
 
         async function carregarPilares() {
+            const myId = ++lastQueryId;
             try {
                 mostrarSpinner();
                 if (!pilaresRows) return;
@@ -1186,6 +1189,9 @@
                     });
                 }
 
+                // Evita renderização se uma busca mais recente já foi iniciada
+                if (myId !== lastQueryId) { return; }
+
                 if (listaFiltrada.length === 0) {
                     const empty = document.createElement('div');
                     empty.style.textAlign = 'center';
@@ -1194,6 +1200,8 @@
                     empty.innerHTML = '<i class="fas fa-layer-group" style="font-size:48px;opacity:.3;display:block;margin-bottom:16px"></i><p style="font-size:16px;margin:0;">Nenhum pilar encontrado</p>';
                     pilaresRows.appendChild(empty);
                 } else {
+                    // Evita renderização se uma busca mais recente já foi iniciada
+                    if (myId !== lastQueryId) { return; }
                     listaFiltrada.forEach(p => pilaresRows.appendChild(createPilarRow(p)));
                 }
             } catch (e) {
@@ -1256,7 +1264,10 @@
             // Busca
             const searchInput = document.getElementById('searchPilares');
             if (searchInput) {
-                searchInput.addEventListener('input', carregarPilares);
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(carregarPilares, 250);
+                });
             }
 
             carregarPilares();
