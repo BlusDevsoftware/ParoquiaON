@@ -1633,6 +1633,8 @@
 
         // Listar usuários via API e renderizar em linhas
         const usuariosRows = document.getElementById('usuariosRows');
+        let lastQueryId = 0; // evita renderizações fora de ordem
+        let debounceTimer = null; // debounce para a busca
         const loaderUsuarios = document.getElementById('loader-usuarios');
 
         // Spinner local deste módulo e export para window
@@ -1688,6 +1690,7 @@
         }
 
         async function carregarUsuarios() {
+            const myId = ++lastQueryId;
             try {
                 mostrarSpinner();
                 if (!usuariosRows) return;
@@ -1709,6 +1712,9 @@
                     });
                 }
 
+                // Evita renderização se uma busca mais recente já foi iniciada
+                if (myId !== lastQueryId) { return; }
+
                 if (listaFiltrada.length === 0) {
                     const empty = document.createElement('div');
                     empty.style.textAlign = 'center';
@@ -1717,6 +1723,8 @@
                     empty.innerHTML = '<i class="fas fa-user-cog" style="font-size:48px;opacity:.3;display:block;margin-bottom:16px"></i><p style="font-size:16px;margin:0;">Nenhum usuário encontrado</p>';
                     usuariosRows.appendChild(empty);
                 } else {
+                    // Evita renderização se uma busca mais recente já foi iniciada
+                    if (myId !== lastQueryId) { return; }
                     listaFiltrada.forEach(u => usuariosRows.appendChild(createUsuarioRow(u)));
                 }
             } catch (e) {
@@ -1815,7 +1823,10 @@
             // Busca
             const searchInput = document.getElementById('searchUsuarios');
             if (searchInput) {
-                searchInput.addEventListener('input', carregarUsuarios);
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(carregarUsuarios, 250);
+                });
             }
 
             const statusToggle = document.getElementById('statusToggleUsuarioModal');

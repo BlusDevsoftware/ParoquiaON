@@ -1582,6 +1582,8 @@
 
         // Listar pessoas via API e renderizar em linhas
         const pessoasRows = document.getElementById('pessoasRows');
+        let lastQueryId = 0; // evita renderizações fora de ordem
+        let debounceTimer = null; // debounce para a busca
         const loaderPessoas = document.getElementById('loader-pessoas');
 
         // Spinner local deste módulo e export para window
@@ -1630,6 +1632,7 @@
         }
 
         async function carregarPessoas() {
+            const myId = ++lastQueryId;
             try {
                 mostrarSpinner();
                 if (!pessoasRows) return;
@@ -1652,6 +1655,9 @@
                     });
                 }
 
+                // Evita renderização se uma busca mais recente já foi iniciada
+                if (myId !== lastQueryId) { return; }
+
                 if (listaFiltrada.length === 0) {
                     const empty = document.createElement('div');
                     empty.style.textAlign = 'center';
@@ -1660,6 +1666,8 @@
                     empty.innerHTML = '<i class="fas fa-user" style="font-size:48px;opacity:.3;display:block;margin-bottom:16px"></i><p style="font-size:16px;margin:0;">Nenhuma pessoa encontrada</p>';
                     pessoasRows.appendChild(empty);
                 } else {
+                    // Evita renderização se uma busca mais recente já foi iniciada
+                    if (myId !== lastQueryId) { return; }
                     listaFiltrada.forEach(p => pessoasRows.appendChild(createPessoaRow(p)));
                 }
             } catch (e) {
@@ -1723,7 +1731,10 @@
             // Busca
             const searchInput = document.getElementById('searchPessoas');
             if (searchInput) {
-                searchInput.addEventListener('input', carregarPessoas);
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(carregarPessoas, 250);
+                });
             }
 
             // Salva placeholder da imagem para resets futuros

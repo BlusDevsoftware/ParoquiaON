@@ -1694,7 +1694,11 @@
             // Busca
             const searchInput = document.getElementById('searchPerfis');
             if (searchInput) {
-                searchInput.addEventListener('input', carregarPerfisGrid);
+                let debounceTimer = null;
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(carregarPerfisGrid, 250);
+                });
             }
 
             carregarPerfisGrid();
