@@ -1439,6 +1439,8 @@
     <script type="module">
         // Listar locais via API e renderizar em linhas
         const locaisRows = document.getElementById('locaisRows');
+        let lastQueryId = 0; // evita renderizações fora de ordem
+        let debounceTimer = null; // debounce para a busca
         const loaderLocais = document.getElementById('loader-locais');
 
         // Spinner local deste módulo e export para window
@@ -1485,6 +1487,7 @@
         }
 
         async function carregarLocais() {
+            const myId = ++lastQueryId;
             try {
                 mostrarSpinner();
                 if (!locaisRows) return;
@@ -1506,6 +1509,9 @@
                     });
                 }
 
+                // Evita renderização se uma busca mais recente já foi iniciada
+                if (myId !== lastQueryId) { return; }
+
                 if (listaFiltrada.length === 0) {
                     const empty = document.createElement('div');
                     empty.style.textAlign = 'center';
@@ -1514,6 +1520,8 @@
                     empty.innerHTML = '<i class="fas fa-map-marker-alt" style="font-size:48px;opacity:.3;display:block;margin-bottom:16px"></i><p style="font-size:16px;margin:0;">Nenhum local encontrado</p>';
                     locaisRows.appendChild(empty);
                 } else {
+                    // Evita renderização se uma busca mais recente já foi iniciada
+                    if (myId !== lastQueryId) { return; }
                     listaFiltrada.forEach(l => locaisRows.appendChild(createLocalRow(l)));
                 }
             } catch (e) {
@@ -1866,7 +1874,10 @@
             // Busca
             const searchInput = document.getElementById('searchLocais');
             if (searchInput) {
-                searchInput.addEventListener('input', carregarLocais);
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(carregarLocais, 250);
+                });
             }
 
             try {
