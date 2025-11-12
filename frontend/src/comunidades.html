@@ -346,10 +346,13 @@
                 if (statusLabel) statusLabel.textContent = toggle.checked ? 'Ativo' : 'Inativo';
             };
             syncFromModel();
-            toggle.addEventListener('change', () => {
-                if (toggle.disabled) return;
-                syncFromToggle();
-            });
+            if (toggle.dataset.listenerAttached !== 'true') {
+                toggle.addEventListener('change', () => {
+                    if (toggle.disabled) return;
+                    syncFromToggle();
+                });
+                toggle.dataset.listenerAttached = 'true';
+            }
         }
 
         // Inicializar handlers de foto (preview + hidden base64)
@@ -408,6 +411,9 @@
                 form.data_fundacao.value = comunidade.data_fundacao || '';
                 form.status.value = comunidade.status || 'Ativo';
                 form.cor.value = comunidade.cor || '#1e3a8a';
+
+                // Sincronizar toggle de status com valor existente
+                inicializarStatusToggle();
                 
                 // Preencher membros do conselho se existirem
                 if (comunidade.membros_conselho) {
