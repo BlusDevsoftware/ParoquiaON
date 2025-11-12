@@ -1,11 +1,34 @@
 // Agenda selects population - attach to window.AgendaSelects
 (function() {
+  function isEntityActive(entity) {
+    if (!entity) return false;
+    if (Object.prototype.hasOwnProperty.call(entity, 'ativo')) {
+      const value = entity.ativo;
+      if (typeof value === 'boolean') return value;
+      if (typeof value === 'string') {
+        const normalized = value.trim().toLowerCase();
+        if (['false', '0', 'n', 'nao', 'não', 'inativo'].includes(normalized)) return false;
+        if (['true', '1', 's', 'sim', 'ativo'].includes(normalized)) return true;
+      }
+      if (typeof value === 'number') return value !== 0;
+      return Boolean(value);
+    }
+    const statusValue = entity.status || entity.situacao || entity.situacao_registro || entity.status_registro;
+    if (statusValue != null) {
+      const normalized = String(statusValue).trim().toLowerCase();
+      if (['inativo', 'i', 'false', '0', 'n', 'nao', 'não'].includes(normalized)) return false;
+      if (['ativo', 'a', 'true', '1', 's', 'sim'].includes(normalized)) return true;
+    }
+    return true;
+  }
+
   function fillSelect(selectEl, list, placeholder) {
     if (!selectEl) return;
+    const activeList = (list || []).filter(isEntityActive);
     const options = [
       `<option value="">${placeholder}</option>`
     ].concat(
-      (list || []).map(item => `<option value="${item.id}">${item.nome || item.titulo || item.descricao || 'Registro'}</option>`)
+      activeList.map(item => `<option value="${item.id}">${item.nome || item.titulo || item.descricao || 'Registro'}</option>`)
     );
     selectEl.innerHTML = options.join('');
   }
