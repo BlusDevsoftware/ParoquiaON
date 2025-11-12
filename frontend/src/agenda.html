@@ -5479,24 +5479,6 @@
             }, 100);
         }
 
-        function isEntityActive(entity) {
-            
-            if (!entity) return false;
-            if (Object.prototype.hasOwnProperty.call(entity, 'ativo')) {
-                return entity.ativo !== false;
-            }
-            if (entity.status && typeof entity.status === 'string') {
-                return entity.status.toLowerCase() === 'ativo';
-            }
-            if (entity.situacao && typeof entity.situacao === 'string') {
-                return entity.situacao.toLowerCase() === 'ativo';
-            }
-            if (entity.ativo == null && entity.status == null && entity.situacao == null) {
-                return true;
-            }
-            return true;
-        }
-
         // Função para popular selects do modal usando dados do cache
         function populateSelectsFromCache() {
             
