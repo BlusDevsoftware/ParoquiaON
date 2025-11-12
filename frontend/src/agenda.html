@@ -5479,6 +5479,24 @@
             }, 100);
         }
 
+        function isEntityActive(entity) {
+            
+            if (!entity) return false;
+            if (Object.prototype.hasOwnProperty.call(entity, 'ativo')) {
+                return entity.ativo !== false;
+            }
+            if (entity.status && typeof entity.status === 'string') {
+                return entity.status.toLowerCase() === 'ativo';
+            }
+            if (entity.situacao && typeof entity.situacao === 'string') {
+                return entity.situacao.toLowerCase() === 'ativo';
+            }
+            if (entity.ativo == null && entity.status == null && entity.situacao == null) {
+                return true;
+            }
+            return true;
+        }
+
         // Função para popular selects do modal usando dados do cache
         function populateSelectsFromCache() {
             
@@ -5486,7 +5504,9 @@
             const communitySelect = document.getElementById('eventCommunity');
             if (communitySelect && modalDataCache.comunidades.length > 0) {
                 communitySelect.innerHTML = '<option value="">Selecione a comunidade</option>';
-                modalDataCache.comunidades.forEach(comunidade => {
+                modalDataCache.comunidades
+                    .filter(isEntityActive)
+                    .forEach(comunidade => {
                     const option = document.createElement('option');
                     option.value = comunidade.id;
                     option.textContent = comunidade.nome;
@@ -5498,7 +5518,9 @@
             const pastoralSelect = document.getElementById('eventPastoral');
             if (pastoralSelect && modalDataCache.pastorais.length > 0) {
                 pastoralSelect.innerHTML = '<option value="">Selecione a pastoral</option>';
-                modalDataCache.pastorais.forEach(pastoral => {
+                modalDataCache.pastorais
+                    .filter(isEntityActive)
+                    .forEach(pastoral => {
                     const option = document.createElement('option');
                     option.value = pastoral.id;
                     option.textContent = pastoral.nome;
@@ -5510,7 +5532,9 @@
             const pilarSelect = document.getElementById('eventPilares');
             if (pilarSelect && modalDataCache.pilares.length > 0) {
                 pilarSelect.innerHTML = '<option value="">Selecione o pilar</option>';
-                modalDataCache.pilares.forEach(pilar => {
+                modalDataCache.pilares
+                    .filter(isEntityActive)
+                    .forEach(pilar => {
                     const option = document.createElement('option');
                     option.value = pilar.id;
                     option.textContent = pilar.nome;
@@ -5522,7 +5546,9 @@
             const acaoSelect = document.getElementById('eventAcao');
             if (acaoSelect && modalDataCache.acoes.length > 0) {
                 acaoSelect.innerHTML = '<option value="">Selecione a ação</option>';
-                modalDataCache.acoes.forEach(acao => {
+                modalDataCache.acoes
+                    .filter(isEntityActive)
+                    .forEach(acao => {
                     const option = document.createElement('option');
                     option.value = acao.id;
                     option.textContent = acao.nome;
@@ -5534,7 +5560,9 @@
             const localSelect = document.getElementById('eventLocation');
             if (localSelect && modalDataCache.locais.length > 0) {
                 localSelect.innerHTML = '<option value="">Selecione o local</option>';
-                modalDataCache.locais.forEach(local => {
+                modalDataCache.locais
+                    .filter(isEntityActive)
+                    .forEach(local => {
                     const option = document.createElement('option');
                     option.value = local.id;
                     option.textContent = local.nome;
