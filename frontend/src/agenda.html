@@ -6973,49 +6973,61 @@
             }
         }
 
-        function buildPeriodFromEvent(event) {
-            if (!event) return null;
-            const startRaw = event.startTime || event.start_time || event.data_inicio || event.dataHoraInicio || event.start || event.inicio;
-            if (!startRaw) return null;
-            const startDate = new Date(startRaw);
-            if (isNaN(startDate)) return null;
-            const endRaw = event.endTime || event.end_time || event.data_fim || event.dataHoraFim || event.end || event.fim || startRaw;
-            const endDate = new Date(endRaw);
+        function toDateTimeStrings(date) {
             return {
-                date: formatDateToYmd(startDate),
-                startTime: formatTimeToHm(startDate),
-                endTime: formatTimeToHm(!isNaN(endDate) ? endDate : startDate)
+                date: formatDateToYmd(date),
+                time: formatTimeToHm(date)
             };
-        }
-
-        function getCachedEditingPeriods() {
-            if (Array.isArray(editingEventPeriods) && editingEventPeriods.length > 0) {
-                return editingEventPeriods.map(period => ({ ...period }));
-            }
-            const fallback = buildPeriodFromEvent(editingEvent);
-            return fallback ? [fallback] : [];
         }
 
         function derivePeriodsFromEvent(event) {
             if (!event) return [];
-            const normalized = [];
+            const periods = [];
+
+            // 1) Se o backend trouxe múltiplos horários
             if (Array.isArray(event.horarios) && event.horarios.length > 0) {
-                event.horarios.forEach(h => {
-                    const date = h.data || h.date || h.data_inicio || h.dataInicio;
-                    const start = h.hora_inicio || h.hora_inicio || h.inicio || h.startTime;
-                    const end = h.hora_fim || h.horaFim || h.fim || h.endTime;
+                event.horarios.forEach((slot) => {
+                    const date = slot.data || slot.date || slot.data_inicio || slot.dataInicio;
+                    const start = slot.hora_inicio || slot.startTime || slot.inicio;
+                    const end = slot.hora_fim || slot.endTime || slot.fim;
                     if (date && start && end) {
-                        normalized.push({
+                        periods.push({
                             date,
                             startTime: start,
                             endTime: end
                         });
                     }
                 });
+                if (periods.length > 0) return periods;
             }
-            if (normalized.length > 0) return normalized;
-            const fallback = buildPeriodFromEvent(event);
-            return fallback ? [fallback] : [];
+
+            // 2) Fallback: usar data_inicio/data_fim ou startTime/endTime
+            const startRaw = event.data_inicio || event.startTime || event.start || event.inicio;
+            if (!startRaw) return periods;
+
+            const start = new Date(startRaw);
+            if (isNaN(start)) return periods;
+
+            const endRaw = event.data_fim || event.endTime || event.end || event.fim || startRaw;
+            const end = new Date(endRaw);
+
+            const startParts = toDateTimeStrings(start);
+            const endParts = toDateTimeStrings(!isNaN(end) ? end : start);
+
+            periods.push({
+                date: startParts.date,
+                startTime: startParts.time,
+                endTime: endParts.time
+            });
+
+            return periods;
+        }
+
+        function getCachedEditingPeriods() {
+            if (Array.isArray(editingEventPeriods) && editingEventPeriods.length > 0) {
+                return editingEventPeriods.map(period => ({ ...period }));
+            }
+            return derivePeriodsFromEvent(editingEvent);
         }
 
         function populateEventFormFields(event, attempt = 0) {
@@ -7056,13 +7068,12 @@
                 reloadCustomSelects('#eventModal');
             }
 
-            if (typeof window.clearAllPeriods === 'function') {
-                window.clearAllPeriods();
-            }
             const derivedPeriods = derivePeriodsFromEvent(event);
             editingEventPeriods = derivedPeriods.map(period => ({ ...period }));
             if (typeof window.applyExistingPeriodsForEdit === 'function') {
                 window.applyExistingPeriodsForEdit(derivedPeriods);
+            } else if (typeof window.clearAllPeriods === 'function') {
+                window.clearAllPeriods();
             }
             const previewPeriod = derivedPeriods[0];
             if (previewPeriod) {
@@ -7089,7 +7100,7 @@
                 window.closeEditEventModal();
             }
             editingEvent = event;
-            editingEventPeriods = [];
+            editingEventPeriods = derivePeriodsFromEvent(event);
             setEventFormMode('edit');
             openEventModal();
             populateEventFormFields(event);
