@@ -7568,6 +7568,7 @@
             window.updatePeriodsList = function() {
                 const periodsListElement = document.getElementById('periodsList');
                 
+                periodsListElement.innerHTML = '';
                 if (periodsList.length === 0) {
                     periodsListElement.innerHTML = `
                         <div class="no-periods-message">
