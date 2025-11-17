@@ -4104,6 +4104,17 @@
 
             const isEditing = Boolean(editingEvent && editingEvent.id);
             let periods = typeof window.getPeriodsData === 'function' ? window.getPeriodsData() : [];
+            const tryPopulateFromEvent = () => {
+                if (!isEditing) return [];
+                const derived = derivePeriodsFromEvent(editingEvent);
+                if (Array.isArray(derived) && derived.length > 0) {
+                    editingEventPeriods = derived.map(period => ({ ...period }));
+                    if (typeof window.applyExistingPeriodsForEdit === 'function') {
+                        window.applyExistingPeriodsForEdit(derived);
+                    }
+                }
+                return derived;
+            };
             if (Array.isArray(periods) && periods.length > 0) {
                 editingEventPeriods = periods.map(period => ({
                     date: period.date,
@@ -4113,6 +4124,9 @@
             }
             if (!Array.isArray(periods) || periods.length === 0) {
                 periods = getCachedEditingPeriods();
+            }
+            if ((!Array.isArray(periods) || periods.length === 0) && isEditing) {
+                periods = tryPopulateFromEvent();
             }
             if (!Array.isArray(periods) || periods.length === 0) {
                 if (typeof showToast === 'function') showToast('Por favor, adicione pelo menos um período.', 'error');
@@ -4130,6 +4144,17 @@
                     periods = fallbackCache;
                     editingEventPeriods = fallbackCache.map(period => ({ ...period }));
                     horarios = fallbackCache.map(p => ({
+                        data: p.date,
+                        hora_inicio: p.startTime,
+                        hora_fim: p.endTime
+                    }));
+                }
+            }
+            if (horarios.length === 0 && isEditing) {
+                const derived = tryPopulateFromEvent();
+                if (derived.length > 0) {
+                    periods = derived;
+                    horarios = derived.map(p => ({
                         data: p.date,
                         hora_inicio: p.startTime,
                         hora_fim: p.endTime
