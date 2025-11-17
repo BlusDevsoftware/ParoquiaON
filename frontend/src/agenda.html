@@ -4102,6 +4102,7 @@
                 return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}T${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`;
             };
 
+            const isEditing = Boolean(editingEvent && editingEvent.id);
             let periods = typeof window.getPeriodsData === 'function' ? window.getPeriodsData() : [];
             if (Array.isArray(periods) && periods.length > 0) {
                 editingEventPeriods = periods.map(period => ({
@@ -4136,7 +4137,7 @@
                 }
             }
 
-            const dataInicio = periods[0]?.date || '';
+            let dataInicio = periods[0]?.date || '';
             const formData = {
                 titulo: document.getElementById('eventTitle')?.value || '',
                 comunidade: document.getElementById('eventCommunity')?.value || '',
@@ -4152,13 +4153,28 @@
             };
 
             // Validação: apenas título, comunidade, data de início e horários são obrigatórios
-            if (!formData.titulo || !formData.comunidade || !formData.dataInicio || horarios.length === 0) {
+            if (!formData.titulo || !formData.comunidade || (!formData.dataInicio && !isEditing) || (horarios.length === 0 && !isEditing)) {
                 if (typeof showToast === 'function') showToast('Preencha campos obrigatórios e adicione um horário.', 'error');
                 return;
             }
 
             // Validate times and build API payloads using DateUtils
             const eventos = [];
+            if (horarios.length === 0 && isEditing) {
+                const fallbackCache = getCachedEditingPeriods();
+                if (fallbackCache.length > 0) {
+                    periods = fallbackCache;
+                    editingEventPeriods = fallbackCache.map(period => ({ ...period }));
+                    horarios.push(...fallbackCache.map(p => ({
+                        data: p.date,
+                        hora_inicio: p.startTime,
+                        hora_fim: p.endTime
+                    })));
+                    dataInicio = fallbackCache[0]?.date || dataInicio;
+                    formData.dataInicio = dataInicio;
+                }
+            }
+
             for (let i = 0; i < horarios.length; i++) {
                 const h = horarios[i];
                 if (!h.hora_inicio || !h.hora_fim) {
