@@ -32,6 +32,10 @@
     return window.api.post(window.endpoints.agenda.create, evento);
   }
 
+  async function update(id, evento) {
+    return window.api.put(window.endpoints.agenda.update(id), evento);
+  }
+
   async function remove(id) {
     return window.api.delete(window.endpoints.agenda.delete(id));
   }
@@ -48,7 +52,7 @@
     return (Array.isArray(data) ? data : []).map(normalizeEvent);
   }
 
-  window.AgendaAPI = { list, create, remove, byDate, byMonth };
+  window.AgendaAPI = { list, create, update, remove, byDate, byMonth };
 })();
 
 

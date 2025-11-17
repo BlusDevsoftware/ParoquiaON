@@ -3874,7 +3874,7 @@
                 <!-- Container de Informações -->
                 <div class="calendar-info-container">
                     <div class="info-left">
-                        <button class="create-button" onclick="openEventModal()">
+                        <button class="create-button" onclick="openEventModalFromCreate()">
                             <i class="fas fa-plus"></i>
                             Criar
                         </button>
@@ -3962,7 +3962,7 @@
     </div>
 
     <!-- FAB criar evento - visível apenas no mobile pelo CSS -->
-    <button class="fab-create-event" onclick="openEventModal()" aria-label="Criar evento" title="Criar evento"><i class="fas fa-plus"></i></button>
+    <button class="fab-create-event" onclick="openEventModalFromCreate()" aria-label="Criar evento" title="Criar evento"><i class="fas fa-plus"></i></button>
 
     <!-- Menu Lateral Mobile (igual Pastorais) -->
     <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
@@ -4172,15 +4172,32 @@
 
             try {
                 const resultados = [];
-                for (const evento of eventos) {
-                    const { data, error } = await window.AgendaAPI.create(evento);
+                const isEditing = editingEvent && editingEvent.id;
+
+                if (isEditing) {
+                    if (eventos.length === 0) {
+                        if (typeof showToast === 'function') showToast('Adicione pelo menos um período para salvar.', 'error');
+                        return;
+                    }
+                    const eventoAtualizado = { ...eventos[0] };
+                    const { data, error } = await window.AgendaAPI.update(editingEvent.id, eventoAtualizado);
                     if (error) throw error;
                     resultados.push(data);
+                    if (typeof showToast === 'function') showToast('Evento atualizado com sucesso!', 'success');
+                } else {
+                    for (const evento of eventos) {
+                        const { data, error } = await window.AgendaAPI.create(evento);
+                        if (error) throw error;
+                        resultados.push(data);
+                    }
+                    if (typeof showToast === 'function') showToast(eventos.length > 1 ? `${eventos.length} eventos criados com sucesso!` : 'Evento criado com sucesso!', 'success');
                 }
-                if (typeof showToast === 'function') showToast(eventos.length > 1 ? `${eventos.length} eventos criados com sucesso!` : 'Evento criado com sucesso!', 'success');
+
                 if (typeof window.clearEventForm === 'function') window.clearEventForm();
                 if (typeof window.clearAllPeriods === 'function') window.clearAllPeriods();
                 if (typeof window.closeEventModal === 'function') window.closeEventModal();
+                editingEvent = null;
+
                 await loadEventsFromApi();
                 filterEventsByCommunity();
                 renderCalendar();
@@ -4922,11 +4939,11 @@
                         const endDt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 0, 0);
                         if (typeof window.openEventModalWithTime === 'function') {
                             window.openEventModalWithTime(startDt, endDt);
-                        } else if (typeof window.openEventModal === 'function') {
+                        } else if (typeof window.openEventModalFromCreate === 'function') {
                             const y = date.getFullYear();
                             const m = String(date.getMonth() + 1).padStart(2, '0');
                             const d = String(date.getDate()).padStart(2, '0');
-                            window.openEventModal(`${y}-${m}-${d}`);
+                            window.openEventModalFromCreate(`${y}-${m}-${d}`);
                         }
                     });
 
@@ -6842,12 +6859,125 @@
         function executeModalScripts() {
             console.log('🔧 Executando scripts dos modais...');
             
-            // Definir as funções dos modais no escopo global
+        // Utilidades para modo do formulário e preenchimento de dados
+        function setEventFormMode(mode) {
+            const modalTitle = document.querySelector('#eventModal .modal-title');
+            if (modalTitle) {
+                modalTitle.innerHTML = mode === 'edit'
+                    ? '<i class="fas fa-edit"></i> Editar Agendamento'
+                    : '<i class="fas fa-calendar-plus"></i> Novo Agendamento';
+            }
+            const submitBtn = document.querySelector('#eventForm .new-appointment-actions .btn-primary');
+            if (submitBtn) {
+                submitBtn.textContent = mode === 'edit' ? 'Atualizar Evento' : 'Salvar Evento';
+            }
+        }
+
+        function formatDateToYmd(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatTimeToHm(date) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        function populateEventFormFields(event, attempt = 0) {
+            const maxAttempts = 10;
+            const titleInput = document.getElementById('eventTitle');
+            if (!titleInput) {
+                if (attempt < maxAttempts) {
+                    setTimeout(() => populateEventFormFields(event, attempt + 1), 200);
+                }
+                return;
+            }
+
+            titleInput.value = event.titulo || event.title || '';
+
+            const fieldMap = [
+                ['eventCommunity', event.comunidade_id],
+                ['eventPastoral', event.pastoral_id],
+                ['eventPilares', event.pilar_id],
+                ['eventLocation', event.local_id],
+                ['eventAcao', event.acao_id]
+            ];
+
+            fieldMap.forEach(([id, value]) => {
+                const el = document.getElementById(id);
+                if (el && value !== undefined && value !== null && value !== '') {
+                    el.value = String(value);
+                }
+            });
+
+            const objetivoInput = document.getElementById('eventObjetivo');
+            if (objetivoInput) {
+                objetivoInput.value = event.objetivo || '';
+            }
+
+            const paroquialInput = document.getElementById('eventParoquial');
+            if (paroquialInput) {
+                paroquialInput.checked = !!(event.evento_paroquial || event.eventoParoquial);
+            }
+
+            if (typeof reloadCustomSelects === 'function') {
+                reloadCustomSelects('#eventModal');
+            }
+
+            if (typeof window.clearAllPeriods === 'function') {
+                window.clearAllPeriods();
+            }
+
+            const startRaw = event.startTime || event.data_inicio || event.dataHoraInicio || event.start || event.inicio;
+            if (startRaw) {
+                const startDate = new Date(startRaw);
+                const endRaw = event.endTime || event.data_fim || event.dataHoraFim || event.end || event.fim || startRaw;
+                const endDate = new Date(endRaw);
+                if (!isNaN(startDate)) {
+                    const dateInput = document.getElementById('newPeriodDate');
+                    const startInput = document.getElementById('newPeriodStartTime');
+                    const endInput = document.getElementById('newPeriodEndTime');
+                    if (dateInput && startInput && endInput) {
+                        dateInput.value = formatDateToYmd(startDate);
+                        startInput.value = formatTimeToHm(startDate);
+                        endInput.value = !isNaN(endDate) ? formatTimeToHm(endDate) : formatTimeToHm(startDate);
+                        if (typeof window.addPeriod === 'function') {
+                            window.addPeriod();
+                        }
+                    }
+                }
+            }
+        }
+
+        window.openEventModalFromCreate = function(date = null) {
+            editingEvent = null;
+            setEventFormMode('create');
+            openEventModal(date);
+        };
+
+        window.openEventFormForEditing = function(event) {
+            if (typeof window.closeEditEventModal === 'function') {
+                window.closeEditEventModal();
+            }
+            editingEvent = event;
+            setEventFormMode('edit');
+            openEventModal();
+            populateEventFormFields(event);
+        };
+
+        // Definir as funções dos modais no escopo global
             window.openEventModalWithTime = function(startTime, endTime) {
                 console.log('🔄 Abrindo modal com horário:', startTime, endTime);
                 
                 // Usar o modal padrão
+            if (typeof window.openEventModalFromCreate === 'function') {
+                window.openEventModalFromCreate();
+            } else {
                 openEventModal();
+            }
                 
                 // Preencher e adicionar período após o modal estar aberto
                 setTimeout(() => {
@@ -6925,6 +7055,7 @@
             window.openEventModal = function(date = null) {
                 console.log('🔄 Abrindo modal padrão');
                 mostrarSpinnerAgenda();
+                setEventFormMode(editingEvent ? 'edit' : 'create');
                 
                 // Limpar períodos anteriores
                 if (window.clearAllPeriods) {
@@ -7034,6 +7165,11 @@
                 
                 // Resetar todos os cards expandidos
                 resetExpandedCards();
+                editingEvent = null;
+                setEventFormMode('create');
+                if (typeof window.clearAllPeriods === 'function') {
+                    window.clearAllPeriods();
+                }
                 
                 const modal = document.getElementById('eventModal');
                 if (modal) {
@@ -7086,6 +7222,15 @@
                             deleteEvent(event.id);
                             resetExpandedCards();
                             modal.style.display = 'none';
+                        };
+                    }
+
+                    const editBtn = document.getElementById('btnEditEvent');
+                    if (editBtn) {
+                        editBtn.onclick = function() {
+                            if (typeof window.openEventFormForEditing === 'function') {
+                                window.openEventFormForEditing(event);
+                            }
                         };
                     }
                 }
