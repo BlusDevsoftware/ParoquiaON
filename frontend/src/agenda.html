@@ -4223,12 +4223,12 @@
                     resultados.push(data);
                     if (typeof showToast === 'function') showToast('Evento atualizado com sucesso!', 'success');
                 } else {
-                    for (const evento of eventos) {
-                        const { data, error } = await window.AgendaAPI.create(evento);
-                        if (error) throw error;
-                        resultados.push(data);
-                    }
-                    if (typeof showToast === 'function') showToast(eventos.length > 1 ? `${eventos.length} eventos criados com sucesso!` : 'Evento criado com sucesso!', 'success');
+                for (const evento of eventos) {
+                    const { data, error } = await window.AgendaAPI.create(evento);
+                    if (error) throw error;
+                    resultados.push(data);
+                }
+                if (typeof showToast === 'function') showToast(eventos.length > 1 ? `${eventos.length} eventos criados com sucesso!` : 'Evento criado com sucesso!', 'success');
                 }
 
                 if (typeof window.clearEventForm === 'function') window.clearEventForm();
@@ -6926,6 +6926,28 @@
             return `${hours}:${minutes}`;
         }
 
+        function setSelectValueWithRetry(selectId, value, attempts = 15) {
+            if (value === undefined || value === null || value === '') return;
+            const select = document.getElementById(selectId);
+            if (!select) {
+                if (attempts > 0) {
+                    setTimeout(() => setSelectValueWithRetry(selectId, value, attempts - 1), 150);
+                }
+                return;
+            }
+            const stringValue = String(value);
+            const options = Array.from(select.options || []);
+            const hasOption = options.some(opt => opt.value === stringValue);
+            if (hasOption) {
+                select.value = stringValue;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            } else if (attempts > 0) {
+                setTimeout(() => setSelectValueWithRetry(selectId, value, attempts - 1), 150);
+            } else {
+                select.value = stringValue;
+            }
+        }
+
         function buildPeriodFromEvent(event) {
             if (!event) return null;
             const startRaw = event.startTime || event.start_time || event.data_inicio || event.dataHoraInicio || event.start || event.inicio;
@@ -6946,6 +6968,28 @@
                 return editingEventPeriods.map(period => ({ ...period }));
             }
             const fallback = buildPeriodFromEvent(editingEvent);
+            return fallback ? [fallback] : [];
+        }
+
+        function derivePeriodsFromEvent(event) {
+            if (!event) return [];
+            const normalized = [];
+            if (Array.isArray(event.horarios) && event.horarios.length > 0) {
+                event.horarios.forEach(h => {
+                    const date = h.data || h.date || h.data_inicio || h.dataInicio;
+                    const start = h.hora_inicio || h.hora_inicio || h.inicio || h.startTime;
+                    const end = h.hora_fim || h.horaFim || h.fim || h.endTime;
+                    if (date && start && end) {
+                        normalized.push({
+                            date,
+                            startTime: start,
+                            endTime: end
+                        });
+                    }
+                });
+            }
+            if (normalized.length > 0) return normalized;
+            const fallback = buildPeriodFromEvent(event);
             return fallback ? [fallback] : [];
         }
 
@@ -6970,10 +7014,7 @@
             ];
 
             fieldMap.forEach(([id, value]) => {
-                const el = document.getElementById(id);
-                if (el && value !== undefined && value !== null && value !== '') {
-                    el.value = String(value);
-                }
+                setSelectValueWithRetry(id, value);
             });
 
             const objetivoInput = document.getElementById('eventObjetivo');
@@ -6993,20 +7034,20 @@
             if (typeof window.clearAllPeriods === 'function') {
                 window.clearAllPeriods();
             }
-            const fallbackPeriod = buildPeriodFromEvent(event);
-            editingEventPeriods = fallbackPeriod ? [{ ...fallbackPeriod }] : [];
-
-            if (fallbackPeriod) {
+            const derivedPeriods = derivePeriodsFromEvent(event);
+            editingEventPeriods = derivedPeriods.map(period => ({ ...period }));
+            if (typeof window.applyExistingPeriodsForEdit === 'function') {
+                window.applyExistingPeriodsForEdit(derivedPeriods);
+            }
+            const previewPeriod = derivedPeriods[0];
+            if (previewPeriod) {
                 const dateInput = document.getElementById('newPeriodDate');
                 const startInput = document.getElementById('newPeriodStartTime');
                 const endInput = document.getElementById('newPeriodEndTime');
                 if (dateInput && startInput && endInput) {
-                    dateInput.value = fallbackPeriod.date;
-                    startInput.value = fallbackPeriod.startTime;
-                    endInput.value = fallbackPeriod.endTime;
-                    if (typeof window.addPeriod === 'function') {
-                        window.addPeriod();
-                    }
+                    dateInput.value = previewPeriod.date;
+                    startInput.value = previewPeriod.startTime;
+                    endInput.value = previewPeriod.endTime;
                 }
             }
         }
@@ -7028,8 +7069,8 @@
             openEventModal();
             populateEventFormFields(event);
         };
-
-        // Definir as funções dos modais no escopo global
+            
+            // Definir as funções dos modais no escopo global
             window.openEventModalWithTime = function(startTime, endTime) {
                 console.log('🔄 Abrindo modal com horário:', startTime, endTime);
                 
@@ -7553,6 +7594,29 @@
 
             window.clearAllPeriods = function() {
                 periodsList = [];
+                updatePeriodsList();
+                if (typeof window.togglePeriodFieldsRequired === 'function') {
+                    window.togglePeriodFieldsRequired();
+                }
+            };
+
+            window.applyExistingPeriodsForEdit = function(periods) {
+                const normalized = Array.isArray(periods) ? periods.filter(period => period && period.date && period.startTime && period.endTime) : [];
+                if (normalized.length === 0) {
+                    periodsList = [];
+                    updatePeriodsList();
+                    if (typeof window.togglePeriodFieldsRequired === 'function') {
+                        window.togglePeriodFieldsRequired();
+                    }
+                    return;
+                }
+                periodsList = normalized.map((period, index) => ({
+                    id: Date.now() + index,
+                    date: period.date,
+                    startTime: period.startTime,
+                    endTime: period.endTime
+                }));
+                editingEventPeriods = normalized.map(period => ({ date: period.date, startTime: period.startTime, endTime: period.endTime }));
                 updatePeriodsList();
                 if (typeof window.togglePeriodFieldsRequired === 'function') {
                     window.togglePeriodFieldsRequired();
