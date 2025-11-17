@@ -4102,7 +4102,28 @@
                 return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}T${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`;
             };
 
-            const periods = typeof window.getPeriodsData === 'function' ? window.getPeriodsData() : [];
+            let periods = typeof window.getPeriodsData === 'function' ? window.getPeriodsData() : [];
+            if (!Array.isArray(periods) || periods.length === 0) {
+                const fallbackPeriod = (() => {
+                    if (!editingEvent) return null;
+                    const startRaw = editingEvent.startTime || editingEvent.start_time || editingEvent.data_inicio || editingEvent.dataHoraInicio || editingEvent.start || editingEvent.inicio;
+                    if (!startRaw) return null;
+                    const startDate = new Date(startRaw);
+                    if (isNaN(startDate)) return null;
+                    const endRaw = editingEvent.endTime || editingEvent.end_time || editingEvent.data_fim || editingEvent.dataHoraFim || editingEvent.end || editingEvent.fim || startRaw;
+                    const endDate = new Date(endRaw);
+                    const formatDateYmd = (date) => `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+                    const formatTimeHm = (date) => `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+                    return {
+                        date: formatDateYmd(startDate),
+                        startTime: formatTimeHm(startDate),
+                        endTime: formatTimeHm(!isNaN(endDate) ? endDate : startDate)
+                    };
+                })();
+                if (fallbackPeriod) {
+                    periods = [fallbackPeriod];
+                }
+            }
             if (!Array.isArray(periods) || periods.length === 0) {
                 if (typeof showToast === 'function') showToast('Por favor, adicione pelo menos um período.', 'error');
                 return;
