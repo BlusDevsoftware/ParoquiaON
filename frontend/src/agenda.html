@@ -4177,9 +4177,16 @@
                 status: 'agendado'
             };
 
-            // Validação: apenas título, comunidade, data de início e horários são obrigatórios
-            if (!formData.titulo || !formData.comunidade || (!formData.dataInicio && !isEditing) || (horarios.length === 0 && !isEditing)) {
-                if (typeof showToast === 'function') showToast('Preencha campos obrigatórios e adicione um horário.', 'error');
+            if (!formData.titulo) {
+                if (typeof showToast === 'function') showToast('Informe o título do evento.', 'error');
+                return;
+            }
+            if (!formData.dataInicio && !isEditing) {
+                if (typeof showToast === 'function') showToast('Informe a data do evento ou adicione um período.', 'error');
+                return;
+            }
+            if (horarios.length === 0) {
+                if (typeof showToast === 'function') showToast('Adicione pelo menos um horário.', 'error');
                 return;
             }
 
