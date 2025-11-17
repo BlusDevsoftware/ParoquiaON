@@ -4103,41 +4103,38 @@
             };
 
             let periods = typeof window.getPeriodsData === 'function' ? window.getPeriodsData() : [];
+            if (Array.isArray(periods) && periods.length > 0) {
+                editingEventPeriods = periods.map(period => ({
+                    date: period.date,
+                    startTime: period.startTime,
+                    endTime: period.endTime
+                }));
+            }
             if (!Array.isArray(periods) || periods.length === 0) {
-                if (Array.isArray(editingEventPeriods) && editingEventPeriods.length > 0) {
-                    periods = editingEventPeriods.map(p => ({ ...p }));
-                } else {
-                    const fallbackPeriod = (() => {
-                        if (!editingEvent) return null;
-                        const startRaw = editingEvent.startTime || editingEvent.start_time || editingEvent.data_inicio || editingEvent.dataHoraInicio || editingEvent.start || editingEvent.inicio;
-                        if (!startRaw) return null;
-                        const startDate = new Date(startRaw);
-                        if (isNaN(startDate)) return null;
-                        const endRaw = editingEvent.endTime || editingEvent.end_time || editingEvent.data_fim || editingEvent.dataHoraFim || editingEvent.end || editingEvent.fim || startRaw;
-                        const endDate = new Date(endRaw);
-                        const formatDateYmd = (date) => `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
-                        const formatTimeHm = (date) => `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
-                        return {
-                            date: formatDateYmd(startDate),
-                            startTime: formatTimeHm(startDate),
-                            endTime: formatTimeHm(!isNaN(endDate) ? endDate : startDate)
-                        };
-                    })();
-                    if (fallbackPeriod) {
-                        periods = [fallbackPeriod];
-                    }
-                }
+                periods = getCachedEditingPeriods();
             }
             if (!Array.isArray(periods) || periods.length === 0) {
                 if (typeof showToast === 'function') showToast('Por favor, adicione pelo menos um período.', 'error');
                 return;
             }
 
-            const horarios = periods.map(p => ({
+            let horarios = periods.map(p => ({
                 data: p.date,
                 hora_inicio: p.startTime,
                 hora_fim: p.endTime
             }));
+            if (horarios.length === 0) {
+                const fallbackCache = getCachedEditingPeriods();
+                if (fallbackCache.length > 0) {
+                    periods = fallbackCache;
+                    editingEventPeriods = fallbackCache.map(period => ({ ...period }));
+                    horarios = fallbackCache.map(p => ({
+                        data: p.date,
+                        hora_inicio: p.startTime,
+                        hora_fim: p.endTime
+                    }));
+                }
+            }
 
             const dataInicio = periods[0]?.date || '';
             const formData = {
@@ -6913,6 +6910,29 @@
             return `${hours}:${minutes}`;
         }
 
+        function buildPeriodFromEvent(event) {
+            if (!event) return null;
+            const startRaw = event.startTime || event.start_time || event.data_inicio || event.dataHoraInicio || event.start || event.inicio;
+            if (!startRaw) return null;
+            const startDate = new Date(startRaw);
+            if (isNaN(startDate)) return null;
+            const endRaw = event.endTime || event.end_time || event.data_fim || event.dataHoraFim || event.end || event.fim || startRaw;
+            const endDate = new Date(endRaw);
+            return {
+                date: formatDateToYmd(startDate),
+                startTime: formatTimeToHm(startDate),
+                endTime: formatTimeToHm(!isNaN(endDate) ? endDate : startDate)
+            };
+        }
+
+        function getCachedEditingPeriods() {
+            if (Array.isArray(editingEventPeriods) && editingEventPeriods.length > 0) {
+                return editingEventPeriods.map(period => ({ ...period }));
+            }
+            const fallback = buildPeriodFromEvent(editingEvent);
+            return fallback ? [fallback] : [];
+        }
+
         function populateEventFormFields(event, attempt = 0) {
             const maxAttempts = 10;
             const titleInput = document.getElementById('eventTitle');
@@ -6957,36 +6977,22 @@
             if (typeof window.clearAllPeriods === 'function') {
                 window.clearAllPeriods();
             }
+            const fallbackPeriod = buildPeriodFromEvent(event);
+            editingEventPeriods = fallbackPeriod ? [{ ...fallbackPeriod }] : [];
 
-            const startRaw = event.startTime || event.data_inicio || event.dataHoraInicio || event.start || event.inicio;
-            const periodsBuffer = [];
-            if (startRaw) {
-                const startDate = new Date(startRaw);
-                const endRaw = event.endTime || event.data_fim || event.dataHoraFim || event.end || event.fim || startRaw;
-                const endDate = new Date(endRaw);
-                if (!isNaN(startDate)) {
-                    const dateValue = formatDateToYmd(startDate);
-                    const startValue = formatTimeToHm(startDate);
-                    const endValue = formatTimeToHm(!isNaN(endDate) ? endDate : startDate);
-                    periodsBuffer.push({
-                        date: dateValue,
-                        startTime: startValue,
-                        endTime: endValue
-                    });
-                    const dateInput = document.getElementById('newPeriodDate');
-                    const startInput = document.getElementById('newPeriodStartTime');
-                    const endInput = document.getElementById('newPeriodEndTime');
-                    if (dateInput && startInput && endInput) {
-                        dateInput.value = dateValue;
-                        startInput.value = startValue;
-                        endInput.value = endValue;
-                        if (typeof window.addPeriod === 'function') {
-                            window.addPeriod();
-                        }
+            if (fallbackPeriod) {
+                const dateInput = document.getElementById('newPeriodDate');
+                const startInput = document.getElementById('newPeriodStartTime');
+                const endInput = document.getElementById('newPeriodEndTime');
+                if (dateInput && startInput && endInput) {
+                    dateInput.value = fallbackPeriod.date;
+                    startInput.value = fallbackPeriod.startTime;
+                    endInput.value = fallbackPeriod.endTime;
+                    if (typeof window.addPeriod === 'function') {
+                        window.addPeriod();
                     }
                 }
             }
-            editingEventPeriods = periodsBuffer;
         }
 
         window.openEventModalFromCreate = function(date = null) {
