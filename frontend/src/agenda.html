@@ -7274,17 +7274,26 @@
                                     if (typeof initDynamicMiniCalendar === 'function') {
                                         initDynamicMiniCalendar();
                                     } else {
-                                        try {
-                                            // A função está no escopo do executeModalScripts; exposta via window se necessário
-                                            if (window.initDynamicMiniCalendar) {
-                                                window.initDynamicMiniCalendar();
-                                            }
-                                        } catch (_) {}
+                                        if (window.initDynamicMiniCalendar) {
+                                            window.initDynamicMiniCalendar();
+                                        }
                                     }
                                 }
                             });
                             dynamicToggle.setAttribute('data-listener-added', 'true');
                         }
+                    }
+
+                    // Configurar botão de adicionar períodos dinâmicos
+                    const btnAddDynamic = document.getElementById('btnAddDynamicPeriods');
+                    if (btnAddDynamic && !btnAddDynamic.hasAttribute('data-listener-added')) {
+                        btnAddDynamic.addEventListener('click', function () {
+                            console.log('🔘 Botão Adicionar Períodos Dinâmicos clicado');
+                            if (window.addDynamicPeriods) {
+                                window.addDynamicPeriods();
+                            }
+                        });
+                        btnAddDynamic.setAttribute('data-listener-added', 'true');
                     }
                         
                         // Desativar validação nativa do formulário; usamos validação customizada
