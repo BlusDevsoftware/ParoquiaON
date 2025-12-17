@@ -4316,6 +4316,30 @@
             }
         }
         
+        // Funções helper para gerenciar preferência do onboarding
+        function shouldShowOnboardingAgendamentoDinamico() {
+            try {
+                return !localStorage.getItem('onboardingAgendamentoDinamicoShown');
+            } catch (error) {
+                console.error('Erro ao verificar preferência do onboarding:', error);
+                return true; // Em caso de erro, mostrar por padrão
+            }
+        }
+
+        function saveOnboardingAgendamentoDinamicoPreference(dontShowAgain) {
+            try {
+                if (dontShowAgain) {
+                    localStorage.setItem('onboardingAgendamentoDinamicoShown', 'true');
+                    console.log('✅ Preferência salva: Modal de onboarding não será exibido novamente');
+                } else {
+                    localStorage.removeItem('onboardingAgendamentoDinamicoShown');
+                    console.log('✅ Preferência removida: Modal de onboarding será exibido novamente');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao salvar preferência do onboarding:', error);
+            }
+        }
+        
         function ocultarSpinnerAgenda() {
             const spinner = document.getElementById('loader-agenda');
             if (spinner) {
@@ -4324,7 +4348,8 @@
 
             // Exibir onboarding do Agendamento Dinâmico após o carregamento inicial
             try {
-                if (!window.__onboardingAgendaShown) {
+                // Verificar se o usuário já optou por não ver novamente
+                if (shouldShowOnboardingAgendamentoDinamico() && !window.__onboardingAgendaShown) {
                     const onboardingModal = document.getElementById('onboardingAgendamentoDinamicoModal');
                     if (onboardingModal) {
                         onboardingModal.style.display = 'flex';
@@ -7936,9 +7961,17 @@
             const onboardingModal = document.getElementById('onboardingAgendamentoDinamicoModal');
             const onboardingClose = document.getElementById('onboardingAgendamentoCloseBtn');
             const onboardingPrimary = document.getElementById('onboardingAgendamentoPrimaryBtn');
+            const onboardingDontShowAgain = document.getElementById('onboardingAgendamentoDontShowAgain');
 
             function closeOnboardingModal() {
                 if (!onboardingModal) return;
+                
+                // Verificar se o checkbox "Não mostrar novamente" está marcado e salvar preferência
+                if (onboardingDontShowAgain) {
+                    saveOnboardingAgendamentoDinamicoPreference(onboardingDontShowAgain.checked);
+                }
+                
+                // Fechar modal
                 onboardingModal.style.display = 'none';
             }
 
