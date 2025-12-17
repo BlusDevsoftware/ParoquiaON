@@ -271,4 +271,136 @@
     </div>
 </div>
 
+<!-- Modal de apresentação do Agendamento Dinâmico (onboarding) -->
+<div id="onboardingAgendamentoDinamicoModal" class="modal" style="display: flex;">
+    <div class="modal-content new-appointment-modal" style="max-width: 900px;">
+        <div class="modal-header new-appointment-header">
+            <h2 class="modal-title">
+                <i class="fas fa-bolt"></i>
+                Agendamento Dinâmico
+            </h2>
+            <button class="close-modal" id="onboardingAgendamentoCloseBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body new-appointment-body" style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr); gap: 20px; align-items: stretch;">
+            <!-- Lado esquerdo: texto explicativo -->
+            <div>
+                <p style="font-size: 14px; color: #4b5563; margin-bottom: 14px;">
+                    Com o <strong>Agendamento Dinâmico</strong> você pode selecionar vários dias no mini calendário,
+                    informar um único horário de início e fim, e deixar o sistema criar todos os períodos de uma só vez.
+                </p>
+
+                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #374151;">
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">1</span>
+                        <span><strong>Ative o Agendamento Dinâmico</strong> no modal de Novo Agendamento.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">2</span>
+                        <span><strong>Clique em todos os dias</strong> que vão usar o mesmo horário no mini calendário.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">3</span>
+                        <span>
+                            <strong>Defina o horário de início e fim</strong> e clique em <strong>Adicionar</strong> no bloco de Agendamento Dinâmico.
+                            A lista <em>Períodos do Agendamento</em> receberá um período para cada dia escolhido.
+                        </span>
+                    </li>
+                </ul>
+
+                <div style="margin-top: 16px; font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+                    <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <input type="checkbox" id="onboardingAgendamentoDontShowAgain" style="width: 13px; height: 13px;">
+                        <span>Não mostrar novamente para este navegador</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Lado direito: mini ilustração do fluxo -->
+            <div style="border-radius: 12px; border: 1px solid #e5e7eb; padding: 12px; background: linear-gradient(135deg, #eef2ff, #eff6ff);">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:11px; color:#4b5563;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <i class="fas fa-calendar-week" style="color:#6366f1; font-size:11px;"></i>
+                        <span>Mini calendário</span>
+                    </div>
+                    <span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; color:#1f2937;">
+                        <i class="fas fa-toggle-on" style="color:#16a34a;"></i>
+                        Dinâmico
+                    </span>
+                </div>
+
+                <!-- Grade simples de dias com destaque em 3 dias -->
+                <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:3px; font-size:9px; margin-bottom:8px;">
+                    <span style="text-align:center; color:#6b7280;">D</span>
+                    <span style="text-align:center; color:#6b7280;">S</span>
+                    <span style="text-align:center; color:#6b7280;">T</span>
+                    <span style="text-align:center; color:#6b7280;">Q</span>
+                    <span style="text-align:center; color:#6b7280;">Q</span>
+                    <span style="text-align:center; color:#6b7280;">S</span>
+                    <span style="text-align:center; color:#6b7280;">S</span>
+
+                    <!-- Linha 1 -->
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px; border-radius:6px; border:1px solid #c7d2fe; background:#e0ebff; text-align:center; line-height:18px; font-weight:600; color:#1d4ed8;">9</div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px; border-radius:6px; border:1px solid #c7d2fe; background:#e0ebff; text-align:center; line-height:18px; font-weight:600; color:#1d4ed8;">12</div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+
+                    <!-- Linha 2 -->
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px; border-radius:6px; border:1px solid #c7d2fe; background:#e0ebff; text-align:center; line-height:18px; font-weight:600; color:#1d4ed8;">17</div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+                </div>
+
+                <!-- Horário aplicado -->
+                <div style="display:flex; align-items:center; justify-content:space-between; font-size:10px; margin-bottom:8px;">
+                    <div style="display:inline-flex; align-items:center; gap:6px; border-radius:999px; background:#1d4ed8; color:#eef2ff; padding:3px 8px;">
+                        <span style="width:6px; height:6px; border-radius:999px; background:#bbf7d0;"></span>
+                        <span>19:00 - 20:00</span>
+                    </div>
+                    <span style="color:#6b7280;">Horário aplicado</span>
+                </div>
+
+                <!-- Pré-visualização dos períodos criados -->
+                <div style="display:flex; flex-direction:column; gap:4px; font-size:10px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 6px; border-radius:6px; background:#ffffff; border:1px solid #e5e7eb;">
+                        <span style="display:inline-flex; align-items:center; gap:4px; color:#4b5563;">
+                            <i class="fas fa-calendar-day" style="font-size:9px; color:#4f46e5;"></i>
+                            09/08
+                        </span>
+                        <span style="font-variant-numeric:tabular-nums; color:#374151;">19:00 - 20:00</span>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 6px; border-radius:6px; background:#ffffff; border:1px solid #e5e7eb;">
+                        <span style="display:inline-flex; align-items:center; gap:4px; color:#4b5563;">
+                            <i class="fas fa-calendar-day" style="font-size:9px; color:#4f46e5;"></i>
+                            12/08
+                        </span>
+                        <span style="font-variant-numeric:tabular-nums; color:#374151;">19:00 - 20:00</span>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 6px; border-radius:6px; background:#ffffff; border:1px solid #e5e7eb;">
+                        <span style="display:inline-flex; align-items:center; gap:4px; color:#4b5563;">
+                            <i class="fas fa-calendar-day" style="font-size:9px; color:#4f46e5;"></i>
+                            17/08
+                        </span>
+                        <span style="font-variant-numeric:tabular-nums; color:#374151;">19:00 - 20:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer" style="display:flex; justify-content:flex-end; padding-top:12px; border-top:1px solid #e5e7eb; margin-top:8px;">
+            <button type="button" class="btn-primary" id="onboardingAgendamentoPrimaryBtn">
+                Entendi, quero usar agora
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Scripts movidos para agenda.html -->

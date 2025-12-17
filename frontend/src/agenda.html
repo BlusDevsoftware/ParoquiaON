@@ -7920,6 +7920,26 @@
             }, 100);
 
             console.log('✅ Scripts dos modais executados com sucesso');
+
+            // Configuração do modal de apresentação do Agendamento Dinâmico
+            const onboardingModal = document.getElementById('onboardingAgendamentoDinamicoModal');
+            const onboardingClose = document.getElementById('onboardingAgendamentoCloseBtn');
+            const onboardingPrimary = document.getElementById('onboardingAgendamentoPrimaryBtn');
+
+            function closeOnboardingModal() {
+                if (!onboardingModal) return;
+                onboardingModal.style.display = 'none';
+            }
+
+            if (onboardingClose && !onboardingClose.hasAttribute('data-listener-added')) {
+                onboardingClose.addEventListener('click', closeOnboardingModal);
+                onboardingClose.setAttribute('data-listener-added', 'true');
+            }
+
+            if (onboardingPrimary && !onboardingPrimary.hasAttribute('data-listener-added')) {
+                onboardingPrimary.addEventListener('click', closeOnboardingModal);
+                onboardingPrimary.setAttribute('data-listener-added', 'true');
+            }
         }
 
         // Função de teste para verificar se os modais estão funcionando
