@@ -4321,6 +4321,17 @@
             if (spinner) {
                 spinner.style.display = 'none';
             }
+
+            // Exibir onboarding do Agendamento Dinâmico após o carregamento inicial
+            try {
+                if (!window.__onboardingAgendaShown) {
+                    const onboardingModal = document.getElementById('onboardingAgendamentoDinamicoModal');
+                    if (onboardingModal) {
+                        onboardingModal.style.display = 'flex';
+                        window.__onboardingAgendaShown = true;
+                    }
+                }
+            } catch (_) {}
         }
 
         // Inicializar aplicação
