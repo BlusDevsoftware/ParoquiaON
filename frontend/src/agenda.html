@@ -7257,7 +7257,8 @@
                     const periodModeDynamic = document.getElementById('periodModeDynamic');
                     if (dynamicToggle && periodModeSimple && periodModeDynamic) {
                         // Estado inicial: modo simples ativo
-                        dynamicToggle.checked = false;
+                        // Mantém o valor atual do toggle ao reabrir, se desejar. Por padrão, inicia desligado.
+                        // dynamicToggle.checked = false;
                         periodModeSimple.style.display = '';
                         periodModeDynamic.style.display = 'none';
 
@@ -7268,7 +7269,19 @@
                                 periodModeSimple.style.display = enabled ? 'none' : '';
                                 periodModeDynamic.style.display = enabled ? '' : 'none';
 
-                                // Por enquanto, apenas troca visual. Lógica de múltiplos dias será adicionada depois.
+                                if (enabled) {
+                                    // Inicializar calendário dinâmico quando o modo for ativado
+                                    if (typeof initDynamicMiniCalendar === 'function') {
+                                        initDynamicMiniCalendar();
+                                    } else {
+                                        try {
+                                            // A função está no escopo do executeModalScripts; exposta via window se necessário
+                                            if (window.initDynamicMiniCalendar) {
+                                                window.initDynamicMiniCalendar();
+                                            }
+                                        } catch (_) {}
+                                    }
+                                }
                             });
                             dynamicToggle.setAttribute('data-listener-added', 'true');
                         }
@@ -7510,6 +7523,120 @@
             // Funções para múltiplos períodos de agendamento
             let periodsList = [];
 
+            // Estado do modo de agendamento dinâmico
+            let dynamicSelectedDates = new Set();
+            let dynamicCurrentYear = null;
+            let dynamicCurrentMonth = null;
+
+            function getMonthNamePtBr(monthIndex) {
+                const months = [
+                    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                ];
+                return months[monthIndex] || '';
+            }
+
+            function renderDynamicMiniCalendar() {
+                const grid = document.getElementById('dynamicMiniCalendarGrid');
+                const titleEl = document.getElementById('dynamicMiniCalendarTitle');
+                if (!grid || dynamicCurrentYear === null || dynamicCurrentMonth === null) return;
+
+                // Preservar cabeçalho dos dias da semana (primeiros 7 filhos)
+                while (grid.children.length > 7) {
+                    grid.removeChild(grid.lastElementChild);
+                }
+
+                const year = dynamicCurrentYear;
+                const month = dynamicCurrentMonth;
+
+                if (titleEl) {
+                    titleEl.textContent = `${getMonthNamePtBr(month)} ${year}`;
+                }
+
+                const firstDay = new Date(year, month, 1);
+                const firstWeekday = firstDay.getDay(); // 0 = domingo
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                // Espaços vazios antes do dia 1
+                for (let i = 0; i < firstWeekday; i++) {
+                    const empty = document.createElement('div');
+                    empty.className = 'dynamic-mini-day';
+                    empty.style.visibility = 'hidden';
+                    grid.appendChild(empty);
+                }
+
+                const today = new Date();
+                const todayY = today.getFullYear();
+                const todayM = today.getMonth();
+                const todayD = today.getDate();
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'dynamic-mini-day';
+                    const ymd = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    cell.dataset.date = ymd;
+                    cell.textContent = String(day);
+
+                    if (year === todayY && month === todayM && day === todayD) {
+                        cell.classList.add('dynamic-today');
+                    }
+                    if (dynamicSelectedDates.has(ymd)) {
+                        cell.classList.add('dynamic-selected');
+                    }
+
+                    cell.addEventListener('click', () => {
+                        if (dynamicSelectedDates.has(ymd)) {
+                            dynamicSelectedDates.delete(ymd);
+                            cell.classList.remove('dynamic-selected');
+                        } else {
+                            dynamicSelectedDates.add(ymd);
+                            cell.classList.add('dynamic-selected');
+                        }
+                    });
+
+                    grid.appendChild(cell);
+                }
+            }
+
+            // Expor inicialização do mini calendário dinâmico para uso em openEventModal
+            window.initDynamicMiniCalendar = function initDynamicMiniCalendar() {
+                const grid = document.getElementById('dynamicMiniCalendarGrid');
+                if (!grid) return;
+
+                const now = new Date();
+                dynamicCurrentYear = now.getFullYear();
+                dynamicCurrentMonth = now.getMonth();
+
+                const prevBtn = document.getElementById('dynamicPrevMonthBtn');
+                const nextBtn = document.getElementById('dynamicNextMonthBtn');
+
+                if (prevBtn && !prevBtn.hasAttribute('data-listener-added')) {
+                    prevBtn.addEventListener('click', () => {
+                        dynamicCurrentMonth--;
+                        if (dynamicCurrentMonth < 0) {
+                            dynamicCurrentMonth = 11;
+                            dynamicCurrentYear--;
+                        }
+                        renderDynamicMiniCalendar();
+                    });
+                    prevBtn.setAttribute('data-listener-added', 'true');
+                }
+
+                if (nextBtn && !nextBtn.hasAttribute('data-listener-added')) {
+                    nextBtn.addEventListener('click', () => {
+                        dynamicCurrentMonth++;
+                        if (dynamicCurrentMonth > 11) {
+                            dynamicCurrentMonth = 0;
+                            dynamicCurrentYear++;
+                        }
+                        renderDynamicMiniCalendar();
+                    });
+                    nextBtn.setAttribute('data-listener-added', 'true');
+                }
+
+                renderDynamicMiniCalendar();
+            };
+
             window.addPeriod = function() {
                 const date = document.getElementById('newPeriodDate').value;
                 const endDateValue = document.getElementById('newPeriodEndDate') ? document.getElementById('newPeriodEndDate').value : '';
@@ -7586,6 +7713,60 @@
                 clearPeriodForm();
 
                 // Após adicionar o primeiro período, remover obrigatoriedade dos campos de período
+                if (typeof window.togglePeriodFieldsRequired === 'function') {
+                    window.togglePeriodFieldsRequired();
+                }
+            };
+
+            // Adicionar períodos em lote a partir do modo de Agendamento Dinâmico
+            window.addDynamicPeriods = function() {
+                const startTime = document.getElementById('dynamicStartTime')?.value || '';
+                const endTime = document.getElementById('dynamicEndTime')?.value || '';
+
+                if (!startTime || !endTime) {
+                    alert('Por favor, informe o horário de início e fim.');
+                    return;
+                }
+
+                if (startTime >= endTime) {
+                    alert('O horário de início deve ser anterior ao horário de fim.');
+                    return;
+                }
+
+                const selectedDates = Array.from(dynamicSelectedDates || []);
+                if (!selectedDates.length) {
+                    alert('Selecione pelo menos um dia no calendário para aplicar o horário.');
+                    return;
+                }
+
+                const toAdd = [];
+                selectedDates.sort().forEach((ymd, idx) => {
+                    const dup = periodsList.find(p => p.date === ymd && p.startTime === startTime && p.endTime === endTime) ||
+                                toAdd.find(p => p.date === ymd && p.startTime === startTime && p.endTime === endTime);
+                    if (!dup) {
+                        toAdd.push({
+                            id: Date.now() + idx,
+                            date: ymd,
+                            startTime,
+                            endTime
+                        });
+                    }
+                });
+
+                if (!toAdd.length) {
+                    alert('Os períodos selecionados já existem na lista.');
+                    return;
+                }
+
+                periodsList = periodsList.concat(toAdd);
+                updatePeriodsList();
+
+                // Opcional: limpar somente os horários; manter dias selecionados
+                const startEl = document.getElementById('dynamicStartTime');
+                const endEl = document.getElementById('dynamicEndTime');
+                if (startEl) startEl.value = '';
+                if (endEl) endEl.value = '';
+
                 if (typeof window.togglePeriodFieldsRequired === 'function') {
                     window.togglePeriodFieldsRequired();
                 }
