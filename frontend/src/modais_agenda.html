@@ -83,7 +83,13 @@
                             </label>
                         </div>
                         <div class="toggle-group">
-                            <label class="dynamic-mode-toggle-label">Agendamento Dinâmico:</label>
+                            <label class="dynamic-mode-toggle-label">
+                                Agendamento Dinâmico:
+                                <span class="novidade-badge" title="Nova funcionalidade!">
+                                    <i class="fas fa-bolt"></i>
+                                    <span>NOVO</span>
+                                </span>
+                            </label>
                             <label class="switch">
                                 <input type="checkbox" id="eventDinamico" name="agendamento_dinamico">
                                 <span class="slider"></span>
@@ -403,13 +409,66 @@
     </div>
 </div>
 
-<!-- Estilos específicos para mobile -->
+<!-- Estilos específicos para mobile e badge de novidade -->
 <style>
+    /* Badge de novidade no Agendamento Dinâmico */
+    .novidade-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #ffffff;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 6px;
+        box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+        animation: pulse-badge 2s ease-in-out infinite;
+    }
+
+    .novidade-badge i {
+        font-size: 8px;
+        animation: flash-icon 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-badge {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+        }
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 3px 6px rgba(251, 191, 36, 0.5);
+        }
+    }
+
+    @keyframes flash-icon {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.6;
+        }
+    }
+
     @media (max-width: 768px) {
         #onboardingAgendamentoPrimaryBtn {
             padding: 6px 12px !important;
             font-size: 12px !important;
             margin-right: 4px !important;
+        }
+
+        .novidade-badge {
+            font-size: 8px;
+            padding: 2px 5px;
+            margin-left: 4px;
+        }
+
+        .novidade-badge i {
+            font-size: 7px;
         }
     }
 </style>
