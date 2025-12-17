@@ -6,6 +6,7 @@
     <title>Agenda - ParoquiaON</title>
     <link rel="icon" type="image/png" href="assets/images/logo2.png">
     <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/agenda-dynamic.css">
     <link rel="stylesheet" href="template-menu-superior.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -7233,22 +7234,45 @@
                     setTimeout(() => {
                         const today = new Date().toISOString().split('T')[0];
                         const dateInput = document.getElementById('newPeriodDate');
-                        if (dateInput) {
-                            dateInput.value = today;
-                        }
-                        
-                        // Adicionar event listener ao botão de adicionar período
-                        const btnAddPeriod = document.getElementById('btnAddPeriod');
-                        if (btnAddPeriod && !btnAddPeriod.hasAttribute('data-listener-added')) {
-                            btnAddPeriod.addEventListener('click', function() {
-                                console.log('🔘 Botão Adicionar Período clicado');
-                                if (window.addPeriod) {
-                                    window.addPeriod();
-                                }
+                    if (dateInput) {
+                        dateInput.value = today;
+                    }
+
+                    // Adicionar event listener ao botão de adicionar período (modo simples)
+                    const btnAddPeriod = document.getElementById('btnAddPeriod');
+                    if (btnAddPeriod && !btnAddPeriod.hasAttribute('data-listener-added')) {
+                        btnAddPeriod.addEventListener('click', function() {
+                            console.log('🔘 Botão Adicionar Período clicado');
+                            if (window.addPeriod) {
+                                window.addPeriod();
+                            }
+                        });
+                        btnAddPeriod.setAttribute('data-listener-added', 'true');
+                        console.log('✅ Event listener adicionado ao btnAddPeriod');
+                    }
+
+                    // Configurar alternância entre modo simples e dinâmico
+                    const dynamicToggle = document.getElementById('eventDinamico');
+                    const periodModeSimple = document.getElementById('periodModeSimple');
+                    const periodModeDynamic = document.getElementById('periodModeDynamic');
+                    if (dynamicToggle && periodModeSimple && periodModeDynamic) {
+                        // Estado inicial: modo simples ativo
+                        dynamicToggle.checked = false;
+                        periodModeSimple.style.display = '';
+                        periodModeDynamic.style.display = 'none';
+
+                        if (!dynamicToggle.hasAttribute('data-listener-added')) {
+                            dynamicToggle.addEventListener('change', function () {
+                                const enabled = this.checked;
+                                console.log('🔁 Agendamento Dinâmico alterado:', enabled);
+                                periodModeSimple.style.display = enabled ? 'none' : '';
+                                periodModeDynamic.style.display = enabled ? '' : 'none';
+
+                                // Por enquanto, apenas troca visual. Lógica de múltiplos dias será adicionada depois.
                             });
-                            btnAddPeriod.setAttribute('data-listener-added', 'true');
-                            console.log('✅ Event listener adicionado ao btnAddPeriod');
+                            dynamicToggle.setAttribute('data-listener-added', 'true');
                         }
+                    }
                         
                         // Desativar validação nativa do formulário; usamos validação customizada
                         const form = document.getElementById('eventForm');

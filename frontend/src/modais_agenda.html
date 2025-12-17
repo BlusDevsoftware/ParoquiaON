@@ -82,10 +82,17 @@
                                 <span class="slider"></span>
                             </label>
                         </div>
+                        <div class="toggle-group">
+                            <label class="dynamic-mode-toggle-label">Agendamento Dinâmico:</label>
+                            <label class="switch">
+                                <input type="checkbox" id="eventDinamico" name="agendamento_dinamico">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                     </div>
                     
-                    <!-- Formulário para adicionar novo período -->
-                    <div class="add-period-section">
+                    <!-- Modo padrão de períodos (um período por vez) -->
+                    <div class="add-period-section" id="periodModeSimple">
                         <h4 class="subsection-title">Adicionar Período</h4>
                         <div class="form-row">
                             <div class="form-group">
@@ -109,6 +116,62 @@
                                 <button type="button" class="btn-add-period" id="btnAddPeriod">
                                     <i class="fas fa-plus"></i> Adicionar
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modo dinâmico: seleção de vários dias em mini calendário + hora única -->
+                    <div class="add-period-section" id="periodModeDynamic" style="display: none;">
+                        <h4 class="subsection-title">Agendamento Dinâmico</h4>
+                        <div class="dynamic-periods-container">
+                            <!-- Mini calendário para seleção de múltiplos dias -->
+                            <div class="dynamic-mini-calendar">
+                                <div class="dynamic-mini-calendar-header">
+                                    <button type="button" class="dynamic-mini-nav-btn" id="dynamicPrevMonthBtn">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <span id="dynamicMiniCalendarTitle">Mês Atual</span>
+                                    <button type="button" class="dynamic-mini-nav-btn" id="dynamicNextMonthBtn">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <div class="dynamic-mini-calendar-grid" id="dynamicMiniCalendarGrid">
+                                    <!-- Cabeçalho de dias da semana -->
+                                    <div class="dynamic-mini-weekday">D</div>
+                                    <div class="dynamic-mini-weekday">S</div>
+                                    <div class="dynamic-mini-weekday">T</div>
+                                    <div class="dynamic-mini-weekday">Q</div>
+                                    <div class="dynamic-mini-weekday">Q</div>
+                                    <div class="dynamic-mini-weekday">S</div>
+                                    <div class="dynamic-mini-weekday">S</div>
+                                    <!-- Dias serão inseridos via JavaScript futuramente -->
+                                </div>
+                                <div class="dynamic-info-text">
+                                    Selecione um ou mais dias no calendário para aplicar o mesmo horário.
+                                </div>
+                            </div>
+
+                            <!-- Campos de horário para aplicar aos dias selecionados -->
+                            <div class="dynamic-time-form">
+                                <div class="dynamic-time-row">
+                                    <div class="form-group">
+                                        <label>De: *</label>
+                                        <input type="time" id="dynamicStartTime">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Até: *</label>
+                                        <input type="time" id="dynamicEndTime">
+                                    </div>
+                                    <div class="form-group dynamic-add-btn-group">
+                                        <label>&nbsp;</label>
+                                        <button type="button" class="btn-add-period" id="btnAddDynamicPeriods">
+                                            <i class="fas fa-plus"></i> Adicionar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="dynamic-info-text">
+                                    No futuro, este botão criará vários períodos de uma só vez usando os dias selecionados.
+                                </div>
                             </div>
                         </div>
                     </div>
