@@ -356,8 +356,7 @@ function aplicarPermissoesNoMenu() {
         { selector: 'a[href="usuarios.html"]', flag: 'usuarios_ver' },
         { selector: 'a[href="perfil.html"]', flag: 'perfis_ver' },
         { selector: 'a[href="recebimento.html"]', flag: 'relatorios_ver' },
-        { selector: 'a[href="conferencia.html"]', flag: 'relatorios_ver' },
-        { selector: 'a[href="dinamico.html"]', flag: 'relatorios_ver' }
+        { selector: 'a[href="conferencia.html"]', flag: 'relatorios_ver' }
     ];
     itens.forEach(function(item) {
         var el = document.querySelector(item.selector);
