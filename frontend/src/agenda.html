@@ -4011,6 +4011,40 @@
             window.showToast = window.AgendaUI.showToast;
         }
 
+        // Helpers globais de compartilhamento (WhatsApp) - usados no hover mensal e no modal "Visualizar Agendamento"
+        window.AgendaShare = window.AgendaShare || {};
+        window.AgendaShare.buildWhatsAppText = function(ev) {
+            if (!ev || typeof ev !== 'object') return '';
+            let cleanTitle = ev.title || ev.titulo || 'Evento';
+            cleanTitle = String(cleanTitle).replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
+            const comunidadeNome = ev.comunidade_nome || (ev.comunidades && ev.comunidades.nome) || 'Comunidade';
+            const localNome = ev.local_nome || (ev.locais && ev.locais.nome) || '';
+            const acaoNome = ev.acao_nome || (ev.acoes && ev.acoes.nome) || '';
+
+            const startDate = new Date(ev.startTime || ev.data_inicio || ev.inicio || ev.start);
+            const endDate = new Date(ev.endTime || ev.data_fim || ev.fim || ev.end || ev.startTime || ev.data_inicio || ev.inicio || ev.start);
+            const fmt = (n) => String(n).padStart(2, '0');
+            const dateText = !isNaN(startDate) ? `${fmt(startDate.getDate())}/${fmt(startDate.getMonth() + 1)}/${startDate.getFullYear()}` : '';
+            const timeText = (!isNaN(startDate) && !isNaN(endDate))
+                ? `${fmt(startDate.getHours())}:${fmt(startDate.getMinutes())} - ${fmt(endDate.getHours())}:${fmt(endDate.getMinutes())}`
+                : '';
+
+            const parts = [
+                `📅 *${cleanTitle}*`,
+                dateText ? `📆 ${dateText}` : null,
+                timeText ? `⏰ ${timeText}` : null,
+                comunidadeNome ? `🏘️ ${comunidadeNome}` : null,
+                localNome ? `📍 ${localNome}` : null,
+                acaoNome ? `✅ ${acaoNome}` : null
+            ].filter(Boolean);
+            return parts.join('\n');
+        };
+        window.AgendaShare.openWhatsAppShare = function(ev) {
+            const text = window.AgendaShare.buildWhatsAppText(ev);
+            const url = `https://wa.me/?text=${encodeURIComponent(text || '')}`;
+            window.open(url, '_blank', 'noopener,noreferrer');
+        };
+
         // Override: loadEventsFromApi using AgendaAPI + normalization
         window.loadEventsFromApi = async function() {
             try {
@@ -5088,39 +5122,6 @@
                             listContainer.style.cssText = 'display:flex; flex-direction:column; gap:6px;';
                             hoverPanel.appendChild(listContainer);
 
-                            // Helper: montar mensagem para WhatsApp
-                            const buildWhatsAppText = (ev) => {
-                                let cleanTitle = ev.title || ev.titulo || 'Evento';
-                                cleanTitle = String(cleanTitle).replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
-                                const comunidadeNome = ev.comunidade_nome || (ev.comunidades && ev.comunidades.nome) || 'Comunidade';
-                                const localNome = ev.local_nome || (ev.locais && ev.locais.nome) || '';
-                                const acaoNome = ev.acao_nome || (ev.acoes && ev.acoes.nome) || '';
-
-                                const startDate = new Date(ev.startTime || ev.data_inicio || ev.inicio || ev.start);
-                                const endDate = new Date(ev.endTime || ev.data_fim || ev.fim || ev.end || ev.startTime || ev.data_inicio || ev.inicio || ev.start);
-                                const fmt = (n) => String(n).padStart(2, '0');
-                                const dateText = !isNaN(startDate) ? `${fmt(startDate.getDate())}/${fmt(startDate.getMonth() + 1)}/${startDate.getFullYear()}` : '';
-                                const timeText = (!isNaN(startDate) && !isNaN(endDate))
-                                    ? `${fmt(startDate.getHours())}:${fmt(startDate.getMinutes())} - ${fmt(endDate.getHours())}:${fmt(endDate.getMinutes())}`
-                                    : '';
-
-                                const parts = [
-                                    `📅 *${cleanTitle}*`,
-                                    dateText ? `📆 ${dateText}` : null,
-                                    timeText ? `⏰ ${timeText}` : null,
-                                    comunidadeNome ? `🏘️ ${comunidadeNome}` : null,
-                                    localNome ? `📍 ${localNome}` : null,
-                                    acaoNome ? `✅ ${acaoNome}` : null
-                                ].filter(Boolean);
-                                return parts.join('\n');
-                            };
-
-                            const openWhatsAppShare = (ev) => {
-                                const text = buildWhatsAppText(ev);
-                                const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-                                window.open(url, '_blank', 'noopener,noreferrer');
-                            };
-
                             // Lista completa de eventos
                             dayEvents.forEach(ev => {
                                 const item = document.createElement('div');
@@ -5200,7 +5201,9 @@
                                 shareBtn.addEventListener('click', (e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    openWhatsAppShare(ev);
+                                    if (window.AgendaShare && typeof window.AgendaShare.openWhatsAppShare === 'function') {
+                                        window.AgendaShare.openWhatsAppShare(ev);
+                                    }
                                 });
                                 item.appendChild(shareBtn);
 
@@ -7512,6 +7515,18 @@
                         editBtn.onclick = function() {
                             if (typeof window.openEventFormForEditing === 'function') {
                                 window.openEventFormForEditing(event);
+                            }
+                        };
+                    }
+
+                    // Configurar botão de compartilhar (WhatsApp)
+                    const shareBtn = document.getElementById('btnShareEvent');
+                    if (shareBtn) {
+                        shareBtn.onclick = function(e) {
+                            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+                            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+                            if (window.AgendaShare && typeof window.AgendaShare.openWhatsAppShare === 'function') {
+                                window.AgendaShare.openWhatsAppShare(event);
                             }
                         };
                     }
