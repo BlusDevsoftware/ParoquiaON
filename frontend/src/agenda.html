@@ -4020,6 +4020,7 @@
             const comunidadeNome = ev.comunidade_nome || (ev.comunidades && ev.comunidades.nome) || 'Comunidade';
             const localNome = ev.local_nome || (ev.locais && ev.locais.nome) || '';
             const acaoNome = ev.acao_nome || (ev.acoes && ev.acoes.nome) || '';
+            const objetivo = ev.objetivo || ev.descricao || '';
 
             const startDate = new Date(ev.startTime || ev.data_inicio || ev.inicio || ev.start);
             const endDate = new Date(ev.endTime || ev.data_fim || ev.fim || ev.end || ev.startTime || ev.data_inicio || ev.inicio || ev.start);
@@ -4035,7 +4036,8 @@
                 timeText ? `⏰ ${timeText}` : null,
                 comunidadeNome ? `🏘️ ${comunidadeNome}` : null,
                 localNome ? `📍 ${localNome}` : null,
-                acaoNome ? `✅ ${acaoNome}` : null
+                acaoNome ? `✅ ${acaoNome}` : null,
+                objetivo ? `📝 ${objetivo}` : null
             ].filter(Boolean);
             return parts.join('\n');
         };
