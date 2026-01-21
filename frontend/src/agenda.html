@@ -4017,9 +4017,11 @@
             if (!ev || typeof ev !== 'object') return '';
             let cleanTitle = ev.title || ev.titulo || 'Evento';
             cleanTitle = String(cleanTitle).replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
-            const comunidadeNome = ev.comunidade_nome || (ev.comunidades && ev.comunidades.nome) || 'Comunidade';
+            const comunidadeNome = ev.comunidade_nome || (ev.comunidades && ev.comunidades.nome) || '';
             const localNome = ev.local_nome || (ev.locais && ev.locais.nome) || '';
             const acaoNome = ev.acao_nome || (ev.acoes && ev.acoes.nome) || '';
+            const pastoralNome = ev.pastoral_nome || (ev.pastorais && ev.pastorais.nome) || '';
+            const pilarNome = ev.pilar_nome || (ev.pilares && ev.pilares.nome) || '';
             const objetivo = ev.objetivo || ev.descricao || '';
 
             const startDate = new Date(ev.startTime || ev.data_inicio || ev.inicio || ev.start);
@@ -4030,15 +4032,51 @@
                 ? `${fmt(startDate.getHours())}:${fmt(startDate.getMinutes())} - ${fmt(endDate.getHours())}:${fmt(endDate.getMinutes())}`
                 : '';
 
-            const parts = [
-                `📅 *${cleanTitle}*`,
-                dateText ? `📆 ${dateText}` : null,
-                timeText ? `⏰ ${timeText}` : null,
-                comunidadeNome ? `🏘️ ${comunidadeNome}` : null,
-                localNome ? `📍 ${localNome}` : null,
-                acaoNome ? `✅ ${acaoNome}` : null,
-                objetivo ? `📝 ${objetivo}` : null
-            ].filter(Boolean);
+            const parts = [];
+            
+            // Título sempre aparece primeiro
+            parts.push(`📅 *Título:* ${cleanTitle}`);
+            
+            // Data (se informada)
+            if (dateText) {
+                parts.push(`📆 *Data:* ${dateText}`);
+            }
+            
+            // Hora (se informada)
+            if (timeText) {
+                parts.push(`⏰ *Hora:* ${timeText}`);
+            }
+            
+            // Comunidade (se informada)
+            if (comunidadeNome) {
+                parts.push(`🏘️ *Comunidade:* ${comunidadeNome}`);
+            }
+            
+            // Local (se informado)
+            if (localNome) {
+                parts.push(`📍 *Local:* ${localNome}`);
+            }
+            
+            // Ação (se informada)
+            if (acaoNome) {
+                parts.push(`✅ *Ação:* ${acaoNome}`);
+            }
+            
+            // Pastoral (se informada)
+            if (pastoralNome) {
+                parts.push(`⛪ *Pastoral:* ${pastoralNome}`);
+            }
+            
+            // Pilar (se informado)
+            if (pilarNome) {
+                parts.push(`📊 *Pilar:* ${pilarNome}`);
+            }
+            
+            // Objetivo (se informado)
+            if (objetivo) {
+                parts.push(`📝 *Objetivo:* ${objetivo}`);
+            }
+            
             return parts.join('\n');
         };
         window.AgendaShare.openWhatsAppShare = function(ev) {
