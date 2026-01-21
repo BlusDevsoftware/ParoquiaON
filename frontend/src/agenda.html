@@ -5088,10 +5088,44 @@
                             listContainer.style.cssText = 'display:flex; flex-direction:column; gap:6px;';
                             hoverPanel.appendChild(listContainer);
 
+                            // Helper: montar mensagem para WhatsApp
+                            const buildWhatsAppText = (ev) => {
+                                let cleanTitle = ev.title || ev.titulo || 'Evento';
+                                cleanTitle = String(cleanTitle).replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
+                                const comunidadeNome = ev.comunidade_nome || (ev.comunidades && ev.comunidades.nome) || 'Comunidade';
+                                const localNome = ev.local_nome || (ev.locais && ev.locais.nome) || '';
+                                const acaoNome = ev.acao_nome || (ev.acoes && ev.acoes.nome) || '';
+
+                                const startDate = new Date(ev.startTime || ev.data_inicio || ev.inicio || ev.start);
+                                const endDate = new Date(ev.endTime || ev.data_fim || ev.fim || ev.end || ev.startTime || ev.data_inicio || ev.inicio || ev.start);
+                                const fmt = (n) => String(n).padStart(2, '0');
+                                const dateText = !isNaN(startDate) ? `${fmt(startDate.getDate())}/${fmt(startDate.getMonth() + 1)}/${startDate.getFullYear()}` : '';
+                                const timeText = (!isNaN(startDate) && !isNaN(endDate))
+                                    ? `${fmt(startDate.getHours())}:${fmt(startDate.getMinutes())} - ${fmt(endDate.getHours())}:${fmt(endDate.getMinutes())}`
+                                    : '';
+
+                                const parts = [
+                                    `📅 *${cleanTitle}*`,
+                                    dateText ? `📆 ${dateText}` : null,
+                                    timeText ? `⏰ ${timeText}` : null,
+                                    comunidadeNome ? `🏘️ ${comunidadeNome}` : null,
+                                    localNome ? `📍 ${localNome}` : null,
+                                    acaoNome ? `✅ ${acaoNome}` : null
+                                ].filter(Boolean);
+                                return parts.join('\n');
+                            };
+
+                            const openWhatsAppShare = (ev) => {
+                                const text = buildWhatsAppText(ev);
+                                const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                                window.open(url, '_blank', 'noopener,noreferrer');
+                            };
+
                             // Lista completa de eventos
                             dayEvents.forEach(ev => {
                                 const item = document.createElement('div');
                                 item.style.cssText = 'display:flex; align-items:center; gap:10px; padding:8px; border:1px solid #f1f5f9; border-radius:8px; background:#fff;';
+                                item.style.position = 'relative';
 
                                 const colorBar = document.createElement('div');
                                 colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${ev.color || '#1e3a8a'};`;
@@ -5147,6 +5181,30 @@
                                 item.appendChild(colorBar);
                                 item.appendChild(avatarEl);
                                 item.appendChild(textCol);
+
+                                // Botão compartilhar (WhatsApp) no canto superior esquerdo do card expandido (hover)
+                                const shareBtn = document.createElement('button');
+                                shareBtn.type = 'button';
+                                shareBtn.title = 'Compartilhar no WhatsApp';
+                                shareBtn.setAttribute('aria-label', 'Compartilhar no WhatsApp');
+                                shareBtn.innerHTML = `
+                                    <span style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:9999px; background:#25D366; color:#fff; font-weight:700; font-size:12px; line-height:1;">
+                                        W
+                                    </span>
+                                `;
+                                shareBtn.style.cssText = [
+                                    'position:absolute; top:6px; right:6px;',
+                                    'border:none; background:transparent; padding:0; margin:0;',
+                                    'cursor:pointer;',
+                                    'display:inline-flex; align-items:center; justify-content:center;',
+                                    'z-index:2;'
+                                ].join(' ');
+                                shareBtn.addEventListener('click', (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    openWhatsAppShare(ev);
+                                });
+                                item.appendChild(shareBtn);
 
                                 // Clique para abrir modal de edição/detalhe se existir
                                 item.style.cursor = 'pointer';
