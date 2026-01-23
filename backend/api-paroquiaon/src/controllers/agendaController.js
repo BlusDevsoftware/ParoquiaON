@@ -363,20 +363,40 @@ async function atualizarEvento(req, res) {
         const { id } = req.params;
         const dados = req.body;
         
-        // Buscar evento original para preservar usuario_lancamento_id se não vier no body
+        // Buscar evento original para preservar valores se não vierem no body ou vierem como null
         const { data: eventoOriginal } = await supabase
             .from('agendamentos')
-            .select('usuario_lancamento_id')
+            .select('*')
             .eq('id', id)
             .single();
+            
+        if (!eventoOriginal) {
+            return res.status(404).json({ error: 'Agendamento não encontrado' });
+        }
         
-        // Preservar dados do usuário original se não vierem no body
+        // Preservar valores originais se campos vierem como null ou undefined
         const dadosAtualizados = {
             ...dados,
-            // Se não vier usuario_lancamento_id no body, preserva o original
-            usuario_lancamento_id: dados.usuario_lancamento_id !== undefined 
+            // Preservar usuario_lancamento_id original se não vier ou vier null
+            usuario_lancamento_id: dados.usuario_lancamento_id !== undefined && dados.usuario_lancamento_id !== null
                 ? dados.usuario_lancamento_id 
-                : (eventoOriginal?.usuario_lancamento_id || req.user?.id || null)
+                : (eventoOriginal.usuario_lancamento_id || req.user?.id || null),
+            // Preservar outros campos se vierem como null
+            comunidade_id: dados.comunidade_id !== undefined && dados.comunidade_id !== null
+                ? dados.comunidade_id
+                : eventoOriginal.comunidade_id,
+            pastoral_id: dados.pastoral_id !== undefined && dados.pastoral_id !== null
+                ? dados.pastoral_id
+                : eventoOriginal.pastoral_id,
+            pilar_id: dados.pilar_id !== undefined && dados.pilar_id !== null
+                ? dados.pilar_id
+                : eventoOriginal.pilar_id,
+            local_id: dados.local_id !== undefined && dados.local_id !== null
+                ? dados.local_id
+                : eventoOriginal.local_id,
+            acao_id: dados.acao_id !== undefined && dados.acao_id !== null
+                ? dados.acao_id
+                : eventoOriginal.acao_id
         };
         
         // Atualizar evento

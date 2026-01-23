@@ -4316,17 +4316,24 @@
                 const startDate = buildDateFromYmdHm(y, m, d, sh, sm);
                 const endDate = buildDateFromYmdHm(y, m, d, eh, em);
                 // Permitir agendamentos no passado: remover validação de data anterior
+                // Função helper para converter string para int ou retornar null
+                const toIntOrNull = (value) => {
+                    if (!value || value === '' || value === '0') return null;
+                    const parsed = parseInt(value);
+                    return isNaN(parsed) ? null : parsed;
+                };
+                
                 eventos.push({
                     titulo: formData.titulo,
                     objetivo: formData.objetivo || '',
                     data_inicio: formatLocalDateTime(startDate),
                     data_fim: formatLocalDateTime(endDate),
-                    local_id: formData.local ? parseInt(formData.local) : null,
-                    acao_id: formData.acao ? parseInt(formData.acao) : null,
+                    local_id: toIntOrNull(formData.local),
+                    acao_id: toIntOrNull(formData.acao),
                     responsavel_id: null,
-                    comunidade_id: parseInt(formData.comunidade),
-                    pastoral_id: formData.pastoral ? parseInt(formData.pastoral) : null,
-                    pilar_id: formData.pilares ? parseInt(formData.pilares) : null,
+                    comunidade_id: toIntOrNull(formData.comunidade),
+                    pastoral_id: toIntOrNull(formData.pastoral),
+                    pilar_id: toIntOrNull(formData.pilares),
                     status_id: (AC && typeof AC.getStatusIdByName === 'function') ? AC.getStatusIdByName(formData.status) : 1,
                     evento_paroquial: formData.eventoParoquial || false,
                     usuario_lancamento_id: usuarioLancamentoId
@@ -4343,6 +4350,24 @@
                         return;
                     }
                     const eventoAtualizado = { ...eventos[0] };
+                    
+                    // Preservar valores originais se campos estiverem vazios/null na edição
+                    if (!eventoAtualizado.comunidade_id && editingEvent.comunidade_id) {
+                        eventoAtualizado.comunidade_id = editingEvent.comunidade_id;
+                    }
+                    if (!eventoAtualizado.pastoral_id && editingEvent.pastoral_id) {
+                        eventoAtualizado.pastoral_id = editingEvent.pastoral_id;
+                    }
+                    if (!eventoAtualizado.pilar_id && editingEvent.pilar_id) {
+                        eventoAtualizado.pilar_id = editingEvent.pilar_id;
+                    }
+                    if (!eventoAtualizado.local_id && editingEvent.local_id) {
+                        eventoAtualizado.local_id = editingEvent.local_id;
+                    }
+                    if (!eventoAtualizado.acao_id && editingEvent.acao_id) {
+                        eventoAtualizado.acao_id = editingEvent.acao_id;
+                    }
+                    
                     const { data, error } = await window.AgendaAPI.update(editingEvent.id, eventoAtualizado);
                     if (error) throw error;
                     resultados.push(data);
