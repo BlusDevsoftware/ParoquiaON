@@ -4370,7 +4370,38 @@
                     
                     const { data, error } = await window.AgendaAPI.update(editingEvent.id, eventoAtualizado);
                     if (error) throw error;
-                    resultados.push(data);
+                    
+                    // Normalizar dados retornados (mesmo formato usado em loadEventsFromApi)
+                    const eventoAtualizadoNormalizado = {
+                        ...data,
+                        title: data.titulo || data.title || 'Agendamento sem título',
+                        local_nome: data.locais?.nome || data.local_nome || 'Local não informado',
+                        acao_nome: data.acoes?.nome || data.acao_nome || 'Ação não informada',
+                        responsavel_nome: data.pessoas?.nome || data.responsavel_nome || 'Responsável não informado',
+                        comunidade_nome: data.comunidades?.nome || data.comunidade_nome || 'Comunidade não informada',
+                        pastoral_nome: data.pastorais?.nome || data.pastoral_nome || 'Pastoral não informada',
+                        pilar_nome: data.pilares?.nome || data.pilar_nome || 'Pilar não informado',
+                        usuario_lancamento_nome: data.usuarios?.nome || data.usuarios?.email || 'Sistema',
+                        color: data.comunidades?.cor || data.comunidade_cor || data.acoes?.pilares?.cor || data.pilares?.cor || data.cor || '#1e3a8a'
+                    };
+                    
+                    resultados.push(eventoAtualizadoNormalizado);
+                    
+                    // Atualizar editingEvent com os dados retornados
+                    editingEvent = eventoAtualizadoNormalizado;
+                    
+                    // Atualizar evento na lista allEvents
+                    const indexInAllEvents = allEvents.findIndex(e => e.id === editingEvent.id);
+                    if (indexInAllEvents !== -1) {
+                        allEvents[indexInAllEvents] = eventoAtualizadoNormalizado;
+                    }
+                    
+                    // Atualizar evento na lista events (filtrada)
+                    const indexInEvents = events.findIndex(e => e.id === editingEvent.id);
+                    if (indexInEvents !== -1) {
+                        events[indexInEvents] = eventoAtualizadoNormalizado;
+                    }
+                    
                     if (typeof showToast === 'function') showToast('Evento atualizado com sucesso!', 'success');
                 } else {
                 for (const evento of eventos) {
@@ -4381,17 +4412,27 @@
                 if (typeof showToast === 'function') showToast(eventos.length > 1 ? `${eventos.length} eventos criados com sucesso!` : 'Evento criado com sucesso!', 'success');
                 }
 
+                // Recarregar eventos da API para garantir sincronização
+                await loadEventsFromApi();
+                
+                // Se estava editando, atualizar editingEvent com o evento atualizado da lista
+                if (isEditing && resultados.length > 0) {
+                    const eventoAtualizadoNaLista = allEvents.find(e => e.id === resultados[0].id);
+                    if (eventoAtualizadoNaLista) {
+                        editingEvent = eventoAtualizadoNaLista;
+                    }
+                }
+                
+                filterEventsByCommunity();
+                renderCalendar();
+                updateMiniCalendar();
+                updateRecentAppointments();
+                
                 if (typeof window.clearEventForm === 'function') window.clearEventForm();
                 if (typeof window.clearAllPeriods === 'function') window.clearAllPeriods();
                 if (typeof window.closeEventModal === 'function') window.closeEventModal();
                 editingEvent = null;
                 editingEventPeriods = [];
-
-                await loadEventsFromApi();
-                filterEventsByCommunity();
-                renderCalendar();
-                updateMiniCalendar();
-                updateRecentAppointments();
             } catch (error) {
                 console.error('Erro ao criar evento:', error);
                 if (typeof showToast === 'function') showToast('Erro ao criar evento', 'error');
@@ -7285,11 +7326,28 @@
             if (typeof window.closeEditEventModal === 'function') {
                 window.closeEditEventModal();
             }
-            editingEvent = event;
-            editingEventPeriods = derivePeriodsFromEvent(event);
+            
+            // Buscar evento mais recente da lista usando o ID para garantir dados atualizados
+            let eventoAtualizado = event;
+            if (event && event.id) {
+                // Tentar encontrar na lista allEvents primeiro (mais completa)
+                const eventoNaLista = allEvents.find(e => e.id === event.id);
+                if (eventoNaLista) {
+                    eventoAtualizado = eventoNaLista;
+                } else {
+                    // Se não encontrar, tentar na lista events (filtrada)
+                    const eventoNaListaFiltrada = events.find(e => e.id === event.id);
+                    if (eventoNaListaFiltrada) {
+                        eventoAtualizado = eventoNaListaFiltrada;
+                    }
+                }
+            }
+            
+            editingEvent = eventoAtualizado;
+            editingEventPeriods = derivePeriodsFromEvent(eventoAtualizado);
             setEventFormMode('edit');
             openEventModal();
-            populateEventFormFields(event);
+            populateEventFormFields(eventoAtualizado);
         };
             
             // Definir as funções dos modais no escopo global
