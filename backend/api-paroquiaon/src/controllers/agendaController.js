@@ -192,12 +192,14 @@ async function criarEvento(req, res) {
         const visibilidadeCorreta = visibilidadeMapping[dados.visibilidade] || 'Publico';
         
         // Adicionar dados do usuário de lançamento
+        // Prioriza dados enviados do frontend, usa req.user como fallback
         const dadosCompletos = {
             ...dados,
             status_id: statusId,
             visibilidade: visibilidadeCorreta,
-            usuario_lancamento_id: req.user?.id || null,
-            usuario_lancamento_nome: req.user?.nome || 'Sistema'
+            usuario_lancamento_id: dados.usuario_lancamento_id || req.user?.id || null,
+            usuario_lancamento_nome: dados.usuario_lancamento_nome || req.user?.nome || 'Sistema',
+            usuario_lancamento_email: dados.usuario_lancamento_email || req.user?.email || null
         };
         
         console.log('🔧 Dados completos para inserção:', JSON.stringify(dadosCompletos, null, 2));
@@ -363,10 +365,32 @@ async function atualizarEvento(req, res) {
         const { id } = req.params;
         const dados = req.body;
         
+        // Buscar evento original para preservar usuario_lancamento_id se não vier no body
+        const { data: eventoOriginal } = await supabase
+            .from('agendamentos')
+            .select('usuario_lancamento_id, usuario_lancamento_nome, usuario_lancamento_email')
+            .eq('id', id)
+            .single();
+        
+        // Preservar dados do usuário original se não vierem no body
+        const dadosAtualizados = {
+            ...dados,
+            // Se não vier usuario_lancamento_id no body, preserva o original
+            usuario_lancamento_id: dados.usuario_lancamento_id !== undefined 
+                ? dados.usuario_lancamento_id 
+                : (eventoOriginal?.usuario_lancamento_id || req.user?.id || null),
+            usuario_lancamento_nome: dados.usuario_lancamento_nome !== undefined 
+                ? dados.usuario_lancamento_nome 
+                : (eventoOriginal?.usuario_lancamento_nome || req.user?.nome || 'Sistema'),
+            usuario_lancamento_email: dados.usuario_lancamento_email !== undefined 
+                ? dados.usuario_lancamento_email 
+                : (eventoOriginal?.usuario_lancamento_email || req.user?.email || null)
+        };
+        
         // Atualizar evento
         const { data: updatedData, error } = await supabase
             .from('agendamentos')
-            .update(dados)
+            .update(dadosAtualizados)
             .eq('id', id)
             .select('*')
             .single();

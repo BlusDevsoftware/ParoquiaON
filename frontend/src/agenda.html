@@ -4265,6 +4265,33 @@
 
             // Validate times and build API payloads using DateUtils
             const eventos = [];
+            
+            // Capturar usuário de lançamento
+            // Se estiver editando: preserva o usuário original que criou o evento
+            // Se estiver criando: usa o usuário atual logado
+            let usuarioLancamentoId = null;
+            let usuarioLancamentoNome = 'Sistema';
+            let usuarioLancamentoEmail = null;
+            
+            if (isEditing && editingEvent) {
+                // Preservar usuário original ao editar
+                usuarioLancamentoId = editingEvent.usuario_lancamento_id || editingEvent.usuarios?.id || null;
+                usuarioLancamentoNome = editingEvent.usuario_lancamento_nome || editingEvent.usuarios?.nome || editingEvent.usuarios?.email || 'Sistema';
+                usuarioLancamentoEmail = editingEvent.usuario_lancamento_email || editingEvent.usuarios?.email || null;
+            } else {
+                // Usar usuário atual ao criar novo evento
+                const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') 
+                    ? window.authGuard.getCurrentUser() 
+                    : null;
+                usuarioLancamentoId = currentUser && (currentUser.id || currentUser.usuario_id || currentUser.userId) 
+                    ? parseInt(currentUser.id || currentUser.usuario_id || currentUser.userId) 
+                    : null;
+                usuarioLancamentoNome = currentUser && (currentUser.nome || currentUser.name || currentUser.email) 
+                    ? (currentUser.nome || currentUser.name || currentUser.email) 
+                    : 'Sistema';
+                usuarioLancamentoEmail = currentUser && currentUser.email ? currentUser.email : null;
+            }
+            
             if (horarios.length === 0 && isEditing) {
                 const fallbackCache = getCachedEditingPeriods();
                 if (fallbackCache.length > 0) {
@@ -4309,7 +4336,10 @@
                     pastoral_id: formData.pastoral ? parseInt(formData.pastoral) : null,
                     pilar_id: formData.pilares ? parseInt(formData.pilares) : null,
                     status_id: (AC && typeof AC.getStatusIdByName === 'function') ? AC.getStatusIdByName(formData.status) : 1,
-                    evento_paroquial: formData.eventoParoquial || false
+                    evento_paroquial: formData.eventoParoquial || false,
+                    usuario_lancamento_id: usuarioLancamentoId,
+                    usuario_lancamento_nome: usuarioLancamentoNome,
+                    usuario_lancamento_email: usuarioLancamentoEmail
                 });
             }
 
@@ -5091,7 +5121,7 @@
                         titleDiv.textContent = cleanTitle;
                         titleDiv.style.cssText = 'font-weight:500; font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#1e3a8a;';
 
-                        // Ícone para evento paroquial (quando marcado)
+                        // Ícone para evento paroquial OBS > icone so aparece (quando marcado)
                         if (ev && (ev.evento_paroquial === true || ev.evento_paroquial === 'true' || ev.paroquial === true)) {
                             const icon = document.createElement('span');
                             icon.textContent = '⛪';
