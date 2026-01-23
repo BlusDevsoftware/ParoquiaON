@@ -4096,7 +4096,7 @@
                     const comunidadeNome = ev.comunidades?.nome || ev.comunidade_nome || 'Comunidade não informada';
                     const pastoralNome = ev.pastorais?.nome || ev.pastoral_nome || 'Pastoral não informada';
                     const pilarNome = ev.pilares?.nome || ev.pilar_nome || 'Pilar não informado';
-                    const usuarioLancamento = ev.usuarios?.nome || ev.usuario_lancamento_nome || 'Sistema';
+                    const usuarioLancamento = ev.usuarios?.nome || ev.usuarios?.email || 'Sistema';
                     return {
                         ...ev,
                         title: ev.titulo || ev.title || 'Agendamento sem título',
@@ -4270,14 +4270,10 @@
             // Se estiver editando: preserva o usuário original que criou o evento
             // Se estiver criando: usa o usuário atual logado
             let usuarioLancamentoId = null;
-            let usuarioLancamentoNome = 'Sistema';
-            let usuarioLancamentoEmail = null;
             
             if (isEditing && editingEvent) {
                 // Preservar usuário original ao editar
                 usuarioLancamentoId = editingEvent.usuario_lancamento_id || editingEvent.usuarios?.id || null;
-                usuarioLancamentoNome = editingEvent.usuario_lancamento_nome || editingEvent.usuarios?.nome || editingEvent.usuarios?.email || 'Sistema';
-                usuarioLancamentoEmail = editingEvent.usuario_lancamento_email || editingEvent.usuarios?.email || null;
             } else {
                 // Usar usuário atual ao criar novo evento
                 const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') 
@@ -4286,10 +4282,6 @@
                 usuarioLancamentoId = currentUser && (currentUser.id || currentUser.usuario_id || currentUser.userId) 
                     ? parseInt(currentUser.id || currentUser.usuario_id || currentUser.userId) 
                     : null;
-                usuarioLancamentoNome = currentUser && (currentUser.nome || currentUser.name || currentUser.email) 
-                    ? (currentUser.nome || currentUser.name || currentUser.email) 
-                    : 'Sistema';
-                usuarioLancamentoEmail = currentUser && currentUser.email ? currentUser.email : null;
             }
             
             if (horarios.length === 0 && isEditing) {
@@ -4337,9 +4329,7 @@
                     pilar_id: formData.pilares ? parseInt(formData.pilares) : null,
                     status_id: (AC && typeof AC.getStatusIdByName === 'function') ? AC.getStatusIdByName(formData.status) : 1,
                     evento_paroquial: formData.eventoParoquial || false,
-                    usuario_lancamento_id: usuarioLancamentoId,
-                    usuario_lancamento_nome: usuarioLancamentoNome,
-                    usuario_lancamento_email: usuarioLancamentoEmail
+                    usuario_lancamento_id: usuarioLancamentoId
                 });
             }
 
