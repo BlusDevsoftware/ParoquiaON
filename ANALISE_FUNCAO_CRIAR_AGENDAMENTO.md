@@ -66,13 +66,14 @@ Esta análise examina detalhadamente o fluxo completo de criação de agendament
        data_fim: formatLocalDateTime(endDate),
        local_id: formData.local ? parseInt(formData.local) : null,
        acao_id: formData.acao ? parseInt(formData.acao) : null,
-       responsavel_id: null,
+       responsavel_id: null, ( função sem destino ate momento) = > falta validar  
        comunidade_id: parseInt(formData.comunidade),
        pastoral_id: formData.pastoral ? parseInt(formData.pastoral) : null,
        pilar_id: formData.pilares ? parseInt(formData.pilares) : null,
        status_id: AC.getStatusIdByName(formData.status) || 1,
        evento_paroquial: formData.eventoParoquial || false
-   });
+       ( falta adicionar o capturador de usuario de lançamento => : null )
+   })
    ```
 
 7. **Envio para API:**

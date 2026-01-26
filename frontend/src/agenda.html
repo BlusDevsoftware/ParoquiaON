@@ -3753,6 +3753,376 @@
                 padding: 2px 4px;
             }
         }
+        /* Estilos para Modal de Visualização de Agendamento */
+        .modal-view-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .modal-view-container {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: modalViewSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalViewSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Header roxo com gradiente */
+        .modal-view-header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+            padding: 24px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .modal-view-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .modal-view-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .modal-view-icon i {
+            font-size: 24px;
+            color: white;
+        }
+
+        .modal-view-title-group {
+            flex: 1;
+        }
+
+        .modal-view-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin: 0 0 4px 0;
+            line-height: 1.2;
+        }
+
+        .modal-view-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .modal-view-subtitle i {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .modal-view-close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .modal-view-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Corpo do modal */
+        .modal-view-body {
+            padding: 24px 28px;
+            background: #ffffff;
+            overflow-y: auto;
+            flex: 1;
+            max-height: calc(90vh - 200px);
+        }
+
+        .modal-view-detail-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .modal-view-detail-item:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .modal-view-detail-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #8b5cf6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: white;
+        }
+
+        .modal-view-detail-icon i {
+            font-size: 18px;
+            color: #8b5cf6;
+        }
+
+        .modal-view-detail-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .modal-view-detail-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .modal-view-detail-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1f2937;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* Seção Objetivo destacada */
+        .modal-view-objetivo-box {
+            margin-top: 24px;
+            padding: 20px;
+            background: #f3f4f6;
+            border-radius: 12px;
+            display: flex;
+            gap: 16px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .modal-view-objetivo-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .modal-view-objetivo-icon i {
+            font-size: 24px;
+            color: #8b5cf6;
+        }
+
+        .modal-view-objetivo-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .modal-view-objetivo-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #8b5cf6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .modal-view-objetivo-label i {
+            font-size: 10px;
+        }
+
+        .modal-view-objetivo-value {
+            font-size: 14px;
+            font-weight: 400;
+            color: #1f2937;
+            margin: 0;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        /* Footer com botões */
+        .modal-view-footer {
+            padding: 20px 28px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .modal-view-btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .modal-view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-view-btn:active {
+            transform: translateY(0);
+        }
+
+        .modal-view-btn-edit {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .modal-view-btn-edit:hover {
+            background: #7c3aed;
+        }
+
+        .modal-view-btn-whatsapp {
+            background: white;
+            color: #25d366;
+            border: 2px solid #25d366;
+        }
+
+        .modal-view-btn-whatsapp:hover {
+            background: #25d366;
+            color: white;
+        }
+
+        .modal-view-btn-whatsapp img {
+            filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
+            transition: filter 0.2s;
+        }
+
+        .modal-view-btn-whatsapp:hover img {
+            filter: brightness(0) invert(1);
+        }
+
+        .modal-view-btn-delete {
+            background: white;
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+
+        .modal-view-btn-delete:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .modal-view-close-link {
+            position: absolute;
+            bottom: 20px;
+            right: 28px;
+            background: none;
+            border: none;
+            color: #6b7280;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 4px 8px;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .modal-view-close-link:hover {
+            color: #1f2937;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .modal-view-container {
+                max-width: 95%;
+                max-height: 95vh;
+            }
+
+            .modal-view-header {
+                padding: 20px;
+            }
+
+            .modal-view-title {
+                font-size: 22px;
+            }
+
+            .modal-view-body {
+                padding: 20px;
+            }
+
+            .modal-view-footer {
+                padding: 16px 20px;
+                flex-direction: column;
+            }
+
+            .modal-view-btn {
+                width: 100%;
+                flex: none;
+            }
+
+            .modal-view-close-link {
+                position: static;
+                margin-top: 8px;
+                align-self: flex-end;
+            }
+        }
     </style>
 </head>
 <body>
@@ -7607,7 +7977,7 @@
             };
 
             window.editEventModal = function(event) {
-                console.log('🔄 Abrindo modal de edição:', event);
+                console.log('🔄 Abrindo modal de visualização:', event);
                 
                 const modal = document.getElementById('modalEdicaoAgendamento');
                 if (modal) {
@@ -7615,17 +7985,40 @@
                     
                     // Preencher dados do evento
                     // Limpar horário do título para exibição
-                    let cleanTitle = event.title || 'Sem título';
+                    let cleanTitle = event.titulo || event.title || 'Sem título';
                     cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
                     
+                    // Formatar data e hora
+                    let dataHoraFormatada = 'Não informado';
+                    if (event.data_inicio || event.startTime) {
+                        try {
+                            const dataInicio = new Date(event.data_inicio || event.startTime);
+                            if (!isNaN(dataInicio.getTime())) {
+                                const dia = String(dataInicio.getDate()).padStart(2, '0');
+                                const mes = String(dataInicio.getMonth() + 1).padStart(2, '0');
+                                const ano = dataInicio.getFullYear();
+                                const hora = String(dataInicio.getHours()).padStart(2, '0');
+                                const minuto = String(dataInicio.getMinutes()).padStart(2, '0');
+                                const segundo = String(dataInicio.getSeconds()).padStart(2, '0');
+                                dataHoraFormatada = `${dia}/${mes}/${ano}, ${hora}:${minuto}:${segundo}`;
+                            }
+                        } catch (e) {
+                            console.error('Erro ao formatar data:', e);
+                        }
+                    }
+                    
+                    // Preencher título
+                    const titleElement = document.getElementById('editEventTitle');
+                    if (titleElement) titleElement.textContent = cleanTitle;
+                    
+                    // Preencher campos de detalhes
                     const elements = {
-                        'editEventTitle': cleanTitle,
-                        'editEventDateTime': event.startTime ? new Date(event.startTime).toLocaleString('pt-BR') : 'Não informado',
+                        'editEventDateTime': dataHoraFormatada,
                         'editEventLocal': event.local_nome || 'Não informado',
+                        'editEventPilar': event.pilar_nome || 'Não informado',
                         'editEventAcao': event.acao_nome || 'Não informado',
                         'editEventComunidade': event.comunidade_nome || 'Não informado',
-                        'editEventPastoral': event.pastoral_nome || 'Não informado',
-                        'editEventPilar': event.pilar_nome || 'Não informado'
+                        'editEventPastoral': event.pastoral_nome || 'Não informado'
                     };
                     
                     Object.entries(elements).forEach(([id, value]) => {
@@ -7638,7 +8031,7 @@
                     const objetivoSpan = document.getElementById('editEventObjetivo');
                     if (event.objetivo) {
                         if (objetivoSpan) objetivoSpan.textContent = event.objetivo;
-                        if (objetivoRow) objetivoRow.style.display = 'block';
+                        if (objetivoRow) objetivoRow.style.display = 'flex';
                     } else {
                         if (objetivoRow) objetivoRow.style.display = 'none';
                     }
@@ -7647,15 +8040,18 @@
                     const deleteBtn = document.getElementById('btnDeleteEvent');
                     if (deleteBtn) {
                         deleteBtn.onclick = function() {
-                            deleteEvent(event.id);
-                            resetExpandedCards();
-                            modal.style.display = 'none';
+                            if (confirm('Tem certeza que deseja excluir este evento?')) {
+                                deleteEvent(event.id);
+                                resetExpandedCards();
+                                modal.style.display = 'none';
+                            }
                         };
                     }
 
                     const editBtn = document.getElementById('btnEditEvent');
                     if (editBtn) {
                         editBtn.onclick = function() {
+                            modal.style.display = 'none';
                             if (typeof window.openEventFormForEditing === 'function') {
                                 window.openEventFormForEditing(event);
                             }
