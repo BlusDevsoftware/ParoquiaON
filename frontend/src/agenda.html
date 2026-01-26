@@ -7964,7 +7964,7 @@
                     let cleanTitle = event.titulo || event.title || 'Sem título';
                     cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
                     
-                    // Formatar data e hora
+                    // Formatar data e hora (início e fim)
                     let dataHoraFormatada = 'Não informado';
                     if (event.data_inicio || event.startTime) {
                         try {
@@ -7973,10 +7973,32 @@
                                 const dia = String(dataInicio.getDate()).padStart(2, '0');
                                 const mes = String(dataInicio.getMonth() + 1).padStart(2, '0');
                                 const ano = dataInicio.getFullYear();
-                                const hora = String(dataInicio.getHours()).padStart(2, '0');
-                                const minuto = String(dataInicio.getMinutes()).padStart(2, '0');
-                                const segundo = String(dataInicio.getSeconds()).padStart(2, '0');
-                                dataHoraFormatada = `${dia}/${mes}/${ano}, ${hora}:${minuto}:${segundo}`;
+                                const horaInicio = String(dataInicio.getHours()).padStart(2, '0');
+                                const minutoInicio = String(dataInicio.getMinutes()).padStart(2, '0');
+                                const segundoInicio = String(dataInicio.getSeconds()).padStart(2, '0');
+                                
+                                // Formato base: DD/MM/YYYY, HH:mm:ss
+                                let formatoBase = `${dia}/${mes}/${ano}, ${horaInicio}:${minutoInicio}:${segundoInicio}`;
+                                
+                                // Adicionar horário de fim se existir
+                                if (event.data_fim || event.endTime) {
+                                    try {
+                                        const dataFim = new Date(event.data_fim || event.endTime);
+                                        if (!isNaN(dataFim.getTime())) {
+                                            const horaFim = String(dataFim.getHours()).padStart(2, '0');
+                                            const minutoFim = String(dataFim.getMinutes()).padStart(2, '0');
+                                            const segundoFim = String(dataFim.getSeconds()).padStart(2, '0');
+                                            dataHoraFormatada = `${formatoBase} - ${horaFim}:${minutoFim}:${segundoFim}`;
+                                        } else {
+                                            dataHoraFormatada = formatoBase;
+                                        }
+                                    } catch (e) {
+                                        console.error('Erro ao formatar data de fim:', e);
+                                        dataHoraFormatada = formatoBase;
+                                    }
+                                } else {
+                                    dataHoraFormatada = formatoBase;
+                                }
                             }
                         } catch (e) {
                             console.error('Erro ao formatar data:', e);
