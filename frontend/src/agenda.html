@@ -7975,10 +7975,9 @@
                                 const ano = dataInicio.getFullYear();
                                 const horaInicio = String(dataInicio.getHours()).padStart(2, '0');
                                 const minutoInicio = String(dataInicio.getMinutes()).padStart(2, '0');
-                                const segundoInicio = String(dataInicio.getSeconds()).padStart(2, '0');
                                 
-                                // Formato base: DD/MM/YYYY, HH:mm:ss
-                                let formatoBase = `${dia}/${mes}/${ano}, ${horaInicio}:${minutoInicio}:${segundoInicio}`;
+                                // Formato base: DD/MM/YYYY, HH:mm
+                                let formatoBase = `${dia}/${mes}/${ano}, ${horaInicio}:${minutoInicio}`;
                                 
                                 // Adicionar horário de fim se existir
                                 if (event.data_fim || event.endTime) {
@@ -7987,8 +7986,7 @@
                                         if (!isNaN(dataFim.getTime())) {
                                             const horaFim = String(dataFim.getHours()).padStart(2, '0');
                                             const minutoFim = String(dataFim.getMinutes()).padStart(2, '0');
-                                            const segundoFim = String(dataFim.getSeconds()).padStart(2, '0');
-                                            dataHoraFormatada = `${formatoBase} - ${horaFim}:${minutoFim}:${segundoFim}`;
+                                            dataHoraFormatada = `${formatoBase} - ${horaFim}:${minutoFim}`;
                                         } else {
                                             dataHoraFormatada = formatoBase;
                                         }
@@ -8010,7 +8008,20 @@
                     if (titleElement) titleElement.textContent = cleanTitle;
                     
                     // Preencher campos de detalhes
+                    // Obter nome do usuário agendador
+                    let usuarioAgendador = 'Não informado';
+                    if (event.usuario_lancamento_nome) {
+                        usuarioAgendador = event.usuario_lancamento_nome;
+                    } else if (event.usuarios?.nome) {
+                        usuarioAgendador = event.usuarios.nome;
+                    } else if (event.usuarios?.email) {
+                        usuarioAgendador = event.usuarios.email;
+                    } else if (event.usuario_email) {
+                        usuarioAgendador = event.usuario_email;
+                    }
+                    
                     const elements = {
+                        'editEventUsuarioAgendador': usuarioAgendador,
                         'editEventDateTime': dataHoraFormatada,
                         'editEventLocal': event.local_nome || 'Não informado',
                         'editEventPilar': event.pilar_nome || 'Não informado',
