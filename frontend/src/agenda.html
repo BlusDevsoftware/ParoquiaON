@@ -3793,9 +3793,9 @@
             }
         }
 
-        /* Header azul com gradiente */
+        /* Header azul sólido */
         .modal-view-header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1e3a8a 100%);
+            background: #1e3a8a;
             padding: 24px 28px;
             display: flex;
             justify-content: space-between;
@@ -4070,24 +4070,6 @@
             color: white;
         }
 
-        .modal-view-close-link {
-            position: absolute;
-            bottom: 20px;
-            right: 28px;
-            background: none;
-            border: none;
-            color: #6b7280;
-            font-size: 13px;
-            cursor: pointer;
-            padding: 4px 8px;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .modal-view-close-link:hover {
-            color: #1f2937;
-        }
-
         /* Responsivo */
         @media (max-width: 768px) {
             .modal-view-container {
@@ -4115,12 +4097,6 @@
             .modal-view-btn {
                 width: 100%;
                 flex: none;
-            }
-
-            .modal-view-close-link {
-                position: static;
-                margin-top: 8px;
-                align-self: flex-end;
             }
         }
     </style>
