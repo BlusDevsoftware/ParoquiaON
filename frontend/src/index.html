@@ -728,7 +728,7 @@
         <!-- Charts Section -->
         <div class="charts-section">
             <div class="chart-container">
-                <h2>Evolução de Pessoas Cadastradas</h2>
+                <h2>Eventos por Comunidade</h2>
                 <canvas id="pessoasChart"></canvas>
             </div>
             <div class="chart-container">
@@ -1050,36 +1050,27 @@
                     throw new Error('Dados dos gráficos inválidos');
                 }
 
-                // Gráfico de evolução de pessoas
+                // Gráfico de eventos por comunidade
                 const ctxPessoas = document.getElementById('pessoasChart').getContext('2d');
                 pessoasChart = new Chart(ctxPessoas, {
-                    type: 'line',
+                    type: 'bar',
                     data: {
-                        labels: dadosGraficos.pessoas.labels,
+                        labels: dadosGraficos.eventosPorComunidade.labels,
                         datasets: [{
-                            label: 'Pessoas Cadastradas',
-                            data: dadosGraficos.pessoas.dados,
-                            borderColor: '#007bff',
-                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                            tension: 0.4,
-                            fill: true
+                            label: 'Eventos',
+                            data: dadosGraficos.eventosPorComunidade.dados,
+                            backgroundColor: '#42a5f5'
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
+                        plugins: { legend: { display: false } },
                         scales: {
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    callback: function(value) {
-                                        return value.toLocaleString('pt-BR');
-                                    }
+                                    stepSize: 1
                                 }
                             }
                         }
@@ -1193,9 +1184,9 @@
 
                 console.log('Dados dos gráficos recebidos:', { pessoas, pastorais, agenda, comunidades });
 
-                // Calcular evolução de pessoas (últimos 6 meses)
-                const evolucaoPessoas = calcularEvolucaoPessoas(pessoas);
-                
+                // Calcular eventos por comunidade
+                const eventosPorComunidade = calcularEventosPorComunidade(agenda, comunidades);
+
                 // Calcular distribuição por pastorais
                 const distribuicaoPastorais = calcularDistribuicaoPastorais(pastorais);
 
@@ -1206,7 +1197,7 @@
                 const topComunidades = calcularTopComunidades(comunidades, pessoas);
 
                 return { 
-                    pessoas: evolucaoPessoas, 
+                    eventosPorComunidade,
                     pastorais: distribuicaoPastorais,
                     eventos: eventosPorMes,
                     comunidades: topComunidades
@@ -1223,29 +1214,27 @@
             }
         }
 
-        // Função para calcular evolução de pessoas cadastradas
-        function calcularEvolucaoPessoas(pessoas) {
-            const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-            const dados = new Array(6).fill(0);
+        // Função para calcular eventos por comunidade
+        function calcularEventosPorComunidade(agenda, comunidades) {
+            // Mapa de eventos por comunidade_id
+            const eventosPorComunidade = {};
+
+            (agenda || []).forEach(evento => {
+                const comunidadeId = evento.comunidade_id || evento.comunidade || null;
+                if (!comunidadeId) return;
+                eventosPorComunidade[comunidadeId] = (eventosPorComunidade[comunidadeId] || 0) + 1;
+            });
+
             const labels = [];
+            const dados = [];
 
-            // Pegar os últimos 6 meses
-            const hoje = new Date();
-            for (let i = 5; i >= 0; i--) {
-                const mes = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
-                labels.push(meses[mes.getMonth()]);
-                
-                // Filtrar pessoas do mês
-                const pessoasMes = (pessoas || []).filter(p => {
-                    if (!p || !p.created_at) return false;
-                    const dataPessoa = new Date(p.created_at);
-                    if (isNaN(dataPessoa.getTime())) return false;
-                    return dataPessoa.getMonth() === mes.getMonth() && 
-                           dataPessoa.getFullYear() === mes.getFullYear();
-                });
-
-                dados[5 - i] = pessoasMes.length;
-            }
+            (comunidades || []).forEach(comunidade => {
+                if (!comunidade || (!comunidade.id && !comunidade.codigo)) return;
+                const id = comunidade.id || comunidade.codigo;
+                const nome = comunidade.nome || comunidade.descricao || `Comunidade ${id}`;
+                labels.push(nome);
+                dados.push(eventosPorComunidade[id] || 0);
+            });
 
             return { labels, dados };
         }
@@ -1348,37 +1337,26 @@
                     destruirGraficos();
                 }
                 
-                // Gráfico de evolução de pessoas
+                // Gráfico de eventos por comunidade (padrão)
                 const ctxPessoas = document.getElementById('pessoasChart').getContext('2d');
                 pessoasChart = new Chart(ctxPessoas, {
-                    type: 'line',
+                    type: 'bar',
                     data: {
-                        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                        labels: ['Sem dados'],
                         datasets: [{
-                            label: 'Pessoas Cadastradas',
-                            data: [0, 0, 0, 0, 0, 0],
-                            borderColor: '#007bff',
-                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                            tension: 0.4,
-                            fill: true
+                            label: 'Eventos',
+                            data: [0],
+                            backgroundColor: '#42a5f5'
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
+                        plugins: { legend: { display: false } },
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return value.toLocaleString('pt-BR');
-                                    }
-                                }
+                                ticks: { stepSize: 1 }
                             }
                         }
                     }
