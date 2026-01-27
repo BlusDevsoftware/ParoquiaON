@@ -8009,7 +8009,30 @@
                     // Preencher título
                     const titleElement = document.getElementById('editEventTitle');
                     if (titleElement) titleElement.textContent = cleanTitle;
-                    
+
+                    // Formatar data de criação do agendamento
+                    let createdAtFormatted = 'Não informado';
+                    if (event.created_at) {
+                        try {
+                            const created = new Date(event.created_at);
+                            if (!isNaN(created.getTime())) {
+                                const dia = String(created.getDate()).padStart(2, '0');
+                                const mes = String(created.getMonth() + 1).padStart(2, '0');
+                                const ano = created.getFullYear();
+                                const hora = String(created.getHours()).padStart(2, '0');
+                                const minuto = String(created.getMinutes()).padStart(2, '0');
+                                createdAtFormatted = `${dia}/${mes}/${ano}, ${hora}:${minuto}`;
+                            }
+                        } catch (e) {
+                            console.error('Erro ao formatar data de criação:', e);
+                        }
+                    }
+
+                    const createdAtElement = document.getElementById('editEventCreatedAt');
+                    if (createdAtElement) {
+                        createdAtElement.textContent = createdAtFormatted;
+                    }
+
                     // Preencher campos de detalhes
                     // Obter nome e foto do usuário agendador
                     let usuarioAgendador = 'Não informado';
