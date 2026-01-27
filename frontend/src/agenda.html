@@ -8023,7 +8023,8 @@
                                 const ano = createdLocal.getFullYear();
                                 const hora = String(createdLocal.getHours()).padStart(2, '0');
                                 const minuto = String(createdLocal.getMinutes()).padStart(2, '0');
-                                createdAtFormatted = `${dia}/${mes}/${ano}, ${hora}:${minuto}`;
+                                // Formato: DD/MM/AAAA às HH:mm
+                                createdAtFormatted = `${dia}/${mes}/${ano} às ${hora}:${minuto}`;
                             }
                         } catch (e) {
                             console.error('Erro ao formatar data de criação:', e);
