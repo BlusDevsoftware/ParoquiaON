@@ -8010,17 +8010,19 @@
                     const titleElement = document.getElementById('editEventTitle');
                     if (titleElement) titleElement.textContent = cleanTitle;
 
-                    // Formatar data de criação do agendamento
+                    // Formatar data de criação do agendamento (ajusta -3h do horário do banco)
                     let createdAtFormatted = 'Não informado';
                     if (event.created_at) {
                         try {
-                            const created = new Date(event.created_at);
-                            if (!isNaN(created.getTime())) {
-                                const dia = String(created.getDate()).padStart(2, '0');
-                                const mes = String(created.getMonth() + 1).padStart(2, '0');
-                                const ano = created.getFullYear();
-                                const hora = String(created.getHours()).padStart(2, '0');
-                                const minuto = String(created.getMinutes()).padStart(2, '0');
+                            const createdUtc = new Date(event.created_at);
+                            if (!isNaN(createdUtc.getTime())) {
+                                // Subtrai 3 horas para exibição (fuso local)
+                                const createdLocal = new Date(createdUtc.getTime() - 3 * 60 * 60 * 1000);
+                                const dia = String(createdLocal.getDate()).padStart(2, '0');
+                                const mes = String(createdLocal.getMonth() + 1).padStart(2, '0');
+                                const ano = createdLocal.getFullYear();
+                                const hora = String(createdLocal.getHours()).padStart(2, '0');
+                                const minuto = String(createdLocal.getMinutes()).padStart(2, '0');
                                 createdAtFormatted = `${dia}/${mes}/${ano}, ${hora}:${minuto}`;
                             }
                         } catch (e) {
