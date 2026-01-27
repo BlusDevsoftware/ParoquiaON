@@ -241,14 +241,17 @@
             <!-- Usuário Agendador -->
             <div class="modal-view-detail-item">
                 <div class="modal-view-detail-icon">
-                    <i class="fas fa-user"></i>
+                    <!-- Foto do usuário agendador -->
+                    <img id="editEventUsuarioAgendadorFoto" src="" alt="Usuário agendador" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;">
+                    <!-- Ícone padrão (fallback quando não houver foto) -->
+                    <i class="fas fa-user" id="editEventUsuarioAgendadorIcon"></i>
                 </div>
                 <div class="modal-view-detail-content">
                     <label class="modal-view-detail-label">USUÁRIO AGENDADOR</label>
                     <span class="modal-view-detail-value" id="editEventUsuarioAgendador">Não informado</span>
                 </div>
             </div>
-            
+
             <!-- Data e Hora -->
             <div class="modal-view-detail-item">
                 <div class="modal-view-detail-icon">

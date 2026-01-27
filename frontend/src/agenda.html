@@ -8008,7 +8008,7 @@
                     if (titleElement) titleElement.textContent = cleanTitle;
                     
                     // Preencher campos de detalhes
-                    // Obter nome do usuário agendador
+                    // Obter nome e foto do usuário agendador
                     let usuarioAgendador = 'Não informado';
                     if (event.usuario_lancamento_nome) {
                         usuarioAgendador = event.usuario_lancamento_nome;
@@ -8019,7 +8019,13 @@
                     } else if (event.usuario_email) {
                         usuarioAgendador = event.usuario_email;
                     }
-                    
+
+                    const usuarioAgendadorFoto =
+                        event.usuario_lancamento_foto ||
+                        event.usuarios?.pessoas?.foto ||
+                        event.usuario_foto ||
+                        null;
+
                     const elements = {
                         'editEventUsuarioAgendador': usuarioAgendador,
                         'editEventDateTime': dataHoraFormatada,
@@ -8034,6 +8040,21 @@
                         const element = document.getElementById(id);
                         if (element) element.textContent = value;
                     });
+
+                    // Atualizar avatar (foto do usuário agendador ou ícone padrão)
+                    const fotoEl = document.getElementById('editEventUsuarioAgendadorFoto');
+                    const iconEl = document.getElementById('editEventUsuarioAgendadorIcon');
+                    if (fotoEl && iconEl) {
+                        if (usuarioAgendadorFoto) {
+                            fotoEl.src = usuarioAgendadorFoto;
+                            fotoEl.style.display = 'block';
+                            iconEl.style.display = 'none';
+                        } else {
+                            fotoEl.style.display = 'none';
+                            fotoEl.src = '';
+                            iconEl.style.display = 'inline-flex';
+                        }
+                    }
                     
                     // Mostrar objetivo se existir
                     const objetivoRow = document.getElementById('editEventObjetivoRow');

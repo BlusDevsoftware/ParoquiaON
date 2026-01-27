@@ -42,8 +42,8 @@ async function listarEventos(req, res) {
         const { data: acoes } = await supabase.from('acoes').select('id, nome');
         if (acoes) relacionamentos.acoes = acoes;
         
-        // Buscar pessoas
-        const { data: pessoas } = await supabase.from('pessoas').select('id, nome');
+        // Buscar pessoas (inclui foto para usar como avatar)
+        const { data: pessoas } = await supabase.from('pessoas').select('id, nome, foto');
         if (pessoas) relacionamentos.pessoas = pessoas;
         
         // Buscar comunidades
@@ -58,8 +58,8 @@ async function listarEventos(req, res) {
         const { data: pilares } = await supabase.from('pilares').select('id, nome');
         if (pilares) relacionamentos.pilares = pilares;
         
-        // Buscar usuários
-        const { data: usuarios } = await supabase.from('usuarios').select('id, email');
+        // Buscar usuários (inclui pessoa_id para chegar na foto)
+        const { data: usuarios } = await supabase.from('usuarios').select('id, email, pessoa_id');
         if (usuarios) relacionamentos.usuarios = usuarios;
         
         // Buscar status
@@ -67,17 +67,29 @@ async function listarEventos(req, res) {
         if (status) relacionamentos.status = status;
         
         // Combinar os dados
-        const data = agendamentos?.map(agendamento => ({
-            ...agendamento,
-            locais: relacionamentos.locais?.find(l => l.id === agendamento.local_id),
-            acoes: relacionamentos.acoes?.find(a => a.id === agendamento.acao_id),
-            pessoas: relacionamentos.pessoas?.find(p => p.id === agendamento.responsavel_id),
-            comunidades: relacionamentos.comunidades?.find(c => c.id === agendamento.comunidade_id),
-            pastorais: relacionamentos.pastorais?.find(p => p.id === agendamento.pastoral_id),
-            pilares: relacionamentos.pilares?.find(p => p.id === agendamento.pilar_id),
-            usuarios: relacionamentos.usuarios?.find(u => u.id === agendamento.usuario_lancamento_id),
-            status_agendamento: relacionamentos.status?.find(s => s.id === agendamento.status_id)
-        })) || [];
+        const data = agendamentos?.map(agendamento => {
+            const usuarioLancamento = relacionamentos.usuarios?.find(u => u.id === agendamento.usuario_lancamento_id) || null;
+            const pessoaDoUsuarioLancamento = usuarioLancamento && relacionamentos.pessoas
+                ? relacionamentos.pessoas.find(p => p.id === usuarioLancamento.pessoa_id)
+                : null;
+
+            return {
+                ...agendamento,
+                locais: relacionamentos.locais?.find(l => l.id === agendamento.local_id),
+                acoes: relacionamentos.acoes?.find(a => a.id === agendamento.acao_id),
+                pessoas: relacionamentos.pessoas?.find(p => p.id === agendamento.responsavel_id),
+                comunidades: relacionamentos.comunidades?.find(c => c.id === agendamento.comunidade_id),
+                pastorais: relacionamentos.pastorais?.find(p => p.id === agendamento.pastoral_id),
+                pilares: relacionamentos.pilares?.find(p => p.id === agendamento.pilar_id),
+                // Usuário que lançou o agendamento
+                usuarios: usuarioLancamento,
+                // Campos derivados para facilitar uso no frontend
+                usuario_lancamento_nome: pessoaDoUsuarioLancamento?.nome || usuarioLancamento?.email || null,
+                usuario_lancamento_email: usuarioLancamento?.email || null,
+                usuario_lancamento_foto: pessoaDoUsuarioLancamento?.foto || null,
+                status_agendamento: relacionamentos.status?.find(s => s.id === agendamento.status_id)
+            };
+        }) || [];
         
         console.log(`✅ ${data?.length || 0} eventos encontrados`);
         res.json(data || []);
@@ -138,8 +150,32 @@ async function buscarEvento(req, res) {
         }
         
         if (agendamento.usuario_lancamento_id) {
-            const { data: usuario } = await supabase.from('usuarios').select('id, email').eq('id', agendamento.usuario_lancamento_id).single();
+            // Buscar usuário que lançou o agendamento (inclui pessoa_id)
+            const { data: usuario } = await supabase
+                .from('usuarios')
+                .select('id, email, pessoa_id')
+                .eq('id', agendamento.usuario_lancamento_id)
+                .single();
             relacionamentos.usuarios = usuario;
+
+            // Buscar pessoa vinculada ao usuário para obter nome/foto
+            if (usuario && usuario.pessoa_id) {
+                const { data: pessoaUsuario } = await supabase
+                    .from('pessoas')
+                    .select('id, nome, foto')
+                    .eq('id', usuario.pessoa_id)
+                    .single();
+
+                if (pessoaUsuario) {
+                    relacionamentos.usuario_lancamento_nome = pessoaUsuario.nome || usuario.email || null;
+                    relacionamentos.usuario_lancamento_email = usuario.email || null;
+                    relacionamentos.usuario_lancamento_foto = pessoaUsuario.foto || null;
+                } else {
+                    relacionamentos.usuario_lancamento_nome = usuario.email || null;
+                    relacionamentos.usuario_lancamento_email = usuario.email || null;
+                    relacionamentos.usuario_lancamento_foto = null;
+                }
+            }
         }
         
         if (agendamento.status_id) {
