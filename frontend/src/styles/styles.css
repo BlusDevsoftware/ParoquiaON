@@ -462,11 +462,12 @@ body {
 }
 
 .chart-container {
-    background: white;
+    background: linear-gradient(135deg, #ffffff, #f3f4ff);
     padding: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
     height: 400px;
+    border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 .chart-container h2 {

@@ -1059,18 +1059,58 @@
                         datasets: [{
                             label: 'Eventos',
                             data: dadosGraficos.eventosPorComunidade.dados,
-                            backgroundColor: '#42a5f5'
+                            backgroundColor: dadosGraficos.eventosPorComunidade.labels.map((_, idx) => {
+                                const colors = ['#3b82f6', '#6366f1', '#0ea5e9', '#22c55e', '#f97316', '#ec4899'];
+                                return colors[idx % colors.length];
+                            }),
+                            borderRadius: 12,
+                            borderSkipped: false,
+                            maxBarThickness: 40
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                titleFont: { size: 13, weight: '600', family: 'system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif' },
+                                bodyFont: { size: 12, family: 'system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif' },
+                                padding: 10,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        const value = ctx.parsed.y || 0;
+                                        const plural = value === 1 ? 'evento' : 'eventos';
+                                        return `${value} ${plural}`;
+                                    }
+                                }
+                            }
+                        },
                         scales: {
                             y: {
                                 beginAtZero: true,
                                 ticks: {
                                     stepSize: 1
+                                },
+                                grid: {
+                                    color: 'rgba(148, 163, 184, 0.25)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false,
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                    autoSkip: true,
+                                    font: {
+                                        size: 11
+                                    }
                                 }
                             }
                         }
