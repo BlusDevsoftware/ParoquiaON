@@ -1108,6 +1108,15 @@
                                     autoSkip: true,
                                     font: {
                                         size: 11
+                                    },
+                                    // Encurta nomes muito longos para não vazar do card
+                                    callback: function(value) {
+                                        const label = this.getLabelForValue(value) || '';
+                                        const maxLength = 18;
+                                        if (label.length > maxLength) {
+                                            return label.slice(0, maxLength - 1) + '…';
+                                        }
+                                        return label;
                                     }
                                 }
                             }
