@@ -457,12 +457,17 @@ body {
     margin-bottom: 0.5rem;
 }
 
+/* Quando o número está ao lado dos avatares, não queremos margem embaixo do número */
+.card-value-with-avatars .card-value {
+    margin-bottom: 0;
+}
+
 /* Avatares de comunidades no card Total de Comunidades */
 .card-avatars {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    margin-top: 0.25rem;
+    margin-top: 0;
 }
 
 .card-avatars .community-avatar {
