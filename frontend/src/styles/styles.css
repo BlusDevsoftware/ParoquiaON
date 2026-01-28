@@ -490,6 +490,18 @@ body {
     display: block;
 }
 
+/* Ajuste responsivo: em telas grandes, aumentar levemente os avatares para ocupar melhor o espaço */
+@media (min-width: 1200px) {
+    .card-avatars .community-avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .card-value-with-avatars {
+        gap: 0.75rem;
+    }
+}
+
 .card-change.negative {
     color: #dc3545;
 }
