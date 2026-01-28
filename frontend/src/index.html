@@ -1050,25 +1050,20 @@
                     throw new Error('Dados dos gráficos inválidos');
                 }
 
-                // Gráfico de eventos por comunidade (estilo linha/área moderno)
+                // Gráfico de eventos por comunidade
                 const ctxPessoas = document.getElementById('pessoasChart').getContext('2d');
                 pessoasChart = new Chart(ctxPessoas, {
-                    type: 'line',
+                    type: 'bar',
                     data: {
                         labels: dadosGraficos.eventosPorComunidade.labels,
                         datasets: [{
                             label: 'Eventos',
                             data: dadosGraficos.eventosPorComunidade.dados,
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.15)',
-                            borderWidth: 3,
-                            tension: 0.45,
-                            fill: true,
-                            pointRadius: 0,
-                            pointHoverRadius: 7,
-                            pointHoverBackgroundColor: '#3b82f6',
-                            pointHoverBorderColor: '#ffffff',
-                            pointHoverBorderWidth: 2
+                            // Cada coluna usa a cor da própria comunidade
+                            backgroundColor: dadosGraficos.eventosPorComunidade.cores,
+                            borderRadius: 12,
+                            borderSkipped: false,
+                            maxBarThickness: 40
                         }]
                     },
                     options: {
@@ -1098,7 +1093,7 @@
                                     stepSize: 1
                                 },
                                 grid: {
-                                    color: 'rgba(148, 163, 184, 0.18)',
+                                    color: 'rgba(148, 163, 184, 0.25)',
                                     drawBorder: false
                                 }
                             },
@@ -1258,6 +1253,7 @@
         }
 
         // Função para calcular eventos por comunidade
+        // Retorna labels, dados e cor de cada comunidade (para usar a cor da comunidade nas colunas)
         function calcularEventosPorComunidade(agenda, comunidades) {
             // Mapa de eventos por comunidade_id
             const eventosPorComunidade = {};
@@ -1270,16 +1266,20 @@
 
             const labels = [];
             const dados = [];
+            const cores = [];
 
             (comunidades || []).forEach(comunidade => {
                 if (!comunidade || (!comunidade.id && !comunidade.codigo)) return;
                 const id = comunidade.id || comunidade.codigo;
                 const nome = comunidade.nome || comunidade.descricao || `Comunidade ${id}`;
+                const cor = comunidade.cor || comunidade.color || '#3b82f6';
+
                 labels.push(nome);
                 dados.push(eventosPorComunidade[id] || 0);
+                cores.push(cor);
             });
 
-            return { labels, dados };
+            return { labels, dados, cores };
         }
 
         // Função para calcular distribuição por pastorais
@@ -1380,25 +1380,16 @@
                     destruirGraficos();
                 }
                 
-                // Gráfico de eventos por comunidade (padrão, estilo linha/área)
+                // Gráfico de eventos por comunidade (padrão)
                 const ctxPessoas = document.getElementById('pessoasChart').getContext('2d');
                 pessoasChart = new Chart(ctxPessoas, {
-                    type: 'line',
+                    type: 'bar',
                     data: {
                         labels: ['Sem dados'],
                         datasets: [{
                             label: 'Eventos',
                             data: [0],
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.15)',
-                            borderWidth: 3,
-                            tension: 0.45,
-                            fill: true,
-                            pointRadius: 0,
-                            pointHoverRadius: 7,
-                            pointHoverBackgroundColor: '#3b82f6',
-                            pointHoverBorderColor: '#ffffff',
-                            pointHoverBorderWidth: 2
+                            backgroundColor: '#42a5f5'
                         }]
                     },
                     options: {
