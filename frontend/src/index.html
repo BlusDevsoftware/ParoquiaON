@@ -726,7 +726,10 @@
                     <h3>Eventos do Mês</h3>
                     <i class="fas fa-calendar-alt"></i>
                 </div>
-                <div class="card-value" id="eventos-mes">-</div>
+                <div class="card-value-with-avatars">
+                    <span class="card-value" id="eventos-mes">-</span>
+                    <span class="card-events-rolling" id="eventos-mes-titulo">Carregando...</span>
+                </div>
                 <div class="card-change" id="qtd-eventos">Carregando...</div>
             </div>
         </div>
@@ -762,6 +765,7 @@
         // Variáveis globais
         let pessoasChart, pastoraisChart, eventosChart, comunidadesChart;
         let minhaComunidadeData = {};
+        let eventosMesTituloTimer = null;
 
         // Inicializar Minha Comunidade
         // Funções para controlar menu mobile
@@ -921,6 +925,8 @@
                 atualizarAvataresComunidades(dados.comunidadesLista || []);
                 // Atualizar avatares de pessoas ao lado do total de pessoas
                 atualizarAvataresPessoas(dados.pessoasLista || []);
+                // Atualizar título rotativo de eventos do mês
+                atualizarTitulosEventosMes(dados.eventos.titulosMes || []);
 
                 // Aplicar classes de cor baseadas no crescimento
                 aplicarClassesCrescimento();
@@ -969,6 +975,19 @@
                 const eventosAtivos = agenda.filter(e => e.status === 'Ativo').length;
                 const totalEventos = agenda.length;
 
+                // Lista de títulos de eventos do mês atual
+                const hoje = new Date();
+                const mesAtual = hoje.getMonth();
+                const anoAtual = hoje.getFullYear();
+                const titulosEventosMes = agenda
+                    .filter(e => {
+                        if (!e || !e.data_inicio) return false;
+                        const dataEv = new Date(e.data_inicio);
+                        if (isNaN(dataEv.getTime())) return false;
+                        return dataEv.getMonth() === mesAtual && dataEv.getFullYear() === anoAtual;
+                    })
+                    .map(e => e.titulo || e.title || 'Evento sem título');
+
                 return {
                     comunidades: {
                         total: totalComunidades,
@@ -984,7 +1003,8 @@
                     },
                     eventos: {
                         total: totalEventos,
-                        detalhes: `${eventosAtivos} eventos ativos`
+                        detalhes: `${eventosAtivos} eventos ativos`,
+                        titulosMes: titulosEventosMes
                     },
                     comunidadesLista: comunidades,
                     pessoasLista: pessoas
@@ -1165,6 +1185,41 @@
                 }
             } catch (error) {
                 console.error('Erro ao atualizar avatares de pessoas:', error);
+            }
+        }
+
+        // Função para atualizar os títulos dos eventos do mês ao lado do total
+        function atualizarTitulosEventosMes(titulos) {
+            try {
+                const el = document.getElementById('eventos-mes-titulo');
+                if (!el) return;
+
+                // Limpar qualquer rotação anterior
+                if (eventosMesTituloTimer) {
+                    clearInterval(eventosMesTituloTimer);
+                    eventosMesTituloTimer = null;
+                }
+
+                if (!Array.isArray(titulos) || titulos.length === 0) {
+                    el.textContent = 'Nenhum evento neste mês';
+                    return;
+                }
+
+                let idx = 0;
+                const normalizarTitulo = (t) => (t || '').toString().trim() || 'Evento sem título';
+
+                el.textContent = normalizarTitulo(titulos[idx]);
+
+                if (titulos.length === 1) {
+                    return; // apenas um título, não precisa rotacionar
+                }
+
+                eventosMesTituloTimer = setInterval(() => {
+                    idx = (idx + 1) % titulos.length;
+                    el.textContent = normalizarTitulo(titulos[idx]);
+                }, 4000);
+            } catch (error) {
+                console.error('Erro ao atualizar títulos de eventos do mês:', error);
             }
         }
 
