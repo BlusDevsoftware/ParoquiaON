@@ -19,10 +19,17 @@ function aguardarElemento(seletor, timeout = 3000) {
 // Cache de dados do usuário para evitar recarregamento entre páginas
 const USER_CACHE_KEY = 'paroquiaon_user_cache';
 const USER_PHOTO_CACHE_KEY = 'paroquiaon_user_photo_cache';
+// Foto em data URL para persistir entre abas/recarregamento (quando API retorna base64)
+const USER_PHOTO_DATAURL_KEY = 'paroquiaon_user_photo_dataurl';
 
 // Não armazena base64 no sessionStorage (excede quota). Apenas URLs.
 function ehUrlFoto(val) {
     return val && typeof val === 'string' && (val.startsWith('http://') || val.startsWith('https://'));
+}
+
+// Data URL (base64) para uso no cache de exibição
+function ehDataUrlFoto(val) {
+    return val && typeof val === 'string' && val.startsWith('data:');
 }
 
 // Função para atualizar cache do usuário
@@ -211,7 +218,8 @@ function atualizarAvatarUsuario(fotoOverride) {
     const inicial = nome.charAt(0).toUpperCase();
     const email = user.email || '';
     const fotoCache = sessionStorage.getItem(USER_PHOTO_CACHE_KEY);
-    const foto = fotoOverride || fotoCache || user.foto || user.avatar || user.pessoa?.foto || null;
+    const fotoDataUrl = sessionStorage.getItem(USER_PHOTO_DATAURL_KEY);
+    const foto = fotoOverride || fotoCache || fotoDataUrl || user.foto || user.avatar || user.pessoa?.foto || null;
     
     console.log('Atualizando avatar:', { nome, email, temFoto: !!foto });
     
@@ -375,6 +383,51 @@ function configurarDropdownAvatar() {
     console.log('✅ Dropdown do avatar configurado');
 }
 
+// Limites para foto de perfil: até 15MB; acima de 5MB é comprimida no cliente antes do envio
+const MAX_FILE_SIZE_PHOTO_PERFIL = 15 * 1024 * 1024;   // 15MB
+const COMPRESS_PHOTO_OVER_SIZE = 5 * 1024 * 1024;     // acima de 5MB comprimir
+
+/**
+ * Comprime imagem (data URL) para reduzir tamanho: redimensiona e exporta como JPEG.
+ * @param {string} dataUrl - data URL da imagem
+ * @param {number} maxDimension - maior lado em pixels (ex.: 1200)
+ * @param {number} quality - qualidade JPEG 0..1 (ex.: 0.85)
+ * @returns {Promise<string>} data URL comprimida
+ */
+function comprimirImagemParaAvatar(dataUrl, maxDimension, quality) {
+    maxDimension = maxDimension || 1200;
+    quality = quality == null ? 0.85 : quality;
+    return new Promise(function(resolve, reject) {
+        const img = new Image();
+        img.onload = function() {
+            try {
+                let w = img.naturalWidth;
+                let h = img.naturalHeight;
+                if (w <= maxDimension && h <= maxDimension) {
+                    w = img.naturalWidth;
+                    h = img.naturalHeight;
+                } else if (w >= h) {
+                    h = Math.round(h * (maxDimension / w));
+                    w = maxDimension;
+                } else {
+                    w = Math.round(w * (maxDimension / h));
+                    h = maxDimension;
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            } catch (e) {
+                reject(e);
+            }
+        };
+        img.onerror = function() { reject(new Error('Erro ao carregar imagem')); };
+        img.src = dataUrl;
+    });
+}
+
 // Abrir seletor de arquivo para foto do perfil
 function abrirSeletorFotoPerfil() {
     const user = obterDadosUsuario();
@@ -397,36 +450,52 @@ function abrirSeletorFotoPerfil() {
     input.addEventListener('change', async function() {
         const file = this.files && this.files[0];
         if (!file) return;
-        if (file.size > 5 * 1024 * 1024) { // 5MB
+        if (file.size > MAX_FILE_SIZE_PHOTO_PERFIL) {
             const toast = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
-            toast('A imagem deve ter no máximo 5MB.', 'error');
+            toast('A imagem deve ter no máximo 15MB.', 'error');
             return;
         }
         const reader = new FileReader();
         reader.onload = async function() {
-            const base64 = reader.result;
+            let base64 = reader.result;
             try {
+                if (file.size > COMPRESS_PHOTO_OVER_SIZE) {
+                    base64 = await comprimirImagemParaAvatar(base64, 1200, 0.85);
+                }
                 // Atualiza avatar IMEDIATAMENTE com base64 (exibição instantânea, sem rede)
                 atualizarAvatarUsuario(base64);
                 document.querySelector('.user-avatar-dropdown')?.classList.remove('active');
 
                 const { data, error } = await window.api.put(window.endpoints.pessoas.update(user.pessoa_id), { foto: base64 });
                 if (error) throw error;
-                // URL da API para cache (nunca base64 no sessionStorage - excede quota)
                 const fotoUrl = (data && data.foto && ehUrlFoto(data.foto)) ? data.foto : null;
+                const fotoBase64 = (data && data.foto && ehDataUrlFoto(data.foto)) ? data.foto : null;
                 const userAtual = window.authGuard ? window.authGuard.getCurrentUser() : user;
-                const userAtualizado = { ...userAtual, foto: fotoUrl };
+                const userAtualizado = { ...userAtual, foto: fotoUrl || userAtual.foto };
                 if (window.authGuard) {
                     try {
                         const userStr = sessionStorage.getItem('user');
                         const parsed = userStr ? JSON.parse(userStr) : {};
-                        parsed.foto = fotoUrl;
+                        if (fotoUrl) parsed.foto = fotoUrl;
                         sessionStorage.setItem('user', JSON.stringify(parsed));
                     } catch (_) {}
                 }
                 atualizarCacheUsuario(userAtualizado);
-                if (fotoUrl) sessionStorage.setItem(USER_PHOTO_CACHE_KEY, fotoUrl);
-                else sessionStorage.removeItem(USER_PHOTO_CACHE_KEY);
+                if (fotoUrl) {
+                    sessionStorage.setItem(USER_PHOTO_CACHE_KEY, fotoUrl);
+                    sessionStorage.removeItem(USER_PHOTO_DATAURL_KEY);
+                } else {
+                    sessionStorage.removeItem(USER_PHOTO_CACHE_KEY);
+                    // Persistir data URL para a foto aparecer ao trocar de aba/recarregar
+                    const fotoParaPersistir = fotoBase64 || base64;
+                    if (fotoParaPersistir) {
+                        try {
+                            sessionStorage.setItem(USER_PHOTO_DATAURL_KEY, fotoParaPersistir);
+                        } catch (quotaErr) {
+                            if (quotaErr && quotaErr.name === 'QuotaExceededError') sessionStorage.removeItem(USER_PHOTO_DATAURL_KEY);
+                        }
+                    }
+                }
                 const toastOk = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
                 toastOk('Foto atualizada com sucesso!', 'success');
             } catch (err) {

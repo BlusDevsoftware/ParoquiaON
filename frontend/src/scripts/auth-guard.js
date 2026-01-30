@@ -214,6 +214,7 @@ class AuthGuard {
         // Limpar cache do usuário
         sessionStorage.removeItem('paroquiaon_user_cache');
         sessionStorage.removeItem('paroquiaon_user_photo_cache');
+        sessionStorage.removeItem('paroquiaon_user_photo_dataurl');
     }
 
     getCurrentUser() {
