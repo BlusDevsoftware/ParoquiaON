@@ -1,3 +1,10 @@
+// Esconder avatar até o conteúdo estar pronto (evita piscar "A" ao recarregar)
+(function() {
+    var style = document.createElement('style');
+    style.textContent = '.user-avatar:not(.avatar-loaded), .user-dropdown-avatar:not(.avatar-loaded){ opacity:0; }.user-avatar.avatar-loaded, .user-dropdown-avatar.avatar-loaded{ opacity:1; transition:opacity 0.12s ease; }';
+    if (document.head) document.head.appendChild(style); else document.addEventListener('DOMContentLoaded', function() { document.head.appendChild(style); });
+})();
+
 // Função para aguardar elemento estar disponível
 function aguardarElemento(seletor, timeout = 3000) {
     return new Promise((resolve, reject) => {
@@ -129,14 +136,12 @@ window.atualizarCacheUsuario = atualizarCacheUsuario;
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔒 Aplicando proteção de autenticação...');
     
-    // Atualizar avatar imediatamente do cache (sem esperar verificação)
-    const cachedUser = obterDadosUsuario();
+    // Atualizar avatar imediatamente do cache (sem delay para evitar piscar)
+    var cachedUser = obterDadosUsuario();
     if (cachedUser) {
         console.log('📦 Usando dados do cache para atualização rápida');
-        setTimeout(() => {
-            atualizarAvatarUsuario();
-            configurarDropdownAvatar();
-        }, 50);
+        atualizarAvatarUsuario();
+        configurarDropdownAvatar();
     }
     
     if (typeof window.authGuard !== 'undefined') {
@@ -204,13 +209,21 @@ function criarEstruturaAvatarSeNecessario() {
     }
 }
 
+// Marcar avatares como carregados (mostrar na tela) quando não há usuário ou para evitar ficar escondido
+function marcarAvatarComoCarregado() {
+    var a = document.getElementById('userAvatar');
+    var b = document.getElementById('userDropdownAvatar');
+    if (a) a.classList.add('avatar-loaded');
+    if (b) b.classList.add('avatar-loaded');
+}
+
 // Atualizar avatar do usuário no menu superior
 // fotoOverride: opcional - URL da foto para forçar atualização imediata (ex: após upload)
 function atualizarAvatarUsuario(fotoOverride) {
-    const user = obterDadosUsuario();
+    var user = obterDadosUsuario();
 
     if (!user) {
-        console.warn('Usuário não encontrado para atualizar avatar');
+        marcarAvatarComoCarregado();
         return;
     }
 
@@ -231,11 +244,8 @@ function atualizarAvatarUsuario(fotoOverride) {
         if (foto && foto.trim() !== '') {
             var imgAtual = el.querySelector('img');
             if (imgAtual && (imgAtual.src === foto || imgAtual.getAttribute('src') === foto)) {
+                el.classList.add('avatar-loaded');
                 return;
-            }
-            var eraInicial = !imgAtual;
-            if (eraInicial) {
-                el.style.visibility = 'hidden';
             }
             var img = document.createElement('img');
             img.alt = nome;
@@ -248,23 +258,25 @@ function atualizarAvatarUsuario(fotoOverride) {
                 el.innerHTML = '';
                 el.style.background = '';
                 el.style.color = '';
-                el.style.visibility = '';
                 el.appendChild(img);
+                el.classList.add('avatar-loaded');
             };
             img.onerror = function() {
-                el.style.visibility = '';
                 el.innerHTML = inicial;
                 el.style.background = tamanho === 'small' ? '#ffffff' : '#1e3a8a';
                 el.style.color = tamanho === 'small' ? '#1e3a8a' : 'white';
+                el.classList.add('avatar-loaded');
             };
             img.src = foto;
         } else {
             if (!el.querySelector('img') && el.textContent === inicial) {
+                el.classList.add('avatar-loaded');
                 return;
             }
             el.innerHTML = inicial;
             el.style.background = tamanho === 'small' ? '#ffffff' : '#1e3a8a';
             el.style.color = tamanho === 'small' ? '#1e3a8a' : 'white';
+            el.classList.add('avatar-loaded');
         }
     }
     

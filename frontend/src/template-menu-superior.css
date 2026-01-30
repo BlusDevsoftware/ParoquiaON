@@ -178,6 +178,17 @@
     display: inline-block;
 }
 
+/* Esconder avatar até o script marcar como carregado (evita piscar "A" ao recarregar) */
+.user-avatar:not(.avatar-loaded),
+.user-dropdown-avatar:not(.avatar-loaded) {
+    opacity: 0;
+}
+.user-avatar.avatar-loaded,
+.user-dropdown-avatar.avatar-loaded {
+    opacity: 1;
+    transition: opacity 0.12s ease;
+}
+
 .user-avatar {
     width: 44px;
     height: 44px;
