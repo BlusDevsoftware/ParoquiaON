@@ -372,6 +372,39 @@ function configurarDropdownAvatar() {
         }
     }
 
+    // Botão Remover foto (só aparece quando tem pessoa_id; visível só quando tem foto)
+    var removePhotoBtn = document.getElementById('removePhotoBtn');
+    if (!removePhotoBtn && avatarDropdown) {
+        var userForBtn = obterDadosUsuario();
+        if (userForBtn && userForBtn.pessoa_id) {
+            var temFotoAgora = sessionStorage.getItem(USER_PHOTO_CACHE_KEY) || sessionStorage.getItem(USER_PHOTO_DATAURL_KEY) || (userForBtn.foto || (userForBtn.pessoa && userForBtn.pessoa.foto));
+            removePhotoBtn = document.createElement('a');
+            removePhotoBtn.href = '#';
+            removePhotoBtn.className = 'user-dropdown-item';
+            removePhotoBtn.id = 'removePhotoBtn';
+            removePhotoBtn.innerHTML = '<i class="fas fa-trash-alt"></i><span>Remover foto</span>';
+            removePhotoBtn.style.display = temFotoAgora ? '' : 'none';
+            removePhotoBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                removerFotoPerfil();
+            });
+            var addBtnRef = document.getElementById('addPhotoBtn');
+            if (addBtnRef && addBtnRef.nextElementSibling) {
+                addBtnRef.parentNode.insertBefore(removePhotoBtn, addBtnRef.nextElementSibling);
+            } else if (addBtnRef) {
+                addBtnRef.parentNode.appendChild(removePhotoBtn);
+            } else {
+                var div = avatarDropdown.querySelector('.user-dropdown-divider');
+                if (div && div.nextElementSibling) {
+                    div.parentNode.insertBefore(removePhotoBtn, div.nextElementSibling);
+                } else {
+                    avatarDropdown.querySelector('.user-dropdown-menu').appendChild(removePhotoBtn);
+                }
+            }
+        }
+    }
+
     // Logout
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function(e) {
@@ -440,6 +473,34 @@ function comprimirImagemParaAvatar(dataUrl, maxDimension, quality) {
     });
 }
 
+// Remover foto do perfil (API + cache + avatar)
+function removerFotoPerfil() {
+    var user = obterDadosUsuario();
+    if (!user || !user.pessoa_id) return;
+    document.querySelector('.user-avatar-dropdown')?.classList.remove('active');
+    sessionStorage.removeItem(USER_PHOTO_CACHE_KEY);
+    sessionStorage.removeItem(USER_PHOTO_DATAURL_KEY);
+    if (window.authGuard) {
+        try {
+            var userStr = sessionStorage.getItem('user');
+            var parsed = userStr ? JSON.parse(userStr) : {};
+            parsed.foto = null;
+            sessionStorage.setItem('user', JSON.stringify(parsed));
+        } catch (_) {}
+    }
+    var userAtualizado = { ...user, foto: null };
+    atualizarCacheUsuario(userAtualizado);
+    atualizarAvatarUsuario(null);
+    var removeBtn = document.getElementById('removePhotoBtn');
+    if (removeBtn) removeBtn.style.display = 'none';
+    (function() {
+        var u = user;
+        window.api.put(window.endpoints.pessoas.update(u.pessoa_id), { foto: null }).then(function() {}).catch(function(err) {
+            console.warn('Erro ao remover foto no servidor:', err);
+        });
+    })();
+}
+
 // Abrir seletor de arquivo para foto do perfil
 function abrirSeletorFotoPerfil() {
     const user = obterDadosUsuario();
@@ -485,6 +546,8 @@ function abrirSeletorFotoPerfil() {
                 } catch (quotaErr) {
                     if (quotaErr && quotaErr.name === 'QuotaExceededError') sessionStorage.removeItem(USER_PHOTO_DATAURL_KEY);
                 }
+                var rb = document.getElementById('removePhotoBtn');
+                if (rb) rb.style.display = '';
 
                 const { data, error } = await window.api.put(window.endpoints.pessoas.update(user.pessoa_id), { foto: base64 });
                 if (error) throw error;
@@ -515,8 +578,6 @@ function abrirSeletorFotoPerfil() {
                         }
                     }
                 }
-                var toastOk = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
-                toastOk('Foto atualizada com sucesso!', 'success');
             } catch (err) {
                 console.error('Erro ao enviar foto:', err);
                 const toastErr = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
