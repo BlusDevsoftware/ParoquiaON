@@ -220,51 +220,51 @@ function atualizarAvatarUsuario(fotoOverride) {
     const fotoCache = sessionStorage.getItem(USER_PHOTO_CACHE_KEY);
     const fotoDataUrl = sessionStorage.getItem(USER_PHOTO_DATAURL_KEY);
     const foto = fotoOverride || fotoCache || fotoDataUrl || user.foto || user.avatar || user.pessoa?.foto || null;
-    
-    console.log('Atualizando avatar:', { nome, email, temFoto: !!foto });
-    
+
     // Função para atualizar avatar (com foto ou inicial)
+    // Só altera o DOM se a foto for diferente da atual, e só troca conteúdo quando a nova imagem já carregou (evita piscar)
     function atualizarElementoAvatar(el, tamanho) {
         if (!el) {
             console.warn('Elemento de avatar não encontrado');
             return;
         }
         if (foto && foto.trim() !== '') {
-            // Limpar conteúdo anterior
-            el.innerHTML = '';
-            el.style.background = '';
-            el.style.color = '';
-            
-            const img = document.createElement('img');
+            var imgAtual = el.querySelector('img');
+            if (imgAtual && (imgAtual.src === foto || imgAtual.getAttribute('src') === foto)) {
+                return;
+            }
+            var eraInicial = !imgAtual;
+            if (eraInicial) {
+                el.style.visibility = 'hidden';
+            }
+            var img = document.createElement('img');
             img.alt = nome;
             img.style.width = '100%';
             img.style.height = '100%';
             img.style.objectFit = 'cover';
             img.style.borderRadius = '50%';
-            // Adicionar atributos para melhor uso do cache do navegador
-            img.loading = 'eager'; // Carregar imediatamente
-            // Adicionar imagem ao DOM primeiro para permitir carregamento
-            el.appendChild(img);
-            // Definir src após adicionar ao DOM para melhor cache
-            img.src = foto;
-            // Verificar se já está carregada (cache do navegador)
+            img.loading = 'eager';
             img.onload = function() {
-                // Imagem carregada com sucesso (pode ser do cache)
-                console.log('✅ Foto carregada');
+                el.innerHTML = '';
+                el.style.background = '';
+                el.style.color = '';
+                el.style.visibility = '';
+                el.appendChild(img);
             };
             img.onerror = function() {
-                console.warn('Erro ao carregar foto do usuário:', foto);
+                el.style.visibility = '';
                 el.innerHTML = inicial;
                 el.style.background = tamanho === 'small' ? '#ffffff' : '#1e3a8a';
                 el.style.color = tamanho === 'small' ? '#1e3a8a' : 'white';
             };
+            img.src = foto;
         } else {
+            if (!el.querySelector('img') && el.textContent === inicial) {
+                return;
+            }
             el.innerHTML = inicial;
             el.style.background = tamanho === 'small' ? '#ffffff' : '#1e3a8a';
             el.style.color = tamanho === 'small' ? '#1e3a8a' : 'white';
-            // Remover imagens se houver
-            const img = el.querySelector('img');
-            if (img) img.remove();
         }
     }
     
