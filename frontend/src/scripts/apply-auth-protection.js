@@ -386,7 +386,8 @@ function abrirSeletorFotoPerfil() {
         const file = this.files && this.files[0];
         if (!file) return;
         if (file.size > 5 * 1024 * 1024) { // 5MB
-            (typeof mostrarToast === 'function' ? mostrarToast : showToast || alert)('A imagem deve ter no máximo 5MB.', 'error');
+            const toast = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
+            toast('A imagem deve ter no máximo 5MB.', 'error');
             return;
         }
         const reader = new FileReader();
@@ -409,11 +410,13 @@ function abrirSeletorFotoPerfil() {
                 atualizarCacheUsuario(userAtualizado);
                 sessionStorage.setItem(USER_PHOTO_CACHE_KEY, fotoUrl);
                 atualizarAvatarUsuario();
-                (typeof mostrarToast === 'function' ? mostrarToast : showToast || function(m) { alert(m); })('Foto atualizada com sucesso!', 'success');
+                const toastOk = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
+                toastOk('Foto atualizada com sucesso!', 'success');
                 document.querySelector('.user-avatar-dropdown')?.classList.remove('active');
             } catch (err) {
                 console.error('Erro ao enviar foto:', err);
-                (typeof mostrarToast === 'function' ? mostrarToast : showToast || alert)('Erro ao atualizar foto. Tente novamente.', 'error');
+                const toastErr = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
+                toastErr('Erro ao atualizar foto. Tente novamente.', 'error');
             }
         };
         reader.readAsDataURL(file);
