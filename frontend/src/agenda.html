@@ -3830,12 +3830,45 @@
             flex: 1;
         }
 
+        .modal-view-title-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
         .modal-view-title {
             font-size: 28px;
             font-weight: 700;
             color: white;
-            margin: 0 0 4px 0;
+            margin: 0;
             line-height: 1.2;
+        }
+
+        /* Badge Evento Paroquial - destaque moderno no header do modal */
+        .modal-view-badge-paroquial {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: #1e293b;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%);
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+            animation: modal-view-badge-paroquial-pulse 2.5s ease-in-out infinite;
+        }
+        .modal-view-badge-paroquial i {
+            font-size: 14px;
+            color: #b45309;
+        }
+        @keyframes modal-view-badge-paroquial-pulse {
+            0%, 100% { box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.3); }
+            50% { box-shadow: 0 4px 14px rgba(245, 158, 11, 0.55), 0 0 0 2px rgba(255, 255, 255, 0.4); }
         }
 
         .modal-view-subtitle {
@@ -4084,6 +4117,14 @@
 
             .modal-view-title {
                 font-size: 22px;
+            }
+
+            .modal-view-badge-paroquial {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+            .modal-view-badge-paroquial i {
+                font-size: 12px;
             }
 
             .modal-view-body {
@@ -8015,6 +8056,13 @@
                     // Preencher título
                     const titleElement = document.getElementById('editEventTitle');
                     if (titleElement) titleElement.textContent = cleanTitle;
+
+                    // Mostrar ou esconder badge "Evento Paroquial"
+                    const paroquialBadge = document.getElementById('editEventParoquialBadge');
+                    if (paroquialBadge) {
+                        const isParoquial = !!(event.evento_paroquial || event.eventoParoquial);
+                        paroquialBadge.style.display = isParoquial ? 'inline-flex' : 'none';
+                    }
 
                     // Formatar data de criação do agendamento (ajusta -3h do horário do banco)
                     let createdAtFormatted = 'Não informado';
