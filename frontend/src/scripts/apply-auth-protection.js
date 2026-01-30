@@ -406,9 +406,13 @@ function abrirSeletorFotoPerfil() {
         reader.onload = async function() {
             const base64 = reader.result;
             try {
+                // Atualiza avatar IMEDIATAMENTE com base64 (exibição instantânea, sem rede)
+                atualizarAvatarUsuario(base64);
+                document.querySelector('.user-avatar-dropdown')?.classList.remove('active');
+
                 const { data, error } = await window.api.put(window.endpoints.pessoas.update(user.pessoa_id), { foto: base64 });
                 if (error) throw error;
-                // Usar apenas URL da API - nunca base64 no sessionStorage (excede quota)
+                // URL da API para cache (nunca base64 no sessionStorage - excede quota)
                 const fotoUrl = (data && data.foto && ehUrlFoto(data.foto)) ? data.foto : null;
                 const userAtual = window.authGuard ? window.authGuard.getCurrentUser() : user;
                 const userAtualizado = { ...userAtual, foto: fotoUrl };
@@ -423,11 +427,8 @@ function abrirSeletorFotoPerfil() {
                 atualizarCacheUsuario(userAtualizado);
                 if (fotoUrl) sessionStorage.setItem(USER_PHOTO_CACHE_KEY, fotoUrl);
                 else sessionStorage.removeItem(USER_PHOTO_CACHE_KEY);
-                const fotoComBust = fotoUrl ? (fotoUrl + (fotoUrl.includes('?') ? '&' : '?') + 't=' + Date.now()) : null;
-                atualizarAvatarUsuario(fotoComBust);
                 const toastOk = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
                 toastOk('Foto atualizada com sucesso!', 'success');
-                document.querySelector('.user-avatar-dropdown')?.classList.remove('active');
             } catch (err) {
                 console.error('Erro ao enviar foto:', err);
                 const toastErr = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
