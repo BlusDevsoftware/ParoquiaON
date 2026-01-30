@@ -478,16 +478,24 @@ function abrirSeletorFotoPerfil() {
                 atualizarAvatarUsuario(base64);
                 document.querySelector('.user-avatar-dropdown')?.classList.remove('active');
 
+                // Persistir nova foto no cache AGORA para ao trocar de aba já aparecer a foto nova (não esperar a API)
+                sessionStorage.removeItem(USER_PHOTO_CACHE_KEY);
+                try {
+                    sessionStorage.setItem(USER_PHOTO_DATAURL_KEY, base64);
+                } catch (quotaErr) {
+                    if (quotaErr && quotaErr.name === 'QuotaExceededError') sessionStorage.removeItem(USER_PHOTO_DATAURL_KEY);
+                }
+
                 const { data, error } = await window.api.put(window.endpoints.pessoas.update(user.pessoa_id), { foto: base64 });
                 if (error) throw error;
                 const fotoUrl = (data && data.foto && ehUrlFoto(data.foto)) ? data.foto : null;
                 const fotoBase64 = (data && data.foto && ehDataUrlFoto(data.foto)) ? data.foto : null;
-                const userAtual = window.authGuard ? window.authGuard.getCurrentUser() : user;
-                const userAtualizado = { ...userAtual, foto: fotoUrl || userAtual.foto };
+                var userAtual = window.authGuard ? window.authGuard.getCurrentUser() : user;
+                var userAtualizado = { ...userAtual, foto: fotoUrl || userAtual.foto };
                 if (window.authGuard) {
                     try {
-                        const userStr = sessionStorage.getItem('user');
-                        const parsed = userStr ? JSON.parse(userStr) : {};
+                        var userStr = sessionStorage.getItem('user');
+                        var parsed = userStr ? JSON.parse(userStr) : {};
                         if (fotoUrl) parsed.foto = fotoUrl;
                         sessionStorage.setItem('user', JSON.stringify(parsed));
                     } catch (_) {}
@@ -498,17 +506,16 @@ function abrirSeletorFotoPerfil() {
                     sessionStorage.removeItem(USER_PHOTO_DATAURL_KEY);
                 } else {
                     sessionStorage.removeItem(USER_PHOTO_CACHE_KEY);
-                    // Persistir data URL para a foto aparecer ao trocar de aba/recarregar
-                    const fotoParaPersistir = fotoBase64 || base64;
+                    var fotoParaPersistir = fotoBase64 || base64;
                     if (fotoParaPersistir) {
                         try {
                             sessionStorage.setItem(USER_PHOTO_DATAURL_KEY, fotoParaPersistir);
-                        } catch (quotaErr) {
-                            if (quotaErr && quotaErr.name === 'QuotaExceededError') sessionStorage.removeItem(USER_PHOTO_DATAURL_KEY);
+                        } catch (quotaErr2) {
+                            if (quotaErr2 && quotaErr2.name === 'QuotaExceededError') sessionStorage.removeItem(USER_PHOTO_DATAURL_KEY);
                         }
                     }
                 }
-                const toastOk = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
+                var toastOk = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
                 toastOk('Foto atualizada com sucesso!', 'success');
             } catch (err) {
                 console.error('Erro ao enviar foto:', err);
