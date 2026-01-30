@@ -198,21 +198,20 @@ function criarEstruturaAvatarSeNecessario() {
 }
 
 // Atualizar avatar do usuário no menu superior
-function atualizarAvatarUsuario() {
-    // Usar função que busca do cache primeiro
+// fotoOverride: opcional - URL da foto para forçar atualização imediata (ex: após upload)
+function atualizarAvatarUsuario(fotoOverride) {
     const user = obterDadosUsuario();
-    
+
     if (!user) {
         console.warn('Usuário não encontrado para atualizar avatar');
         return;
     }
-    
+
     const nome = user.nome || user.email || 'U';
     const inicial = nome.charAt(0).toUpperCase();
     const email = user.email || '';
-    // Tentar foto do cache primeiro, depois do usuário
     const fotoCache = sessionStorage.getItem(USER_PHOTO_CACHE_KEY);
-    const foto = fotoCache || user.foto || user.avatar || user.pessoa?.foto || null;
+    const foto = fotoOverride || fotoCache || user.foto || user.avatar || user.pessoa?.foto || null;
     
     console.log('Atualizando avatar:', { nome, email, temFoto: !!foto });
     
@@ -424,7 +423,8 @@ function abrirSeletorFotoPerfil() {
                 atualizarCacheUsuario(userAtualizado);
                 if (fotoUrl) sessionStorage.setItem(USER_PHOTO_CACHE_KEY, fotoUrl);
                 else sessionStorage.removeItem(USER_PHOTO_CACHE_KEY);
-                atualizarAvatarUsuario();
+                const fotoComBust = fotoUrl ? (fotoUrl + (fotoUrl.includes('?') ? '&' : '?') + 't=' + Date.now()) : null;
+                atualizarAvatarUsuario(fotoComBust);
                 const toastOk = typeof mostrarToast === 'function' ? mostrarToast : (typeof showToast === 'function' ? showToast : function(m) { alert(m); });
                 toastOk('Foto atualizada com sucesso!', 'success');
                 document.querySelector('.user-avatar-dropdown')?.classList.remove('active');
