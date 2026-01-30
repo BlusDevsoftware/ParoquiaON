@@ -316,6 +316,30 @@ function configurarDropdownAvatar() {
     };
     document.addEventListener('click', documentClickHandler);
     
+    // Botão Adicionar/alterar foto ao perfil
+    let addPhotoBtn = document.getElementById('addPhotoBtn');
+    if (!addPhotoBtn && avatarDropdown) {
+        addPhotoBtn = document.createElement('a');
+        addPhotoBtn.href = '#';
+        addPhotoBtn.className = 'user-dropdown-item';
+        addPhotoBtn.id = 'addPhotoBtn';
+        addPhotoBtn.innerHTML = '<i class="fas fa-camera"></i><span>Adicionar foto ao perfil</span>';
+        addPhotoBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            abrirSeletorFotoPerfil();
+        });
+        // Inserir antes do logout
+        const divider = avatarDropdown.querySelector('.user-dropdown-divider');
+        if (divider && divider.nextElementSibling) {
+            divider.parentNode.insertBefore(addPhotoBtn, divider.nextElementSibling);
+        } else if (logoutBtn) {
+            logoutBtn.parentNode.insertBefore(addPhotoBtn, logoutBtn);
+        } else {
+            avatarDropdown.querySelector('.user-dropdown-menu').appendChild(addPhotoBtn);
+        }
+    }
+
     // Logout
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function(e) {
@@ -337,6 +361,66 @@ function configurarDropdownAvatar() {
     }
     
     console.log('✅ Dropdown do avatar configurado');
+}
+
+// Abrir seletor de arquivo para foto do perfil
+function abrirSeletorFotoPerfil() {
+    const user = obterDadosUsuario();
+    if (!user || !user.pessoa_id) {
+        const msg = 'Para adicionar foto, é necessário estar vinculado a um cadastro de pessoa. Acesse Usuários para vincular seu usuário a uma pessoa.';
+        if (typeof mostrarToast === 'function') {
+            mostrarToast(msg, 'error');
+        } else if (typeof showToast === 'function') {
+            showToast(msg, 'error');
+        } else {
+            alert(msg);
+        }
+        return;
+    }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/png,image/jpeg,image/jpg,image/webp';
+    input.style.display = 'none';
+    input.addEventListener('change', async function() {
+        const file = this.files && this.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { // 5MB
+            (typeof mostrarToast === 'function' ? mostrarToast : showToast || alert)('A imagem deve ter no máximo 5MB.', 'error');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = async function() {
+            const base64 = reader.result;
+            try {
+                const { data, error } = await window.api.put(window.endpoints.pessoas.update(user.pessoa_id), { foto: base64 });
+                if (error) throw error;
+                const fotoUrl = (data && data.foto) || base64;
+                const userAtual = window.authGuard ? window.authGuard.getCurrentUser() : user;
+                const userAtualizado = { ...userAtual, foto: fotoUrl };
+                if (window.authGuard) {
+                    try {
+                        const userStr = sessionStorage.getItem('user');
+                        const parsed = userStr ? JSON.parse(userStr) : {};
+                        parsed.foto = fotoUrl;
+                        sessionStorage.setItem('user', JSON.stringify(parsed));
+                    } catch (_) {}
+                }
+                atualizarCacheUsuario(userAtualizado);
+                sessionStorage.setItem(USER_PHOTO_CACHE_KEY, fotoUrl);
+                atualizarAvatarUsuario();
+                (typeof mostrarToast === 'function' ? mostrarToast : showToast || function(m) { alert(m); })('Foto atualizada com sucesso!', 'success');
+                document.querySelector('.user-avatar-dropdown')?.classList.remove('active');
+            } catch (err) {
+                console.error('Erro ao enviar foto:', err);
+                (typeof mostrarToast === 'function' ? mostrarToast : showToast || alert)('Erro ao atualizar foto. Tente novamente.', 'error');
+            }
+        };
+        reader.readAsDataURL(file);
+        document.body.removeChild(input);
+    });
+    document.body.appendChild(input);
+    input.click();
 }
 
 function aplicarPermissoesNoMenu() {

@@ -123,12 +123,19 @@ async function atualizarPessoa(req, res) {
             ? (String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo')
             : undefined;
 
+        // Se houver foto base64, faz upload para o Storage e troca por URL
+        let fotoParaSalvar = body.foto;
+        if (body.foto !== undefined && isBase64DataUrl(body.foto)) {
+            const dadosComUrl = await uploadFotoIfNeeded({ foto: body.foto }, id);
+            fotoParaSalvar = dadosComUrl.foto;
+        }
+
         const updateData = {
             ...(body.nome !== undefined ? { nome: body.nome } : {}),
             ...(body.telefone !== undefined ? { telefone: body.telefone } : {}),
             ...(body.endereco !== undefined ? { endereco: body.endereco } : {}),
             ...(normalizedStatus !== undefined ? { status: normalizedStatus } : {}),
-            ...(body.foto !== undefined ? { foto: body.foto } : {}),
+            ...(fotoParaSalvar !== undefined ? { foto: fotoParaSalvar } : {}),
             ...(body.usuario_id !== undefined ? { usuario_id: body.usuario_id } : {}),
             ...(body.criado_por_email !== undefined ? { criado_por_email: body.criado_por_email } : {}),
             ...(body.criado_por_nome !== undefined ? { criado_por_nome: body.criado_por_nome } : {})
