@@ -5987,9 +5987,15 @@
             if (currentView === 'dia') {
                 currentDate = new Date(year, month, day + direction);
             } else if (currentView === 'mês') {
-                currentDate = new Date(year, month + direction, day);
+                var nextMonth = month + direction;
+                var lastDayOfNextMonth = new Date(year, nextMonth + 1, 0).getDate();
+                var safeDay = Math.min(day, lastDayOfNextMonth);
+                currentDate = new Date(year, nextMonth, safeDay);
             } else if (currentView === 'ano') {
-                currentDate = new Date(year + direction, month, day);
+                var nextYear = year + direction;
+                var lastDayOfMonth = new Date(nextYear, month + 1, 0).getDate();
+                var safeDayYear = Math.min(day, lastDayOfMonth);
+                currentDate = new Date(nextYear, month, safeDayYear);
             } else {
                 currentDate = new Date(year, month, day + (direction * 7));
             }
