@@ -696,10 +696,7 @@
                     <h3>Total de Comunidades</h3>
                     <i class="fas fa-users"></i>
                 </div>
-                <div class="card-value-with-avatars">
-                    <span class="card-value" id="total-comunidades">-</span>
-                    <div class="card-avatars" id="comunidades-avatars"></div>
-                </div>
+                <div class="card-value" id="total-comunidades">-</div>
                 <div class="card-change" id="crescimento-comunidades">Carregando...</div>
             </div>
             <div class="card" draggable="true">
@@ -715,10 +712,7 @@
                     <h3>Pessoas Cadastradas</h3>
                     <i class="fas fa-user"></i>
                 </div>
-                <div class="card-value-with-avatars">
-                    <span class="card-value" id="pessoas-cadastradas">-</span>
-                    <div class="card-avatars" id="pessoas-avatars"></div>
-                </div>
+                <div class="card-value" id="pessoas-cadastradas">-</div>
                 <div class="card-change" id="crescimento-pessoas">Carregando...</div>
             </div>
             <div class="card" draggable="true">
@@ -917,11 +911,6 @@
                 document.getElementById('eventos-mes').textContent = dados.eventos.total;
                 document.getElementById('qtd-eventos').textContent = dados.eventos.detalhes;
 
-                // Atualizar avatares de comunidades ao lado do total
-                atualizarAvataresComunidades(dados.comunidadesLista || []);
-                // Atualizar avatares de pessoas ao lado do total de pessoas
-                atualizarAvataresPessoas(dados.pessoasLista || []);
-
                 // Aplicar classes de cor baseadas no crescimento
                 aplicarClassesCrescimento();
                 
@@ -999,172 +988,6 @@
                     pessoas: { total: 0, crescimento: 'Erro ao carregar' },
                     eventos: { total: 0, detalhes: 'Erro ao carregar' }
                 };
-            }
-        }
-
-        // Função para atualizar os avatares de comunidades no card "Total de Comunidades"
-        function atualizarAvataresComunidades(comunidades) {
-            try {
-                const container = document.getElementById('comunidades-avatars');
-                if (!container) return;
-
-                container.innerHTML = '';
-
-                if (!Array.isArray(comunidades) || comunidades.length === 0) {
-                    return;
-                }
-
-                // Ordenar por nome para uma visualização consistente
-                const listaOrdenada = [...comunidades].sort((a, b) => {
-                    const nomeA = (a.nome || '').toString().toLowerCase();
-                    const nomeB = (b.nome || '').toString().toLowerCase();
-                    return nomeA.localeCompare(nomeB);
-                });
-
-                // Selecionar até 5 comunidades para mostrar inicialmente
-                const maxAvatares = 5;
-                const selecionadas = listaOrdenada.slice(0, maxAvatares);
-
-                selecionadas.forEach(comunidade => {
-                    const avatar = document.createElement('div');
-                    avatar.className = 'community-avatar';
-
-                    const foto = comunidade.foto || null;
-                    if (foto) {
-                        // Foto real da comunidade
-                        const img = document.createElement('img');
-                        img.src = foto;
-                        img.alt = comunidade.nome || 'Comunidade';
-                        avatar.appendChild(img);
-                    } else {
-                        // Fallback: bolinha com a primeira letra e cor da comunidade (se tiver)
-                        const letra = (comunidade.nome || 'C').charAt(0).toUpperCase();
-                        avatar.style.backgroundColor = comunidade.cor || '#1e3a8a';
-                        avatar.style.color = '#ffffff';
-                        avatar.style.display = 'flex';
-                        avatar.style.alignItems = 'center';
-                        avatar.style.justifyContent = 'center';
-                        avatar.style.fontWeight = '700';
-                        avatar.style.fontSize = '12px';
-                        avatar.textContent = letra;
-                    }
-
-                    container.appendChild(avatar);
-                });
-
-                // Se houver mais que 5 comunidades, rotacionar automaticamente os avatares
-                if (listaOrdenada.length > maxAvatares) {
-                    let offset = 0;
-                    setInterval(() => {
-                        const proximoSlice = [];
-                        for (let i = 0; i < maxAvatares; i++) {
-                            const idx = (offset + i) % listaOrdenada.length;
-                            proximoSlice.push(listaOrdenada[idx]);
-                        }
-                        container.innerHTML = '';
-                        proximoSlice.forEach(comunidade => {
-                            const avatar = document.createElement('div');
-                            avatar.className = 'community-avatar';
-
-                            const foto = comunidade.foto || null;
-                            if (foto) {
-                                const img = document.createElement('img');
-                                img.src = foto;
-                                img.alt = comunidade.nome || 'Comunidade';
-                                avatar.appendChild(img);
-                            } else {
-                                const letra = (comunidade.nome || 'C').charAt(0).toUpperCase();
-                                avatar.style.backgroundColor = comunidade.cor || '#1e3a8a';
-                                avatar.style.color = '#ffffff';
-                                avatar.style.display = 'flex';
-                                avatar.style.alignItems = 'center';
-                                avatar.style.justifyContent = 'center';
-                                avatar.style.fontWeight = '700';
-                                avatar.style.fontSize = '12px';
-                                avatar.textContent = letra;
-                            }
-
-                            container.appendChild(avatar);
-                        });
-
-                        offset = (offset + 1) % listaOrdenada.length;
-                    }, 4000);
-                }
-            } catch (error) {
-                console.error('Erro ao atualizar avatares de comunidades:', error);
-            }
-        }
-
-        // Função para atualizar os avatares de pessoas no card "Pessoas Cadastradas"
-        function atualizarAvataresPessoas(pessoas) {
-            try {
-                const container = document.getElementById('pessoas-avatars');
-                if (!container) return;
-
-                container.innerHTML = '';
-
-                if (!Array.isArray(pessoas) || pessoas.length === 0) {
-                    return;
-                }
-
-                // Ordenar por nome para uma visualização consistente
-                const listaOrdenada = [...pessoas].sort((a, b) => {
-                    const nomeA = (a.nome || '').toString().toLowerCase();
-                    const nomeB = (b.nome || '').toString().toLowerCase();
-                    return nomeA.localeCompare(nomeB);
-                });
-
-                const maxAvatares = 5;
-                const selecionadas = listaOrdenada.slice(0, maxAvatares);
-
-                const criarAvatarPessoa = (pessoa) => {
-                    const avatar = document.createElement('div');
-                    avatar.className = 'community-avatar';
-
-                    const foto = pessoa.foto || null;
-                    if (foto) {
-                        const img = document.createElement('img');
-                        img.src = foto;
-                        img.alt = pessoa.nome || 'Pessoa';
-                        avatar.appendChild(img);
-                    } else {
-                        const letra = (pessoa.nome || 'P').charAt(0).toUpperCase();
-                        avatar.style.backgroundColor = '#1e3a8a';
-                        avatar.style.color = '#ffffff';
-                        avatar.style.display = 'flex';
-                        avatar.style.alignItems = 'center';
-                        avatar.style.justifyContent = 'center';
-                        avatar.style.fontWeight = '700';
-                        avatar.style.fontSize = '12px';
-                        avatar.textContent = letra;
-                    }
-
-                    return avatar;
-                };
-
-                selecionadas.forEach(pessoa => {
-                    container.appendChild(criarAvatarPessoa(pessoa));
-                });
-
-                if (listaOrdenada.length > maxAvatares) {
-                    let offset = 0;
-                    setInterval(() => {
-                        const proximoSlice = [];
-                        for (let i = 0; i < maxAvatares; i++) {
-                            const idx = (offset + i) % listaOrdenada.length;
-                            proximoSlice.push(listaOrdenada[idx]);
-                        }
-
-                        container.innerHTML = '';
-                        proximoSlice.forEach(pessoa => {
-                            container.appendChild(criarAvatarPessoa(pessoa));
-                        });
-
-                        offset = (offset + 1) % listaOrdenada.length;
-                    }, 4000);
-                }
-            } catch (error) {
-                console.error('Erro ao atualizar avatares de pessoas:', error);
             }
         }
 
