@@ -43,7 +43,8 @@ async function uploadFotoIfNeeded(dados, identificador) {
 async function listarPessoas(req, res) {
     try {
         const leve = req.query.leve === '1' || req.query.leve === 'true';
-        const campos = leve ? 'id, nome, comunidade_id' : '*';
+        // Modo leve: só id e nome (evita foto e evita erro se comunidade_id não existir na tabela)
+        const campos = leve ? 'id, nome' : '*';
         const { data, error } = await supabase.from('pessoas').select(campos).order('id', { ascending: true });
         if (error) throw error;
         res.json(data);
