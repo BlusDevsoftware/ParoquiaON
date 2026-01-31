@@ -872,10 +872,12 @@
                     destruirGraficos();
                 }
                 
-                await Promise.all([
-                    carregarDadosCards(),
-                    inicializarGraficos()
-                ]);
+                // Buscar dados uma única vez e reutilizar para cards e gráficos
+                const raw = await buscarDadosUnificados();
+                const dadosCards = montarDadosParaCards(raw);
+                const dadosGraficos = montarDadosParaGraficos(raw);
+                carregarDadosCards(dadosCards);
+                await inicializarGraficos(dadosGraficos);
                 
                 // Ocultar spinner centralizado quando tudo carregar
                 ocultarSpinner();
@@ -892,11 +894,10 @@
         inicializarMinhaComunidade();
         });
 
-        // Função para carregar dados dos cards da Minha Comunidade
-        async function carregarDadosCards() {
+        // Função para carregar dados dos cards da Minha Comunidade (recebe dados já buscados)
+        function carregarDadosCards(dados) {
             try {
-                // Buscar dados reais das APIs do ParoquiaON
-                const dados = await buscarDadosReais();
+                if (!dados) return;
                 
                 // Atualizar cards
                 document.getElementById('total-comunidades').textContent = dados.comunidades.total;
@@ -920,75 +921,36 @@
             }
         }
 
-        // Função para buscar dados reais das APIs do ParoquiaON
-        async function buscarDadosReais() {
-            try {
-                // Buscar dados das APIs individuais (que já funcionam nas outras abas)
-                const [comunidadesRes, pastoraisRes, pessoasRes, agendaRes] = await Promise.all([
-                    window.api.get('/comunidades'),
-                    window.api.get('/pastorais'),
-                    window.api.get('/pessoas'),
-                    window.api.get('/agenda')
-                ]);
-
-                // Extrair dados dos arrays (a API pode retornar {data: [...]} ou array direto)
-                const comunidades = Array.isArray(comunidadesRes) ? comunidadesRes : (comunidadesRes.data || []);
-                const pastorais = Array.isArray(pastoraisRes) ? pastoraisRes : (pastoraisRes.data || []);
-                const pessoas = Array.isArray(pessoasRes) ? pessoasRes : (pessoasRes.data || []);
-                const agenda = Array.isArray(agendaRes) ? agendaRes : (agendaRes.data || []);
-
-                console.log('Dados recebidos:', { comunidades, pastorais, pessoas, agenda });
-
-                // Calcular dados das comunidades
-                const totalComunidades = comunidades.length;
-                const comunidadesAtivas = comunidades.filter(c => c.status === 'Ativo').length;
-                const crescimentoComunidades = '+12% este mês'; // Pode ser calculado baseado em dados históricos
-
-                // Calcular dados das pastorais
-                const pastoraisAtivas = pastorais.filter(p => p.ativo === true).length;
-                const totalPastorais = pastorais.length;
-                const crescimentoPastorais = '+8% este mês';
-
-                // Calcular dados das pessoas
-                const pessoasAtivas = pessoas.filter(p => p.ativo === true).length;
-                const totalPessoas = pessoas.length;
-                const crescimentoPessoas = '+15% este mês';
-
-                // Calcular eventos ativos
-                const eventosAtivos = agenda.filter(e => e.status === 'Ativo').length;
-                const totalEventos = agenda.length;
-
-                return {
-                    comunidades: {
-                        total: totalComunidades,
-                        crescimento: crescimentoComunidades
-                    },
-                    pastorais: {
-                        total: totalPastorais,
-                        crescimento: crescimentoPastorais
-                    },
-                    pessoas: {
-                        total: totalPessoas,
-                        crescimento: crescimentoPessoas
-                    },
-                    eventos: {
-                        total: totalEventos,
-                        detalhes: `${eventosAtivos} eventos ativos`
-                    },
-                    comunidadesLista: comunidades,
-                    pessoasLista: pessoas
-                };
-
-            } catch (error) {
-                console.error('Erro ao buscar dados reais:', error);
-                // Retornar dados padrão em caso de erro
-                return {
-                    comunidades: { total: 0, crescimento: 'Erro ao carregar' },
-                    pastorais: { total: 0, crescimento: 'Erro ao carregar' },
-                    pessoas: { total: 0, crescimento: 'Erro ao carregar' },
-                    eventos: { total: 0, detalhes: 'Erro ao carregar' }
-                };
+        // Busca única às 4 APIs (reutilizada para cards e gráficos)
+        async function buscarDadosUnificados() {
+            const [comunidadesRes, pastoraisRes, pessoasRes, agendaRes] = await Promise.all([
+                window.api.get('/comunidades'),
+                window.api.get('/pastorais'),
+                window.api.get('/pessoas'),
+                window.api.get('/agenda')
+            ]);
+            if (comunidadesRes?.error || pastoraisRes?.error || pessoasRes?.error || agendaRes?.error) {
+                throw new Error(comunidadesRes?.error?.message || pastoraisRes?.error?.message || pessoasRes?.error?.message || agendaRes?.error?.message || 'Erro ao carregar dados');
             }
+            const comunidades = Array.isArray(comunidadesRes) ? comunidadesRes : (comunidadesRes?.data || []);
+            const pastorais = Array.isArray(pastoraisRes) ? pastoraisRes : (pastoraisRes?.data || []);
+            const pessoas = Array.isArray(pessoasRes) ? pessoasRes : (pessoasRes?.data || []);
+            const agenda = Array.isArray(agendaRes) ? agendaRes : (agendaRes?.data || []);
+            return { comunidades, pastorais, pessoas, agenda };
+        }
+
+        // Monta o objeto usado pelos cards a partir dos dados brutos
+        function montarDadosParaCards(raw) {
+            if (!raw) return { comunidades: { total: 0, crescimento: 'Erro ao carregar' }, pastorais: { total: 0, crescimento: 'Erro ao carregar' }, pessoas: { total: 0, crescimento: 'Erro ao carregar' }, eventos: { total: 0, detalhes: 'Erro ao carregar' } };
+            const { comunidades, pastorais, pessoas, agenda } = raw;
+            const eventosAtivos = (agenda || []).filter(e => e.status === 'Ativo').length;
+            const totalEventos = (agenda || []).length;
+            return {
+                comunidades: { total: (comunidades || []).length, crescimento: '+12% este mês' },
+                pastorais: { total: (pastorais || []).length, crescimento: '+8% este mês' },
+                pessoas: { total: (pessoas || []).length, crescimento: '+15% este mês' },
+                eventos: { total: totalEventos, detalhes: `${eventosAtivos} eventos ativos` }
+            };
         }
 
         // Função para calcular crescimento percentual
@@ -1041,11 +1003,10 @@
         }
 
 
-        // Função para inicializar gráficos da Minha Comunidade
-        async function inicializarGraficos() {
+        // Função para inicializar gráficos da Minha Comunidade (aceita dados pré-calculados para evitar nova requisição)
+        async function inicializarGraficos(dadosPreCalculados) {
             try {
-                // Buscar dados reais para os gráficos
-                const dadosGraficos = await buscarDadosGraficos();
+                const dadosGraficos = dadosPreCalculados != null ? dadosPreCalculados : await buscarDadosGraficos();
                 
                 // Validar dados antes de criar gráficos
                 if (!dadosGraficos) {
@@ -1216,48 +1177,27 @@
             }
         }
 
-        // Função para buscar dados dos gráficos do ParoquiaON
+        // Monta o objeto usado pelos gráficos a partir dos dados brutos (evita segunda rodada de APIs)
+        function montarDadosParaGraficos(raw) {
+            if (!raw) return { eventosPorComunidade: { labels: [], dados: [], cores: [] }, pastorais: { labels: ['Ativa', 'Inativa'], dados: [0, 0] }, eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] }, comunidades: { labels: ['Sem dados'], dados: [0] } };
+            const { comunidades, pastorais, pessoas, agenda } = raw;
+            return {
+                eventosPorComunidade: calcularEventosPorComunidade(agenda || [], comunidades || []),
+                pastorais: calcularDistribuicaoPastorais(pastorais || []),
+                eventos: calcularEventosPorMes(agenda || []),
+                comunidades: calcularTopComunidades(comunidades || [], pessoas || [])
+            };
+        }
+
+        // Fallback: busca dados só para gráficos (usado se inicializarGraficos for chamado sem dados)
         async function buscarDadosGraficos() {
             try {
-                // Buscar dados das APIs individuais (que já funcionam nas outras abas)
-                const [pessoasRes, pastoraisRes, agendaRes, comunidadesRes] = await Promise.all([
-                    window.api.get('/pessoas'),
-                    window.api.get('/pastorais'),
-                    window.api.get('/agenda'),
-                    window.api.get('/comunidades')
-                ]);
-
-                // Extrair dados dos arrays (a API pode retornar {data: [...]} ou array direto)
-                const pessoas = Array.isArray(pessoasRes) ? pessoasRes : (pessoasRes.data || []);
-                const pastorais = Array.isArray(pastoraisRes) ? pastoraisRes : (pastoraisRes.data || []);
-                const agenda = Array.isArray(agendaRes) ? agendaRes : (agendaRes.data || []);
-                const comunidades = Array.isArray(comunidadesRes) ? comunidadesRes : (comunidadesRes.data || []);
-
-                console.log('Dados dos gráficos recebidos:', { pessoas, pastorais, agenda, comunidades });
-
-                // Calcular eventos por comunidade
-                const eventosPorComunidade = calcularEventosPorComunidade(agenda, comunidades);
-
-                // Calcular distribuição por pastorais
-                const distribuicaoPastorais = calcularDistribuicaoPastorais(pastorais);
-
-                // Calcular eventos por mês (últimos 6 meses)
-                const eventosPorMes = calcularEventosPorMes(agenda);
-
-                // Calcular top comunidades por número de pessoas
-                const topComunidades = calcularTopComunidades(comunidades, pessoas);
-
-                return { 
-                    eventosPorComunidade,
-                    pastorais: distribuicaoPastorais,
-                    eventos: eventosPorMes,
-                    comunidades: topComunidades
-                };
-
+                const raw = await buscarDadosUnificados();
+                return montarDadosParaGraficos(raw);
             } catch (error) {
                 console.error('Erro ao buscar dados dos gráficos:', error);
                 return {
-                    pessoas: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] },
+                    eventosPorComunidade: { labels: ['Sem dados'], dados: [0], cores: ['#42a5f5'] },
                     pastorais: { labels: ['Ativa', 'Inativa'], dados: [0, 0] },
                     eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] },
                     comunidades: { labels: ['Sem dados'], dados: [0] }
