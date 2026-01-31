@@ -42,7 +42,9 @@ async function uploadFotoIfNeeded(dados, identificador) {
 
 async function listarPessoas(req, res) {
     try {
-        const { data, error } = await supabase.from('pessoas').select('*').order('id', { ascending: true });
+        const leve = req.query.leve === '1' || req.query.leve === 'true';
+        const campos = leve ? 'id, nome, comunidade_id' : '*';
+        const { data, error } = await supabase.from('pessoas').select(campos).order('id', { ascending: true });
         if (error) throw error;
         res.json(data);
     } catch (error) {

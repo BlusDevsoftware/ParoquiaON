@@ -921,12 +921,12 @@
             }
         }
 
-        // Busca única às 4 APIs (reutilizada para cards e gráficos)
+        // Busca única às 4 APIs (reutilizada para cards e gráficos). ?leve=1 evita enviar fotos no payload.
         async function buscarDadosUnificados() {
             const [comunidadesRes, pastoraisRes, pessoasRes, agendaRes] = await Promise.all([
-                window.api.get('/comunidades'),
+                window.api.get('/comunidades?leve=1'),
                 window.api.get('/pastorais'),
-                window.api.get('/pessoas'),
+                window.api.get('/pessoas?leve=1'),
                 window.api.get('/agenda')
             ]);
             if (comunidadesRes?.error || pastoraisRes?.error || pessoasRes?.error || agendaRes?.error) {

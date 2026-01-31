@@ -44,7 +44,9 @@ async function uploadFotoIfNeeded(dados, identificador) {
 
 async function listarComunidades(req, res) {
     try {
-        const { data, error } = await supabase.from('comunidades').select('*').order('id', { ascending: true });
+        const leve = req.query.leve === '1' || req.query.leve === 'true';
+        const campos = leve ? 'id, nome, cor, status' : '*';
+        const { data, error } = await supabase.from('comunidades').select(campos).order('id', { ascending: true });
         if (error) throw error;
         res.json(data);
     } catch (error) {
