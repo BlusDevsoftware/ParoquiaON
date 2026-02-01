@@ -3,15 +3,36 @@ const { supabase } = require('../config/supabase');
 async function listarPastorais(req, res) {
     try {
         const leve = req.query.leve === '1' || req.query.leve === 'true';
-        // Incluir tanto 'status' quanto 'ativo' para compatibilidade com frontend
-        const campos = leve ? 'id, nome, status, ativo' : '*';
         
-        const { data, error } = await supabase.from('pastorais').select(campos).order('id', { ascending: true });
+        if (leve) {
+            // Modo leve: buscar apenas campos essenciais
+            // Primeiro tenta com status e ativo, se falhar, busca apenas id e nome
+            let campos = 'id, nome, status, ativo';
+            let { data, error } = await supabase.from('pastorais').select(campos).order('id', { ascending: true });
+            
+            // Se erro por campos não existirem, tenta apenas id e nome
+            if (error && (error.code === 'PGRST116' || error.message?.includes('column') || error.message?.includes('does not exist'))) {
+                console.log('⚠️ Campos status/ativo não encontrados, usando apenas id e nome');
+                campos = 'id, nome';
+                const retry = await supabase.from('pastorais').select(campos).order('id', { ascending: true });
+                data = retry.data;
+                error = retry.error;
+            }
+            
+            if (error) throw error;
+            return res.json(data || []);
+        }
+        
+        // Modo completo: todos os campos
+        const { data, error } = await supabase.from('pastorais').select('*').order('id', { ascending: true });
         if (error) throw error;
         res.json(data);
     } catch (error) {
         console.error('Erro ao listar pastorais:', error);
-        res.status(500).json({ error: 'Erro ao listar pastorais' });
+        res.status(500).json({ 
+            error: 'Erro ao listar pastorais',
+            details: error.message 
+        });
     }
 }
 
