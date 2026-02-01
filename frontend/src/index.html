@@ -817,23 +817,9 @@
             document.getElementById('loader-minha-comunidade').style.display = 'none';
         }
 
-        // Função para debug dos gráficos
+        // Função para debug dos gráficos (logs removidos para produção)
         function debugGraficos() {
-            console.log('=== DEBUG DOS GRÁFICOS ===');
-            console.log('pessoasChart:', pessoasChart);
-            console.log('pastoraisChart:', pastoraisChart);
-            console.log('eventosChart:', eventosChart);
-            console.log('comunidadesChart:', comunidadesChart);
-            
-            // Verificar se os elementos canvas existem
-            const canvasIds = ['pessoasChart', 'pastoraisChart', 'eventosChart', 'comunidadesChart'];
-            canvasIds.forEach(id => {
-                const canvas = document.getElementById(id);
-                console.log(`Canvas ${id}:`, canvas);
-                if (canvas) {
-                    console.log(`- Contexto:`, canvas.getContext('2d'));
-                }
-            });
+            // Logs removidos para reduzir poluição do console
         }
 
         // Função para destruir gráficos existentes
@@ -855,7 +841,6 @@
                     comunidadesChart.destroy();
                     comunidadesChart = null;
                 }
-                console.log('Gráficos destruídos com sucesso');
             } catch (error) {
                 console.error('Erro ao destruir gráficos:', error);
             }

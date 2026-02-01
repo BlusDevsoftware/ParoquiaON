@@ -12,7 +12,6 @@ async function listarPastorais(req, res) {
             
             // Se erro por campos não existirem, tenta apenas id e nome
             if (error && (error.code === 'PGRST116' || error.message?.includes('column') || error.message?.includes('does not exist'))) {
-                console.log('⚠️ Campos status/ativo não encontrados, usando apenas id e nome');
                 campos = 'id, nome';
                 const retry = await supabase.from('pastorais').select(campos).order('id', { ascending: true });
                 data = retry.data;

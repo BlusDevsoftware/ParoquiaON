@@ -6,8 +6,6 @@ async function listarEventos(req, res) {
         
         // Modo leve: apenas campos essenciais (para Minha Comunidade)
         if (leve) {
-            console.log('🔄 Modo leve: buscando apenas campos essenciais...');
-            
             const { data: agendamentos, error: agendamentosError } = await supabase
                 .from('agendamentos')
                 .select('id, data_inicio, comunidade_id, status_id')
@@ -31,7 +29,6 @@ async function listarEventos(req, res) {
                        agendamento.status_id === 4 ? 'Cancelado' : 'Agendado'
             }));
             
-            console.log(`✅ ${data?.length || 0} eventos encontrados (modo leve)`);
             return res.json(data || []);
         }
         

@@ -52,7 +52,6 @@ async function listarPessoas(req, res) {
             
             // Se erro por comunidade_id não existir, tenta apenas id e nome
             if (error && (error.code === 'PGRST116' || error.message?.includes('column') || error.message?.includes('does not exist'))) {
-                console.log('⚠️ Campo comunidade_id não encontrado, usando apenas id e nome');
                 campos = 'id, nome';
                 const retry = await supabase.from('pessoas').select(campos).order('id', { ascending: true });
                 data = retry.data;
