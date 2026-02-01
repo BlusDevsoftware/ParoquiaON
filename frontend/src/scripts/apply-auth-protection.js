@@ -64,8 +64,6 @@ function atualizarCacheUsuario(user) {
         } else {
             sessionStorage.removeItem(USER_PHOTO_CACHE_KEY);
         }
-
-        console.log('✅ Cache do usuário atualizado');
     } catch (e) {
         if (e && e.name === 'QuotaExceededError') {
             sessionStorage.removeItem(USER_PHOTO_CACHE_KEY);
@@ -118,7 +116,6 @@ function preloadUserPhoto(photoUrl) {
         // Verificar se já está no cache do navegador
         const img = new Image();
         img.onload = () => {
-            console.log('✅ Foto do usuário pré-carregada');
             resolve();
         };
         img.onerror = () => {
@@ -134,18 +131,14 @@ window.atualizarCacheUsuario = atualizarCacheUsuario;
 
 // Aplicar proteção de autenticação e ajustar UI por permissões
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔒 Aplicando proteção de autenticação...');
-    
     // Atualizar avatar imediatamente do cache (sem delay para evitar piscar)
     var cachedUser = obterDadosUsuario();
     if (cachedUser) {
-        console.log('📦 Usando dados do cache para atualização rápida');
         atualizarAvatarUsuario();
         configurarDropdownAvatar();
     }
     
     if (typeof window.authGuard !== 'undefined') {
-        console.log('✅ Sistema de autenticação disponível');
         const maybePromise = window.authGuard && window.authGuard.protectPage ? window.authGuard.protectPage() : true;
         Promise.resolve(maybePromise).then(function() {
             try { 
@@ -305,8 +298,6 @@ function atualizarAvatarUsuario(fotoOverride) {
     if (dropdownEmail) {
         dropdownEmail.textContent = email;
     }
-    
-    console.log('✅ Avatar atualizado');
 }
 
 // Configurar dropdown do avatar
@@ -336,7 +327,6 @@ function configurarDropdownAvatar() {
         e.stopPropagation();
         e.preventDefault();
         avatarDropdown.classList.toggle('active');
-        console.log('Avatar clicado, dropdown:', avatarDropdown.classList.contains('active'));
     };
     avatar.addEventListener('click', avatarClickHandler);
     
@@ -424,8 +414,6 @@ function configurarDropdownAvatar() {
             }
         });
     }
-    
-    console.log('✅ Dropdown do avatar configurado');
 }
 
 // Limites para foto de perfil: até 15MB; acima de 5MB é comprimida no cliente antes do envio
