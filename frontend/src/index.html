@@ -943,13 +943,28 @@
         function montarDadosParaCards(raw) {
             if (!raw) return { comunidades: { total: 0, crescimento: 'Erro ao carregar' }, pastorais: { total: 0, crescimento: 'Erro ao carregar' }, pessoas: { total: 0, crescimento: 'Erro ao carregar' }, eventos: { total: 0, detalhes: 'Erro ao carregar' } };
             const { comunidades, pastorais, pessoas, agenda } = raw;
-            const eventosAtivos = (agenda || []).filter(e => e.status === 'Ativo').length;
-            const totalEventos = (agenda || []).length;
+            
+            // Calcular eventos do mês atual
+            const hoje = new Date();
+            const mesAtual = hoje.getMonth();
+            const anoAtual = hoje.getFullYear();
+            
+            const eventosDoMes = (agenda || []).filter(evento => {
+                if (!evento || !evento.data_inicio) return false;
+                const dataEvento = new Date(evento.data_inicio);
+                if (isNaN(dataEvento.getTime())) return false;
+                return dataEvento.getMonth() === mesAtual && 
+                       dataEvento.getFullYear() === anoAtual;
+            });
+            
+            const eventosAtivosDoMes = eventosDoMes.filter(e => e.status === 'Ativo' || e.status_id === 1).length;
+            const totalEventosDoMes = eventosDoMes.length;
+            
             return {
                 comunidades: { total: (comunidades || []).length, crescimento: '+12% este mês' },
                 pastorais: { total: (pastorais || []).length, crescimento: '+8% este mês' },
                 pessoas: { total: (pessoas || []).length, crescimento: '+15% este mês' },
-                eventos: { total: totalEventos, detalhes: `${eventosAtivos} eventos ativos` }
+                eventos: { total: totalEventosDoMes, detalhes: `${eventosAtivosDoMes} eventos ativos` }
             };
         }
 
