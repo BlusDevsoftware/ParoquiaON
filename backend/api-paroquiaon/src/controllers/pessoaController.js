@@ -43,14 +43,36 @@ async function uploadFotoIfNeeded(dados, identificador) {
 async function listarPessoas(req, res) {
     try {
         const leve = req.query.leve === '1' || req.query.leve === 'true';
-        // Modo leve: só id e nome (evita foto e evita erro se comunidade_id não existir na tabela)
-        const campos = leve ? 'id, nome' : '*';
-        const { data, error } = await supabase.from('pessoas').select(campos).order('id', { ascending: true });
+        
+        if (leve) {
+            // Modo leve: id, nome e comunidade_id (necessário para gráfico Top Comunidades)
+            // Tenta buscar com comunidade_id, se não existir, busca apenas id e nome
+            let campos = 'id, nome, comunidade_id';
+            let { data, error } = await supabase.from('pessoas').select(campos).order('id', { ascending: true });
+            
+            // Se erro por comunidade_id não existir, tenta apenas id e nome
+            if (error && (error.code === 'PGRST116' || error.message?.includes('column') || error.message?.includes('does not exist'))) {
+                console.log('⚠️ Campo comunidade_id não encontrado, usando apenas id e nome');
+                campos = 'id, nome';
+                const retry = await supabase.from('pessoas').select(campos).order('id', { ascending: true });
+                data = retry.data;
+                error = retry.error;
+            }
+            
+            if (error) throw error;
+            return res.json(data || []);
+        }
+        
+        // Modo completo: todos os campos
+        const { data, error } = await supabase.from('pessoas').select('*').order('id', { ascending: true });
         if (error) throw error;
         res.json(data);
     } catch (error) {
         console.error('Erro ao listar pessoas:', error);
-        res.status(500).json({ error: 'Erro ao listar pessoas' });
+        res.status(500).json({ 
+            error: 'Erro ao listar pessoas',
+            details: error.message 
+        });
     }
 }
 
