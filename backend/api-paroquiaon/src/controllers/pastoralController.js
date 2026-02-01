@@ -2,7 +2,11 @@ const { supabase } = require('../config/supabase');
 
 async function listarPastorais(req, res) {
     try {
-        const { data, error } = await supabase.from('pastorais').select('*').order('id', { ascending: true });
+        const leve = req.query.leve === '1' || req.query.leve === 'true';
+        // Incluir tanto 'status' quanto 'ativo' para compatibilidade com frontend
+        const campos = leve ? 'id, nome, status, ativo' : '*';
+        
+        const { data, error } = await supabase.from('pastorais').select(campos).order('id', { ascending: true });
         if (error) throw error;
         res.json(data);
     } catch (error) {

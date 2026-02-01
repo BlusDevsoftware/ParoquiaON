@@ -925,9 +925,9 @@
         async function buscarDadosUnificados() {
             const [comunidadesRes, pastoraisRes, pessoasRes, agendaRes] = await Promise.all([
                 window.api.get('/comunidades?leve=1'),
-                window.api.get('/pastorais'),
+                window.api.get('/pastorais?leve=1'),
                 window.api.get('/pessoas?leve=1'),
-                window.api.get('/agenda')
+                window.api.get('/agenda?leve=1')
             ]);
             if (comunidadesRes?.error || pastoraisRes?.error || pessoasRes?.error || agendaRes?.error) {
                 throw new Error(comunidadesRes?.error?.message || pastoraisRes?.error?.message || pessoasRes?.error?.message || agendaRes?.error?.message || 'Erro ao carregar dados');
