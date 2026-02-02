@@ -3703,41 +3703,15 @@
         @media (max-width: 768px) {
             .calendar-info-container {
                 display: grid !important;
-                grid-template-columns: 1fr auto auto !important; /* date (com toggle) | view | today */
+                grid-template-columns: auto auto auto !important; /* comunidade | visão | hoje */
                 grid-auto-rows: minmax(40px, auto) !important;
                 gap: 10px !important; /* mínimo espaço entre controles */
                 align-items: center !important;
                 justify-content: center !important; /* centralizar trio de botões */
-                grid-template-areas: "date view today" "community community community" !important;
+                grid-template-areas: "community view today" "date date date" !important;
             }
             .calendar-info-container .info-left,
             .calendar-info-container .info-right { width: 100% !important; display: contents !important; }
-            /* Container para toggle e date-navigation na mesma área do grid */
-            .calendar-info-container .info-right {
-                grid-area: date !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                position: relative !important;
-                gap: 0 !important;
-            }
-            /* Toggle posicionado ao lado esquerdo da navegação de data */
-            .calendar-info-container .toggle-switch-wrapper {
-                display: inline-flex !important;
-                align-items: center !important;
-                margin: 0 !important;
-                margin-right: 8px !important;
-                flex-shrink: 0 !important;
-            }
-            /* Ajustar date-navigation para ficar ao lado do toggle */
-            .calendar-info-container .date-navigation { 
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                gap: 10px !important;
-                flex-wrap: nowrap !important;
-                flex: 1 !important;
-            }
             .calendar-info-container .community-dropdown {
                 display: flex !important;
                 width: auto !important; /* não ocupar 100% */
@@ -3770,6 +3744,35 @@
                 align-self: center !important;
                 justify-self: center !important;
             }
+            /* Manter info-right com display: contents para que filhos entrem no grid */
+            .calendar-info-container .info-right {
+                display: contents !important;
+            }
+            
+            /* Toggle e date-navigation na mesma área do grid (date), lado a lado e centralizados */
+            .calendar-info-container .toggle-switch-wrapper {
+                grid-area: date !important;
+                margin-right: 12px !important; /* gap entre toggle e date-navigation */
+                margin-bottom: 0 !important;
+                align-self: center !important;
+                justify-self: center !important;
+                transform: translateX(calc(-50% - 80px)) !important; /* mover toggle para esquerda para centralizar o grupo */
+            }
+            
+            .calendar-info-container .date-navigation { 
+                grid-area: date !important;
+                align-self: center !important;
+                justify-self: center !important;
+                margin-left: 0 !important;
+                transform: translateX(calc(-50% + 68px)) !important; /* mover date-navigation para direita, ao lado do toggle (44px toggle + 12px gap + 12px ajuste) */
+            }
+            
+            /* Garantir que ambos fiquem alinhados horizontalmente */
+            .calendar-info-container .toggle-switch-wrapper,
+            .calendar-info-container .date-navigation {
+                display: inline-flex !important;
+            }
+            
             .calendar-info-container .community-dropdown-trigger,
             .calendar-info-container .view-dropdown-trigger {
                 min-width: 120px !important;
