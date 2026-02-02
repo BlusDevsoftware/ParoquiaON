@@ -1797,6 +1797,58 @@
             font-weight: 600;
         }
 
+        /* Toggle Switch para exibir agendamentos anteriores */
+        .toggle-switch-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .toggle-switch {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch:checked + .toggle-slider {
+            background-color: #1e3a8a;
+        }
+
+        .toggle-switch:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .toggle-switch-wrapper:hover .toggle-slider {
+            box-shadow: 0 0 4px rgba(30, 58, 138, 0.5);
+        }
+
         .info-right {
             display: flex;
             align-items: center;
@@ -4284,6 +4336,10 @@
                         </div>
                     </div>
                     <div class="info-right">
+                        <label class="toggle-switch-wrapper" title="Exibir agendamentos anteriores">
+                            <input type="checkbox" id="togglePastEvents" class="toggle-switch">
+                            <span class="toggle-slider"></span>
+                        </label>
                         <div class="date-navigation">
                             <button class="date-nav-btn" onclick="navigateWeek(-1)" title="Semana anterior">
                                 <i class="fas fa-chevron-left"></i>
@@ -5018,36 +5074,11 @@
             
             setupEventListeners();
 
-            // Criar toggle para exibir agendamentos anteriores
+            // Configurar toggle para exibir agendamentos anteriores
             try {
-                const rangeElement = document.getElementById('dateRange');
-                if (rangeElement && !document.getElementById('togglePastEvents')) {
-                    const wrapper = document.createElement('label');
-                    wrapper.id = 'togglePastEventsWrapper';
-                    wrapper.style.marginLeft = '12px';
-                    wrapper.style.fontSize = '12px';
-                    wrapper.style.cursor = 'pointer';
-                    wrapper.style.display = 'inline-flex';
-                    wrapper.style.alignItems = 'center';
-                    wrapper.style.gap = '4px';
-
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.id = 'togglePastEvents';
-                    checkbox.style.cursor = 'pointer';
-
-                    const text = document.createElement('span');
-                    text.textContent = 'Exibir agendamentos anteriores';
-
-                    wrapper.appendChild(checkbox);
-                    wrapper.appendChild(text);
-
-                    const parent = rangeElement.parentNode;
-                    if (parent) {
-                        parent.appendChild(wrapper);
-                    }
-
-                    checkbox.addEventListener('change', async function() {
+                const toggleCheckbox = document.getElementById('togglePastEvents');
+                if (toggleCheckbox) {
+                    toggleCheckbox.addEventListener('change', async function() {
                         includePastEvents = this.checked;
                         try {
                             mostrarSpinnerAgenda();
