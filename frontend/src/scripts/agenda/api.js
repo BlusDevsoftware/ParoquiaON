@@ -29,11 +29,19 @@
 
   async function create(evento) {
     // Expect evento with data_inicio/data_fim already normalized (YYYY-MM-DDTHH:mm:ss)
-    return window.api.post(window.endpoints.agenda.create, evento);
+    const resp = await window.api.post(window.endpoints.agenda.create, evento);
+    if (resp && resp.data) {
+      resp.data = normalizeEvent(resp.data);
+    }
+    return resp;
   }
 
   async function update(id, evento) {
-    return window.api.put(window.endpoints.agenda.update(id), evento);
+    const resp = await window.api.put(window.endpoints.agenda.update(id), evento);
+    if (resp && resp.data) {
+      resp.data = normalizeEvent(resp.data);
+    }
+    return resp;
   }
 
   async function remove(id) {

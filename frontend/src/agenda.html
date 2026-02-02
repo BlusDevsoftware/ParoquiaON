@@ -4852,6 +4852,14 @@
                     }
                     allEvents = [...allEvents, ...novosEventosNormalizados];
 
+                    // Manter ordenação por data/hora para o calendário renderizar corretamente
+                    const getEventTime = (ev) => {
+                        const raw = ev?.startTime || ev?.start_time || ev?.data_inicio || ev?.inicio || ev?.start || 0;
+                        const t = new Date(raw).getTime();
+                        return isNaN(t) ? 0 : t;
+                    };
+                    allEvents.sort((a, b) => getEventTime(a) - getEventTime(b));
+
                     if (!Array.isArray(events)) {
                         events = [];
                     }
