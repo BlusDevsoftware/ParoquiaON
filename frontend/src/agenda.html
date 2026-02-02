@@ -8234,19 +8234,43 @@
                 }
             };
 
-            // Função para carregar foto do usuário de lançamento sob demanda
+            // Cache de fotos de usuários para evitar requisições repetidas
+            const usuarioFotoCache = new Map();
+            
+            // Função para carregar foto do usuário de lançamento sob demanda (com cache)
             async function loadUsuarioFotoSobDemanda(pessoaId) {
                 if (!pessoaId) return null;
                 
+                // Verificar se já está no cache
+                if (usuarioFotoCache.has(pessoaId)) {
+                    console.log('✅ Foto do usuário encontrada no cache:', pessoaId);
+                    return usuarioFotoCache.get(pessoaId);
+                }
+                
                 try {
+                    console.log('🔄 Carregando foto do usuário:', pessoaId);
                     const { data, error } = await window.api.get(`/pessoas/${pessoaId}?campos=foto`);
                     if (error) {
                         console.warn('⚠️ Erro ao carregar foto do usuário:', error);
                         return null;
                     }
-                    return data?.foto || null;
+                    
+                    const foto = data?.foto || null;
+                    
+                    // Armazenar no cache (mesmo se for null para evitar requisições repetidas)
+                    if (foto !== null) {
+                        usuarioFotoCache.set(pessoaId, foto);
+                        console.log('✅ Foto do usuário carregada e armazenada no cache:', pessoaId);
+                    } else {
+                        // Armazenar null para evitar requisições repetidas quando não há foto
+                        usuarioFotoCache.set(pessoaId, null);
+                    }
+                    
+                    return foto;
                 } catch (error) {
                     console.warn('⚠️ Erro ao carregar foto do usuário:', error);
+                    // Armazenar null no cache para evitar requisições repetidas em caso de erro
+                    usuarioFotoCache.set(pessoaId, null);
                     return null;
                 }
             }
