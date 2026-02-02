@@ -3703,15 +3703,41 @@
         @media (max-width: 768px) {
             .calendar-info-container {
                 display: grid !important;
-                grid-template-columns: auto auto auto !important; /* comunidade | visão | hoje */
+                grid-template-columns: 1fr auto auto !important; /* date (com toggle) | view | today */
                 grid-auto-rows: minmax(40px, auto) !important;
                 gap: 10px !important; /* mínimo espaço entre controles */
                 align-items: center !important;
                 justify-content: center !important; /* centralizar trio de botões */
-                grid-template-areas: "community view today" "date date date" !important;
+                grid-template-areas: "date view today" "community community community" !important;
             }
             .calendar-info-container .info-left,
             .calendar-info-container .info-right { width: 100% !important; display: contents !important; }
+            /* Container para toggle e date-navigation na mesma área do grid */
+            .calendar-info-container .info-right {
+                grid-area: date !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: relative !important;
+                gap: 0 !important;
+            }
+            /* Toggle posicionado ao lado esquerdo da navegação de data */
+            .calendar-info-container .toggle-switch-wrapper {
+                display: inline-flex !important;
+                align-items: center !important;
+                margin: 0 !important;
+                margin-right: 8px !important;
+                flex-shrink: 0 !important;
+            }
+            /* Ajustar date-navigation para ficar ao lado do toggle */
+            .calendar-info-container .date-navigation { 
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 10px !important;
+                flex-wrap: nowrap !important;
+                flex: 1 !important;
+            }
             .calendar-info-container .community-dropdown {
                 display: flex !important;
                 width: auto !important; /* não ocupar 100% */
@@ -3744,7 +3770,6 @@
                 align-self: center !important;
                 justify-self: center !important;
             }
-            .calendar-info-container .date-navigation { grid-area: date !important; }
             .calendar-info-container .community-dropdown-trigger,
             .calendar-info-container .view-dropdown-trigger {
                 min-width: 120px !important;
