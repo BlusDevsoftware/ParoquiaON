@@ -8234,6 +8234,23 @@
                 }
             };
 
+            // Função para carregar foto do usuário de lançamento sob demanda
+            async function loadUsuarioFotoSobDemanda(pessoaId) {
+                if (!pessoaId) return null;
+                
+                try {
+                    const { data, error } = await window.api.get(`/pessoas/${pessoaId}?campos=foto`);
+                    if (error) {
+                        console.warn('⚠️ Erro ao carregar foto do usuário:', error);
+                        return null;
+                    }
+                    return data?.foto || null;
+                } catch (error) {
+                    console.warn('⚠️ Erro ao carregar foto do usuário:', error);
+                    return null;
+                }
+            }
+
             window.editEventModal = function(event) {
                 console.log('🔄 Abrindo modal de visualização:', event);
                 
@@ -8335,7 +8352,8 @@
                         usuarioAgendador = event.usuario_email;
                     }
 
-                    const usuarioAgendadorFoto =
+                    // Verificar se já temos a foto (caso ainda venha do cache antigo)
+                    let usuarioAgendadorFoto =
                         event.usuario_lancamento_foto ||
                         event.usuarios?.pessoas?.foto ||
                         event.usuario_foto ||
@@ -8361,13 +8379,31 @@
                     const iconEl = document.getElementById('editEventUsuarioAgendadorIcon');
                     if (fotoEl && iconEl) {
                         if (usuarioAgendadorFoto) {
+                            // Se já temos a foto, usar diretamente
                             fotoEl.src = usuarioAgendadorFoto;
                             fotoEl.style.display = 'block';
                             iconEl.style.display = 'none';
                         } else {
-                            fotoEl.style.display = 'none';
-                            fotoEl.src = '';
-                            iconEl.style.display = 'inline-flex';
+                            // Se não temos a foto, tentar carregar sob demanda
+                            const pessoaId = event.usuarios?.pessoa_id;
+                            if (pessoaId) {
+                                // Mostrar ícone enquanto carrega
+                                fotoEl.style.display = 'none';
+                                iconEl.style.display = 'inline-flex';
+                                
+                                // Carregar foto sob demanda
+                                loadUsuarioFotoSobDemanda(pessoaId).then(foto => {
+                                    if (foto) {
+                                        fotoEl.src = foto;
+                                        fotoEl.style.display = 'block';
+                                        iconEl.style.display = 'none';
+                                    }
+                                });
+                            } else {
+                                fotoEl.style.display = 'none';
+                                fotoEl.src = '';
+                                iconEl.style.display = 'inline-flex';
+                            }
                         }
                     }
                     

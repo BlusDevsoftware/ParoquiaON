@@ -82,8 +82,8 @@ async function listarEventos(req, res) {
         const { data: acoes } = await supabase.from('acoes').select('id, nome');
         if (acoes) relacionamentos.acoes = acoes;
         
-        // Buscar pessoas (inclui foto para usar como avatar)
-        const { data: pessoas } = await supabase.from('pessoas').select('id, nome, foto');
+        // Buscar pessoas (sem foto para reduzir consumo - foto será carregada sob demanda)
+        const { data: pessoas } = await supabase.from('pessoas').select('id, nome');
         if (pessoas) relacionamentos.pessoas = pessoas;
         
         // Buscar comunidades
@@ -126,7 +126,7 @@ async function listarEventos(req, res) {
                 // Campos derivados para facilitar uso no frontend
                 usuario_lancamento_nome: pessoaDoUsuarioLancamento?.nome || usuarioLancamento?.email || null,
                 usuario_lancamento_email: usuarioLancamento?.email || null,
-                usuario_lancamento_foto: pessoaDoUsuarioLancamento?.foto || null,
+                // usuario_lancamento_foto removido - será carregado sob demanda quando o modal for aberto
                 status_agendamento: relacionamentos.status?.find(s => s.id === agendamento.status_id)
             };
         }) || [];
