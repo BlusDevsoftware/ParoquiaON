@@ -4509,20 +4509,47 @@
             }
         };
 
-        // Override: deleteEvent via AgendaAPI
+        // Override: deleteEvent via AgendaAPI (atualiza apenas o item em memória, sem recarregar toda a lista)
         window.deleteEvent = async function(eventId) {
             if (!confirm('Tem certeza que deseja excluir este evento?')) return;
             try {
                 await window.AgendaAPI.remove(eventId);
-                await loadEventsFromApi();
-                filterEventsByCommunity();
-                renderCalendar();
-                updateMiniCalendar();
-                updateRecentAppointments();
-                if (typeof showToast === 'function') showToast('Evento excluído com sucesso!', 'success');
+
+                // Remover o evento das listas em memória para evitar novo GET /agenda pesado
+                if (Array.isArray(allEvents)) {
+                    allEvents = allEvents.filter(ev => ev && ev.id !== eventId);
+                } else {
+                    allEvents = [];
+                }
+
+                if (Array.isArray(events)) {
+                    events = events.filter(ev => ev && ev.id !== eventId);
+                } else {
+                    events = [];
+                }
+
+                // Reaplicar filtros e atualizar a UI
+                if (typeof filterEventsByCommunity === 'function') {
+                    filterEventsByCommunity();
+                }
+                if (typeof renderCalendar === 'function') {
+                    renderCalendar();
+                }
+                if (typeof updateMiniCalendar === 'function') {
+                    updateMiniCalendar();
+                }
+                if (typeof updateRecentAppointments === 'function') {
+                    updateRecentAppointments();
+                }
+
+                if (typeof showToast === 'function') {
+                    showToast('Evento excluído com sucesso!', 'success');
+                }
             } catch (err) {
                 console.error('Erro ao excluir evento:', err);
-                if (typeof showToast === 'function') showToast('Erro ao excluir evento', 'error');
+                if (typeof showToast === 'function') {
+                    showToast('Erro ao excluir evento', 'error');
+                }
             }
         };
 
@@ -4794,29 +4821,65 @@
                     
                     if (typeof showToast === 'function') showToast('Evento atualizado com sucesso!', 'success');
                 } else {
-                for (const evento of eventos) {
-                    const { data, error } = await window.AgendaAPI.create(evento);
-                    if (error) throw error;
-                    resultados.push(data);
-                }
-                if (typeof showToast === 'function') showToast(eventos.length > 1 ? `${eventos.length} eventos criados com sucesso!` : 'Evento criado com sucesso!', 'success');
-                }
+                    // Criação de novos eventos: atualizar apenas em memória, sem novo GET /agenda
+                    const novosEventosNormalizados = [];
 
-                // Recarregar eventos da API para garantir sincronização
-                await loadEventsFromApi();
-                
-                // Se estava editando, atualizar editingEvent com o evento atualizado da lista
-                if (isEditing && resultados.length > 0) {
-                    const eventoAtualizadoNaLista = allEvents.find(e => e.id === resultados[0].id);
-                    if (eventoAtualizadoNaLista) {
-                        editingEvent = eventoAtualizadoNaLista;
+                    for (const evento of eventos) {
+                        const { data, error } = await window.AgendaAPI.create(evento);
+                        if (error) throw error;
+
+                        // Normalizar no mesmo formato usado em loadEventsFromApi
+                        const normalizado = {
+                            ...data,
+                            title: data.titulo || data.title || 'Agendamento sem título',
+                            local_nome: data.locais?.nome || data.local_nome || 'Local não informado',
+                            acao_nome: data.acoes?.nome || data.acao_nome || 'Ação não informada',
+                            responsavel_nome: data.pessoas?.nome || data.responsavel_nome || 'Responsável não informado',
+                            comunidade_nome: data.comunidades?.nome || data.comunidade_nome || 'Comunidade não informada',
+                            pastoral_nome: data.pastorais?.nome || data.pastoral_nome || 'Pastoral não informada',
+                            pilar_nome: data.pilares?.nome || data.pilar_nome || 'Pilar não informado',
+                            usuario_lancamento_nome: data.usuarios?.nome || data.usuarios?.email || 'Sistema',
+                            color: data.comunidades?.cor || data.comunidade_cor || data.acoes?.pilares?.cor || data.pilares?.cor || data.cor || '#1e3a8a'
+                        };
+
+                        resultados.push(normalizado);
+                        novosEventosNormalizados.push(normalizado);
+                    }
+
+                    // Adicionar novos eventos às listas em memória
+                    if (!Array.isArray(allEvents)) {
+                        allEvents = [];
+                    }
+                    allEvents = [...allEvents, ...novosEventosNormalizados];
+
+                    if (!Array.isArray(events)) {
+                        events = [];
+                    }
+                    // Deixa o filtro recalcular quais devem aparecer
+
+                    if (typeof showToast === 'function') {
+                        showToast(
+                            eventos.length > 1
+                                ? `${eventos.length} eventos criados com sucesso!`
+                                : 'Evento criado com sucesso!',
+                            'success'
+                        );
                     }
                 }
-                
-                filterEventsByCommunity();
-                renderCalendar();
-                updateMiniCalendar();
-                updateRecentAppointments();
+
+                // Reaplicar filtros e atualizar calendários sem novo GET /agenda
+                if (typeof filterEventsByCommunity === 'function') {
+                    filterEventsByCommunity();
+                }
+                if (typeof renderCalendar === 'function') {
+                    renderCalendar();
+                }
+                if (typeof updateMiniCalendar === 'function') {
+                    updateMiniCalendar();
+                }
+                if (typeof updateRecentAppointments === 'function') {
+                    updateRecentAppointments();
+                }
                 
                 if (typeof window.clearEventForm === 'function') window.clearEventForm();
                 if (typeof window.clearAllPeriods === 'function') window.clearAllPeriods();
