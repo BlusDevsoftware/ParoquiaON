@@ -5107,16 +5107,23 @@
                 const toggleCheckbox = document.getElementById('togglePastEvents');
                 if (toggleCheckbox) {
                     toggleCheckbox.addEventListener('change', async function() {
+                        const wasChecked = includePastEvents;
                         includePastEvents = this.checked;
+                        
                         try {
-                            mostrarSpinnerAgenda();
-                            await loadEventsFromApi();
-                            renderCalendar();
-                            updateMiniCalendar();
-                            updateRecentAppointments();
+                            // Se está marcando (precisa buscar eventos passados que podem não estar carregados)
+                            if (includePastEvents && !wasChecked) {
+                                mostrarSpinnerAgenda();
+                                await loadEventsFromApi(); // Chama API para buscar eventos passados
+                                ocultarSpinnerAgenda();
+                            } 
+                            // Se está desmarcando, apenas filtra os eventos já carregados em memória (SEM chamar API)
+                            else if (!includePastEvents && wasChecked) {
+                                // Não chama API, apenas filtra em memória - sem spinner para melhor UX
+                                filterPastEvents();
+                            }
                         } catch (err) {
-                            console.error('Erro ao recarregar eventos (toggle passados):', err);
-                        } finally {
+                            console.error('Erro ao processar toggle de agendamentos anteriores:', err);
                             ocultarSpinnerAgenda();
                         }
                     });
@@ -7283,13 +7290,39 @@
 
         // Removido: loadEventsFromApi duplicado (usa override com módulos)
 
+        // Função para filtrar eventos passados em memória (sem chamar API)
+        function filterPastEvents() {
+            // Aplicar filtros de comunidade e eventos passados
+            filterEventsByCommunity();
+        }
+
         function filterEventsByCommunity() {
-            if (selectedCommunityId === null) {
-                // Mostrar todos os eventos
-                events = [...allEvents];
-            } else {
-                // Filtrar eventos por comunidade
-                events = allEvents.filter(event => {
+            let filteredEvents = [...allEvents];
+            
+            // Filtrar eventos passados se o toggle estiver desmarcado
+            if (!includePastEvents) {
+                const hoje = new Date();
+                const ano = hoje.getFullYear();
+                const mes = hoje.getMonth(); // 0-11
+                const inicioMes = new Date(ano, mes, 1);
+                inicioMes.setHours(0, 0, 0, 0); // Zerar horas para comparação
+                
+                filteredEvents = filteredEvents.filter(event => {
+                    // Obter data de início do evento
+                    const eventStartDate = event.startTime || event.data_inicio || event.data_inicio_iso;
+                    if (!eventStartDate) return false;
+                    
+                    const eventDate = new Date(eventStartDate);
+                    eventDate.setHours(0, 0, 0, 0);
+                    
+                    // Manter apenas eventos a partir do primeiro dia do mês atual
+                    return eventDate >= inicioMes;
+                });
+            }
+            
+            // Filtrar por comunidade se houver seleção
+            if (selectedCommunityId !== null) {
+                filteredEvents = filteredEvents.filter(event => {
                     // Verificar se o evento tem vínculo com a comunidade selecionada
                     if (event.vinculos && Array.isArray(event.vinculos)) {
                         return event.vinculos.some(vinculo => 
@@ -7303,6 +7336,9 @@
                     return false;
                 });
             }
+            
+            // Atualizar lista de eventos filtrados
+            events = filteredEvents;
             
             // Atualizar calendário
             renderCalendar();
