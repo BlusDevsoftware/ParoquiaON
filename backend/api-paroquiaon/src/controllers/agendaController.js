@@ -51,10 +51,19 @@ async function listarEventos(req, res) {
         
         console.log('✅ Tabela agendamentos acessível, fazendo consulta completa...');
         
+        // Filtro opcional por data de início (para reduzir volume quando desejado)
+        const { start_date: startDate } = req.query;
+        
         // Primeiro buscar os agendamentos sem relacionamentos complexos
-        const { data: agendamentos, error: agendamentosError } = await supabase
+        let agendamentosQuery = supabase
             .from('agendamentos')
-            .select('*')
+            .select('*');
+
+        if (startDate) {
+            agendamentosQuery = agendamentosQuery.gte('data_inicio', startDate);
+        }
+
+        const { data: agendamentos, error: agendamentosError } = await agendamentosQuery
             .order('data_inicio', { ascending: true });
             
         if (agendamentosError) {

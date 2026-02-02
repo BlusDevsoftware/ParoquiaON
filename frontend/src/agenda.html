@@ -4478,7 +4478,24 @@
         // Override: loadEventsFromApi using AgendaAPI + normalization
         window.loadEventsFromApi = async function() {
             try {
-                const lista = await window.AgendaAPI.list();
+                // Se o usuário não marcou para exibir agendamentos anteriores,
+                // limitar a partir do primeiro dia do mês atual para frente
+                let params = undefined;
+                if (!includePastEvents) {
+                    const hoje = new Date();
+                    const ano = hoje.getFullYear();
+                    const mes = hoje.getMonth(); // 0-11
+                    const inicioMes = new Date(ano, mes, 1);
+                    const toYmd = (d) => {
+                        const y = d.getFullYear();
+                        const m = String(d.getMonth() + 1).padStart(2, '0');
+                        const dia = String(d.getDate()).padStart(2, '0');
+                        return `${y}-${m}-${dia}`;
+                    };
+                    params = { startDate: toYmd(inicioMes) };
+                }
+
+                const lista = await window.AgendaAPI.list(params);
                 allEvents = lista.map(ev => {
                     const localNome = ev.locais?.nome || ev.local_nome || 'Local não informado';
                     const acaoNome = ev.acoes?.nome || ev.acao_nome || 'Ação não informada';
@@ -4915,6 +4932,7 @@
         let editingEventPeriods = [];
         let miniCalendarDate = new Date();
         let currentView = 'mês'; // 'semana' | 'mês'
+        let includePastEvents = false; // Exibir agendamentos anteriores ao mês atual
 
         // Atualiza a lista do dropdown de visão para ocultar a visão atualmente selecionada
         function updateViewDropdown() {
@@ -4999,6 +5017,54 @@
             }
             
             setupEventListeners();
+
+            // Criar toggle para exibir agendamentos anteriores
+            try {
+                const rangeElement = document.getElementById('dateRange');
+                if (rangeElement && !document.getElementById('togglePastEvents')) {
+                    const wrapper = document.createElement('label');
+                    wrapper.id = 'togglePastEventsWrapper';
+                    wrapper.style.marginLeft = '12px';
+                    wrapper.style.fontSize = '12px';
+                    wrapper.style.cursor = 'pointer';
+                    wrapper.style.display = 'inline-flex';
+                    wrapper.style.alignItems = 'center';
+                    wrapper.style.gap = '4px';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = 'togglePastEvents';
+                    checkbox.style.cursor = 'pointer';
+
+                    const text = document.createElement('span');
+                    text.textContent = 'Exibir agendamentos anteriores';
+
+                    wrapper.appendChild(checkbox);
+                    wrapper.appendChild(text);
+
+                    const parent = rangeElement.parentNode;
+                    if (parent) {
+                        parent.appendChild(wrapper);
+                    }
+
+                    checkbox.addEventListener('change', async function() {
+                        includePastEvents = this.checked;
+                        try {
+                            mostrarSpinnerAgenda();
+                            await loadEventsFromApi();
+                            renderCalendar();
+                            updateMiniCalendar();
+                            updateRecentAppointments();
+                        } catch (err) {
+                            console.error('Erro ao recarregar eventos (toggle passados):', err);
+                        } finally {
+                            ocultarSpinnerAgenda();
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Erro ao configurar toggle de agendamentos anteriores:', e);
+            }
         });
 
         function initializeApp() {

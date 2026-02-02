@@ -20,8 +20,18 @@
     };
   }
 
-  async function list() {
-    const { data, error } = await window.api.get(window.endpoints.agenda.list);
+  // params opcional: { startDate: 'YYYY-MM-DD' }
+  async function list(params) {
+    let url = window.endpoints.agenda.list;
+
+    if (params && params.startDate) {
+      const search = new URLSearchParams();
+      search.append('start_date', params.startDate);
+      const qs = search.toString();
+      if (qs) url += `?${qs}`;
+    }
+
+    const { data, error } = await window.api.get(url);
     if (error) throw error;
     const lista = Array.isArray(data) ? data : [];
     return lista.map(normalizeEvent);
