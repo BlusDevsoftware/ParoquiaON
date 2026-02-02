@@ -8,7 +8,7 @@ async function listarEventos(req, res) {
         if (leve) {
             const { data: agendamentos, error: agendamentosError } = await supabase
                 .from('agendamentos')
-                .select('id, data_inicio, comunidade_id, status_id')
+                .select('id, data_inicio, comunidade_id')
                 .order('data_inicio', { ascending: true });
             
             if (agendamentosError) {
@@ -16,20 +16,7 @@ async function listarEventos(req, res) {
                 throw agendamentosError;
             }
             
-            // Mapear status_id para status string (compatibilidade)
-            const data = (agendamentos || []).map(agendamento => ({
-                id: agendamento.id,
-                data_inicio: agendamento.data_inicio,
-                comunidade_id: agendamento.comunidade_id,
-                status_id: agendamento.status_id,
-                // Mapear status_id para status string
-                status: agendamento.status_id === 1 ? 'Agendado' : 
-                       agendamento.status_id === 2 ? 'Confirmado' :
-                       agendamento.status_id === 3 ? 'Pendente' : 
-                       agendamento.status_id === 4 ? 'Cancelado' : 'Agendado'
-            }));
-            
-            return res.json(data || []);
+            return res.json(agendamentos || []);
         }
         
         // Modo completo: comportamento original (para outras telas)
@@ -243,16 +230,6 @@ async function criarEvento(req, res) {
             return res.status(400).json({ error: 'Título e data de início são obrigatórios' });
         }
         
-        // Mapear status para status_id
-        const statusMapping = {
-            'agendado': 1,
-            'confirmado': 2, 
-            'pendente': 3,
-            'cancelado': 4
-        };
-        
-        const statusId = statusMapping[dados.status] || 1; // Padrão: agendado
-        
         // Mapear visibilidade para valores corretos do banco
         const visibilidadeMapping = {
             'publico': 'Publico',
@@ -266,7 +243,6 @@ async function criarEvento(req, res) {
         // Prioriza dados enviados do frontend, usa req.user como fallback
         const dadosCompletos = {
             ...dados,
-            status_id: statusId,
             visibilidade: visibilidadeCorreta,
             usuario_lancamento_id: dados.usuario_lancamento_id || req.user?.id || null
         };
@@ -551,30 +527,12 @@ async function estatisticasEventos(req, res) {
             .from('agendamentos')
             .select('*', { count: 'exact', head: true });
 
-        const { data: agendados, error: agendadosError } = await supabase
-            .from('agendamentos')
-            .select('*', { count: 'exact', head: true })
-            .eq('status_id', 1);
-
-        const { data: confirmados, error: confirmadosError } = await supabase
-            .from('agendamentos')
-            .select('*', { count: 'exact', head: true })
-            .eq('status_id', 2);
-
-        const { data: cancelados, error: canceladosError } = await supabase
-            .from('agendamentos')
-            .select('*', { count: 'exact', head: true })
-            .eq('status_id', 4);
-
-        if (totalError || agendadosError || confirmadosError || canceladosError) {
+        if (totalError) {
             throw new Error('Erro ao buscar estatísticas');
         }
 
         res.json({
-            total: total?.length || 0,
-            agendados: agendados?.length || 0,
-            confirmados: confirmados?.length || 0,
-            cancelados: cancelados?.length || 0
+            total: total?.length || 0
         });
     } catch (error) {
         console.error('Erro ao buscar estatísticas:', error);
@@ -592,7 +550,6 @@ async function dadosGraficosEventos(req, res) {
                 id,
                 titulo,
                 data_inicio,
-                status_id,
                 created_at
             `)
             .order('created_at', { ascending: true });
@@ -601,16 +558,12 @@ async function dadosGraficosEventos(req, res) {
 
         // Calcular evolução de agendamentos por mês (últimos 6 meses)
         const evolucaoAgendamentos = calcularEvolucaoEventos(agendamentos);
-        
-        // Calcular distribuição por status
-        const distribuicaoStatus = calcularDistribuicaoStatusEventos(agendamentos);
 
         // Calcular agendamentos por mês (próximos 6 meses)
         const agendamentosPorMes = calcularEventosPorMes(agendamentos);
 
         res.json({
             evolucao: evolucaoAgendamentos,
-            distribuicao: distribuicaoStatus,
             eventosPorMes: agendamentosPorMes,
             totalEventos: agendamentos?.length || 0
         });
@@ -644,34 +597,6 @@ function calcularEvolucaoEventos(eventos) {
     }
 
     return { labels, dados };
-}
-
-// Função auxiliar para calcular distribuição por status dos agendamentos
-function calcularDistribuicaoStatusEventos(agendamentos) {
-    const status = {
-        agendado: 0,
-        confirmado: 0,
-        pendente: 0,
-        cancelado: 0
-    };
-
-    (agendamentos || []).forEach(agendamento => {
-        const statusId = agendamento.status_id;
-        if (statusId === 1) {
-            status.agendado++;
-        } else if (statusId === 2) {
-            status.confirmado++;
-        } else if (statusId === 3) {
-            status.pendente++;
-        } else if (statusId === 4) {
-            status.cancelado++;
-        }
-    });
-
-    return {
-        labels: ['Agendado', 'Confirmado', 'Pendente', 'Cancelado'],
-        dados: [status.agendado, status.confirmado, status.pendente, status.cancelado]
-    };
 }
 
 // Função auxiliar para calcular eventos por mês
