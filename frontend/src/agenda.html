@@ -3749,22 +3749,22 @@
                 display: contents !important;
             }
             
-            /* Toggle e date-navigation na mesma área do grid (date), lado a lado e centralizados */
+            /* Toggle à esquerda e date-navigation centralizado na mesma linha */
             .calendar-info-container .toggle-switch-wrapper {
                 grid-area: date !important;
-                margin-right: 12px !important; /* gap entre toggle e date-navigation */
+                margin-right: 0 !important;
                 margin-bottom: 0 !important;
                 align-self: center !important;
-                justify-self: center !important;
-                transform: translateX(calc(-50% - 80px)) !important; /* mover toggle para esquerda para centralizar o grupo */
+                justify-self: start !important; /* posicionar à esquerda */
+                margin-left: 10px !important; /* pequeno espaçamento da borda esquerda */
             }
             
             .calendar-info-container .date-navigation { 
                 grid-area: date !important;
                 align-self: center !important;
-                justify-self: center !important;
+                justify-self: center !important; /* centralizar o date-navigation */
                 margin-left: 0 !important;
-                transform: translateX(calc(-50% + 68px)) !important; /* mover date-navigation para direita, ao lado do toggle (44px toggle + 12px gap + 12px ajuste) */
+                transform: none !important; /* remover transform para centralizar corretamente */
             }
             
             /* Garantir que ambos fiquem alinhados horizontalmente */
