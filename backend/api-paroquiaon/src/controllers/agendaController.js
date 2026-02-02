@@ -102,9 +102,7 @@ async function listarEventos(req, res) {
         const { data: usuarios } = await supabase.from('usuarios').select('id, email, pessoa_id');
         if (usuarios) relacionamentos.usuarios = usuarios;
         
-        // Buscar status
-        const { data: status } = await supabase.from('status_agendamento').select('id, nome, descricao');
-        if (status) relacionamentos.status = status;
+        // Status removido - não é necessário carregar essa informação
         
         // Combinar os dados
         const data = agendamentos?.map(agendamento => {
@@ -125,9 +123,9 @@ async function listarEventos(req, res) {
                 usuarios: usuarioLancamento,
                 // Campos derivados para facilitar uso no frontend
                 usuario_lancamento_nome: pessoaDoUsuarioLancamento?.nome || usuarioLancamento?.email || null,
-                usuario_lancamento_email: usuarioLancamento?.email || null,
+                usuario_lancamento_email: usuarioLancamento?.email || null
                 // usuario_lancamento_foto removido - será carregado sob demanda quando o modal for aberto
-                status_agendamento: relacionamentos.status?.find(s => s.id === agendamento.status_id)
+                // status_agendamento removido - não é necessário
             };
         }) || [];
         
@@ -218,10 +216,7 @@ async function buscarEvento(req, res) {
             }
         }
         
-        if (agendamento.status_id) {
-            const { data: status } = await supabase.from('status_agendamento').select('id, nome, descricao').eq('id', agendamento.status_id).single();
-            relacionamentos.status_agendamento = status;
-        }
+        // Status removido - não é necessário carregar essa informação
         
         // Combinar os dados
         const data = {
@@ -396,10 +391,7 @@ async function criarEvento(req, res) {
             relacionamentos.usuarios = usuario;
         }
         
-        if (insertedData.status_id) {
-            const { data: status } = await supabase.from('status_agendamento').select('id, nome, descricao').eq('id', insertedData.status_id).single();
-            relacionamentos.status_agendamento = status;
-        }
+        // Status removido - não é necessário carregar essa informação
         
         // Combinar os dados
         const data = {
@@ -524,10 +516,7 @@ async function atualizarEvento(req, res) {
             relacionamentos.usuarios = usuario;
         }
         
-        if (updatedData.status_id) {
-            const { data: status } = await supabase.from('status_agendamento').select('id, nome, descricao').eq('id', updatedData.status_id).single();
-            relacionamentos.status_agendamento = status;
-        }
+        // Status removido - não é necessário carregar essa informação
         
         // Combinar os dados
         const data = {
