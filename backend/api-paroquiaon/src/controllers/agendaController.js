@@ -222,11 +222,8 @@ async function criarEvento(req, res) {
     try {
         const dados = req.body;
         
-        console.log('📋 Dados recebidos para criar evento:', JSON.stringify(dados, null, 2));
-        
         // Validação básica
         if (!dados.titulo || !dados.data_inicio) {
-            console.log('❌ Validação falhou - campos obrigatórios:', { titulo: dados.titulo, data_inicio: dados.data_inicio });
             return res.status(400).json({ error: 'Título e data de início são obrigatórios' });
         }
         
@@ -240,77 +237,14 @@ async function criarEvento(req, res) {
         const visibilidadeCorreta = visibilidadeMapping[dados.visibilidade] || 'Publico';
         
         // Adicionar dados do usuário de lançamento
-        // Prioriza dados enviados do frontend, usa req.user como fallback
         const dadosCompletos = {
             ...dados,
             visibilidade: visibilidadeCorreta,
             usuario_lancamento_id: dados.usuario_lancamento_id || req.user?.id || null
         };
         
-        console.log('🔧 Dados completos para inserção:', JSON.stringify(dadosCompletos, null, 2));
-        
-        // Validar se os IDs existem nas tabelas relacionadas
-        if (dadosCompletos.local_id) {
-            const { data: local, error: localError } = await supabase
-                .from('locais')
-                .select('id')
-                .eq('id', dadosCompletos.local_id)
-                .single();
-            if (localError || !local) {
-                console.error('❌ Local não encontrado:', dadosCompletos.local_id);
-                return res.status(400).json({ error: 'Local não encontrado' });
-            }
-        }
-        
-        if (dadosCompletos.acao_id) {
-            const { data: acao, error: acaoError } = await supabase
-                .from('acoes')
-                .select('id')
-                .eq('id', dadosCompletos.acao_id)
-                .single();
-            if (acaoError || !acao) {
-                console.error('❌ Ação não encontrada:', dadosCompletos.acao_id);
-                return res.status(400).json({ error: 'Ação não encontrada' });
-            }
-        }
-        
-        if (dadosCompletos.comunidade_id) {
-            const { data: comunidade, error: comunidadeError } = await supabase
-                .from('comunidades')
-                .select('id')
-                .eq('id', dadosCompletos.comunidade_id)
-                .single();
-            if (comunidadeError || !comunidade) {
-                console.error('❌ Comunidade não encontrada:', dadosCompletos.comunidade_id);
-                return res.status(400).json({ error: 'Comunidade não encontrada' });
-            }
-        }
-        
-        if (dadosCompletos.pastoral_id) {
-            const { data: pastoral, error: pastoralError } = await supabase
-                .from('pastorais')
-                .select('id')
-                .eq('id', dadosCompletos.pastoral_id)
-                .single();
-            if (pastoralError || !pastoral) {
-                console.error('❌ Pastoral não encontrada:', dadosCompletos.pastoral_id);
-                return res.status(400).json({ error: 'Pastoral não encontrada' });
-            }
-        }
-        
-        if (dadosCompletos.pilar_id) {
-            const { data: pilar, error: pilarError } = await supabase
-                .from('pilares')
-                .select('id')
-                .eq('id', dadosCompletos.pilar_id)
-                .single();
-            if (pilarError || !pilar) {
-                console.error('❌ Pilar não encontrado:', dadosCompletos.pilar_id);
-                return res.status(400).json({ error: 'Pilar não encontrado' });
-            }
-        }
-        
-        console.log('✅ Todas as validações de foreign keys passaram');
+        // OTIMIZAÇÃO: Remover validações de FK - o banco já valida com constraints
+        // Se houver FK inválida, o Supabase retornará erro e tratamos abaixo
         
         // Inserir evento
         const { data: insertedData, error } = await supabase
@@ -320,6 +254,13 @@ async function criarEvento(req, res) {
             .single();
             
         if (error) {
+            // Tratar erros de FK inválida de forma amigável
+            if (error.code === '23503' || error.message?.includes('foreign key')) {
+                return res.status(400).json({ 
+                    error: 'Referência inválida em um dos campos relacionados',
+                    details: error.message 
+                });
+            }
             console.error('❌ Erro do Supabase ao inserir agendamento:', {
                 message: error.message,
                 details: error.details,
@@ -329,63 +270,73 @@ async function criarEvento(req, res) {
             throw error;
         }
         
-        // Buscar dados relacionados para o evento criado
-        const relacionamentos = {};
+        // OTIMIZAÇÃO: Buscar relacionamentos em PARALELO (Promise.all) ao invés de sequencial
+        const relacionamentosPromises = [];
         
         if (insertedData.local_id) {
-            const { data: local } = await supabase.from('locais').select('id, nome').eq('id', insertedData.local_id).single();
-            relacionamentos.locais = local;
+            relacionamentosPromises.push(
+                supabase.from('locais').select('id, nome').eq('id', insertedData.local_id).single()
+                    .then(({ data }) => ({ key: 'locais', data }))
+            );
         }
         
         if (insertedData.acao_id) {
-            const { data: acao } = await supabase.from('acoes').select('id, nome').eq('id', insertedData.acao_id).single();
-            relacionamentos.acoes = acao;
+            relacionamentosPromises.push(
+                supabase.from('acoes').select('id, nome').eq('id', insertedData.acao_id).single()
+                    .then(({ data }) => ({ key: 'acoes', data }))
+            );
         }
         
         if (insertedData.responsavel_id) {
-            const { data: pessoa } = await supabase.from('pessoas').select('id, nome').eq('id', insertedData.responsavel_id).single();
-            relacionamentos.pessoas = pessoa;
+            relacionamentosPromises.push(
+                supabase.from('pessoas').select('id, nome').eq('id', insertedData.responsavel_id).single()
+                    .then(({ data }) => ({ key: 'pessoas', data }))
+            );
         }
         
         if (insertedData.comunidade_id) {
-            const { data: comunidade } = await supabase.from('comunidades').select('id, nome, foto, cor').eq('id', insertedData.comunidade_id).single();
-            relacionamentos.comunidades = comunidade;
+            relacionamentosPromises.push(
+                supabase.from('comunidades').select('id, nome, foto, cor').eq('id', insertedData.comunidade_id).single()
+                    .then(({ data }) => ({ key: 'comunidades', data }))
+            );
         }
         
         if (insertedData.pastoral_id) {
-            const { data: pastoral } = await supabase.from('pastorais').select('id, nome').eq('id', insertedData.pastoral_id).single();
-            relacionamentos.pastorais = pastoral;
+            relacionamentosPromises.push(
+                supabase.from('pastorais').select('id, nome').eq('id', insertedData.pastoral_id).single()
+                    .then(({ data }) => ({ key: 'pastorais', data }))
+            );
         }
         
         if (insertedData.pilar_id) {
-            const { data: pilar } = await supabase.from('pilares').select('id, nome').eq('id', insertedData.pilar_id).single();
-            relacionamentos.pilares = pilar;
+            relacionamentosPromises.push(
+                supabase.from('pilares').select('id, nome').eq('id', insertedData.pilar_id).single()
+                    .then(({ data }) => ({ key: 'pilares', data }))
+            );
         }
         
         if (insertedData.usuario_lancamento_id) {
-            const { data: usuario } = await supabase.from('usuarios').select('id, email').eq('id', insertedData.usuario_lancamento_id).single();
-            relacionamentos.usuarios = usuario;
+            relacionamentosPromises.push(
+                supabase.from('usuarios').select('id, email').eq('id', insertedData.usuario_lancamento_id).single()
+                    .then(({ data }) => ({ key: 'usuarios', data }))
+            );
         }
         
-        // Status removido - não é necessário carregar essa informação
+        // Executar todas as buscas em paralelo
+        const relacionamentosResults = await Promise.all(relacionamentosPromises);
+        
+        // Montar objeto de relacionamentos
+        const relacionamentos = {};
+        relacionamentosResults.forEach(({ key, data }) => {
+            if (data) relacionamentos[key] = data;
+        });
         
         // Combinar os dados
         const data = {
             ...insertedData,
             ...relacionamentos
         };
-            
-        if (error) {
-            console.error('❌ Erro do Supabase ao inserir agendamento:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code
-            });
-            throw error;
-        }
         
-        console.log('✅ Agendamento criado com sucesso:', data);
         res.status(201).json(data);
     } catch (error) {
         console.error('❌ Erro ao criar agendamento:', {
@@ -454,45 +405,66 @@ async function atualizarEvento(req, res) {
         if (error) throw error;
         if (!updatedData) return res.status(404).json({ error: 'Agendamento não encontrado' });
         
-        // Buscar dados relacionados
-        const relacionamentos = {};
+        // OTIMIZAÇÃO: Buscar relacionamentos em PARALELO
+        const relacionamentosPromises = [];
         
         if (updatedData.local_id) {
-            const { data: local } = await supabase.from('locais').select('id, nome').eq('id', updatedData.local_id).single();
-            relacionamentos.locais = local;
+            relacionamentosPromises.push(
+                supabase.from('locais').select('id, nome').eq('id', updatedData.local_id).single()
+                    .then(({ data }) => ({ key: 'locais', data }))
+            );
         }
         
         if (updatedData.acao_id) {
-            const { data: acao } = await supabase.from('acoes').select('id, nome').eq('id', updatedData.acao_id).single();
-            relacionamentos.acoes = acao;
+            relacionamentosPromises.push(
+                supabase.from('acoes').select('id, nome').eq('id', updatedData.acao_id).single()
+                    .then(({ data }) => ({ key: 'acoes', data }))
+            );
         }
         
         if (updatedData.responsavel_id) {
-            const { data: pessoa } = await supabase.from('pessoas').select('id, nome').eq('id', updatedData.responsavel_id).single();
-            relacionamentos.pessoas = pessoa;
+            relacionamentosPromises.push(
+                supabase.from('pessoas').select('id, nome').eq('id', updatedData.responsavel_id).single()
+                    .then(({ data }) => ({ key: 'pessoas', data }))
+            );
         }
         
         if (updatedData.comunidade_id) {
-            const { data: comunidade } = await supabase.from('comunidades').select('id, nome, foto, cor').eq('id', updatedData.comunidade_id).single();
-            relacionamentos.comunidades = comunidade;
+            relacionamentosPromises.push(
+                supabase.from('comunidades').select('id, nome, foto, cor').eq('id', updatedData.comunidade_id).single()
+                    .then(({ data }) => ({ key: 'comunidades', data }))
+            );
         }
         
         if (updatedData.pastoral_id) {
-            const { data: pastoral } = await supabase.from('pastorais').select('id, nome').eq('id', updatedData.pastoral_id).single();
-            relacionamentos.pastorais = pastoral;
+            relacionamentosPromises.push(
+                supabase.from('pastorais').select('id, nome').eq('id', updatedData.pastoral_id).single()
+                    .then(({ data }) => ({ key: 'pastorais', data }))
+            );
         }
         
         if (updatedData.pilar_id) {
-            const { data: pilar } = await supabase.from('pilares').select('id, nome').eq('id', updatedData.pilar_id).single();
-            relacionamentos.pilares = pilar;
+            relacionamentosPromises.push(
+                supabase.from('pilares').select('id, nome').eq('id', updatedData.pilar_id).single()
+                    .then(({ data }) => ({ key: 'pilares', data }))
+            );
         }
         
         if (updatedData.usuario_lancamento_id) {
-            const { data: usuario } = await supabase.from('usuarios').select('id, email').eq('id', updatedData.usuario_lancamento_id).single();
-            relacionamentos.usuarios = usuario;
+            relacionamentosPromises.push(
+                supabase.from('usuarios').select('id, email').eq('id', updatedData.usuario_lancamento_id).single()
+                    .then(({ data }) => ({ key: 'usuarios', data }))
+            );
         }
         
-        // Status removido - não é necessário carregar essa informação
+        // Executar todas as buscas em paralelo
+        const relacionamentosResults = await Promise.all(relacionamentosPromises);
+        
+        // Montar objeto de relacionamentos
+        const relacionamentos = {};
+        relacionamentosResults.forEach(({ key, data }) => {
+            if (data) relacionamentos[key] = data;
+        });
         
         // Combinar os dados
         const data = {
