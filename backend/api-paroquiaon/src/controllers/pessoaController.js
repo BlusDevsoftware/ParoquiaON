@@ -1,6 +1,7 @@
 const { supabase } = require('../config/supabase');
 
 // Helpers de upload para Supabase Storage (bucket: "pessoas")
+// Importante: o nome aqui deve bater exatamente com o nome do balde no Supabase
 const STORAGE_BUCKET = 'pessoas';
 
 function isBase64DataUrl(value) {
@@ -95,13 +96,12 @@ async function criarPessoa(req, res) {
             ? (String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo')
             : 'ativo';
 
-        const insertData = {
+        // Primeiro insere a pessoa sem foto para obter o ID
+        const baseInsert = {
             nome: body.nome,
             telefone: body.telefone ?? null,
             endereco: body.endereco ?? null,
             status: normalizedStatus,
-            // Igual Pastorais: persiste o que vier (base64 ou URL)
-            foto: body.foto ?? null,
             usuario_id: body.usuario_id ?? null,
             criado_por_email: body.criado_por_email ?? null,
             criado_por_nome: body.criado_por_nome ?? null
@@ -109,20 +109,20 @@ async function criarPessoa(req, res) {
 
         let insertResult = await supabase
             .from('pessoas')
-            .insert([insertData])
+            .insert([baseInsert])
             .select()
             .single();
 
         if (insertResult.error && insertResult.error.code === '42703') {
             // Fallback para esquemas com coluna boolean "ativo"
             const fallbackData = {
-                nome: insertData.nome,
-                telefone: insertData.telefone,
-                endereco: insertData.endereco,
+                nome: baseInsert.nome,
+                telefone: baseInsert.telefone,
+                endereco: baseInsert.endereco,
                 ativo: normalizedStatus === 'ativo',
-                usuario_id: insertData.usuario_id,
-                criado_por_email: insertData.criado_por_email,
-                criado_por_nome: insertData.criado_por_nome
+                usuario_id: baseInsert.usuario_id,
+                criado_por_email: baseInsert.criado_por_email,
+                criado_por_nome: baseInsert.criado_por_nome
             };
             insertResult = await supabase
                 .from('pessoas')
@@ -132,7 +132,31 @@ async function criarPessoa(req, res) {
         }
 
         if (insertResult.error) throw insertResult.error;
-        res.status(201).json(insertResult.data);
+
+        let pessoaCriada = insertResult.data;
+
+        // Se veio foto, processa: se for base64, faz upload pro Storage e troca por URL
+        if (body.foto) {
+            let fotoParaSalvar = body.foto;
+
+            if (isBase64DataUrl(body.foto)) {
+                const dadosComUrl = await uploadFotoIfNeeded({ foto: body.foto }, pessoaCriada.id);
+                fotoParaSalvar = dadosComUrl.foto || body.foto;
+            }
+
+            const { data: updated, error: updateError } = await supabase
+                .from('pessoas')
+                .update({ foto: fotoParaSalvar })
+                .eq('id', pessoaCriada.id)
+                .select()
+                .single();
+
+            if (!updateError && updated) {
+                pessoaCriada = updated;
+            }
+        }
+
+        res.status(201).json(pessoaCriada);
     } catch (error) {
         console.error('Erro ao criar pessoa:', error);
         res.status(500).json({ error: 'Erro ao criar pessoa', details: error?.message });
