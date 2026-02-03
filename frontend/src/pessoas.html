@@ -1855,8 +1855,53 @@
             };
             try {
                 if (form.dataset.id) {
-                    const { error } = await api.put(window.endpoints.pessoas.update(form.dataset.id), payload);
+                    const { data: pessoaAtualizada, error } = await api.put(window.endpoints.pessoas.update(form.dataset.id), payload);
                     if (error) throw error;
+
+                    // Se a pessoa editada for a mesma vinculada ao usuário logado,
+                    // atualizar imediatamente o avatar do topo (sem precisar recarregar a página)
+                    try {
+                        if (currentUser && currentUser.pessoa_id && String(currentUser.pessoa_id) === String(form.dataset.id)) {
+                            const novaFoto = (pessoaAtualizada && pessoaAtualizada.foto) || payload.foto || fotoValue || null;
+
+                            if (novaFoto && typeof ehUrlFoto === 'function' && ehUrlFoto(novaFoto)) {
+                                sessionStorage.setItem('paroquiaon_user_photo_cache', novaFoto);
+                                sessionStorage.removeItem('paroquiaon_user_photo_dataurl');
+                            }
+
+                            // Sincronizar objeto "user" salvo na sessão
+                            try {
+                                const userStr = sessionStorage.getItem('user');
+                                if (userStr) {
+                                    const parsed = JSON.parse(userStr);
+                                    parsed.foto = novaFoto || null;
+                                    if (parsed.pessoa && typeof parsed.pessoa === 'object') {
+                                        parsed.pessoa.foto = novaFoto || null;
+                                    }
+                                    sessionStorage.setItem('user', JSON.stringify(parsed));
+                                }
+                            } catch (_) {}
+
+                            // Atualizar cache rápido de usuário + avatar visível
+                            const userAtualizado = {
+                                ...currentUser,
+                                foto: novaFoto || currentUser.foto || null,
+                                pessoa: {
+                                    ...(currentUser.pessoa || {}),
+                                    foto: novaFoto || (currentUser.pessoa && currentUser.pessoa.foto) || null
+                                }
+                            };
+                            if (typeof atualizarCacheUsuario === 'function') {
+                                atualizarCacheUsuario(userAtualizado);
+                            }
+                            if (typeof atualizarAvatarUsuario === 'function') {
+                                atualizarAvatarUsuario(novaFoto || undefined);
+                            }
+                        }
+                    } catch (syncErr) {
+                        console.warn('Erro ao sincronizar avatar após atualização de pessoa:', syncErr);
+                    }
+
                     window.showUpdateSuccessModal(payload.status === 'ativo' ? 'Ativo' : 'Inativo');
                 } else {
                     const { error } = await api.post(window.endpoints.pessoas.create, payload);
