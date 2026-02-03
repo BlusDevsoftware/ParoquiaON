@@ -98,7 +98,39 @@ async function buscarUsuario(req, res) {
         if (!data) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
-        res.json(data);
+        
+        // Buscar dados relacionados (perfil e pessoa) para retornar informações completas
+        let perfilNome = null;
+        let pessoaNome = null;
+        let pessoaFoto = null;
+        
+        // Buscar nome do perfil se perfil_id existir
+        if (data.perfil_id) {
+            const { data: perfil } = await supabase
+                .from('perfis')
+                .select('nome')
+                .eq('id', data.perfil_id)
+                .single();
+            perfilNome = perfil?.nome || null;
+        }
+        
+        // Buscar dados da pessoa se pessoa_id existir
+        if (data.pessoa_id) {
+            const { data: pessoa } = await supabase
+                .from('pessoas')
+                .select('nome, foto')
+                .eq('id', data.pessoa_id)
+                .single();
+            pessoaNome = pessoa?.nome || null;
+            pessoaFoto = pessoa?.foto || null;
+        }
+        
+        res.json({
+            ...data,
+            perfilNome,
+            pessoaNome,
+            pessoaFoto
+        });
     } catch (error) {
         console.error('Erro ao buscar usuário:', error);
         res.status(500).json({ error: 'Erro ao buscar usuário' });

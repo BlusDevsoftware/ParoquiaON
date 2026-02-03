@@ -1664,11 +1664,12 @@
             const id = usuario?.id ?? usuario?.codigo ?? '';
             const el = document.createElement('div');
             el.className = 'row-card';
+            const inicial = (email || '?').charAt(0).toUpperCase();
             const avatarHtml = pessoaFoto
                 ? `<div style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:1px solid #e6e9ef;background:#fff;display:flex;align-items:center;justify-content:center;">
-                        <img src="${pessoaFoto}" alt="avatar" style="width:100%;height:100%;object-fit:cover;">
+                        <img src="${pessoaFoto}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;\\'>${inicial}</div>'">
                    </div>`
-                : `<div style="width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;">${(email||'?').charAt(0).toUpperCase()}</div>`;
+                : `<div style="width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;">${inicial}</div>`;
 
             el.innerHTML = `
                 <div>
