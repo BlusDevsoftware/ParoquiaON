@@ -172,10 +172,19 @@ async function atualizarPessoa(req, res) {
             : undefined;
 
         // Se houver foto base64, faz upload para o Storage e troca por URL
+        // Se vier base64, sempre processa (mesmo que já exista URL no banco)
         let fotoParaSalvar = body.foto;
-        if (body.foto !== undefined && isBase64DataUrl(body.foto)) {
-            const dadosComUrl = await uploadFotoIfNeeded({ foto: body.foto }, id);
-            fotoParaSalvar = dadosComUrl.foto;
+        if (body.foto !== undefined && body.foto !== null && body.foto !== '') {
+            if (isBase64DataUrl(body.foto)) {
+                // Nova foto em base64: fazer upload e substituir por URL
+                console.log('📸 Processando nova foto base64 para pessoa', id);
+                const dadosComUrl = await uploadFotoIfNeeded({ foto: body.foto }, id);
+                fotoParaSalvar = dadosComUrl.foto || body.foto;
+                console.log('✅ Foto processada:', fotoParaSalvar?.substring(0, 50) + '...');
+            } else {
+                // Se não for base64 (é URL), mantém como está
+                console.log('📸 Foto recebida é URL, mantendo:', body.foto?.substring(0, 50) + '...');
+            }
         }
 
         const updateData = {

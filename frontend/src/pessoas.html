@@ -1841,6 +1841,9 @@
             const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
             const hiddenFotoInput = form.querySelector('input[name="foto"]');
             const fotoValue = hiddenFotoInput ? hiddenFotoInput.value : '';
+            // Debug: verificar se foto é base64 ou URL
+            const fotoTipo = fotoValue && fotoValue.startsWith('data:image') ? 'base64' : (fotoValue && fotoValue.startsWith('http') ? 'URL' : 'vazio');
+            console.log('📸 Foto sendo enviada:', fotoTipo, fotoValue ? fotoValue.substring(0, 50) + '...' : 'nenhuma');
             const payload = {
                 nome: form.nomePessoa.value,
                 telefone: form.telefonePessoa.value || '',

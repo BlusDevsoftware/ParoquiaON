@@ -487,6 +487,10 @@
                     } catch { return null; }
                 })();
 
+                const fotoValue = form.querySelector('input[name="foto"]').value || null;
+                // Debug: verificar se foto é base64 ou URL
+                const fotoTipo = fotoValue && fotoValue.startsWith('data:image') ? 'base64' : (fotoValue && fotoValue.startsWith('http') ? 'URL' : 'vazio');
+                console.log('📸 Foto sendo enviada:', fotoTipo, fotoValue ? fotoValue.substring(0, 50) + '...' : 'nenhuma');
                 const dadosAtualizacao = {
                     nome: nome,
                     telefone: form.telefone.value.trim(),
@@ -495,7 +499,7 @@
                     status: form.status.value || 'Ativo',
                     conselho_membros: conselhoMembrosJson,
                     responsaveis: responsaveisJson,
-                    foto: (form.querySelector('input[name="foto"]').value || null),
+                    foto: fotoValue,
                     cor: form.cor.value || '#1e3a8a'
                 };
                 

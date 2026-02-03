@@ -124,15 +124,24 @@ async function atualizarComunidade(req, res) {
         let dados = req.body || {};
 
         // Se houver foto base64, faz upload e troca por URL antes de atualizar
-        if (isBase64DataUrl(dados.foto)) {
-            // Recupera o registro para obter o código em caso de upload
-            const { data: atual, error: fetchError } = await supabase
-                .from('comunidades')
-                .select('id, codigo')
-                .eq('id', id)
-                .single();
-            if (!fetchError && atual) {
-                dados = await uploadFotoIfNeeded(dados, atual.codigo || atual.id);
+        // Se vier base64, sempre processa (mesmo que já exista URL no banco)
+        if (dados.foto !== undefined && dados.foto !== null && dados.foto !== '') {
+            if (isBase64DataUrl(dados.foto)) {
+                // Nova foto em base64: fazer upload e substituir por URL
+                console.log('📸 Processando nova foto base64 para comunidade', id);
+                // Recupera o registro para obter o código em caso de upload
+                const { data: atual, error: fetchError } = await supabase
+                    .from('comunidades')
+                    .select('id, codigo')
+                    .eq('id', id)
+                    .single();
+                if (!fetchError && atual) {
+                    dados = await uploadFotoIfNeeded(dados, atual.codigo || atual.id);
+                    console.log('✅ Foto processada:', dados.foto?.substring(0, 50) + '...');
+                }
+            } else {
+                // Se não for base64 (é URL), mantém como está
+                console.log('📸 Foto recebida é URL, mantendo:', dados.foto?.substring(0, 50) + '...');
             }
         }
 
