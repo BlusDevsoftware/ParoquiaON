@@ -342,7 +342,7 @@ html.login-page, body.login-page {
     }
 
     .login-message {
-        display: none;
+        display: none !important;
     }
 
     .shape-1, .shape-2 {
@@ -351,9 +351,33 @@ html.login-page, body.login-page {
     }
 }
 
+/* Mobile: garantir que login-message não apareça e não afete o layout */
+@media (max-width: 768px) {
+    .login-message {
+        display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+    }
+    
+    .login-container {
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .login-box {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
 @media (max-width: 480px) {
     .login-box {
-        padding: 30px;
+        padding: 30px 20px;
     }
 
     .form-options {
@@ -364,6 +388,21 @@ html.login-page, body.login-page {
 
     .login-header h2 {
         font-size: 24px;
+    }
+    
+    /* Garantir que login-message não apareça em mobile pequeno */
+    .login-message {
+        display: none !important;
+    }
+    
+    /* Centralizar melhor o formulário */
+    .login-container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        border-radius: 0;
+        min-height: 100vh;
+        justify-content: center;
     }
 }
 
