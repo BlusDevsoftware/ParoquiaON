@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/BlusDevsoftware/ParoquiaON#readme",
   "engines": {
-    "node": ">=18.0.0"
+    "node": "22.x"
   },
   "devDependencies": {
     "vite": "^5.0.0",
