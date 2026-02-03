@@ -2,18 +2,19 @@ const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+// Preferir a service role key quando disponível (backend)
+const rawKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Supabase URL e Key são obrigatórios. Verifique as variáveis de ambiente SUPABASE_URL e SUPABASE_KEY');
+if (!supabaseUrl || !rawKey) {
+    throw new Error('Supabase URL e Key são obrigatórios. Verifique SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY/SUPABASE_KEY');
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, rawKey);
 
 // Configurações adicionais do Supabase
 const supabaseConfig = {
     url: supabaseUrl,
-    key: supabaseKey,
+    key: rawKey,
     options: {
         auth: {
             autoRefreshToken: true,
