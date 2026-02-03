@@ -4658,10 +4658,13 @@
         window.updateRecentAppointments = function() {
             if (window.AgendaUI) {
                 const list = Array.isArray(events) ? [...events] : [];
-                // Ordenar por início desc e limitar aos 10 mais recentes
+                // Ordenar por data de criação (created_at) desc e limitar aos 10 mais recentes
                 list.sort((a, b) => {
-                    const getTime = (ev) => new Date(ev.startTime || ev.start_time || ev.inicio || ev.data_inicio || ev.dataHoraInicio || ev.start || 0).getTime();
-                    return getTime(b) - getTime(a);
+                    const getCreatedTime = (ev) => {
+                        const created = ev.created_at || ev.createdAt || ev.data_criacao || ev.dataCriacao || 0;
+                        return created ? new Date(created).getTime() : 0;
+                    };
+                    return getCreatedTime(b) - getCreatedTime(a); // Descendente: mais recentes primeiro
                 });
                 const top10 = list.slice(0, 10);
                 window.AgendaUI.updateRecentAppointments(top10);

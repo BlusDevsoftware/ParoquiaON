@@ -28,7 +28,14 @@
     const appointmentsList = document.getElementById('recentAppointmentsList');
     if (!appointmentsList) return;
     appointmentsList.innerHTML = '';
-    const sortedEvents = [...events].sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+    // Ordenar por data de criação (created_at) em ordem decrescente (mais recentes primeiro)
+    const sortedEvents = [...events].sort((a, b) => {
+      const getCreatedTime = (ev) => {
+        const created = ev.created_at || ev.createdAt || ev.data_criacao || ev.dataCriacao || 0;
+        return created ? new Date(created).getTime() : 0;
+      };
+      return getCreatedTime(b) - getCreatedTime(a); // Descendente: mais recentes primeiro
+    });
     const recentEvents = sortedEvents.slice(0, 10);
     if (recentEvents.length === 0) {
       appointmentsList.innerHTML = `
