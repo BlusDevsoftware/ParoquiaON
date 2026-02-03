@@ -4673,11 +4673,27 @@
             e.preventDefault();
             const submitBtn = document.querySelector('#eventForm .new-appointment-actions .btn-primary');
             const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+            const originalBtnDisabled = submitBtn ? submitBtn.disabled : false;
+            
+            // Função helper para restaurar o botão
+            const restaurarBotao = () => {
+                if (submitBtn) {
+                    submitBtn.classList.remove('btn-loading');
+                    submitBtn.innerHTML = originalBtnHtml;
+                    submitBtn.disabled = originalBtnDisabled;
+                }
+            };
+            
+            // Marcar botão como carregando
             if (submitBtn) {
                 submitBtn.classList.add('btn-loading');
+                submitBtn.disabled = true;
                 submitBtn.innerHTML = '<span class="btn-spinner"></span>&nbsp;Salvando...';
             }
-            const DU = window.DateUtils;
+            
+            // Usar try/finally para garantir que o botão sempre seja restaurado
+            try {
+                const DU = window.DateUtils;
             const AC = window.AgendaCache;
             // Fallbacks locais se DateUtils não estiver disponível
             const pad2 = (n) => String(n).padStart(2, '0');
@@ -4721,6 +4737,7 @@
             }
             if (!Array.isArray(periods) || periods.length === 0) {
                 if (typeof showToast === 'function') showToast('Por favor, adicione pelo menos um período.', 'error');
+                restaurarBotao();
                 return;
             }
 
@@ -4770,14 +4787,17 @@
 
             if (!formData.titulo) {
                 if (typeof showToast === 'function') showToast('Informe o título do evento.', 'error');
+                restaurarBotao();
                 return;
             }
             if (!formData.dataInicio && !isEditing) {
                 if (typeof showToast === 'function') showToast('Informe a data do evento ou adicione um período.', 'error');
+                restaurarBotao();
                 return;
             }
             if (horarios.length === 0) {
                 if (typeof showToast === 'function') showToast('Adicione pelo menos um horário.', 'error');
+                restaurarBotao();
                 return;
             }
 
@@ -4821,10 +4841,12 @@
                 const h = horarios[i];
                 if (!h.hora_inicio || !h.hora_fim) {
                     if (typeof showToast === 'function') showToast(`Preencha os horários do slot ${i + 1}.`, 'error');
+                    restaurarBotao();
                     return;
                 }
                 if (h.hora_inicio >= h.hora_fim) {
                     if (typeof showToast === 'function') showToast(`Início deve ser antes do fim no slot ${i + 1}.`, 'error');
+                    restaurarBotao();
                     return;
                 }
                 const dateStr = h.data || formData.dataInicio; // YYYY-MM-DD
@@ -4858,13 +4880,13 @@
                 });
             }
 
-            try {
                 const resultados = [];
-                const isEditing = editingEvent && editingEvent.id;
+                // isEditing já foi declarado acima
 
                 if (isEditing) {
                     if (eventos.length === 0) {
                         if (typeof showToast === 'function') showToast('Adicione pelo menos um período para salvar.', 'error');
+                        restaurarBotao();
                         return;
                     }
                     const eventoAtualizado = { ...eventos[0] };
@@ -4999,10 +5021,8 @@
                 console.error('Erro ao criar evento:', error);
                 if (typeof showToast === 'function') showToast('Erro ao criar evento', 'error');
             } finally {
-                if (submitBtn) {
-                    submitBtn.classList.remove('btn-loading');
-                    submitBtn.innerHTML = originalBtnHtml || 'Salvar Evento';
-                }
+                // Garantir que o botão sempre seja restaurado, mesmo se houver erro ou return antecipado
+                restaurarBotao();
             }
         };
     </script>
@@ -8194,6 +8214,30 @@
                         console.log('📝 Formulário submetido');
                         handleEventSubmit(e);
                     });
+                    
+                    // Prevenir submit acidental com Enter (só permite se for no botão de salvar)
+                    form.addEventListener('keydown', function(e) {
+                        // Se pressionar Enter e não for no botão de submit, prevenir
+                        if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.type !== 'submit') {
+                            // Se estiver em um textarea, permitir quebra de linha
+                            if (e.target.tagName === 'TEXTAREA') {
+                                return; // Permite Enter normal em textarea
+                            }
+                            // Para outros campos, prevenir submit
+                            e.preventDefault();
+                            e.stopPropagation();
+                            // Opcional: focar no próximo campo
+                            const nextField = e.target.closest('.form-group')?.nextElementSibling?.querySelector('input, select, textarea');
+                            if (nextField) {
+                                nextField.focus();
+                            } else {
+                                // Se não houver próximo campo, focar no botão de salvar
+                                const submitBtn = form.querySelector('.new-appointment-actions .btn-primary');
+                                if (submitBtn) submitBtn.focus();
+                            }
+                        }
+                    });
+                    
                     form.setAttribute('data-submit-listener', 'true');
                     console.log('✅ Event listener de submit adicionado ao formulário');
                 }
