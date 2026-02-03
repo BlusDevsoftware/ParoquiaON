@@ -37,8 +37,17 @@ async function uploadFotoIfNeeded(dados, identificador) {
         .storage
         .from(STORAGE_BUCKET)
         .getPublicUrl(path);
+    
+    // Importante: adiciona um "cache buster" na URL pública para evitar que o navegador
+    // continue mostrando a foto antiga quando o arquivo é sobrescrito no mesmo caminho.
+    // Assim, sempre que houver um novo upload, a URL gravada no banco muda e força o refresh.
+    const baseUrl = publicUrlData?.publicUrl || dados.foto;
+    const cacheBuster = Date.now();
+    const urlComVersao = baseUrl
+        ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}v=${cacheBuster}`
+        : dados.foto;
 
-    return { ...dados, foto: publicUrlData?.publicUrl || dados.foto };
+    return { ...dados, foto: urlComVersao };
 }
 
 async function listarPessoas(req, res) {
