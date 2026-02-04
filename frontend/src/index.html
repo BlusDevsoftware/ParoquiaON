@@ -436,6 +436,119 @@
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE e Edge */
         }
+
+        /* Estilos específicos do card "Eventos por Comunidade" (Minha Comunidade) */
+        #eventos-comunidade-card {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        #eventos-comunidade-card .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        #eventos-comunidade-card .chart-header h2 {
+            margin: 0;
+        }
+
+        #eventos-comunidade-card .chart-subtitle {
+            margin: 4px 0 0 0;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        #eventos-comunidade-card .chart-total-badge {
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #ecfdf3;
+            color: #166534;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #eventos-comunidade-card .chart-total-badge::before {
+            content: '↗';
+            font-size: 13px;
+        }
+
+        #eventos-comunidade-card .chart-legend-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        #eventos-comunidade-card .chart-legend-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #f9fafb;
+            font-size: 12px;
+            color: #0f172a;
+            border: 1px solid #e5e7eb;
+            max-width: 220px;
+        }
+
+        #eventos-comunidade-card .chart-legend-chip-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: #3b82f6;
+        }
+
+        #eventos-comunidade-card .chart-legend-chip-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        #eventos-comunidade-card .chart-legend-chip-value {
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        #eventos-comunidade-card .chart-body {
+            height: 260px;
+        }
+
+        #eventos-comunidade-card .chart-footer-metrics {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            padding-top: 8px;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 4px;
+        }
+
+        #eventos-comunidade-card .chart-footer-metrics .metric {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        #eventos-comunidade-card .metric-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #9ca3af;
+        }
+
+        #eventos-comunidade-card .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
         
         .main-content::-webkit-scrollbar {
             display: none; /* Chrome, Safari, Opera */
@@ -727,9 +840,32 @@
 
         <!-- Charts Section -->
         <div class="charts-section">
-            <div class="chart-container">
-                <h2>Eventos por Comunidade</h2>
-                <canvas id="pessoasChart"></canvas>
+            <div class="chart-container" id="eventos-comunidade-card">
+                <div class="chart-header">
+                    <div>
+                        <h2>Eventos por Comunidade</h2>
+                        <p class="chart-subtitle">Distribuição de eventos entre as comunidades</p>
+                    </div>
+                    <div class="chart-total-badge" id="eventos-comunidade-total">- total</div>
+                </div>
+                <div class="chart-legend-chips" id="eventos-comunidade-chips"></div>
+                <div class="chart-body">
+                    <canvas id="pessoasChart"></canvas>
+                </div>
+                <div class="chart-footer-metrics" id="eventos-comunidade-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Comunidades</span>
+                        <span class="metric-value" id="eventos-comunidade-qtd-comunidades">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Maior quantidade</span>
+                        <span class="metric-value" id="eventos-comunidade-maior-quantidade">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Média por comunidade</span>
+                        <span class="metric-value" id="eventos-comunidade-media">-</span>
+                    </div>
+                </div>
             </div>
             <div class="chart-container">
                 <h2>Distribuição por Pastorais</h2>
@@ -1014,6 +1150,9 @@
                 }
 
                 // Gráfico de eventos por comunidade
+                const eventosPorComunidade = dadosGraficos.eventosPorComunidade || { labels: [], dados: [], cores: [] };
+                atualizarCardEventosPorComunidade(eventosPorComunidade);
+
                 const ctxPessoas = document.getElementById('pessoasChart').getContext('2d');
                 pessoasChart = new Chart(ctxPessoas, {
                     type: 'bar',
@@ -1035,16 +1174,21 @@
                         plugins: { 
                             legend: { display: false },
                             tooltip: {
-                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                backgroundColor: 'rgba(15, 23, 42, 0.96)',
                                 titleFont: { size: 13, weight: '600', family: 'system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif' },
                                 bodyFont: { size: 12, family: 'system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif' },
-                                padding: 10,
-                                cornerRadius: 8,
+                                padding: 12,
+                                cornerRadius: 12,
+                                displayColors: true,
                                 callbacks: {
                                     label: function(ctx) {
+                                        const total = eventosPorComunidade.dados.reduce((sum, v) => sum + (v || 0), 0) || 0;
                                         const value = ctx.parsed.y || 0;
                                         const plural = value === 1 ? 'evento' : 'eventos';
-                                        return `${value} ${plural}`;
+                                        const base = `${value} ${plural}`;
+                                        if (!total || !value) return base;
+                                        const perc = ((value / total) * 100).toFixed(1);
+                                        return [`${base}`, `${perc}% do total`];
                                     }
                                 }
                             }
@@ -1202,6 +1346,52 @@
                     eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] },
                     comunidades: { labels: ['Sem dados'], dados: [0] }
                 };
+            }
+        }
+
+        // Atualiza título, chips e métricas do card "Eventos por Comunidade"
+        function atualizarCardEventosPorComunidade(eventosPorComunidade) {
+            try {
+                const labels = eventosPorComunidade.labels || [];
+                const dados = eventosPorComunidade.dados || [];
+                const cores = eventosPorComunidade.cores || [];
+                const total = dados.reduce((sum, v) => sum + (v || 0), 0);
+                const qtdComunidades = labels.length;
+                const maiorQuantidade = dados.reduce((max, v) => v > max ? v : max, 0);
+                const media = qtdComunidades ? (total / qtdComunidades) : 0;
+
+                const totalEl = document.getElementById('eventos-comunidade-total');
+                if (totalEl) {
+                    totalEl.textContent = `${total} total`;
+                }
+
+                const comunidadesEl = document.getElementById('eventos-comunidade-qtd-comunidades');
+                if (comunidadesEl) comunidadesEl.textContent = qtdComunidades || '0';
+
+                const maiorQtdEl = document.getElementById('eventos-comunidade-maior-quantidade');
+                if (maiorQtdEl) maiorQtdEl.textContent = maiorQuantidade || '0';
+
+                const mediaEl = document.getElementById('eventos-comunidade-media');
+                if (mediaEl) mediaEl.textContent = media ? Math.round(media) : '0';
+
+                const chipsContainer = document.getElementById('eventos-comunidade-chips');
+                if (chipsContainer) {
+                    chipsContainer.innerHTML = '';
+                    labels.forEach((nome, idx) => {
+                        const valor = dados[idx] || 0;
+                        const cor = cores[idx] || '#3b82f6';
+                        const chip = document.createElement('div');
+                        chip.className = 'chart-legend-chip';
+                        chip.innerHTML = `
+                            <span class=\"chart-legend-chip-color\" style=\"background:${cor}\"></span>
+                            <span class=\"chart-legend-chip-name\" title=\"${nome}\">${nome}</span>
+                            <span class=\"chart-legend-chip-value\">${valor}</span>
+                        `;
+                        chipsContainer.appendChild(chip);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar card Eventos por Comunidade:', error);
             }
         }
 
