@@ -660,6 +660,18 @@
             .chart-container {
                 padding: 12px;
             }
+
+            /* Ajuste específico para o card de Eventos por Comunidade no mobile/tablet */
+            #eventos-comunidade-card {
+                height: auto;
+            }
+            #eventos-comunidade-card .chart-body {
+                height: 220px;
+            }
+            #eventos-comunidade-card .chart-footer-metrics {
+                flex-wrap: wrap;
+                row-gap: 8px;
+            }
         }
 
         /* Media Query: Mobile pequeno (max-width: 480px) */
@@ -718,6 +730,19 @@
             .chart-container {
                 padding: 10px;
                 height: 250px;
+            }
+
+            /* Garantir que o card de Eventos por Comunidade não corte o gráfico nem os totalizadores no mobile pequeno */
+            #eventos-comunidade-card {
+                height: auto;
+            }
+            #eventos-comunidade-card .chart-body {
+                height: 220px;
+            }
+            #eventos-comunidade-card .chart-footer-metrics {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
             }
         }
     </style>
