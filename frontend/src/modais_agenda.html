@@ -3,6 +3,59 @@
 
 <!-- Modal removido - usando apenas o modal padrão -->
 
+<!-- Estilos específicos para o botão de IA (efeito inspirado em Gemini) -->
+<style>
+    .ai-objetivo-actions .gemini-icon {
+        position: relative;
+        width: 20px;
+        height: 20px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 30%, #e0f2fe, #1d4ed8 45%, #0f172a 80%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 6px;
+        overflow: hidden;
+    }
+
+    .ai-objetivo-actions .gemini-orbit {
+        position: absolute;
+        border-radius: 999px;
+        border: 1px solid rgba(248, 250, 252, 0.7);
+        animation: gemini-orbit 3s linear infinite;
+    }
+
+    .ai-objetivo-actions .gemini-orbit-1 {
+        width: 140%;
+        height: 140%;
+    }
+
+    .ai-objetivo-actions .gemini-orbit-2 {
+        width: 95%;
+        height: 95%;
+        opacity: 0.6;
+        animation-duration: 2.2s;
+        animation-direction: reverse;
+    }
+
+    .ai-objetivo-actions .gemini-core {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: #f9fafb;
+        box-shadow: 0 0 8px rgba(248, 250, 252, 0.9);
+    }
+
+    @keyframes gemini-orbit {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
 <!-- Modal de Novo Agendamento (versão padrão) -->
 <div id="eventModal" class="modal active" style="display: none;">
     <div class="modal-content new-appointment-modal">
@@ -199,7 +252,12 @@
                             <label>Objetivo/Descrição:</label>
                             <div class="ai-objetivo-actions" style="display:flex; gap:10px; align-items:center; margin: 6px 0 10px 0; flex-wrap: wrap;">
                                 <button type="button" class="btn-secondary" id="btnGerarObjetivoIA" title="Gerar um texto de objetivo automaticamente com IA">
-                                    <i class="fas fa-atom"></i> Gerar objetivo com IA
+                                    <span class="gemini-icon">
+                                        <span class="gemini-orbit gemini-orbit-1"></span>
+                                        <span class="gemini-orbit gemini-orbit-2"></span>
+                                        <span class="gemini-core"></span>
+                                    </span>
+                                    Gerar objetivo com IA
                                 </button>
                                 <small id="aiObjetivoStatus" style="color:#6b7280;"></small>
                             </div>
