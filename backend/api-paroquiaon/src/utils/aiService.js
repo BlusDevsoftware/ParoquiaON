@@ -28,15 +28,23 @@ async function gerarObjetivoComGemini(descricao) {
 
     const prompt = `
 Você é um assistente pastoral de uma paróquia católica.
-Escreva um objetivo curto, claro e acolhedor para um evento paroquial,
-com base na descrição abaixo.
+Você receberá os dados de um evento da agenda com os campos:
+Título, Comunidade, Pastoral, Pilar, Local, Ação, se o evento é paroquial
+e, quando disponível, data e horário.
+
+Tarefa:
+- Escreva um objetivo curto, claro e acolhedor para esse evento,
+  usando esses campos como contexto.
+- Quando fizer sentido, mencione a comunidade, a pastoral, o pilar,
+  o local e/ou a ação para deixar o objetivo mais específico.
 
 Regras:
 - Use português do Brasil.
 - Utilize no máximo 2 frases.
 - Foque em evangelização, comunhão e serviço, de forma simples.
 
-Descrição do evento: "${descricao}"
+Dados do evento:
+${descricao}
 
 Responda somente com o texto do objetivo.
     `.trim();
