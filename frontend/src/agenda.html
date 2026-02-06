@@ -8106,6 +8106,9 @@
         window.openEventModalFromCreate = function(date = null) {
             editingEvent = null;
             editingEventPeriods = [];
+            if (typeof resetEventFormFields === 'function') {
+                resetEventFormFields();
+            }
             setEventFormMode('create');
             openEventModal(date);
         };
@@ -8383,6 +8386,24 @@
                 }
             };
 
+            // Função auxiliar para resetar formulário do evento
+            function resetEventFormFields() {
+                const form = document.getElementById('eventForm');
+                if (form) {
+                    form.reset();
+                }
+
+                const objetivoInput = document.getElementById('eventObjetivo');
+                if (objetivoInput) {
+                    objetivoInput.value = '';
+                }
+
+                // Garantir que períodos e modos sejam resetados
+                if (typeof window.clearAllPeriods === 'function') {
+                    window.clearAllPeriods();
+                }
+            }
+
             // Função auxiliar para resetar cards expandidos
             function resetExpandedCards() {
                 const expandedCards = document.querySelectorAll('.event-expanded');
@@ -8404,6 +8425,7 @@
                 
                 // Resetar todos os cards expandidos 
                 resetExpandedCards();
+                resetEventFormFields();
                 editingEvent = null;
                 editingEventPeriods = [];
                 setEventFormMode('create');
