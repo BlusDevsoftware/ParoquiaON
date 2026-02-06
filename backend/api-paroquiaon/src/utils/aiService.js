@@ -2,6 +2,9 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Inicializa o cliente do Gemini usando a variável de ambiente
 const apiKey = process.env.GEMINI_API_KEY;
+// Permitir configurar o modelo via env; padrão: gemini-2.5-flash (disponível na sua conta)
+const defaultModel = 'gemini-2.5-flash';
+const modelId = process.env.GEMINI_MODEL || defaultModel;
 
 if (!apiKey) {
     console.warn('[AI Service] GEMINI_API_KEY não configurada. As chamadas de IA irão falhar até que a variável seja definida.');
@@ -21,9 +24,7 @@ async function gerarObjetivoComGemini(descricao) {
         throw new Error('GEMINI_API_KEY não configurada no servidor');
     }
 
-    // Usar o modelo recomendado na API generativelanguage v1beta
-    // (sufixo -latest é o que o Google indica hoje para produção)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    const model = genAI.getGenerativeModel({ model: modelId });
 
     const prompt = `
 Você é um assistente pastoral de uma paróquia católica.
