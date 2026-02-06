@@ -575,6 +575,91 @@
     </div>
 </div>
 
+<!-- Modal de apresentação do Gerador de Objetivo com IA (onboarding) -->
+<div id="onboardingIAObjetivoModal" class="modal" style="display: none;">
+    <div class="modal-content new-appointment-modal" style="max-width: 900px;">
+        <div class="modal-header new-appointment-header">
+            <h2 class="modal-title">
+                <span class="gemini-icon">
+                    <span class="gemini-star"></span>
+                </span>
+                Gerador de Objetivo com IA
+            </h2>
+            <button class="close-modal" id="onboardingIAObjetivoCloseBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body new-appointment-body" style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr); gap: 20px; align-items: stretch;">
+            <!-- Lado esquerdo: texto explicativo -->
+            <div>
+                <p style="font-size: 14px; color: #4b5563; margin-bottom: 14px;">
+                    Apresentamos o <strong>Gerador de Objetivo com IA</strong>: uma ajuda rápida para escrever o objetivo/descrição
+                    dos seus eventos com qualidade pastoral e linguagem acolhedora.
+                </p>
+
+                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #374151;">
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">1</span>
+                        <span><strong>Preencha os campos principais</strong> (título, comunidade, pastoral, pilar, local e ação).</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">2</span>
+                        <span>Clique em <strong>Gerar objetivo com IA</strong> ao lado do campo Objetivo/Descrição.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">3</span>
+                        <span>
+                            <strong>Revise e ajuste o texto sugerido</strong> antes de salvar o evento. A decisão final é sempre sua.
+                        </span>
+                    </li>
+                </ul>
+
+                <div style="margin-top: 16px; padding: 10px 12px; border-radius: 10px; background:#eff6ff; border:1px solid #bfdbfe; font-size:12px; color:#1e3a8a; display:flex; gap:8px; align-items:flex-start;">
+                    <i class="fas fa-info-circle" style="margin-top:2px;"></i>
+                    <span>
+                        A IA usa apenas as informações deste formulário para sugerir o objetivo.
+                        Você pode editar tudo livremente e nada é enviado para outras pessoas.
+                    </span>
+                </div>
+            </div>
+
+            <!-- Lado direito: mini ilustração do botão + campo objetivo -->
+            <div style="border-radius: 12px; border: 1px solid #e5e7eb; padding: 14px; background: linear-gradient(135deg, #f9fafb, #eff6ff); display:flex; flex-direction:column; gap:10px;">
+                <div style="font-size:12px; font-weight:600; color:#1f2937; display:flex; align-items:center; gap:6px;">
+                    <span class="gemini-icon">
+                        <span class="gemini-star"></span>
+                    </span>
+                    <span>Objetivo/Descrição</span>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center; margin-top:2px;">
+                    <button type="button" style="border-radius:999px; border:1px solid #bfdbfe; background:#e0f2fe; color:#1d4ed8; font-size:11px; padding:4px 10px; display:inline-flex; align-items:center; gap:6px;">
+                        <span class="gemini-icon" style="width:16px; height:16px;">
+                            <span class="gemini-star"></span>
+                        </span>
+                        Gerar com IA
+                    </button>
+                    <span style="font-size:11px; color:#6b7280;">Preencha os dados do evento e clique aqui</span>
+                </div>
+                <div style="margin-top:8px;">
+                    <div style="border-radius:10px; border:1px dashed #cbd5f5; background:#ffffff; padding:10px; font-size:11px; color:#4b5563;">
+                        “Fortalecer a comunhão e a missão da comunidade por meio deste encontro, promovendo
+                        oração, formação e partilha entre os participantes.”
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:#4b5563;">
+                <input type="checkbox" id="onboardingIAObjetivoDontShowAgain" style="accent-color:#1d4ed8;">
+                Não mostrar novamente
+            </label>
+            <button class="btn-primary" id="onboardingIAObjetivoGotItBtn" style="padding:8px 16px; border-radius:999px;">
+                Entendi
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Estilos específicos para mobile e badge de novidade -->
 <style>
     /* Badge de novidade no Agendamento Dinâmico */

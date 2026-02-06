@@ -5083,6 +5083,28 @@
                 console.error('❌ Erro ao salvar preferência do onboarding:', error);
             }
         }
+
+        // Onboarding: Gerador de Objetivo com IA
+        function shouldShowOnboardingIAObjetivo() {
+            try {
+                return localStorage.getItem('onboardingIAObjetivoShown') !== 'true';
+            } catch (error) {
+                console.error('❌ Erro ao ler preferência do onboarding de IA:', error);
+                return false;
+            }
+        }
+
+        function saveOnboardingIAObjetivoPreference(dontShowAgain) {
+            try {
+                if (dontShowAgain) {
+                    localStorage.setItem('onboardingIAObjetivoShown', 'true');
+                } else {
+                    localStorage.removeItem('onboardingIAObjetivoShown');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao salvar preferência do onboarding de IA:', error);
+            }
+        }
         
         function ocultarSpinnerAgenda() {
             const spinner = document.getElementById('loader-agenda');
@@ -5101,6 +5123,31 @@
                     }
                 }
             } catch (_) {}
+
+            // Exibir onboarding do Gerador de Objetivo com IA (uma vez)
+            try {
+                if (shouldShowOnboardingIAObjetivo() && !window.__onboardingIAObjetivoShown) {
+                    const onboardingIAModal = document.getElementById('onboardingIAObjetivoModal');
+                    if (onboardingIAModal) {
+                        onboardingIAModal.style.display = 'flex';
+                        window.__onboardingIAObjetivoShown = true;
+
+                        const closeBtn = document.getElementById('onboardingIAObjetivoCloseBtn');
+                        const gotItBtn = document.getElementById('onboardingIAObjetivoGotItBtn');
+                        const dontShowAgainCheckbox = document.getElementById('onboardingIAObjetivoDontShowAgain');
+
+                        const closeHandler = () => {
+                            onboardingIAModal.style.display = 'none';
+                            saveOnboardingIAObjetivoPreference(dontShowAgainCheckbox && dontShowAgainCheckbox.checked);
+                        };
+
+                        if (closeBtn) closeBtn.addEventListener('click', closeHandler);
+                        if (gotItBtn) gotItBtn.addEventListener('click', closeHandler);
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Erro ao exibir onboarding do gerador IA:', error);
+            }
         }
 
         // Inicializar aplicação
@@ -7868,20 +7915,20 @@
                     const { data, error } = await window.api.post('/ai/objetivo', { descricao });
                     if (error) {
                         console.error('Erro ao gerar objetivo com IA:', error);
-                        alert('Não foi possível gerar o objetivo com IA. Tente novamente.');
+                        alert('O gerador por IA está indisponível no momento. Tente novamente mais tarde.');
                         return;
                     }
 
                     const objetivo = data && data.objetivo ? String(data.objetivo).trim() : '';
                     if (!objetivo) {
-                        alert('A IA não retornou um objetivo. Ajuste as informações e tente novamente.');
+                        alert('O gerador por IA está indisponível no momento. Tente novamente mais tarde.');
                         return;
                     }
 
                     objetivoInput.value = objetivo;
                 } catch (e) {
                     console.error('Falha ao gerar objetivo com IA:', e);
-                    alert('Falha ao gerar objetivo com IA. Tente novamente.');
+                    alert('O gerador por IA está indisponível no momento. Tente novamente mais tarde.');
                 } finally {
                     btn.disabled = false;
                     btn.classList.remove('ai-loading');
