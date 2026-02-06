@@ -7801,6 +7801,94 @@
         // Executar scripts dos modais
         function executeModalScripts() {
             console.log('🔧 Executando scripts dos modais...');
+
+        // IA: gerar "Objetivo/Descrição" com Gemini (via backend /api/ai/objetivo)
+        function setupObjetivoIA() {
+            const btn = document.getElementById('btnGerarObjetivoIA');
+            const objetivoInput = document.getElementById('eventObjetivo');
+            const statusEl = document.getElementById('aiObjetivoStatus');
+
+            if (!btn || !objetivoInput) return;
+
+            // Evitar bind duplicado se executeModalScripts rodar mais de uma vez
+            if (btn.dataset.bound === '1') return;
+            btn.dataset.bound = '1';
+
+            function getSelectText(selectId) {
+                const el = document.getElementById(selectId);
+                if (!el || !el.options) return '';
+                const opt = el.options[el.selectedIndex];
+                return opt && opt.value ? (opt.textContent || '').trim() : '';
+            }
+
+            function buildDescricao() {
+                const title = (document.getElementById('eventTitle')?.value || '').trim();
+                const comunidade = getSelectText('eventCommunity');
+                const pastoral = getSelectText('eventPastoral');
+                const pilar = getSelectText('eventPilares');
+                const local = getSelectText('eventLocation');
+                const acao = getSelectText('eventAcao');
+                const paroquial = !!document.getElementById('eventParoquial')?.checked;
+
+                // Data/hora do primeiro período (se já preenchido)
+                const date = (document.getElementById('newPeriodDate')?.value || '').trim();
+                const start = (document.getElementById('newPeriodStartTime')?.value || '').trim();
+                const end = (document.getElementById('newPeriodEndTime')?.value || '').trim();
+
+                const parts = [];
+                if (title) parts.push(`Título: ${title}`);
+                if (paroquial) parts.push('Evento paroquial: sim');
+                if (comunidade) parts.push(`Comunidade: ${comunidade}`);
+                if (pastoral) parts.push(`Pastoral: ${pastoral}`);
+                if (pilar) parts.push(`Pilar: ${pilar}`);
+                if (acao) parts.push(`Ação: ${acao}`);
+                if (local) parts.push(`Local: ${local}`);
+                if (date && start && end) parts.push(`Horário: ${date} ${start}–${end}`);
+
+                return parts.join(' | ');
+            }
+
+            btn.addEventListener('click', async () => {
+                try {
+                    if (!window.api || typeof window.api.post !== 'function') {
+                        alert('API não carregada. Recarregue a página e tente novamente.');
+                        return;
+                    }
+
+                    const descricao = buildDescricao();
+                    if (!descricao) {
+                        alert('Preencha pelo menos o Título do Evento para gerar o objetivo com IA.');
+                        return;
+                    }
+
+                    btn.disabled = true;
+                    if (statusEl) statusEl.textContent = 'Gerando objetivo com IA...';
+
+                    const { data, error } = await window.api.post('/ai/objetivo', { descricao });
+                    if (error) {
+                        console.error('Erro ao gerar objetivo com IA:', error);
+                        alert('Não foi possível gerar o objetivo com IA. Tente novamente.');
+                        return;
+                    }
+
+                    const objetivo = data && data.objetivo ? String(data.objetivo).trim() : '';
+                    if (!objetivo) {
+                        alert('A IA não retornou um objetivo. Ajuste as informações e tente novamente.');
+                        return;
+                    }
+
+                    objetivoInput.value = objetivo;
+                } catch (e) {
+                    console.error('Falha ao gerar objetivo com IA:', e);
+                    alert('Falha ao gerar objetivo com IA. Tente novamente.');
+                } finally {
+                    btn.disabled = false;
+                    if (statusEl) statusEl.textContent = '';
+                }
+            });
+        }
+
+        setupObjetivoIA();
             
         // Utilidades para modo do formulário e preenchimento de dados
         function setEventFormMode(mode) {
@@ -8265,7 +8353,7 @@
             window.closeEventModal = function() {
                 console.log('🔒 Fechando modal...');
                 
-                // Resetar todos os cards expandidos
+                // Resetar todos os cards expandidos 
                 resetExpandedCards();
                 editingEvent = null;
                 editingEventPeriods = [];

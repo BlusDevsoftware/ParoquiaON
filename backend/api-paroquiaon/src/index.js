@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
@@ -20,6 +21,7 @@ const agendaRoutes = require('./routes/agendaRoutes');
 const statusRoutes = require('./routes/statusRoutes');
 const relatorioRoutes = require('./routes/relatorioRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 const app = express();
 
@@ -76,6 +78,7 @@ app.use('/api/agenda', agendaRoutes);
 app.use('/api/status-agendamento', statusRoutes);
 app.use('/api/relatorios', relatorioRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
