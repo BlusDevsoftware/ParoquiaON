@@ -7862,6 +7862,7 @@
                     }
 
                     btn.disabled = true;
+                    btn.classList.add('ai-loading');
                     if (statusEl) statusEl.textContent = 'Gerando objetivo com IA...';
 
                     const { data, error } = await window.api.post('/ai/objetivo', { descricao });
@@ -7883,6 +7884,7 @@
                     alert('Falha ao gerar objetivo com IA. Tente novamente.');
                 } finally {
                     btn.disabled = false;
+                    btn.classList.remove('ai-loading');
                     if (statusEl) statusEl.textContent = '';
                 }
             });

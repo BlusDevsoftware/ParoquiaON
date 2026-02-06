@@ -3,57 +3,59 @@
 
 <!-- Modal removido - usando apenas o modal padrão -->
 
-<!-- Estilos específicos para o botão de IA (avatar animado estilo Gemini) -->
+<!-- Estilos específicos para o botão de IA (ícone inspirado no Gemini) -->
 <style>
-  .ai-objetivo-actions .ai-avatar-container {
-    position: relative;
-    width: 26px;
-    height: 26px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 6px;
-    flex-shrink: 0;
-  }
+    .ai-objetivo-actions .gemini-icon {
+        position: relative;
+        width: 20px;
+        height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 6px;
+    }
 
-  .ai-objetivo-actions .ai-avatar-glow {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, #4285f4, #9b51e0);
-    border-radius: 50%;
-    filter: blur(4px);
-    opacity: 0.7;
-    animation: ai-pulse 2s infinite ease-in-out;
-  }
+    .ai-objetivo-actions .gemini-star {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform: rotate(45deg);
+        border-radius: 40%;
+        border: 3px solid #1d9bf0;
+        background: radial-gradient(circle at 50% 50%, #e0f2ff 0%, #bfdbfe 40%, #eff6ff 80%);
+        box-shadow:
+            0 0 4px rgba(59, 130, 246, 0.7),
+            0 0 10px rgba(59, 130, 246, 0.4);
+    }
 
-  .ai-objetivo-actions .ai-avatar {
-    position: relative;
-    width: 22px;
-    height: 22px;
-    background: linear-gradient(135deg, #1a73e8, #8e24aa);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-    z-index: 1;
-  }
+    /* Anel de loading em volta do ícone (mostrado apenas enquanto gera) */
+    .ai-objetivo-actions .gemini-loading-ring {
+        position: absolute;
+        border-radius: 999px;
+        width: 26px;
+        height: 26px;
+        border: 2px solid rgba(191, 219, 254, 0.4);
+        border-top-color: #1d9bf0;
+        border-right-color: #1d4ed8;
+        opacity: 0;
+        transform-origin: center;
+        pointer-events: none;
+    }
 
-  .ai-objetivo-actions .ai-symbol {
-    color: #ffffff;
-    font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.35);
-  }
+    /* Quando o botão estiver carregando, mostrar animação de rotação */
+    #btnGerarObjetivoIA.ai-loading .gemini-loading-ring {
+        opacity: 1;
+        animation: gemini-spin 0.9s linear infinite;
+    }
 
-  @keyframes ai-pulse {
-    0% { transform: scale(0.95); opacity: 0.5; }
-    50% { transform: scale(1.08); opacity: 0.9; }
-    100% { transform: scale(0.95); opacity: 0.5; }
-  }
+    @keyframes gemini-spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 
 <!-- Modal de Novo Agendamento (versão padrão) -->
@@ -252,12 +254,10 @@
                             <label>Objetivo/Descrição:</label>
                             <div class="ai-objetivo-actions" style="display:flex; gap:10px; align-items:center; margin: 6px 0 10px 0; flex-wrap: wrap;">
                                 <button type="button" class="btn-secondary" id="btnGerarObjetivoIA" title="Gerar um texto de objetivo automaticamente com IA">
-                                    <div class="ai-avatar-container">
-                                      <div class="ai-avatar-glow"></div>
-                                      <div class="ai-avatar">
-                                        <span class="ai-symbol">G</span>
-                                      </div>
-                                    </div>
+                                    <span class="gemini-icon">
+                                        <span class="gemini-star"></span>
+                                        <span class="gemini-loading-ring"></span>
+                                    </span>
                                     Gerar objetivo com IA
                                 </button>
                                 <small id="aiObjetivoStatus" style="color:#6b7280;"></small>
