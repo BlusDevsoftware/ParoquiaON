@@ -21,9 +21,9 @@ async function gerarObjetivoComGemini(descricao) {
         throw new Error('GEMINI_API_KEY não configurada no servidor');
     }
 
-    // Usar modelo amplamente disponível na API generativelanguage (v1beta)
-    // Se quiser depois, pode trocar para 'gemini-1.5-flash' quando estiver habilitado na sua conta/região.
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    // Usar o modelo recomendado na API generativelanguage v1beta
+    // (sufixo -latest é o que o Google indica hoje para produção)
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
     const prompt = `
 Você é um assistente pastoral de uma paróquia católica.
