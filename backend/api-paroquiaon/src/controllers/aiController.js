@@ -21,6 +21,7 @@ async function gerarObjetivo(req, res) {
 
         return res.status(500).json({
             error: 'Não foi possível gerar o objetivo com IA no momento.',
+            details: error && (error.message || error.toString()),
         });
     }
 }
