@@ -3983,7 +3983,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10000;
+            z-index: 10002;
             padding: 20px;
         }
 
@@ -6551,7 +6551,6 @@
                 el.addEventListener('click', function() {
                     const dateStr = el.getAttribute('data-event-date');
                     const eventId = el.getAttribute('data-event-id');
-                    closeSearchModal();
                     if (dateStr) {
                         goToDate(new Date(dateStr));
                     }
