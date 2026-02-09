@@ -145,7 +145,6 @@
         /* Botão de pesquisa ao lado do Criar */
         .search-button {
             margin: 0 8px 0 0;
-            margin-left: 2px;
             width: 42px;
             height: 42px;
             min-width: 42px;
@@ -1853,6 +1852,12 @@
             display: flex;
             align-items: center;
             gap: 30px;
+        }
+
+        .info-left-buttons {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .info-location {
@@ -4498,13 +4503,15 @@
                 <!-- Container de Informações -->
                 <div class="calendar-info-container">
                     <div class="info-left">
-                        <button class="create-button" onclick="openEventModalFromCreate()">
-                            <i class="fas fa-plus"></i>
-                            Criar
-                        </button>
-                        <button class="search-button" onclick="openSearchModal()" aria-label="Buscar eventos" title="Buscar eventos">
-                            <i class="fas fa-search"></i>
-                        </button>
+                        <div class="info-left-buttons">
+                            <button class="create-button" onclick="openEventModalFromCreate()">
+                                <i class="fas fa-plus"></i>
+                                Criar
+                            </button>
+                            <button class="search-button" onclick="openSearchModal()" aria-label="Buscar eventos" title="Buscar eventos">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
                         <div class="info-location">
                             <div class="info-location-container">
                                 <div class="community-dropdown">
