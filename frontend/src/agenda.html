@@ -142,6 +142,142 @@
             box-shadow: 0 1px 4px rgba(30, 58, 138, 0.2);
         }
 
+        /* Botão de pesquisa ao lado do Criar */
+        .search-button {
+            margin: 0 8px 0 0;
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            padding: 0;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.15);
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+        }
+
+        .search-button i {
+            font-size: 16px;
+        }
+
+        /* Modal de busca */
+        .search-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-modal-overlay.open {
+            display: flex;
+        }
+
+        .search-modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 560px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-modal-header input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-modal-header input:focus {
+            border-color: #1e3a8a;
+        }
+
+        .search-modal-header input::placeholder {
+            color: #adb5bd;
+        }
+
+        .search-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .search-modal-close:hover {
+            color: #333;
+        }
+
+        .search-results {
+            padding: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .search-results-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 15px;
+        }
+
+        .search-result-item {
+            padding: 14px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .search-result-item:hover {
+            background: #f8f9fa;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-title {
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 4px;
+        }
+
+        .search-result-meta {
+            font-size: 13px;
+            color: #6c757d;
+        }
+
 
         .modal {
             display: none;
@@ -403,8 +539,9 @@
             .content-area { padding: 0; }
             .main-area { width: 100vw; margin-left: 0; }
 
-            /* Esconder botão Criar do container superior no mobile */
-            .calendar-info-container .create-button { display: none !important; }
+            /* Esconder botões Criar e Pesquisar do container superior no mobile */
+            .calendar-info-container .create-button,
+            .calendar-info-container .search-button { display: none !important; }
 
             /* Esconder texto "Você está em:" no mobile */
             .info-location-label { display: none !important; }
@@ -4228,6 +4365,22 @@
 <body>
     <!-- Include dos modais da agenda -->
     <div id="modais-agenda-container"></div>
+
+    <!-- Modal de busca de eventos -->
+    <div class="search-modal-overlay" id="searchModalOverlay" onclick="if(event.target===this) closeSearchModal()">
+        <div class="search-modal">
+            <div class="search-modal-header">
+                <i class="fas fa-search" style="color: #1e3a8a;"></i>
+                <input type="text" id="searchEventsInput" placeholder="Buscar eventos por título, comunidade, pastoral, local..." autocomplete="off">
+                <button class="search-modal-close" onclick="closeSearchModal()" aria-label="Fechar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="search-results" id="searchResultsContainer">
+                <div class="search-results-empty" id="searchResultsEmpty">Digite para buscar eventos</div>
+            </div>
+        </div>
+    </div>
     
     <div class="app-container">
         <!-- Header Superior -->
@@ -4344,6 +4497,9 @@
                 <!-- Container de Informações -->
                 <div class="calendar-info-container">
                     <div class="info-left">
+                        <button class="search-button" onclick="openSearchModal()" aria-label="Buscar eventos" title="Buscar eventos">
+                            <i class="fas fa-search"></i>
+                        </button>
                         <button class="create-button" onclick="openEventModalFromCreate()">
                             <i class="fas fa-plus"></i>
                             Criar
@@ -6322,6 +6478,99 @@
             renderCalendar();
             updateCurrentWeekRange();
         }
+
+        function goToDate(date) {
+            currentDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            renderCalendar();
+            updateCurrentWeekRange();
+        }
+
+        // Modal de busca
+        function openSearchModal() {
+            const overlay = document.getElementById('searchModalOverlay');
+            const input = document.getElementById('searchEventsInput');
+            if (overlay) overlay.classList.add('open');
+            if (input) {
+                input.value = '';
+                input.focus();
+                setTimeout(function() { performEventSearch(''); }, 0);
+            }
+        }
+
+        function closeSearchModal() {
+            const overlay = document.getElementById('searchModalOverlay');
+            if (overlay) overlay.classList.remove('open');
+        }
+
+        function performEventSearch(term) {
+            const container = document.getElementById('searchResultsContainer');
+            const emptyEl = document.getElementById('searchResultsEmpty');
+            if (!container) return;
+
+            const t = (term || '').trim().toLowerCase();
+            let matches = [];
+
+            if (t.length > 0) {
+                const searchFields = function(ev) {
+                    const title = (ev.title || ev.titulo || '').toLowerCase();
+                    const comunidade = (ev.comunidade_nome || ev.comunidades?.nome || '').toLowerCase();
+                    const pastoral = (ev.pastoral_nome || ev.pastorais?.nome || '').toLowerCase();
+                    const local = (ev.local_nome || ev.locais?.nome || '').toLowerCase();
+                    const acao = (ev.acao_nome || ev.acoes?.nome || '').toLowerCase();
+                    const pilar = (ev.pilar_nome || ev.pilares?.nome || '').toLowerCase();
+                    const objetivo = (ev.objetivo || ev.descricao || '').toLowerCase();
+                    return title.includes(t) || comunidade.includes(t) || pastoral.includes(t) ||
+                           local.includes(t) || acao.includes(t) || pilar.includes(t) || objetivo.includes(t);
+                };
+                matches = (typeof allEvents !== 'undefined' ? allEvents : []).filter(searchFields);
+            }
+
+            if (emptyEl) emptyEl.style.display = 'none';
+
+            if (matches.length === 0) {
+                container.innerHTML = '<div class="search-results-empty" id="searchResultsEmpty">' +
+                    (t.length > 0 ? 'Nenhum evento encontrado' : 'Digite para buscar eventos') + '</div>';
+                return;
+            }
+
+            const monthNames = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+            let html = '';
+            matches.slice(0, 50).forEach(function(ev) {
+                const start = ev.startTime || ev.data_inicio || ev.data_inicio_iso;
+                const d = start ? new Date(start) : null;
+                const dateStr = d ? (d.getDate() + ' ' + monthNames[d.getMonth()] + ' ' + d.getFullYear() + (d.getHours() || d.getMinutes() ? ' às ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') : '')) : '';
+                const meta = [ev.comunidade_nome, ev.pastoral_nome, ev.local_nome].filter(Boolean).join(' • ');
+                html += '<div class="search-result-item" data-event-id="' + (ev.id || '') + '" data-event-date="' + (d ? d.toISOString() : '') + '">' +
+                    '<div class="search-result-title">' + (ev.title || ev.titulo || 'Sem título') + '</div>' +
+                    '<div class="search-result-meta">' + (dateStr ? dateStr + (meta ? ' · ' : '') : '') + meta + '</div></div>';
+            });
+            container.innerHTML = html;
+
+            container.querySelectorAll('.search-result-item').forEach(function(el) {
+                el.addEventListener('click', function() {
+                    const dateStr = el.getAttribute('data-event-date');
+                    const eventId = el.getAttribute('data-event-id');
+                    closeSearchModal();
+                    if (dateStr) {
+                        goToDate(new Date(dateStr));
+                    }
+                    if (eventId && typeof openEventModal === 'function') {
+                        const ev = (typeof allEvents !== 'undefined' ? allEvents : []).find(function(m) { return m && String(m.id) === eventId; });
+                        if (ev) openEventModal(ev);
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchEventsInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() { performEventSearch(this.value); });
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') closeSearchModal();
+                });
+            }
+        });
 
         function isToday(date) {
             const today = new Date();
