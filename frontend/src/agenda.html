@@ -142,7 +142,10 @@
             box-shadow: 0 1px 4px rgba(30, 58, 138, 0.2);
         }
 
-        /* Botão de pesquisa ao lado do Criar */
+        /* Botão de pesquisa ao lado do Criar - margin 0 para manter 4px entre os 3 (Criar, Lupa, Comunidade) */
+        .info-left-buttons .search-button {
+            margin: 0;
+        }
         .search-button {
             margin: 0 8px 0 0;
             width: 42px;
@@ -6557,11 +6560,7 @@
 
             container.querySelectorAll('.search-result-item').forEach(function(el) {
                 el.addEventListener('click', function() {
-                    const dateStr = el.getAttribute('data-event-date');
                     const eventId = el.getAttribute('data-event-id');
-                    if (dateStr) {
-                        goToDate(new Date(dateStr));
-                    }
                     if (eventId && typeof editEventModal === 'function') {
                         const ev = (typeof allEvents !== 'undefined' ? allEvents : []).find(function(m) { return m && String(m.id) === eventId; });
                         if (ev) editEventModal(ev);
