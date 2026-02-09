@@ -125,7 +125,7 @@
         /* Ajuste do botão Criar quando estiver no container superior */
         .info-left .create-button,
         .info-right .create-button {
-            margin: 0 12px 0 0;
+            margin: 0 4px 0 0;
             width: auto;
             padding: 10px 16px;
             box-shadow: 0 2px 8px rgba(30, 58, 138, 0.15);
@@ -6554,9 +6554,9 @@
                     if (dateStr) {
                         goToDate(new Date(dateStr));
                     }
-                    if (eventId && typeof openEventModal === 'function') {
+                    if (eventId && typeof editEventModal === 'function') {
                         const ev = (typeof allEvents !== 'undefined' ? allEvents : []).find(function(m) { return m && String(m.id) === eventId; });
-                        if (ev) openEventModal(ev);
+                        if (ev) editEventModal(ev);
                     }
                 });
             });
