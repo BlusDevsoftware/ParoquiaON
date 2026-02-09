@@ -183,7 +183,11 @@ html.login-page, body.login-page {
     width: 100%;
     padding: 15px 45px 15px 15px;
     border: 2px solid #e9ecef;
-    border-radius: 10px;
+    border-radius: 10px !important;
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+    border-bottom-left-radius: 10px !important;
+    border-bottom-right-radius: 10px !important;
     font-size: 14px;
     transition: all 0.3s ease;
     background-color: #f8f9fa;

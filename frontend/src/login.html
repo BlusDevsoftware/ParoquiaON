@@ -44,6 +44,17 @@
             margin-bottom: 15px;
             text-align: center;
         }
+
+        /* Garantir que todos os inputs tenham os 4 cantos arredondados */
+        .input-group input[type="email"],
+        .input-group input[type="password"],
+        .input-group input[type="text"] {
+            border-radius: 10px !important;
+            border-top-left-radius: 10px !important;
+            border-top-right-radius: 10px !important;
+            border-bottom-left-radius: 10px !important;
+            border-bottom-right-radius: 10px !important;
+        }
     </style>
 </head>
 <body class="login-page">
@@ -221,7 +232,7 @@
             // Resetar header
             const header = document.querySelector('.login-header h2');
             const subheader = document.querySelector('.login-header p');
-            header.innerHTML = 'Bem vindo ao <span class="highlight">Gestor de Comissões</span>';
+            header.innerHTML = 'Bem vindo ao <span class="highlight">ParoquiaON</span>';
             subheader.textContent = 'Preencha os dados do login para acessar';
         }
 
