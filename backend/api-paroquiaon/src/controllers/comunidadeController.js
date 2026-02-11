@@ -82,6 +82,8 @@ async function criarComunidade(req, res) {
                 nome: dados.nome,
                 telefone: dados.telefone,
                 endereco: dados.endereco,
+                latitude: dados.latitude,
+                longitude: dados.longitude,
                 data_fundacao: dados.data_fundacao,
                 status: dados.status,
                 conselho_membros: dados.conselho_membros,

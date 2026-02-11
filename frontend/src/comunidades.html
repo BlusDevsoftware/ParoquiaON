@@ -12,6 +12,7 @@
     
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <script src="scripts/auth-guard.js"></script>
     <script src="scripts/apply-auth-protection.js"></script>
     <script src="scripts/config/api.js"></script>
@@ -281,11 +282,15 @@
                     } catch { return null; }
                 })();
 
+                const latEl = form.querySelector('input[name="latitude"]');
+                const lngEl = form.querySelector('input[name="longitude"]');
                 const dadosComunidade = {
                     codigo: calcularProximoCodigo(comunidades),
                     nome: nome,
                     telefone: form.telefone.value.trim(),
                     endereco: form.endereco.value.trim(),
+                    latitude: latEl && latEl.value ? parseFloat(latEl.value) : null,
+                    longitude: lngEl && lngEl.value ? parseFloat(lngEl.value) : null,
                     data_fundacao: form.data_fundacao.value,
                     status: form.status.value || 'Ativo',
                     conselho_membros: conselhoMembrosJson,
@@ -408,6 +413,10 @@
                 form.nome.value = comunidade.nome || '';
                 form.telefone.value = comunidade.telefone || '';
                 form.endereco.value = comunidade.endereco || '';
+                const latInput = form.querySelector('input[name="latitude"]');
+                const lngInput = form.querySelector('input[name="longitude"]');
+                if (latInput) latInput.value = comunidade.latitude != null ? String(comunidade.latitude) : '';
+                if (lngInput) lngInput.value = comunidade.longitude != null ? String(comunidade.longitude) : '';
                 form.data_fundacao.value = comunidade.data_fundacao || '';
                 form.status.value = comunidade.status || 'Ativo';
                 form.cor.value = comunidade.cor || '#1e3a8a';
@@ -445,6 +454,9 @@
                 const modal = document.getElementById('comunidadeModal');
                 modal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
+
+                // Inicializar mapa com coordenadas da comunidade (se houver)
+                setTimeout(function() { if (typeof initMapComunidade === 'function') initMapComunidade(comunidade); }, 100);
                 
             } catch (error) {
                 console.error('❌ Erro ao editar comunidade:', error);
@@ -491,10 +503,14 @@
                 // Debug: verificar se foto é base64 ou URL
                 const fotoTipo = fotoValue && fotoValue.startsWith('data:image') ? 'base64' : (fotoValue && fotoValue.startsWith('http') ? 'URL' : 'vazio');
                 console.log('📸 Foto sendo enviada:', fotoTipo, fotoValue ? fotoValue.substring(0, 50) + '...' : 'nenhuma');
+                const latEl = form.querySelector('input[name="latitude"]');
+                const lngEl = form.querySelector('input[name="longitude"]');
                 const dadosAtualizacao = {
                     nome: nome,
                     telefone: form.telefone.value.trim(),
                     endereco: form.endereco.value.trim(),
+                    latitude: latEl && latEl.value ? parseFloat(latEl.value) : null,
+                    longitude: lngEl && lngEl.value ? parseFloat(lngEl.value) : null,
                     data_fundacao: form.data_fundacao.value,
                     status: form.status.value || 'Ativo',
                     conselho_membros: conselhoMembrosJson,
@@ -1030,6 +1046,38 @@
             font-size: 1.1rem;
             font-weight: 500;
             text-align: center;
+        }
+
+        /* Endereço + Mapa */
+        .address-map-wrapper { margin-top: 8px; }
+        .address-bar {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .address-bar textarea { flex: 1; min-height: 56px; resize: vertical; }
+        .btn-buscar-mapa {
+            padding: 10px 16px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-buscar-mapa:hover { background: #1e40af; }
+        .map-container {
+            width: 100%;
+            height: 280px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+            background: #f5f5f5;
         }
 
         .toast-container {
@@ -3149,7 +3197,17 @@
                         <div class="form-row">
                             <div class="form-group" style="flex: 1 1 100%;">
                                 <label><i class="fas fa-map-marker-alt"></i> Endereço</label>
-                                <textarea name="endereco" rows="2" placeholder="Digite o endereço completo da comunidade"></textarea>
+                                <div class="address-map-wrapper">
+                                    <div class="address-bar">
+                                        <textarea name="endereco" id="comunidadeEndereco" rows="2" placeholder="Digite o endereço completo da comunidade"></textarea>
+                                        <button type="button" class="btn-buscar-mapa" onclick="buscarEnderecoNoMapa()" title="Buscar no mapa">
+                                            <i class="fas fa-search"></i> Buscar no mapa
+                                        </button>
+                                    </div>
+                                    <div id="mapContainer" class="map-container"></div>
+                                    <input type="hidden" name="latitude" id="comunidadeLatitude" value="">
+                                    <input type="hidden" name="longitude" id="comunidadeLongitude" value="">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3502,6 +3560,13 @@
             // Limpar membros dinâmicos
             document.getElementById('conselho-members').innerHTML = '';
             document.getElementById('responsavel-members').innerHTML = '';
+
+            // Limpar coordenadas e inicializar mapa vazio
+            const latInput = form.querySelector('input[name="latitude"]');
+            const lngInput = form.querySelector('input[name="longitude"]');
+            if (latInput) latInput.value = '';
+            if (lngInput) lngInput.value = '';
+            setTimeout(function() { if (typeof initMapComunidade === 'function') initMapComunidade(null); }, 100);
             conselhoMemberCount = 0;
             responsavelMemberCount = 0;
             
@@ -3612,6 +3677,76 @@
         }
 
         
+    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        let mapComunidade = null;
+        let markerComunidade = null;
+
+        function initMapComunidade(comunidade) {
+            const container = document.getElementById('mapContainer');
+            if (!container) return;
+            if (mapComunidade) {
+                mapComunidade.remove();
+                mapComunidade = null;
+                markerComunidade = null;
+            }
+            const lat = comunidade && comunidade.latitude != null ? parseFloat(comunidade.latitude) : null;
+            const lng = comunidade && comunidade.longitude != null ? parseFloat(comunidade.longitude) : null;
+            const centerLat = lat != null && !isNaN(lat) ? lat : -15.7797;
+            const centerLng = lng != null && !isNaN(lng) ? lng : -47.9297;
+            const zoom = (lat != null && lng != null) ? 16 : 4;
+            mapComunidade = L.map('mapContainer').setView([centerLat, centerLng], zoom);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(mapComunidade);
+            markerComunidade = L.marker([centerLat, centerLng], { draggable: true }).addTo(mapComunidade);
+            if (lat == null || lng == null) markerComunidade.setOpacity(0);
+            markerComunidade.on('dragend', function() {
+                const pos = markerComunidade.getLatLng();
+                const latInput = document.querySelector('input[name="latitude"]');
+                const lngInput = document.querySelector('input[name="longitude"]');
+                if (latInput) latInput.value = pos.lat.toFixed(6);
+                if (lngInput) lngInput.value = pos.lng.toFixed(6);
+            });
+        }
+
+        async function buscarEnderecoNoMapa() {
+            const input = document.getElementById('comunidadeEndereco') || document.querySelector('textarea[name="endereco"]');
+            const endereco = (input && input.value || '').trim();
+            if (!endereco) {
+                try { mostrarToast('Digite o endereço antes de buscar no mapa.', 'error'); } catch(_) {}
+                return;
+            }
+            try {
+                const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(endereco + ', Brasil') + '&format=json&limit=1';
+                const resp = await fetch(url, { headers: { 'Accept-Language': 'pt-BR' } });
+                const data = await resp.json();
+                if (!data || data.length === 0) {
+                    try { mostrarToast('Endereço não encontrado. Tente ser mais específico.', 'error'); } catch(_) {}
+                    return;
+                }
+                const lat = parseFloat(data[0].lat);
+                const lng = parseFloat(data[0].lon);
+                const latInput = document.querySelector('input[name="latitude"]');
+                const lngInput = document.querySelector('input[name="longitude"]');
+                if (latInput) latInput.value = lat.toFixed(6);
+                if (lngInput) lngInput.value = lng.toFixed(6);
+                if (mapComunidade && markerComunidade) {
+                    mapComunidade.setView([lat, lng], 16);
+                    markerComunidade.setLatLng([lat, lng]).setOpacity(1);
+                } else {
+                    initMapComunidade({ latitude: lat, longitude: lng });
+                    if (markerComunidade) markerComunidade.setOpacity(1);
+                }
+                try { mostrarToast('Localização encontrada! Arraste o marcador para ajustar.', 'success'); } catch(_) {}
+            } catch (e) {
+                console.error('Erro no geocoding:', e);
+                try { mostrarToast('Erro ao buscar endereço. Tente novamente.', 'error'); } catch(_) {}
+            }
+        }
+        window.buscarEnderecoNoMapa = buscarEnderecoNoMapa;
+        window.initMapComunidade = initMapComunidade;
     </script>
     <script src="scripts/navigation.js"></script>
 </body>
