@@ -3703,12 +3703,21 @@
             markerComunidade = L.marker([centerLat, centerLng], { draggable: true }).addTo(mapComunidade);
             if (lat == null || lng == null) markerComunidade.setOpacity(0);
             markerComunidade.on('dragend', function() {
-                const pos = markerComunidade.getLatLng();
-                const latInput = document.querySelector('input[name="latitude"]');
-                const lngInput = document.querySelector('input[name="longitude"]');
-                if (latInput) latInput.value = pos.lat.toFixed(6);
-                if (lngInput) lngInput.value = pos.lng.toFixed(6);
+                updateLatLngFromMarker();
             });
+            mapComunidade.on('click', function(e) {
+                markerComunidade.setLatLng(e.latlng).setOpacity(1);
+                updateLatLngFromMarker();
+            });
+        }
+
+        function updateLatLngFromMarker() {
+            if (!markerComunidade) return;
+            const pos = markerComunidade.getLatLng();
+            const latInput = document.querySelector('input[name="latitude"]');
+            const lngInput = document.querySelector('input[name="longitude"]');
+            if (latInput) latInput.value = pos.lat.toFixed(6);
+            if (lngInput) lngInput.value = pos.lng.toFixed(6);
         }
 
         async function buscarEnderecoNoMapa() {
@@ -3723,7 +3732,10 @@
                 const resp = await fetch(url, { headers: { 'Accept-Language': 'pt-BR' } });
                 const data = await resp.json();
                 if (!data || data.length === 0) {
-                    try { mostrarToast('Endereço não encontrado. Tente ser mais específico.', 'error'); } catch(_) {}
+                    if (!mapComunidade || !markerComunidade) initMapComunidade(null);
+                    markerComunidade.setOpacity(1);
+                    updateLatLngFromMarker();
+                    try { mostrarToast('Endereço não encontrado. Clique no mapa ou arraste o marcador para o local correto.', 'info'); } catch(_) {}
                     return;
                 }
                 const lat = parseFloat(data[0].lat);
@@ -3742,7 +3754,10 @@
                 try { mostrarToast('Localização encontrada! Arraste o marcador para ajustar.', 'success'); } catch(_) {}
             } catch (e) {
                 console.error('Erro no geocoding:', e);
-                try { mostrarToast('Erro ao buscar endereço. Tente novamente.', 'error'); } catch(_) {}
+                if (!mapComunidade || !markerComunidade) initMapComunidade(null);
+                markerComunidade.setOpacity(1);
+                updateLatLngFromMarker();
+                try { mostrarToast('Erro ao buscar. Clique no mapa ou arraste o marcador para o local correto.', 'info'); } catch(_) {}
             }
         }
         window.buscarEnderecoNoMapa = buscarEnderecoNoMapa;
