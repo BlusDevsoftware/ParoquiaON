@@ -2834,10 +2834,10 @@
         .calendar-body.year-view .year-month-cell {
             overflow: visible !important;
             min-height: 170px;
+            border: none !important;
         }
         .calendar-body.year-view .year-month-cell:hover {
             background: white !important;
-            border-color: #e0e0e0 !important;
             box-shadow: none !important;
         }
         .calendar-body.year-view .year-month-cell:hover::after {
@@ -6327,10 +6327,10 @@
                     daysGrid.style.cssText = `
                         display: grid;
                         grid-template-columns: repeat(7, 1fr);
-                        grid-template-rows: auto repeat(6, minmax(16px, 1fr));
-                        gap: 2px;
+                        grid-template-rows: auto repeat(6, minmax(20px, 1fr));
+                        gap: 4px;
                         flex: 1;
-                        min-height: 110px;
+                        min-height: 120px;
                         font-size: 10px;
                         align-items: stretch;
                         justify-items: stretch;
@@ -6352,7 +6352,7 @@
                         const date = new Date(startDate);
                         date.setDate(startDate.getDate() + i);
                         const dayCell = document.createElement('div');
-                        dayCell.style.cssText = 'display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; line-height: 1; min-height: 14px;';
+                        dayCell.style.cssText = 'display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; line-height: 1; min-height: 18px; padding: 2px 0;';
                         if (date.getMonth() !== monthIndex) dayCell.style.color = '#bbb';
                         else dayCell.style.color = '#333';
                         if (isToday(date)) {
