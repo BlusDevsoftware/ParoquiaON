@@ -6254,6 +6254,13 @@
         function updateYearlyCalendar() {
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
+            calendarBody.classList.remove('month-view');
+            calendarBody.classList.add('year-view');
+            calendarBody.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            calendarBody.style.gridTemplateRows = 'repeat(4, minmax(180px, 1fr))';
+            calendarBody.style.gap = '16px';
+            calendarBody.style.display = 'grid';
+            calendarBody.style.alignContent = 'stretch';
 
             // Cabeçalho simples - apenas o ano
             const header = document.querySelector('.calendar-header');
@@ -6270,132 +6277,100 @@
                 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
             ];
 
-            // Criar grid 3x4 (3 colunas, 4 linhas) como Google Calendar
             for (let row = 0; row < 4; row++) {
-                // Linha vazia para espaçamento
-                const emptyCell = document.createElement('div');
-                emptyCell.className = 'time-slot';
-                emptyCell.textContent = '';
-                calendarBody.appendChild(emptyCell);
-
-                // 3 meses da linha
                 for (let col = 0; col < 3; col++) {
                     const monthIndex = row * 3 + col;
-                    const monthDate = new Date(year, monthIndex, 1);
                     
                     const monthCell = document.createElement('div');
-                    monthCell.className = 'day-slot';
-                    monthCell.style.height = '140px';
-                    monthCell.style.padding = '12px';
-                    monthCell.style.border = '1px solid #e0e0e0';
-                    monthCell.style.cursor = 'pointer';
-                    monthCell.style.transition = 'all 0.2s ease';
-                    monthCell.style.display = 'flex';
-                    monthCell.style.flexDirection = 'column';
-                    monthCell.style.position = 'relative';
+                    monthCell.className = 'day-slot year-month-cell';
+                    monthCell.style.cssText = `
+                        padding: 12px;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        display: flex;
+                        flex-direction: column;
+                        min-height: 0;
+                        background: white;
+                    `;
 
-                    // Título do mês (estilo Google Calendar)
                     const monthTitle = document.createElement('div');
-                    monthTitle.style.fontWeight = '500';
-                    monthTitle.style.fontSize = '14px';
-                    monthTitle.style.marginBottom = '8px';
-                    monthTitle.style.color = '#333';
-                    monthTitle.style.textAlign = 'left';
+                    monthTitle.style.cssText = 'font-weight: 500; font-size: 14px; margin-bottom: 8px; color: #333; flex-shrink: 0;';
                     monthTitle.textContent = months[monthIndex];
                     monthCell.appendChild(monthTitle);
 
-                    // Grid de dias do mês (estilo Google Calendar)
                     const daysGrid = document.createElement('div');
-                    daysGrid.style.display = 'grid';
-                    daysGrid.style.gridTemplateColumns = 'repeat(7, 1fr)';
-                    daysGrid.style.gap = '2px';
-                    daysGrid.style.flex = '1';
-                    daysGrid.style.fontSize = '11px';
+                    daysGrid.style.cssText = `
+                        display: grid;
+                        grid-template-columns: repeat(7, 1fr);
+                        gap: 2px;
+                        flex: 1;
+                        min-height: 0;
+                        font-size: 11px;
+                    `;
 
-                    // Cabeçalhos dos dias da semana (D S T Q Q S S)
                     const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
                     weekDays.forEach(day => {
                         const dayHeader = document.createElement('div');
-                        dayHeader.style.textAlign = 'center';
-                        dayHeader.style.fontWeight = '500';
-                        dayHeader.style.color = '#666';
-                        dayHeader.style.padding = '2px';
+                        dayHeader.style.cssText = 'text-align: center; font-weight: 500; color: #666; padding: 2px;';
                         dayHeader.textContent = day;
                         daysGrid.appendChild(dayHeader);
                     });
 
-                    // Dias do mês
                     const firstDay = new Date(year, monthIndex, 1);
-                    const lastDay = new Date(year, monthIndex + 1, 0);
                     const startDate = new Date(firstDay);
-                    startDate.setDate(startDate.getDate() - firstDay.getDay()); // Começar no domingo
+                    startDate.setDate(startDate.getDate() - firstDay.getDay());
 
                     for (let i = 0; i < 42; i++) {
                         const date = new Date(startDate);
                         date.setDate(startDate.getDate() + i);
-                        
                         const dayCell = document.createElement('div');
-                        dayCell.style.textAlign = 'center';
-                        dayCell.style.padding = '2px';
-                        dayCell.style.cursor = 'pointer';
-                        dayCell.style.borderRadius = '2px';
-                        dayCell.style.fontSize = '11px';
-                        
-                        if (date.getMonth() !== monthIndex) {
-                            dayCell.style.color = '#ccc';
-                        } else {
-                            dayCell.style.color = '#333';
-                        }
-                        
+                        dayCell.style.cssText = 'text-align: center; padding: 2px; cursor: pointer; border-radius: 2px; font-size: 11px;';
+                        if (date.getMonth() !== monthIndex) dayCell.style.color = '#ccc';
+                        else dayCell.style.color = '#333';
                         if (isToday(date)) {
                             dayCell.style.background = '#1e3a8a';
                             dayCell.style.color = 'white';
                             dayCell.style.fontWeight = 'bold';
                         }
-                        
                         dayCell.textContent = date.getDate();
                         daysGrid.appendChild(dayCell);
                     }
 
                     monthCell.appendChild(daysGrid);
 
-                    // Contador de eventos (estilo Google Calendar)
                     const monthEvents = events.filter(event => {
                         const eventDate = new Date(event.startTime);
                         return eventDate.getFullYear() === year && eventDate.getMonth() === monthIndex;
                     });
 
-                    if (monthEvents.length > 0) {
-                        const eventIndicator = document.createElement('div');
-                        eventIndicator.style.cssText = `
-                            position: absolute;
-                            bottom: 8px;
-                            left: 12px;
-                            right: 12px;
-                            font-size: 10px;
-                            color: #1e3a8a;
-                            font-weight: 500;
-                            text-align: center;
-                            background: rgba(30, 58, 138, 0.1);
-                            padding: 2px 4px;
-                            border-radius: 4px;
-                        `;
-                        eventIndicator.textContent = `${monthEvents.length} evento${monthEvents.length !== 1 ? 's' : ''}`;
-                        monthCell.appendChild(eventIndicator);
-                    }
+                    const eventIndicator = document.createElement('div');
+                    eventIndicator.style.cssText = `
+                        flex-shrink: 0;
+                        margin-top: 8px;
+                        padding-top: 6px;
+                        font-size: 10px;
+                        color: #1e3a8a;
+                        font-weight: 500;
+                        text-align: center;
+                        background: rgba(30, 58, 138, 0.1);
+                        padding: 6px 4px;
+                        border-radius: 4px;
+                    `;
+                    eventIndicator.textContent = monthEvents.length > 0 
+                        ? `${monthEvents.length} evento${monthEvents.length !== 1 ? 's' : ''}` 
+                        : '—';
+                    monthCell.appendChild(eventIndicator);
 
-                    // Hover effect (estilo Google Calendar)
                     monthCell.addEventListener('mouseenter', function() {
                         this.style.background = '#f8f9fa';
                         this.style.borderColor = '#1e3a8a';
                     });
-
                     monthCell.addEventListener('mouseleave', function() {
                         this.style.background = 'white';
                         this.style.borderColor = '#e0e0e0';
                     });
-
-                    // Click para ir para o mês
                     monthCell.addEventListener('click', function() {
                         currentDate = new Date(year, monthIndex, 1);
                         currentView = 'mês';
