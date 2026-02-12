@@ -2824,14 +2824,16 @@
             row-gap: 0 !important;
         }
 
-        /* Visão anual: sem rolagem interna, usa apenas espaço disponível */
+        /* Visão anual: células com altura mínima para os dias não ficarem cortados */
         .calendar-body.year-view {
-            overflow: hidden !important;
+            overflow: auto !important;
             flex: 1;
             min-height: 0;
+            grid-auto-rows: minmax(180px, 1fr);
         }
         .calendar-body.year-view .year-month-cell {
-            overflow: hidden !important;
+            overflow: visible !important;
+            min-height: 170px;
         }
 
         /* Day-slot deve ocupar 100% da célula na visão mensal */
@@ -6315,13 +6317,13 @@
                     daysGrid.style.cssText = `
                         display: grid;
                         grid-template-columns: repeat(7, 1fr);
-                        grid-template-rows: auto repeat(6, minmax(12px, 1fr));
-                        gap: 1px;
+                        grid-template-rows: auto repeat(6, minmax(16px, 1fr));
+                        gap: 2px;
                         flex: 1;
-                        min-height: 80px;
+                        min-height: 110px;
                         font-size: 10px;
-                        align-items: center;
-                        justify-items: center;
+                        align-items: stretch;
+                        justify-items: stretch;
                     `;
 
                     const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
@@ -6340,7 +6342,7 @@
                         const date = new Date(startDate);
                         date.setDate(startDate.getDate() + i);
                         const dayCell = document.createElement('div');
-                        dayCell.style.cssText = 'text-align: center; width: 100%; font-size: 10px; line-height: 1.2;';
+                        dayCell.style.cssText = 'display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; line-height: 1; min-height: 14px;';
                         if (date.getMonth() !== monthIndex) dayCell.style.color = '#bbb';
                         else dayCell.style.color = '#333';
                         if (isToday(date)) {
