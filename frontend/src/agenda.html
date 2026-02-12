@@ -2835,6 +2835,14 @@
             overflow: visible !important;
             min-height: 170px;
         }
+        .calendar-body.year-view .year-month-cell:hover {
+            background: white !important;
+            border-color: #e0e0e0 !important;
+            box-shadow: none !important;
+        }
+        .calendar-body.year-view .year-month-cell:hover::after {
+            content: none !important;
+        }
 
         /* Day-slot deve ocupar 100% da célula na visão mensal */
         .calendar-body.month-view .day-slot {
