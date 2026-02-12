@@ -2852,6 +2852,29 @@
             flex-shrink: 0 !important;
             margin-top: auto !important;
         }
+        .calendar-body.year-view .year-day-cell {
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .calendar-body.year-view .year-day-cell .year-day-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            min-height: 22px;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+        .calendar-body.year-view .year-day-cell:hover .year-day-num {
+            background: rgba(0, 0, 0, 0.08);
+        }
+        .calendar-body.year-view .year-day-cell.year-day-today .year-day-num {
+            background: #1e3a8a;
+        }
+        .calendar-body.year-view .year-day-cell.year-day-today:hover .year-day-num {
+            background: rgba(30, 58, 138, 0.85);
+            box-shadow: 0 0 0 1px rgba(30, 58, 138, 0.3);
+        }
 
         /* Day-slot deve ocupar 100% da célula na visão mensal */
         .calendar-body.month-view .day-slot {
@@ -6360,16 +6383,26 @@
                         const date = new Date(startDate);
                         date.setDate(startDate.getDate() + i);
                         const dayCell = document.createElement('div');
+                        dayCell.className = 'year-day-cell';
                         dayCell.style.cssText = 'display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; line-height: 1; min-height: 14px;';
                         if (date.getMonth() !== monthIndex) dayCell.style.color = '#bbb';
                         else dayCell.style.color = '#333';
                         if (isToday(date)) {
-                            dayCell.style.background = '#1e3a8a';
+                            dayCell.classList.add('year-day-today');
                             dayCell.style.color = 'white';
                             dayCell.style.fontWeight = 'bold';
-                            dayCell.style.borderRadius = '2px';
                         }
-                        dayCell.textContent = date.getDate();
+                        const numSpan = document.createElement('span');
+                        numSpan.className = 'year-day-num';
+                        numSpan.textContent = date.getDate();
+                        dayCell.appendChild(numSpan);
+                        dayCell.addEventListener('click', function() {
+                            currentDate = new Date(date);
+                            currentView = 'dia';
+                            updateViewDropdown();
+                            renderCalendar();
+                            updateCurrentWeekRange();
+                        });
                         daysGrid.appendChild(dayCell);
                     }
 
