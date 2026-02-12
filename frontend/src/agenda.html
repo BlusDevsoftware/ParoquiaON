@@ -2824,6 +2824,16 @@
             row-gap: 0 !important;
         }
 
+        /* Visão anual: sem rolagem interna, usa apenas espaço disponível */
+        .calendar-body.year-view {
+            overflow: hidden !important;
+            flex: 1;
+            min-height: 0;
+        }
+        .calendar-body.year-view .year-month-cell {
+            overflow: hidden !important;
+        }
+
         /* Day-slot deve ocupar 100% da célula na visão mensal */
         .calendar-body.month-view .day-slot {
             position: relative;
@@ -6257,10 +6267,11 @@
             calendarBody.classList.remove('month-view');
             calendarBody.classList.add('year-view');
             calendarBody.style.gridTemplateColumns = 'repeat(3, 1fr)';
-            calendarBody.style.gridTemplateRows = 'repeat(4, minmax(180px, 1fr))';
-            calendarBody.style.gap = '16px';
+            calendarBody.style.gridTemplateRows = 'repeat(4, 1fr)';
+            calendarBody.style.gap = '12px';
             calendarBody.style.display = 'grid';
-            calendarBody.style.alignContent = 'stretch';
+            calendarBody.style.overflow = 'hidden';
+            calendarBody.style.minHeight = '0';
 
             // Cabeçalho simples - apenas o ano
             const header = document.querySelector('.calendar-header');
@@ -6284,19 +6295,20 @@
                     const monthCell = document.createElement('div');
                     monthCell.className = 'day-slot year-month-cell';
                     monthCell.style.cssText = `
-                        padding: 12px;
+                        padding: 6px 8px;
                         border: 1px solid #e0e0e0;
-                        border-radius: 8px;
+                        border-radius: 6px;
                         cursor: pointer;
                         transition: all 0.2s ease;
-                        display: flex;
-                        flex-direction: column;
+                        display: grid;
+                        grid-template-rows: auto 1fr auto;
                         min-height: 0;
+                        overflow: hidden;
                         background: white;
                     `;
 
                     const monthTitle = document.createElement('div');
-                    monthTitle.style.cssText = 'font-weight: 500; font-size: 14px; margin-bottom: 8px; color: #333; flex-shrink: 0;';
+                    monthTitle.style.cssText = 'font-weight: 600; font-size: 12px; color: #333; flex-shrink: 0; line-height: 1.2;';
                     monthTitle.textContent = months[monthIndex];
                     monthCell.appendChild(monthTitle);
 
@@ -6304,16 +6316,19 @@
                     daysGrid.style.cssText = `
                         display: grid;
                         grid-template-columns: repeat(7, 1fr);
-                        gap: 2px;
-                        flex: 1;
+                        grid-template-rows: auto repeat(6, 1fr);
+                        gap: 1px;
                         min-height: 0;
-                        font-size: 11px;
+                        overflow: hidden;
+                        font-size: 10px;
+                        align-items: center;
+                        justify-items: center;
                     `;
 
                     const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
                     weekDays.forEach(day => {
                         const dayHeader = document.createElement('div');
-                        dayHeader.style.cssText = 'text-align: center; font-weight: 500; color: #666; padding: 2px;';
+                        dayHeader.style.cssText = 'text-align: center; font-weight: 600; color: #666; font-size: 9px;';
                         dayHeader.textContent = day;
                         daysGrid.appendChild(dayHeader);
                     });
@@ -6326,13 +6341,14 @@
                         const date = new Date(startDate);
                         date.setDate(startDate.getDate() + i);
                         const dayCell = document.createElement('div');
-                        dayCell.style.cssText = 'text-align: center; padding: 2px; cursor: pointer; border-radius: 2px; font-size: 11px;';
-                        if (date.getMonth() !== monthIndex) dayCell.style.color = '#ccc';
+                        dayCell.style.cssText = 'text-align: center; width: 100%; font-size: 10px; line-height: 1.2;';
+                        if (date.getMonth() !== monthIndex) dayCell.style.color = '#bbb';
                         else dayCell.style.color = '#333';
                         if (isToday(date)) {
                             dayCell.style.background = '#1e3a8a';
                             dayCell.style.color = 'white';
                             dayCell.style.fontWeight = 'bold';
+                            dayCell.style.borderRadius = '2px';
                         }
                         dayCell.textContent = date.getDate();
                         daysGrid.appendChild(dayCell);
@@ -6348,15 +6364,15 @@
                     const eventIndicator = document.createElement('div');
                     eventIndicator.style.cssText = `
                         flex-shrink: 0;
-                        margin-top: 8px;
-                        padding-top: 6px;
-                        font-size: 10px;
+                        font-size: 9px;
                         color: #1e3a8a;
                         font-weight: 500;
                         text-align: center;
                         background: rgba(30, 58, 138, 0.1);
-                        padding: 6px 4px;
+                        padding: 3px 4px;
                         border-radius: 4px;
+                        margin-top: 4px;
+                        line-height: 1.2;
                     `;
                     eventIndicator.textContent = monthEvents.length > 0 
                         ? `${monthEvents.length} evento${monthEvents.length !== 1 ? 's' : ''}` 
