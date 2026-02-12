@@ -5395,14 +5395,14 @@
         }
 
         function renderCalendar() {
-            if (currentView === 'dia') {
-                updateDailyCalendar();
-            } else if (currentView === 'mês') {
-                updateMonthlyCalendar();
-            } else if (currentView === 'ano') {
+            const header = document.querySelector('.calendar-header');
+            if (currentView === 'ano') {
                 updateYearlyCalendar();
             } else {
-                updateWeeklyCalendar();
+                if (header) { header.style.display = ''; header.classList.remove('year-view-header-hidden'); }
+                if (currentView === 'dia') updateDailyCalendar();
+                else if (currentView === 'mês') updateMonthlyCalendar();
+                else updateWeeklyCalendar();
             }
         }
 
@@ -6273,13 +6273,12 @@
             calendarBody.style.overflow = 'hidden';
             calendarBody.style.minHeight = '0';
 
-            // Cabeçalho simples - apenas o ano
+            // Ocultar barra de cabeçalho com ano na visão anual
             const header = document.querySelector('.calendar-header');
             if (header) {
-                header.innerHTML = `
-                    <div class="time-column-header"></div>
-                    <div class="day-header" style="grid-column: span 3;"><div class="day-name">${currentDate.getFullYear()}</div></div>
-                `;
+                header.classList.add('year-view-header-hidden');
+                header.innerHTML = '';
+                header.style.display = 'none';
             }
 
             const year = currentDate.getFullYear();
@@ -6316,10 +6315,10 @@
                     daysGrid.style.cssText = `
                         display: grid;
                         grid-template-columns: repeat(7, 1fr);
-                        grid-template-rows: auto repeat(6, 1fr);
+                        grid-template-rows: auto repeat(6, minmax(12px, 1fr));
                         gap: 1px;
-                        min-height: 0;
-                        overflow: hidden;
+                        flex: 1;
+                        min-height: 80px;
                         font-size: 10px;
                         align-items: center;
                         justify-items: center;
