@@ -2826,14 +2826,14 @@
 
         /* Visão anual: células com altura mínima para os dias não ficarem cortados */
         .calendar-body.year-view {
-            overflow: auto !important;
+            overflow: hidden !important;
             flex: 1;
             min-height: 0;
-            grid-auto-rows: minmax(180px, 1fr);
+            grid-auto-rows: minmax(165px, 1fr);
         }
         .calendar-body.year-view .year-month-cell {
             overflow: visible !important;
-            min-height: 170px;
+            min-height: 155px;
             border: none !important;
         }
         .calendar-body.year-view .year-month-cell:hover {
@@ -6310,9 +6310,9 @@
                         cursor: default;
                         transition: none;
                         display: grid;
-                        grid-template-rows: auto 1fr auto;
+                        grid-template-rows: auto minmax(0, 1fr) auto;
                         gap: 0 0;
-                        row-gap: 6px;
+                        row-gap: 10px;
                         min-height: 0;
                         overflow: hidden;
                         background: white;
@@ -6327,10 +6327,10 @@
                     daysGrid.style.cssText = `
                         display: grid;
                         grid-template-columns: repeat(7, 1fr);
-                        grid-template-rows: auto repeat(6, minmax(20px, 1fr));
-                        gap: 4px;
+                        grid-template-rows: auto repeat(6, minmax(16px, 1fr));
+                        gap: 3px;
                         flex: 1;
-                        min-height: 120px;
+                        min-height: 0;
                         font-size: 10px;
                         align-items: stretch;
                         justify-items: stretch;
@@ -6352,7 +6352,7 @@
                         const date = new Date(startDate);
                         date.setDate(startDate.getDate() + i);
                         const dayCell = document.createElement('div');
-                        dayCell.style.cssText = 'display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; line-height: 1; min-height: 18px; padding: 2px 0;';
+                        dayCell.style.cssText = 'display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; line-height: 1; min-height: 14px;';
                         if (date.getMonth() !== monthIndex) dayCell.style.color = '#bbb';
                         else dayCell.style.color = '#333';
                         if (isToday(date)) {
@@ -6382,7 +6382,7 @@
                         background: rgba(30, 58, 138, 0.1);
                         padding: 3px 4px;
                         border-radius: 4px;
-                        margin-top: 8px;
+                        margin-top: 10px;
                         line-height: 1.2;
                     `;
                     eventIndicator.textContent = monthEvents.length > 0 
