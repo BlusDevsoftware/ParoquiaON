@@ -6299,10 +6299,12 @@
                         padding: 6px 8px;
                         border: 1px solid #e0e0e0;
                         border-radius: 6px;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
+                        cursor: default;
+                        transition: none;
                         display: grid;
                         grid-template-rows: auto 1fr auto;
+                        gap: 0 0;
+                        row-gap: 6px;
                         min-height: 0;
                         overflow: hidden;
                         background: white;
@@ -6372,28 +6374,13 @@
                         background: rgba(30, 58, 138, 0.1);
                         padding: 3px 4px;
                         border-radius: 4px;
-                        margin-top: 4px;
+                        margin-top: 8px;
                         line-height: 1.2;
                     `;
                     eventIndicator.textContent = monthEvents.length > 0 
                         ? `${monthEvents.length} evento${monthEvents.length !== 1 ? 's' : ''}` 
                         : '—';
                     monthCell.appendChild(eventIndicator);
-
-                    monthCell.addEventListener('mouseenter', function() {
-                        this.style.background = '#f8f9fa';
-                        this.style.borderColor = '#1e3a8a';
-                    });
-                    monthCell.addEventListener('mouseleave', function() {
-                        this.style.background = 'white';
-                        this.style.borderColor = '#e0e0e0';
-                    });
-                    monthCell.addEventListener('click', function() {
-                        currentDate = new Date(year, monthIndex, 1);
-                        currentView = 'mês';
-                        renderCalendar();
-                        updateCurrentWeekRange();
-                    });
 
                     calendarBody.appendChild(monthCell);
                 }
