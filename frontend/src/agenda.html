@@ -5542,9 +5542,14 @@
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
             
-            // Limpar classes e estilos da visão mensal
+            // Limpar classes e estilos de outras visões (mensal, anual)
             calendarBody.classList.remove('month-view');
+            calendarBody.classList.remove('year-view');
             calendarBody.style.gridTemplateColumns = '';
+            calendarBody.style.gridTemplateRows = '';
+            calendarBody.style.gap = '';
+            calendarBody.style.overflow = '';
+            calendarBody.style.minHeight = '';
             calendarBody.style.display = '';
             
             // Resetar layout para semanal (coluna de hora + 7 dias)
@@ -5974,6 +5979,14 @@
         function updateMonthlyCalendar() {
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
+            
+            // Limpar classes e estilos de outras visões (anual)
+            calendarBody.classList.remove('year-view');
+            calendarBody.style.gridTemplateRows = '';
+            calendarBody.style.gap = '';
+            calendarBody.style.overflow = '';
+            calendarBody.style.minHeight = '';
+            
             // Visão mensal deve ocupar todo o container em 7 colunas (sem coluna de horário)
             if (calendarBody && calendarBody.style) {
                 calendarBody.style.gridTemplateColumns = 'repeat(7, 1fr)';
@@ -7744,9 +7757,14 @@
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
             
-            // Limpar classes e estilos da visão mensal
+            // Limpar classes e estilos de outras visões (mensal, anual)
             calendarBody.classList.remove('month-view');
+            calendarBody.classList.remove('year-view');
             calendarBody.style.gridTemplateColumns = '';
+            calendarBody.style.gridTemplateRows = '';
+            calendarBody.style.gap = '';
+            calendarBody.style.overflow = '';
+            calendarBody.style.minHeight = '';
             calendarBody.style.display = '';
             
             // Configurar grid para visão diária: coluna de hora + coluna do dia
