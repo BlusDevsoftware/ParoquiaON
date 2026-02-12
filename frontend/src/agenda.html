@@ -2832,9 +2832,14 @@
             grid-auto-rows: minmax(165px, 1fr);
         }
         .calendar-body.year-view .year-month-cell {
-            overflow: visible !important;
+            overflow: hidden !important;
             min-height: 155px;
+            height: 100% !important;
             border: none !important;
+            border-bottom: none !important;
+            border-right: none !important;
+            display: flex !important;
+            flex-direction: column !important;
         }
         .calendar-body.year-view .year-month-cell:hover {
             background: white !important;
@@ -2842,6 +2847,10 @@
         }
         .calendar-body.year-view .year-month-cell:hover::after {
             content: none !important;
+        }
+        .calendar-body.year-view .year-event-indicator {
+            flex-shrink: 0 !important;
+            margin-top: auto !important;
         }
 
         /* Day-slot deve ocupar 100% da célula na visão mensal */
@@ -6372,6 +6381,7 @@
                     });
 
                     const eventIndicator = document.createElement('div');
+                    eventIndicator.className = 'year-event-indicator';
                     eventIndicator.style.cssText = `
                         flex-shrink: 0;
                         font-size: 9px;
