@@ -1,5 +1,7 @@
 // Agenda selects population - attach to window.AgendaSelects
 (function() {
+  let modalSelectsCache = null; // cache para evitar refetch ao abrir modal
+
   function isEntityActive(entity) {
     if (!entity) return false;
     if (Object.prototype.hasOwnProperty.call(entity, 'ativo')) {
@@ -36,7 +38,18 @@
   async function populateSelectsForModal() {
     if (!window.api || !window.endpoints) return;
     try {
-      // Fetch all lists in parallel from API (no cache)
+      // Usar cache se já carregou (evita delay ao reabrir modal)
+      if (modalSelectsCache) {
+        const { comunidades, pastorais, pilares, locais, acoes, status } = modalSelectsCache;
+        fillSelect(document.getElementById('eventCommunity'), comunidades, 'Selecione a comunidade');
+        fillSelect(document.getElementById('eventPastoral'), pastorais, 'Selecione a pastoral');
+        fillSelect(document.getElementById('eventPilares'), pilares, 'Selecione o pilar');
+        fillSelect(document.getElementById('eventLocation'), locais, 'Selecione o local');
+        fillSelect(document.getElementById('eventAcao'), acoes, 'Selecione a ação');
+        const statusSelect = document.getElementById('eventStatus');
+        if (statusSelect && status) fillSelect(statusSelect, status, 'Selecione o status');
+        return;
+      }
       const requests = [
         window.api.get(window.endpoints.comunidades.list),
         window.api.get(window.endpoints.pastorais.list),
@@ -52,6 +65,7 @@
       const locais = Array.isArray(lRes.data) ? lRes.data : [];
       const acoes = Array.isArray(aRes.data) ? aRes.data : [];
       const status = Array.isArray(sRes.data) ? sRes.data : [];
+      modalSelectsCache = { comunidades, pastorais, pilares, locais, acoes, status };
 
       fillSelect(document.getElementById('eventCommunity'), comunidades, 'Selecione a comunidade');
       fillSelect(document.getElementById('eventPastoral'), pastorais, 'Selecione a pastoral');

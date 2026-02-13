@@ -2950,6 +2950,11 @@
             font-size: 10px;
         }
 
+        /* Visão mensal: sem cruz (+) no hover (clique para criar removido) */
+        .calendar-body.month-view .day-slot:hover::after {
+            content: none;
+        }
+
         /* Scroll escondido no container central */
 
         .time-slot {
@@ -6125,30 +6130,12 @@
                         eventsWrap.appendChild(chip);
                     });
 
-                    // Clique no dia (fora dos chips) abre modal de novo agendamento para a data
-                    cell.addEventListener('click', function(e) {
-                        // Evitar conflito quando clicar em um chip existente
-                        if (e.target && (e.target.closest && e.target.closest('.month-event'))) {
-                            return;
-                        }
-                        const startDt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 19, 0, 0);
-                        const endDt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 0, 0);
-                        if (typeof window.openEventModalWithTime === 'function') {
-                            window.openEventModalWithTime(startDt, endDt);
-                        } else if (typeof window.openEventModalFromCreate === 'function') {
-                            const y = date.getFullYear();
-                            const m = String(date.getMonth() + 1).padStart(2, '0');
-                            const d = String(date.getDate()).padStart(2, '0');
-                            window.openEventModalFromCreate(`${y}-${m}-${d}`);
-                        }
-                    });
-
-                    // Interação: ao passar o mouse, mostrar todos os eventos do dia em um painel flutuante
-                    // Só adicionar eventos de hover se houver eventos no dia
+                    // Interação: ao clicar no dia, mostrar painel com eventos (não mais no hover)
                     if (dayEvents.length > 0) {
                         cell.style.position = 'relative';
+                        cell.style.cursor = 'pointer';
                         let hoverPanel;
-                        let hoverTimeout;
+                        let clickOutsideListener = null;
                         const openHoverPanel = () => {
                             // Evitar recriar caso já exista
                             if (hoverPanel) return;
@@ -6308,41 +6295,37 @@
                                 hoverPanel.style.maxHeight = `${Math.min(available, Math.floor(window.innerHeight * 0.8))}px`;
                             });
 
-                            // Manter aberto ao mover o mouse para o painel
-                            hoverPanel.addEventListener('mouseenter', () => {
-                                if (hoverTimeout) {
-                                    clearTimeout(hoverTimeout);
-                                    hoverTimeout = null;
-                                }
-                            });
-                            hoverPanel.addEventListener('mouseleave', () => {
-                                closeHoverPanel();
-                            });
                         };
 
                         const closeHoverPanel = () => {
+                            if (clickOutsideListener) {
+                                document.removeEventListener('click', clickOutsideListener);
+                                clickOutsideListener = null;
+                            }
                             if (hoverPanel && hoverPanel.parentNode) {
                                 hoverPanel.parentNode.removeChild(hoverPanel);
                             }
                             hoverPanel = null;
                         };
 
-                        cell.addEventListener('mouseenter', () => {
-                            if (hoverTimeout) {
-                                clearTimeout(hoverTimeout);
-                                hoverTimeout = null;
+                        cell.addEventListener('click', (e) => {
+                            if (hoverPanel) {
+                                closeHoverPanel();
+                                return;
                             }
                             openHoverPanel();
-                        });
-                        cell.addEventListener('mouseleave', () => {
-                            // Aguardar pequeno atraso para permitir mover o mouse ao painel sem fechar
-                            hoverTimeout = setTimeout(() => {
-                                closeHoverPanel();
-                            }, 120);
+                            // Fechar ao clicar fora (registrar após o clique atual)
+                            setTimeout(() => {
+                                clickOutsideListener = (ev) => {
+                                    if (!hoverPanel) return;
+                                    if (!cell.contains(ev.target) && !hoverPanel.contains(ev.target)) {
+                                        closeHoverPanel();
+                                    }
+                                };
+                                document.addEventListener('click', clickOutsideListener);
+                            }, 0);
                         });
                     }
-
-                    cell.addEventListener('click', () => {});
                     calendarBody.appendChild(cell);
                 }
             }
