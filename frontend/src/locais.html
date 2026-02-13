@@ -1917,6 +1917,9 @@
                 if (statusToggle) statusToggle.checked = status === 'ativo' || status === 'Ativo';
                 if (statusInput) statusInput.value = statusToggle.checked ? 'ativo' : 'inativo';
                 if (statusLabel) statusLabel.textContent = statusToggle.checked ? 'Ativo' : 'Inativo';
+                Array.from(form.elements).forEach(el => { el.disabled = false; });
+                const formActions = form.querySelector('.form-actions');
+                if (formActions) formActions.style.display = 'flex';
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('show'), 10);
                 document.body.style.overflow = 'hidden';
