@@ -5013,7 +5013,27 @@
                 return;
             }
             if (!formData.comunidade || formData.comunidade.trim() === '') {
-                if (typeof showToast === 'function') showToast('Selecione a comunidade do evento.', 'error');
+                if (typeof showToast === 'function') showToast('Selecione a comunidade para o agendamento.', 'error');
+                restaurarBotao();
+                return;
+            }
+            if (!formData.pastoral || formData.pastoral.trim() === '') {
+                if (typeof showToast === 'function') showToast('Selecione a pastoral para o agendamento.', 'error');
+                restaurarBotao();
+                return;
+            }
+            if (!formData.pilares || formData.pilares.trim() === '') {
+                if (typeof showToast === 'function') showToast('Selecione o pilar para o agendamento.', 'error');
+                restaurarBotao();
+                return;
+            }
+            if (!formData.local || formData.local.trim() === '') {
+                if (typeof showToast === 'function') showToast('Selecione o local para o agendamento.', 'error');
+                restaurarBotao();
+                return;
+            }
+            if (!formData.acao || formData.acao.trim() === '') {
+                if (typeof showToast === 'function') showToast('Selecione a ação para o agendamento.', 'error');
                 restaurarBotao();
                 return;
             }
