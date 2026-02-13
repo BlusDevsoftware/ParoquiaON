@@ -1951,12 +1951,22 @@
             const currentUser = (window.authGuard && typeof window.authGuard.getCurrentUser === 'function') ? window.authGuard.getCurrentUser() : null;
             const rawUserId = currentUser && (currentUser.id ?? currentUser.usuario_id ?? currentUser.userId);
             const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
+            const comunidadeId = form.comunidade?.value || '';
+            if (!comunidadeId || comunidadeId.trim() === '') {
+                alert('Selecione a comunidade para o cadastro do local.');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('btn-loading');
+                    submitBtn.innerHTML = originalLabel;
+                }
+                return;
+            }
             const payload = {
                 nome: form.nome.value,
                 endereco: form.endereco.value,
                 status: form.status.value,
                 observacao: form.observacao.value || '',
-                comunidade_id: form.comunidade?.value || null,
+                comunidade_id: comunidadeId,
                 usuario_id: usuarioId ?? undefined,
                 criado_por_email: currentUser?.email ?? undefined,
                 criado_por_nome: (currentUser?.nome ?? currentUser?.name) ?? undefined
