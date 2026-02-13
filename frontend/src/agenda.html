@@ -5012,6 +5012,11 @@
                 restaurarBotao();
                 return;
             }
+            if (!formData.comunidade || formData.comunidade.trim() === '') {
+                if (typeof showToast === 'function') showToast('Selecione a comunidade do evento.', 'error');
+                restaurarBotao();
+                return;
+            }
             if (!formData.dataInicio && !isEditing) {
                 if (typeof showToast === 'function') showToast('Informe a data do evento ou adicione um período.', 'error');
                 restaurarBotao();
