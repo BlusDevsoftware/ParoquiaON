@@ -6158,7 +6158,7 @@
 
                             // Cabeçalho do painel com data
                             const header = document.createElement('div');
-                            const dataFormatada = date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                            const dataFormatada = date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
                             header.textContent = `Agendamentos do dia — ${dataFormatada}`;
                             header.style.cssText = 'font-weight:700; color:#111827; font-size:12px; margin-bottom:8px;';
                             hoverPanel.appendChild(header);
