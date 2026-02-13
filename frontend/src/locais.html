@@ -121,6 +121,59 @@
             background-color: #f5f5f5;
             cursor: not-allowed;
         }
+        /* Search-select igual ao modal de agendamento */
+        #servicoModal .search-select-field {
+            position: relative;
+            width: 100%;
+        }
+        #servicoModal .search-select-field input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
+            color: #333;
+            font-size: 14px;
+        }
+        #servicoModal .search-select-field input:hover {
+            border-color: #1e3a8a;
+        }
+        #servicoModal .search-select-field input:focus {
+            border-color: #1e3a8a;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
+        }
+        #servicoModal .search-select-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 10;
+            display: none;
+        }
+        #servicoModal .search-select-field.open .search-select-menu {
+            display: block;
+        }
+        #servicoModal .search-select-list {
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        #servicoModal .search-select-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f8f8;
+        }
+        #servicoModal .search-select-item:hover {
+            background: #f8f9fa;
+        }
+        #servicoModal .search-select-item.is-selected {
+            background: #eff6ff;
+            color: #1e3a8a;
+        }
         .form-text {
             font-size: 12px;
             color: #666;
@@ -1540,20 +1593,100 @@
             }
         }
 
+        function makeSearchSelectFromNative(nativeSelect) {
+            if (!nativeSelect || nativeSelect.dataset.enhanced === 'true') return;
+            const getSelectedText = () => {
+                const opt = nativeSelect.options[nativeSelect.selectedIndex];
+                return opt && opt.value !== '' ? (opt.textContent || '').trim() : '';
+            };
+            const field = document.createElement('div');
+            field.className = 'search-select-field';
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'Selecione a comunidade';
+            input.value = getSelectedText();
+            const menu = document.createElement('div');
+            menu.className = 'search-select-menu';
+            const list = document.createElement('div');
+            list.className = 'search-select-list';
+            const buildItems = () => {
+                list.innerHTML = '';
+                const options = Array.from(nativeSelect.options);
+                if (options.length <= 1) {
+                    const item = document.createElement('div');
+                    item.className = 'search-select-item no-options';
+                    item.textContent = 'Nenhuma opção disponível';
+                    list.appendChild(item);
+                    return;
+                }
+                options.forEach((opt) => {
+                    const text = (opt.textContent || '').trim();
+                    if (opt.value === '' || /^\s*selecione/i.test(text)) return;
+                    const item = document.createElement('div');
+                    item.className = 'search-select-item' + (opt.selected ? ' is-selected' : '');
+                    item.dataset.value = opt.value;
+                    item.textContent = text;
+                    item.addEventListener('click', () => {
+                        nativeSelect.value = opt.value;
+                        nativeSelect.dispatchEvent(new Event('change'));
+                        list.querySelectorAll('.search-select-item').forEach(el => el.classList.remove('is-selected'));
+                        item.classList.add('is-selected');
+                        input.value = opt.textContent || '';
+                        field.classList.remove('open');
+                    });
+                    list.appendChild(item);
+                });
+            };
+            buildItems();
+            field.reloadItems = buildItems;
+            input.addEventListener('input', () => {
+                const term = input.value.trim().toLowerCase();
+                list.querySelectorAll('.search-select-item').forEach(item => {
+                    item.style.display = item.classList.contains('no-options') ? '' : (item.textContent.toLowerCase().includes(term) ? '' : 'none');
+                });
+            });
+            const openMenu = () => {
+                document.querySelectorAll('#servicoModal .search-select-field.open').forEach(f => { if (f !== field) f.classList.remove('open'); });
+                if (!field.classList.contains('open')) {
+                    field.classList.add('open');
+                    list.querySelectorAll('.search-select-item').forEach(item => { item.style.display = ''; });
+                    setTimeout(() => input.focus(), 0);
+                }
+            };
+            input.addEventListener('focus', openMenu);
+            input.addEventListener('click', (e) => { e.stopPropagation(); openMenu(); });
+            document.addEventListener('click', (e) => { if (!field.contains(e.target)) field.classList.remove('open'); });
+            nativeSelect.addEventListener('change', () => {
+                input.value = getSelectedText();
+                list.querySelectorAll('.search-select-item').forEach(el => { el.classList.toggle('is-selected', el.dataset.value === nativeSelect.value); });
+            });
+            nativeSelect.parentNode.insertBefore(field, nativeSelect);
+            field.appendChild(input);
+            menu.appendChild(list);
+            field.appendChild(menu);
+            nativeSelect.style.display = 'none';
+            nativeSelect.dataset.enhanced = 'true';
+        }
+
         async function carregarComunidadesNoSelect() {
             const select = document.getElementById('comunidade');
             if (!select) return;
             try {
                 const { data, error } = await window.api.get(window.endpoints.comunidades.list);
                 if (error) throw error;
-                const lista = Array.isArray(data) ? data : [];
+                const lista = (Array.isArray(data) ? data : [])
+                    .filter(c => c.ativo !== false && String(c.status || '').toLowerCase() !== 'inativo')
+                    .sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR'));
                 select.innerHTML = '<option value="">Selecione a comunidade</option>';
-                lista.filter(c => c.ativo !== false && String(c.status || '').toLowerCase() !== 'inativo').forEach(c => {
+                lista.forEach(c => {
                     const opt = document.createElement('option');
                     opt.value = c.id;
                     opt.textContent = c.nome || '';
                     select.appendChild(opt);
                 });
+                const field = select.previousElementSibling;
+                if (field && field.reloadItems) field.reloadItems();
+                else makeSearchSelectFromNative(select);
             } catch (e) {
                 console.error('Erro ao carregar comunidades:', e);
             }
@@ -1569,6 +1702,11 @@
             await carregarComunidadesNoSelect();
             form.reset();
             form.dataset.codigo = '';
+            const comunidadeSelect = document.getElementById('comunidade');
+            if (comunidadeSelect) {
+                comunidadeSelect.value = '';
+                comunidadeSelect.dispatchEvent(new Event('change'));
+            }
             
             // Inicializar toggle de status
             const statusToggle = document.getElementById('statusToggleModal');
@@ -1584,6 +1722,7 @@
                 form.endereco.value = servico.endereco || '';
                 form.observacao.value = servico.observacao || servico.descricao || '';
                 form.comunidade.value = servico.comunidade_id || '';
+                form.comunidade.dispatchEvent(new Event('change'));
                 form.dataset.id = servico.id ?? servico.codigo;
                 
                 // Atualizar toggle de status
@@ -1760,6 +1899,7 @@
                 form.endereco.value = local.endereco || '';
                 form.observacao.value = local.observacao || local.descricao || '';
                 form.comunidade.value = local.comunidade_id || '';
+                form.comunidade.dispatchEvent(new Event('change'));
                 const statusToggle = document.getElementById('statusToggleModal');
                 const statusInput = document.getElementById('status');
                 const statusLabel = document.querySelector('.status-label-modal');
@@ -1784,6 +1924,7 @@
                 form.endereco.value = local?.endereco || '';
                 form.observacao.value = local?.observacao || local?.descricao || '';
                 form.comunidade.value = local?.comunidade_id || '';
+                form.comunidade.dispatchEvent(new Event('change'));
             } catch (error) {
                 alert('Erro ao duplicar local');
             }
