@@ -3073,7 +3073,6 @@
         }
 
         .event-block.event-block-hover {
-            transform: translateY(-1px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
             z-index: 200 !important;
             white-space: normal !important;
@@ -6157,9 +6156,10 @@
                                 'padding:10px; max-height:60vh; overflow:auto; animation:fadeIn 120ms ease-out;'
                             ].join(' ');
 
-                            // Cabeçalho do painel
+                            // Cabeçalho do painel com data
                             const header = document.createElement('div');
-                            header.textContent = 'Agendamentos do dia';
+                            const dataFormatada = date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                            header.textContent = `Agendamentos do dia — ${dataFormatada}`;
                             header.style.cssText = 'font-weight:700; color:#111827; font-size:12px; margin-bottom:8px;';
                             hoverPanel.appendChild(header);
 
