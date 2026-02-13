@@ -15,6 +15,8 @@
     <script src="scripts/auth-guard.js"></script>
     <script src="scripts/apply-auth-protection.js"></script>
     <script src="scripts/config/api.js"></script>
+    <script src="scripts/agenda/ui-utils.js"></script>
+    <script>if (window.AgendaUI) window.showToast = window.AgendaUI.showToast;</script>
     <style>
         /* Copiado e adaptado de pilares.html para padronização */
         .modal {
@@ -394,6 +396,14 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
         }
 
         /* Loader específico para locais */
@@ -1953,7 +1963,7 @@
             const usuarioId = rawUserId != null && /^\d+$/.test(String(rawUserId)) ? Number(rawUserId) : rawUserId ?? null;
             const comunidadeId = form.comunidade?.value || '';
             if (!comunidadeId || comunidadeId.trim() === '') {
-                alert('Selecione a comunidade para o cadastro do local.');
+                if (typeof window.showToast === 'function') window.showToast('Selecione a comunidade para o cadastro do local.', 'error');
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.classList.remove('btn-loading');
