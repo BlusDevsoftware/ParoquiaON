@@ -8564,7 +8564,7 @@
 
             window.openEventModal = async function(date = null) {
                 console.log('🔄 Abrindo modal padrão');
-                mostrarSpinnerAgenda();
+                ocultarSpinnerAgenda(); // garantir que não haja tela de carregamento ao abrir
                 setEventFormMode(editingEvent ? 'edit' : 'create');
                 
                 // Limpar períodos anteriores
