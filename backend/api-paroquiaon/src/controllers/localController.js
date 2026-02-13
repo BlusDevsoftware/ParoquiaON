@@ -2,7 +2,7 @@ const { supabase } = require('../config/supabase');
 
 async function listarLocais(req, res) {
     try {
-        const { data, error } = await supabase.from('locais').select('*').order('id', { ascending: true });
+        const { data, error } = await supabase.from('locais').select('*, comunidades(nome)').order('id', { ascending: true });
         if (error) throw error;
         res.json(data);
     } catch (error) {
@@ -14,7 +14,7 @@ async function listarLocais(req, res) {
 async function buscarLocal(req, res) {
     try {
         const { id } = req.params;
-        const { data, error } = await supabase.from('locais').select('*').eq('id', id).single();
+        const { data, error } = await supabase.from('locais').select('*, comunidades(nome)').eq('id', id).single();
         if (error) throw error;
         if (!data) return res.status(404).json({ error: 'Local não encontrado' });
         res.json(data);
@@ -37,6 +37,7 @@ async function criarLocal(req, res) {
             endereco: body.endereco ?? null,
             observacao: body.observacao ?? body.descricao ?? null,
             status: normalizedStatus,
+            comunidade_id: body.comunidade_id ?? null,
             usuario_id: body.usuario_id ?? null,
             criado_por_email: body.criado_por_email ?? null,
             criado_por_nome: body.criado_por_nome ?? null
@@ -93,6 +94,7 @@ async function atualizarLocal(req, res) {
             ...(body.endereco !== undefined ? { endereco: body.endereco } : {}),
             ...(body.observacao !== undefined ? { observacao: body.observacao } : (body.descricao !== undefined ? { observacao: body.descricao } : {})),
             ...(normalizedStatus !== undefined ? { status: normalizedStatus } : {}),
+            ...(body.comunidade_id !== undefined ? { comunidade_id: body.comunidade_id || null } : {}),
             ...(body.usuario_id !== undefined ? { usuario_id: body.usuario_id } : {}),
             ...(body.criado_por_email !== undefined ? { criado_por_email: body.criado_por_email } : {}),
             ...(body.criado_por_nome !== undefined ? { criado_por_nome: body.criado_por_nome } : {})

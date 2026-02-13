@@ -994,7 +994,7 @@
         }
         .locais-header {
             display: grid;
-            grid-template-columns: 56px 1fr 1fr 120px auto;
+            grid-template-columns: 56px 1fr 1fr 1fr 120px auto;
             gap: 16px;
             padding: 14px 0;
             background: #ffffff; /* sem fundo cinza */
@@ -1015,7 +1015,7 @@
         }
         .row-card {
             display: grid;
-            grid-template-columns: 56px 1fr 1fr 120px auto;
+            grid-template-columns: 56px 1fr 1fr 1fr 120px auto;
             gap: 16px;
             align-items: center;
             padding: 12px 12px;
@@ -1336,6 +1336,12 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label><i class="fas fa-users"></i> Comunidade</label>
+                        <select id="comunidade" name="comunidade">
+                            <option value="">Selecione a comunidade</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label><i class="fas fa-map"></i> Endereço</label>
                         <input type="text" id="endereco" name="endereco" placeholder="Digite o endereço completo">
                     </div>
@@ -1461,6 +1467,7 @@
 
         function createLocalRow(local) {
             const nome = local?.nome || 'Sem nome';
+            const comunidadeNome = local?.comunidades?.nome || local?.comunidade_nome || '-';
             const endereco = local?.endereco || '-';
             const ativo = local?.ativo !== false && (local?.status ? String(local.status).toLowerCase() === 'ativo' : true);
             const statusText = ativo ? 'Ativo' : 'Inativo';
@@ -1473,6 +1480,7 @@
                     <div style="width:40px;height:40px;border-radius:50%;background:#e9edf7;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #e6e9ef;">${(nome||'?').charAt(0).toUpperCase()}</div>
                 </div>
                 <div>${nome}</div>
+                <div>${comunidadeNome}</div>
                 <div>${endereco}</div>
                 <div style="text-align:center;"><span class="status ${statusClass}">${statusText}</span></div>
                 <div style="display:flex; gap:8px; justify-content:center;">
@@ -1503,7 +1511,8 @@
                     listaFiltrada = lista.filter(l => {
                         const nome = (l?.nome || '').toLowerCase();
                         const endereco = (l?.endereco || '').toLowerCase();
-                        return nome.includes(searchTerm) || endereco.includes(searchTerm);
+                        const comunidade = (l?.comunidades?.nome || l?.comunidade_nome || '').toLowerCase();
+                        return nome.includes(searchTerm) || endereco.includes(searchTerm) || comunidade.includes(searchTerm);
                     });
                 }
 
@@ -1531,13 +1540,33 @@
             }
         }
 
+        async function carregarComunidadesNoSelect() {
+            const select = document.getElementById('comunidade');
+            if (!select) return;
+            try {
+                const { data, error } = await window.api.get(window.endpoints.comunidades.list);
+                if (error) throw error;
+                const lista = Array.isArray(data) ? data : [];
+                select.innerHTML = '<option value="">Selecione a comunidade</option>';
+                lista.filter(c => c.ativo !== false && String(c.status || '').toLowerCase() !== 'inativo').forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.nome || '';
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('Erro ao carregar comunidades:', e);
+            }
+        }
+
         // Removido listener duplicado; inicialização ocorre no bloco mais abaixo
         // Funções globais para modais
-        window.openServicoModal = function(titulo = 'Novo Local', servico = null, modo = 'novo') {
+        window.openServicoModal = async function(titulo = 'Novo Local', servico = null, modo = 'novo') {
             const modal = document.getElementById('servicoModal');
             const modalTitle = document.getElementById('servicoModalTitle');
             const form = document.getElementById('servicoForm');
             modalTitle.innerHTML = `<i class='fas fa-map-marker-alt'></i> ${titulo}`;
+            await carregarComunidadesNoSelect();
             form.reset();
             form.dataset.codigo = '';
             
@@ -1554,6 +1583,7 @@
                 form.nome.value = servico.nome;
                 form.endereco.value = servico.endereco || '';
                 form.observacao.value = servico.observacao || servico.descricao || '';
+                form.comunidade.value = servico.comunidade_id || '';
                 form.dataset.id = servico.id ?? servico.codigo;
                 
                 // Atualizar toggle de status
@@ -1720,6 +1750,7 @@
             try {
                 const { data: local, error } = await api.get(window.endpoints.locais.get(id));
                 if (error) throw error;
+                await carregarComunidadesNoSelect();
                 const modal = document.getElementById('servicoModal');
                 const modalTitle = document.getElementById('servicoModalTitle');
                 const form = document.getElementById('servicoForm');
@@ -1728,6 +1759,7 @@
                 form.nome.value = local.nome || '';
                 form.endereco.value = local.endereco || '';
                 form.observacao.value = local.observacao || local.descricao || '';
+                form.comunidade.value = local.comunidade_id || '';
                 const statusToggle = document.getElementById('statusToggleModal');
                 const statusInput = document.getElementById('status');
                 const statusLabel = document.querySelector('.status-label-modal');
@@ -1746,11 +1778,12 @@
             try {
                 const { data: local, error } = await api.get(window.endpoints.locais.get(id));
                 if (error) throw error;
-                window.openServicoModal('Novo Local');
+                await window.openServicoModal('Novo Local');
                 const form = document.getElementById('servicoForm');
                 form.nome.value = `${local?.nome || ''} (cópia)`;
                 form.endereco.value = local?.endereco || '';
                 form.observacao.value = local?.observacao || local?.descricao || '';
+                form.comunidade.value = local?.comunidade_id || '';
             } catch (error) {
                 alert('Erro ao duplicar local');
             }
@@ -1782,6 +1815,7 @@
                 endereco: form.endereco.value,
                 status: form.status.value,
                 observacao: form.observacao.value || '',
+                comunidade_id: form.comunidade?.value || null,
                 usuario_id: usuarioId ?? undefined,
                 criado_por_email: currentUser?.email ?? undefined,
                 criado_por_nome: (currentUser?.nome ?? currentUser?.name) ?? undefined
