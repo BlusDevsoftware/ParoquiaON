@@ -5006,6 +5006,16 @@
                 status: 'agendado'
             };
 
+            // Em modo edição: usar valores do evento se selects estiverem vazios (fallback para search-select)
+            if (isEditing && editingEvent) {
+                const toStr = (v) => (v != null && v !== '') ? String(v) : '';
+                if (!formData.comunidade || formData.comunidade.trim() === '') formData.comunidade = toStr(editingEvent.comunidade_id);
+                if (!formData.pastoral || formData.pastoral.trim() === '') formData.pastoral = toStr(editingEvent.pastoral_id);
+                if (!formData.pilares || formData.pilares.trim() === '') formData.pilares = toStr(editingEvent.pilar_id);
+                if (!formData.local || formData.local.trim() === '') formData.local = toStr(editingEvent.local_id);
+                if (!formData.acao || formData.acao.trim() === '') formData.acao = toStr(editingEvent.acao_id);
+            }
+
             if (!formData.titulo) {
                 if (typeof showToast === 'function') showToast('Informe o título do evento.', 'error');
                 restaurarBotao();
@@ -8440,7 +8450,7 @@
             openEventModal(date);
         };
 
-        window.openEventFormForEditing = function(event) {
+        window.openEventFormForEditing = async function(event) {
             if (typeof window.closeEditEventModal === 'function') {
                 window.closeEditEventModal();
             }
@@ -8464,7 +8474,7 @@
             editingEvent = eventoAtualizado;
             editingEventPeriods = derivePeriodsFromEvent(eventoAtualizado);
             setEventFormMode('edit');
-            openEventModal();
+            await openEventModal();
             populateEventFormFields(eventoAtualizado);
         };
             
@@ -8552,7 +8562,7 @@
                 }, 300);
             };
 
-            window.openEventModal = function(date = null) {
+            window.openEventModal = async function(date = null) {
                 console.log('🔄 Abrindo modal padrão');
                 mostrarSpinnerAgenda();
                 setEventFormMode(editingEvent ? 'edit' : 'create');
@@ -8573,12 +8583,11 @@
                         }
                     }
                     
-                    // Popular selects usando cache centralizado
+                    // Popular selects usando cache centralizado (aguardar se assíncrono)
                     if (window.AgendaSelects && typeof window.AgendaSelects.populateSelectsForModal === 'function') {
-                        window.AgendaSelects.populateSelectsForModal();
+                        await window.AgendaSelects.populateSelectsForModal();
                     } else if (typeof populateSelectsFromCache === 'function') {
-                        // fallback antigo
-                    populateSelectsFromCache();
+                        populateSelectsFromCache();
                     }
                     initializeCustomSelects('#eventModal');
                     reloadCustomSelects('#eventModal');
