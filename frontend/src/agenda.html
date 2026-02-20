@@ -6607,26 +6607,127 @@
             }
 
             const monthNames = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-            let html = '';
+
+            // Limpa resultados anteriores
+            container.innerHTML = '';
+
+            // Renderiza resultados usando o mesmo layout do card expandido (hover)
             matches.slice(0, 50).forEach(function(ev) {
                 const start = ev.startTime || ev.data_inicio || ev.data_inicio_iso;
                 const d = start ? new Date(start) : null;
                 const dateStr = d ? (d.getDate() + ' ' + monthNames[d.getMonth()] + ' ' + d.getFullYear() + (d.getHours() || d.getMinutes() ? ' às ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') : '')) : '';
-                const meta = [ev.comunidade_nome, ev.pastoral_nome, ev.local_nome].filter(Boolean).join(' • ');
-                html += '<div class="search-result-item" data-event-id="' + (ev.id || '') + '" data-event-date="' + (d ? d.toISOString() : '') + '">' +
-                    '<div class="search-result-title">' + (ev.title || ev.titulo || 'Sem título') + '</div>' +
-                    '<div class="search-result-meta">' + (dateStr ? dateStr + (meta ? ' · ' : '') : '') + meta + '</div></div>';
-            });
-            container.innerHTML = html;
 
-            container.querySelectorAll('.search-result-item').forEach(function(el) {
-                el.addEventListener('click', function() {
-                    const eventId = el.getAttribute('data-event-id');
-                    if (eventId && typeof editEventModal === 'function') {
-                        const ev = (typeof allEvents !== 'undefined' ? allEvents : []).find(function(m) { return m && String(m.id) === eventId; });
-                        if (ev) editEventModal(ev);
+                const comunidadeNome = ev.comunidade_nome || 'Comunidade';
+                const comunidadeColor = ev.color || '#1e3a8a';
+
+                const item = document.createElement('div');
+                item.className = 'search-result-item';
+                item.setAttribute('data-event-id', ev.id || '');
+                item.setAttribute('data-event-date', d ? d.toISOString() : '');
+                item.style.cssText = 'display:flex; align-items:center; gap:10px; padding:8px; border:1px solid #f1f5f9; border-radius:8px; background:#fff; margin-bottom:6px; position:relative;';
+
+                const colorBar = document.createElement('div');
+                colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${comunidadeColor};`;
+
+                // Avatar/foto da comunidade (mesmo padrão do card expandido)
+                let avatarEl;
+                if (ev.comunidades?.foto) {
+                    avatarEl = document.createElement('img');
+                    avatarEl.src = ev.comunidades.foto;
+                    avatarEl.alt = comunidadeNome;
+                    avatarEl.style.cssText = `width:36px; height:36px; border-radius:50%; object-fit:cover; flex:0 0 36px; background:#f3f4f6; border:2px solid ${comunidadeColor};`;
+                } else {
+                    avatarEl = document.createElement('div');
+                    avatarEl.style.cssText = `width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 36px; background:${comunidadeColor}; color:#fff; font-weight:700; font-size:14px; border:2px solid ${comunidadeColor};`;
+                    avatarEl.textContent = (comunidadeNome.charAt(0) || 'C').toUpperCase();
+                }
+
+                const textCol = document.createElement('div');
+                textCol.style.cssText = 'display:flex; flex-direction:column; gap:2px; min-width:0;';
+
+                let cleanTitle = ev.title || ev.titulo || 'Evento';
+                cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
+
+                const titleDiv = document.createElement('div');
+                titleDiv.textContent = cleanTitle;
+                titleDiv.style.cssText = 'font-weight:700; color:#1e3a8a; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+
+                // Ícone para evento paroquial (mesma regra do card expandido)
+                if (ev && (ev.evento_paroquial === true || ev.evento_paroquial === 'true' || ev.paroquial === true)) {
+                    const icon = document.createElement('span');
+                    icon.textContent = '⛪';
+                    icon.title = 'Evento paroquial';
+                    icon.style.cssText = 'margin-right:6px; color:#334155; opacity:0.85; font-size:12px;';
+                    titleDiv.prepend(icon);
+                }
+
+                const nameDiv = document.createElement('div');
+                nameDiv.textContent = comunidadeNome;
+                nameDiv.style.cssText = 'color:#374151; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+
+                const metaDateDiv = document.createElement('div');
+                if (dateStr) {
+                    metaDateDiv.textContent = dateStr;
+                    metaDateDiv.style.cssText = 'color:#6b7280; font-size:11px;';
+                }
+
+                // Hora início e fim (HH:mm - HH:mm), igual ao card expandido
+                let timeText = '';
+                if (ev.startTime) {
+                    const startDate = new Date(ev.startTime);
+                    const endDate = new Date(ev.endTime || ev.startTime);
+                    const fmt = (n) => String(n).padStart(2, '0');
+                    timeText = `${fmt(startDate.getHours())}:${fmt(startDate.getMinutes())} - ${fmt(endDate.getHours())}:${fmt(endDate.getMinutes())}`;
+                }
+                const timeDiv = document.createElement('div');
+                if (timeText) {
+                    timeDiv.textContent = timeText;
+                    timeDiv.style.cssText = 'color:#6b7280; font-size:11px;';
+                }
+
+                textCol.appendChild(titleDiv);
+                if (dateStr) textCol.appendChild(metaDateDiv);
+                textCol.appendChild(nameDiv);
+                if (timeText) textCol.appendChild(timeDiv);
+
+                item.appendChild(colorBar);
+                item.appendChild(avatarEl);
+                item.appendChild(textCol);
+
+                // Botão compartilhar (WhatsApp), mesma posição do card expandido
+                const shareBtn = document.createElement('button');
+                shareBtn.type = 'button';
+                shareBtn.title = 'Compartilhar no WhatsApp';
+                shareBtn.setAttribute('aria-label', 'Compartilhar no WhatsApp');
+                shareBtn.innerHTML = `
+                    <img src="assets/icons/icon_whatsap.png" alt="WhatsApp" style="width:22px; height:22px; border-radius:9999px; object-fit:cover; display:block;" />
+                `;
+                shareBtn.style.cssText = [
+                    'position:absolute; bottom:6px; right:6px;',
+                    'border:none; background:transparent; padding:0; margin:0;',
+                    'cursor:pointer;',
+                    'display:inline-flex; align-items:center; justify-content:center;',
+                    'z-index:2;'
+                ].join(' ');
+                shareBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (window.AgendaShare && typeof window.AgendaShare.openWhatsAppShare === 'function') {
+                        window.AgendaShare.openWhatsAppShare(ev);
                     }
                 });
+                item.appendChild(shareBtn);
+
+                // Clique abre o modal de edição/detalhe
+                item.style.cursor = 'pointer';
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (typeof window.editEventModal === 'function') {
+                        window.editEventModal(ev);
+                    }
+                });
+
+                container.appendChild(item);
             });
         }
 
