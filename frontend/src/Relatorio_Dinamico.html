@@ -377,6 +377,16 @@
             padding: 10px 12px;
             color: #0f172a;
             white-space: nowrap;
+            cursor: move;
+            user-select: none;
+        }
+
+        thead th::after {
+            content: '⋮⋮';
+            font-size: 9px;
+            opacity: 0.35;
+            margin-left: 6px;
+            letter-spacing: -1px;
         }
 
         tbody td {
