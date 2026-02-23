@@ -195,12 +195,13 @@
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.04);
             overflow: hidden;
-        }
-
-        .panel.results-panel {
             display: flex;
             flex-direction: column;
             max-height: calc(100vh - 140px);
+        }
+
+        .panel.results-panel {
+            /* mantém a classe para semântica, mas herda o comportamento principal de .panel */
         }
 
         .panel-header {
@@ -224,6 +225,9 @@
 
         .panel-body {
             padding: 14px 16px 16px 16px;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
         }
 
         .form-row {
