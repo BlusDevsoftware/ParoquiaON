@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ParoquiaON - Relatório Dinâmico</title>
+    <title>ParoquiaON - Relatórios</title>
     <link rel="icon" type="image/png" href="assets/images/logo2.png">
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="template-menu-superior.css">
@@ -386,6 +386,36 @@
         }
         .loader.show { display: block; }
 
+        .loader-overlay-main {
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spinner-main {
+            border: 8px solid #e3f2fd;
+            border-top: 8px solid #1e3a8a;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
         .pagination {
             padding: 10px 16px 14px 16px;
             border-top: 1px solid #f1f5f9;
@@ -508,16 +538,15 @@
         </ul>
     </div>
 
+    <!-- Spinner Centralizado de Carregamento -->
+    <div id="loader-relatorio-dinamico" class="loader-overlay-main">
+        <div class="spinner-main"></div>
+        <div class="loading-text">Carregando dados...</div>
+    </div>
+
     <!-- Main Content -->
     <div class="main-content">
         <div class="page-wrap">
-            <div class="page-title">
-                <div>
-                    <h1>Relatório Dinâmico</h1>
-                    <div class="subtitle">Gere relatórios de qualquer módulo com filtros, colunas selecionáveis e exportação.</div>
-                </div>
-            </div>
-
             <div class="builder">
                 <div class="panel results-panel">
                     <div class="panel-header">
@@ -705,6 +734,7 @@
                 tbody: document.getElementById('rdTbody'),
                 empty: document.getElementById('rdEmpty'),
                 loader: document.getElementById('rdLoader'),
+                mainLoader: document.getElementById('loader-relatorio-dinamico'),
                 pagination: document.getElementById('rdPagination'),
                 paginationInfo: document.getElementById('rdPaginationInfo'),
                 prevPageBtn: document.getElementById('rdPrevPageBtn'),
@@ -790,8 +820,15 @@
                 });
             }
 
-            // Carrega inicial
-            loadModuleData().then(() => render());
+            // Carrega inicial com spinner global
+            if (els.mainLoader) {
+                els.mainLoader.style.display = 'flex';
+            }
+            loadModuleData().then(() => render()).finally(() => {
+                if (els.mainLoader) {
+                    els.mainLoader.style.display = 'none';
+                }
+            });
 
             async function loadModuleData(force = false) {
                 els.loader.classList.add('show');
