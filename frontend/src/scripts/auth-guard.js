@@ -25,6 +25,7 @@ class AuthGuard {
             'pessoas.html': 'pessoas_ver',
             'usuarios.html': 'usuarios_ver',
             'perfil.html': 'perfis_ver',
+            'Relatorio_Dinamico.html': 'relatorios_ver',
             'recebimento.html': 'relatorios_ver',
             'conferencia.html': 'relatorios_ver',
             'manutencao-bd.html': 'configuracoes_manutencao_ver',
@@ -80,7 +81,7 @@ class AuthGuard {
                 if (!this.isLoginPage()) this.redirectToLogin();
                 return false;
             }
-            // Bloqueio por permissão da página
+            // Bloqueio por permissão da pagina 
             this.enforcePagePermission();
         } catch(_) {}
         return true;
@@ -111,7 +112,7 @@ class AuthGuard {
                 if (response.status === 401 || response.status === 403) return false;
                 return true;
             }
-            // Se a verificação ok, atualizar o usuário/permissões na sessão (caso backend retorne)
+            // Se a verificação ok, atualizar o usuário/permissões na sessão (caso backend retorne) 
             try {
                 const data = await response.json();
                 if (data && data.user) {
@@ -183,7 +184,7 @@ class AuthGuard {
             'pilares.html',
             'locais.html',
             'acoes.html',
-            'recebimento.html',
+            'Relatorio_Dinamico.html',
             'conferencia.html'
         ];
         for (const page of order) {
@@ -226,7 +227,7 @@ class AuthGuard {
                 login: 'admin',
                 nome: 'Administrador',
                 perfil: 'Administrador',
-                permissoes: {} // Permissões vazias - pode ajustar conforme necessário
+                permissoes: {} // Permissões vazias - pode ajustar conforme necessário 
             };
         }
         try {

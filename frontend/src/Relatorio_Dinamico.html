@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParoquiaON - Relatório Dinâmico</title>
+    <link rel="icon" type="image/png" href="assets/images/logo2.png">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="template-menu-superior.css">
+    <link rel="stylesheet" href="styles/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="scripts/auth-guard.js"></script>
+    <script src="scripts/apply-auth-protection.js"></script>
+    <script src="scripts/config/api.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            margin-top: 80px;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* Menu Hamburger e Menu Mobile (mesmo padrão das telas CRUD) */
+        .hamburger-menu {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        .hamburger-menu:hover { background: rgba(255, 255, 255, 0.1); }
+        .hamburger-menu:active { background: rgba(255, 255, 255, 0.2); }
+
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .mobile-menu-overlay.show { opacity: 1; }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            z-index: 1501;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+        }
+        .mobile-menu.open { left: 0; }
+
+        .mobile-menu-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .mobile-menu-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .mobile-menu-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        .mobile-menu-close:hover { background: rgba(255, 255, 255, 0.1); }
+
+        .mobile-menu-links {
+            padding: 0;
+            list-style: none;
+            margin: 0;
+        }
+        .mobile-menu-links li { border-bottom: none; }
+        .mobile-menu-links a {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .mobile-menu-links a:hover,
+        .mobile-menu-links a.active {
+            background: #f0f4ff;
+            color: #1e3a8a;
+        }
+        .mobile-menu-links a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .top-header {
+                height: 60px;
+                padding: 0 12px;
+            }
+            .main-content {
+                margin-top: 60px;
+            }
+            .nav-links { display: none; }
+            .hamburger-menu { display: inline-flex; }
+        }
+
+        .page-wrap {
+            padding: 20px 24px 28px 24px;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .page-title h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .page-title .subtitle {
+            margin: 4px 0 0 0;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .builder {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .builder { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-body {
+            padding: 14px 16px 16px 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .form-row.one { grid-template-columns: 1fr; }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        select, input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            outline: none;
+            font-size: 13px;
+            background: #fff;
+        }
+
+        select:focus, input[type="text"]:focus, input[type="date"]:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 3px rgba(30,58,138,0.12);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .btn {
+            border: 1px solid transparent;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+        }
+
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: #1e3a8a; color: #fff; }
+        .btn-primary:hover { box-shadow: 0 8px 18px rgba(30,58,138,0.22); }
+        .btn-secondary { background: #f8fafc; color: #111827; border-color: #e5e7eb; }
+        .btn-secondary:hover { box-shadow: 0 8px 18px rgba(15,23,42,0.10); }
+        .btn-danger { background: #fff5f5; color: #991b1b; border-color: #fecaca; }
+
+        .muted {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .cols-search {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 8px 0 10px 0;
+        }
+
+        .cols-list {
+            max-height: 360px;
+            overflow: auto;
+            border: 1px solid #f1f5f9;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+        }
+
+        .col-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 6px 6px;
+            border-radius: 8px;
+        }
+
+        .col-item:hover { background: #f8fafc; }
+
+        .col-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .results-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .results-top .kpis {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+            border-radius: 9999px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 760px;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 1;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 12px;
+            text-align: left;
+            padding: 10px 12px;
+            color: #0f172a;
+            white-space: nowrap;
+        }
+
+        tbody td {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #111827;
+            vertical-align: top;
+        }
+
+        tbody tr:hover { background: #f8fafc; }
+
+        .empty-state {
+            padding: 40px 16px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .loader {
+            display: none;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e3a8a;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .loader.show { display: block; }
+    </style>
+</head>
+<body>
+    <!-- Header Superior (mesmo padrão do sistema) -->
+    <div class="top-header">
+        <div class="header-left">
+            <div class="logo-section">
+                <button class="hamburger-menu" id="hamburgerMenu" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span style="font-size: 20px; font-weight: 600;">ParoquiaON</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Minha Comunidade</a>
+                <a href="agenda.html" class="nav-link">Agenda</a>
+                <a href="comunidades.html" class="nav-link">Comunidades</a>
+                <a href="pastorais.html" class="nav-link">Pastorais</a>
+                <a href="pilares.html" class="nav-link">Pilares</a>
+                <a href="locais.html" class="nav-link">Locais</a>
+                <a href="acoes.html" class="nav-link">Ações</a>
+                <a href="pessoas.html" class="nav-link">Pessoas</a>
+                <a href="usuarios.html" class="nav-link">Usuários</a>
+                <a href="perfil.html" class="nav-link">Perfil</a>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-trigger">Relatórios <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="Relatorio_Dinamico.html" class="dropdown-item">Dinâmico</a>
+                        <a href="conferencia.html" class="dropdown-item">Conferência</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-icon">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="user-avatar-dropdown">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="user-dropdown-menu" id="userDropdownMenu">
+                    <div class="user-dropdown-header">
+                        <div class="user-dropdown-avatar" id="userDropdownAvatar">A</div>
+                        <div class="user-dropdown-info">
+                            <div class="user-dropdown-name" id="userDropdownName">Usuário</div>
+                            <div class="user-dropdown-email" id="userDropdownEmail">usuario@email.com</div>
+                        </div>
+                    </div>
+                    <div class="user-dropdown-divider"></div>
+                    <a href="#" class="user-dropdown-item logout" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sair</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Lateral Mobile (mesmo padrão) -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3>Menu</h3>
+            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Fechar menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-menu-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Minha Comunidade</a></li>
+            <li><a href="agenda.html"><i class="fas fa-calendar"></i> Agenda</a></li>
+            <li><a href="comunidades.html"><i class="fas fa-users"></i> Comunidades</a></li>
+            <li><a href="pastorais.html"><i class="fas fa-church"></i> Pastorais</a></li>
+            <li><a href="pilares.html"><i class="fas fa-layer-group"></i> Pilares</a></li>
+            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i> Locais</a></li>
+            <li><a href="acoes.html"><i class="fas fa-tasks"></i> Ações</a></li>
+            <li><a href="pessoas.html"><i class="fas fa-user-friends"></i> Pessoas</a></li>
+            <li><a href="usuarios.html"><i class="fas fa-user-cog"></i> Usuários</a></li>
+            <li><a href="perfil.html"><i class="fas fa-user-circle"></i> Perfil</a></li>
+            <li><a href="Relatorio_Dinamico.html"><i class="fas fa-file-invoice-dollar"></i> Dinâmico</a></li>
+            <li><a href="conferencia.html"><i class="fas fa-clipboard-check"></i> Conferência</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-wrap">
+            <div class="page-title">
+                <div>
+                    <h1>Relatório Dinâmico</h1>
+                    <div class="subtitle">Gere relatórios de qualquer módulo com filtros, colunas selecionáveis e exportação.</div>
+                </div>
+            </div>
+
+            <div class="builder">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-sliders-h"></i> Configuração</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-row one">
+                            <div>
+                                <label for="rdModule">Módulo</label>
+                                <select id="rdModule"></select>
+                            </div>
+                        </div>
+
+                        <div class="form-row one">
+                            <div>
+                                <label for="rdSearch">Pesquisar (texto)</label>
+                                <input id="rdSearch" type="text" placeholder="Ex.: maria, comunidade, evento, email..." />
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label for="rdStatus">Status</label>
+                                <select id="rdStatus">
+                                    <option value="todos">Todos</option>
+                                    <option value="ativo">Ativo</option>
+                                    <option value="inativo">Inativo</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="rdDateField">Campo de data</label>
+                                <select id="rdDateField">
+                                    <option value="">(sem filtro)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label for="rdDateFrom">De</label>
+                                <input id="rdDateFrom" type="date" />
+                            </div>
+                            <div>
+                                <label for="rdDateTo">Até</label>
+                                <input id="rdDateTo" type="date" />
+                            </div>
+                        </div>
+
+                        <div class="form-row one">
+                            <div>
+                                <label>Colunas</label>
+                                <div class="cols-search">
+                                    <input id="rdColsSearch" type="text" placeholder="Filtrar colunas..." />
+                                    <button class="btn btn-secondary" id="rdSelectAllBtn" type="button" title="Selecionar tudo">
+                                        <i class="fas fa-check-double"></i>
+                                    </button>
+                                    <button class="btn btn-secondary" id="rdClearColsBtn" type="button" title="Limpar seleção">
+                                        <i class="fas fa-eraser"></i>
+                                    </button>
+                                </div>
+                                <div class="cols-list" id="rdColsList"></div>
+                                <div class="muted" style="margin-top:8px;" id="rdColsHint"></div>
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <button class="btn btn-primary" id="rdRunBtn" type="button">
+                                <i class="fas fa-play"></i> Gerar
+                            </button>
+                            <button class="btn btn-secondary" id="rdReloadBtn" type="button">
+                                <i class="fas fa-sync-alt"></i> Recarregar dados
+                            </button>
+                            <button class="btn btn-secondary" id="rdExportCsvBtn" type="button" disabled>
+                                <i class="fas fa-file-csv"></i> Exportar CSV
+                            </button>
+                            <button class="btn btn-danger" id="rdClearFiltersBtn" type="button">
+                                <i class="fas fa-broom"></i> Limpar filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="results-top">
+                        <div class="kpis">
+                            <div class="chip" id="rdChipModule">Módulo: -</div>
+                            <div class="chip" id="rdChipTotal">Total: 0</div>
+                            <div class="chip" id="rdChipShown">Exibindo: 0</div>
+                        </div>
+                    </div>
+                    <div class="loader" id="rdLoader">Carregando dados...</div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr id="rdTheadRow"></tr>
+                            </thead>
+                            <tbody id="rdTbody"></tbody>
+                        </table>
+                        <div class="empty-state" id="rdEmpty">Selecione um módulo e clique em “Gerar”.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Menu Mobile (reaproveitando padrão das outras páginas)
+        function openMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.style.display = 'block';
+                menu.classList.add('open');
+                setTimeout(() => overlay.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.classList.remove('show');
+                menu.classList.remove('open');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 300);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerBtn = document.getElementById('hamburgerMenu');
+            const closeBtn = document.getElementById('mobileMenuClose');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', openMobileMenu);
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeMobileMenu);
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', closeMobileMenu);
+            }
+
+            // Relatório dinâmico
+            initDynamicReport();
+        });
+
+        function initDynamicReport() {
+            const els = {
+                module: document.getElementById('rdModule'),
+                search: document.getElementById('rdSearch'),
+                status: document.getElementById('rdStatus'),
+                dateField: document.getElementById('rdDateField'),
+                dateFrom: document.getElementById('rdDateFrom'),
+                dateTo: document.getElementById('rdDateTo'),
+                colsSearch: document.getElementById('rdColsSearch'),
+                colsList: document.getElementById('rdColsList'),
+                colsHint: document.getElementById('rdColsHint'),
+                selectAllBtn: document.getElementById('rdSelectAllBtn'),
+                clearColsBtn: document.getElementById('rdClearColsBtn'),
+                runBtn: document.getElementById('rdRunBtn'),
+                reloadBtn: document.getElementById('rdReloadBtn'),
+                exportCsvBtn: document.getElementById('rdExportCsvBtn'),
+                clearFiltersBtn: document.getElementById('rdClearFiltersBtn'),
+                chipModule: document.getElementById('rdChipModule'),
+                chipTotal: document.getElementById('rdChipTotal'),
+                chipShown: document.getElementById('rdChipShown'),
+                theadRow: document.getElementById('rdTheadRow'),
+                tbody: document.getElementById('rdTbody'),
+                empty: document.getElementById('rdEmpty'),
+                loader: document.getElementById('rdLoader')
+            };
+
+            const MODULES = [
+                { key: 'agenda', label: 'Agenda (Agendamentos)', endpoint: () => window.endpoints.agenda.list },
+                { key: 'comunidades', label: 'Comunidades', endpoint: () => window.endpoints.comunidades.list },
+                { key: 'pastorais', label: 'Pastorais', endpoint: () => window.endpoints.pastorais.list },
+                { key: 'pilares', label: 'Pilares', endpoint: () => window.endpoints.pilares.list },
+                { key: 'locais', label: 'Locais', endpoint: () => window.endpoints.locais.list },
+                { key: 'acoes', label: 'Ações', endpoint: () => window.endpoints.acoes.list },
+                { key: 'pessoas', label: 'Pessoas', endpoint: () => window.endpoints.pessoas.list },
+                { key: 'usuarios', label: 'Usuários', endpoint: () => window.endpoints.usuarios.list },
+                { key: 'perfis', label: 'Perfis', endpoint: () => window.endpoints.perfis.list }
+            ];
+
+            const state = {
+                moduleKey: 'agenda',
+                raw: [],
+                flat: [],
+                keys: [],
+                selectedKeys: new Set(),
+                lastResult: []
+            };
+
+            // Popular módulos
+            els.module.innerHTML = MODULES.map(m => `<option value="${m.key}">${m.label}</option>`).join('');
+            els.module.value = state.moduleKey;
+            els.chipModule.textContent = `Módulo: ${MODULES.find(m => m.key === state.moduleKey)?.label || '-'}`;
+
+            // Eventos
+            els.module.addEventListener('change', async () => {
+                state.moduleKey = els.module.value;
+                els.chipModule.textContent = `Módulo: ${MODULES.find(m => m.key === state.moduleKey)?.label || '-'}`;
+                await loadModuleData();
+                render();
+            });
+
+            els.colsSearch.addEventListener('input', () => renderColumns());
+            els.selectAllBtn.addEventListener('click', () => {
+                state.keys.forEach(k => state.selectedKeys.add(k));
+                renderColumns();
+            });
+            els.clearColsBtn.addEventListener('click', () => {
+                state.selectedKeys.clear();
+                renderColumns();
+            });
+            els.runBtn.addEventListener('click', () => render());
+            els.reloadBtn.addEventListener('click', async () => { await loadModuleData(true); render(); });
+            els.clearFiltersBtn.addEventListener('click', () => {
+                els.search.value = '';
+                els.status.value = 'todos';
+                els.dateField.value = '';
+                els.dateFrom.value = '';
+                els.dateTo.value = '';
+                render();
+            });
+            els.exportCsvBtn.addEventListener('click', () => exportCsv());
+
+            // Carrega inicial
+            loadModuleData().then(() => render());
+
+            async function loadModuleData(force = false) {
+                els.loader.classList.add('show');
+                els.empty.style.display = 'none';
+                els.tbody.innerHTML = '';
+                els.theadRow.innerHTML = '';
+                els.exportCsvBtn.disabled = true;
+
+                try {
+                    const m = MODULES.find(x => x.key === state.moduleKey);
+                    if (!m) throw new Error('Módulo inválido');
+                    const endpoint = m.endpoint();
+                    const { data, error } = await window.api.get(endpoint);
+                    if (error) throw error;
+
+                    state.raw = Array.isArray(data) ? data : [];
+                    state.flat = state.raw.map(r => flatten(r));
+                    state.keys = getAllKeys(state.flat);
+
+                    // Heurística: selecionar um conjunto pequeno inicial
+                    state.selectedKeys.clear();
+                    const preferred = getPreferredKeys(state.keys, state.moduleKey);
+                    preferred.forEach(k => state.selectedKeys.add(k));
+
+                    // Atualiza dropdown de campos de data
+                    const dateKeys = state.keys.filter(k => looksLikeDateKey(k));
+                    els.dateField.innerHTML = `<option value="">(sem filtro)</option>` + dateKeys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(humanizeKey(k))}</option>`).join('');
+
+                    els.chipTotal.textContent = `Total: ${state.raw.length}`;
+                } catch (e) {
+                    console.error('Erro ao carregar dados do relatório dinâmico:', e);
+                    els.empty.textContent = 'Erro ao carregar dados. Verifique sua conexão/permissões.';
+                    els.empty.style.display = 'block';
+                } finally {
+                    els.loader.classList.remove('show');
+                    renderColumns();
+                }
+            }
+
+            function renderColumns() {
+                const q = (els.colsSearch.value || '').trim().toLowerCase();
+                const filteredKeys = state.keys.filter(k => {
+                    if (!q) return true;
+                    const h = humanizeKey(k).toLowerCase();
+                    return k.toLowerCase().includes(q) || h.includes(q);
+                });
+
+                els.colsList.innerHTML = filteredKeys.map(k => {
+                    const checked = state.selectedKeys.has(k);
+                    return `
+                        <label class="col-item">
+                            <input type="checkbox" data-key="${escapeHtml(k)}" ${checked ? 'checked' : ''} />
+                            <div style="min-width:0;">
+                                <div style="font-weight:700; font-size:12px; color:#111827; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    ${escapeHtml(humanizeKey(k))}
+                                </div>
+                                <div class="muted" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(k)}</div>
+                            </div>
+                        </label>
+                    `;
+                }).join('');
+
+                els.colsHint.textContent = `${state.selectedKeys.size} colunas selecionadas • ${state.keys.length} disponíveis`;
+
+                els.colsList.querySelectorAll('input[type="checkbox"][data-key]').forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        const key = cb.getAttribute('data-key');
+                        if (!key) return;
+                        if (cb.checked) state.selectedKeys.add(key);
+                        else state.selectedKeys.delete(key);
+                    });
+                });
+            }
+
+            function render() {
+                const selected = Array.from(state.selectedKeys);
+                if (selected.length === 0) {
+                    els.theadRow.innerHTML = '';
+                    els.tbody.innerHTML = '';
+                    els.empty.textContent = 'Selecione ao menos 1 coluna para gerar o relatório.';
+                    els.empty.style.display = 'block';
+                    els.chipShown.textContent = 'Exibindo: 0';
+                    els.exportCsvBtn.disabled = true;
+                    return;
+                }
+
+                const searchText = (els.search.value || '').trim().toLowerCase();
+                const statusFilter = (els.status.value || 'todos').toLowerCase();
+                const dateField = els.dateField.value || '';
+                const from = els.dateFrom.value ? new Date(els.dateFrom.value + 'T00:00:00') : null;
+                const to = els.dateTo.value ? new Date(els.dateTo.value + 'T23:59:59') : null;
+
+                const rows = state.flat.filter(r => {
+                    if (searchText) {
+                        const hay = selected.map(k => (r[k] ?? '')).join(' ').toLowerCase();
+                        if (!hay.includes(searchText)) return false;
+                    }
+
+                    if (statusFilter !== 'todos') {
+                        const s = getStatusFromRow(r);
+                        if (statusFilter === 'ativo' && s !== 'ativo') return false;
+                        if (statusFilter === 'inativo' && s !== 'inativo') return false;
+                    }
+
+                    if (dateField && (from || to)) {
+                        const v = r[dateField];
+                        if (!v) return false;
+                        const d = parseDateValue(v);
+                        if (!d) return false;
+                        if (from && d < from) return false;
+                        if (to && d > to) return false;
+                    }
+                    return true;
+                });
+
+                state.lastResult = rows;
+                els.chipShown.textContent = `Exibindo: ${rows.length}`;
+                els.exportCsvBtn.disabled = rows.length === 0;
+
+                // Render header
+                els.theadRow.innerHTML = selected.map(k => `<th title="${escapeHtml(k)}">${escapeHtml(humanizeKey(k))}</th>`).join('');
+
+                // Render body (limite para performance)
+                const LIMIT = 500;
+                const slice = rows.slice(0, LIMIT);
+                els.tbody.innerHTML = slice.map(r => {
+                    return `<tr>` + selected.map(k => `<td>${escapeHtml(stringifyCell(r[k]))}</td>`).join('') + `</tr>`;
+                }).join('');
+
+                if (rows.length === 0) {
+                    els.empty.textContent = 'Nenhum resultado encontrado com os filtros atuais.';
+                    els.empty.style.display = 'block';
+                } else if (rows.length > LIMIT) {
+                    els.empty.textContent = `Mostrando os primeiros ${LIMIT} de ${rows.length} resultados (para performance). Exporte CSV para obter todos.`;
+                    els.empty.style.display = 'block';
+                } else {
+                    els.empty.style.display = 'none';
+                }
+            }
+
+            function exportCsv() {
+                const selected = Array.from(state.selectedKeys);
+                const rows = state.lastResult || [];
+                const header = selected.map(k => csvEscape(humanizeKey(k))).join(',');
+                const body = rows.map(r => selected.map(k => csvEscape(stringifyCell(r[k]))).join(',')).join('\n');
+                const csv = header + '\n' + body;
+
+                const modLabel = MODULES.find(m => m.key === state.moduleKey)?.key || 'modulo';
+                const now = new Date();
+                const yyyy = now.getFullYear();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                downloadText(csv, `relatorio_dinamico_${modLabel}_${yyyy}-${mm}-${dd}.csv`, 'text/csv;charset=utf-8;');
+            }
+
+            function flatten(obj, prefix = '', out = {}) {
+                if (!obj || typeof obj !== 'object') return out;
+                Object.keys(obj).forEach(key => {
+                    const value = obj[key];
+                    const fullKey = prefix ? `${prefix}.${key}` : key;
+                    if (value === null || value === undefined) {
+                        out[fullKey] = '';
+                        return;
+                    }
+                    if (Array.isArray(value)) {
+                        // Arrays de primitivos: junta. Arrays de objetos: JSON compactado.
+                        if (value.every(v => v === null || ['string', 'number', 'boolean'].includes(typeof v))) {
+                            out[fullKey] = value.filter(v => v != null).join(', ');
+                        } else {
+                            try { out[fullKey] = JSON.stringify(value); } catch { out[fullKey] = String(value); }
+                        }
+                        return;
+                    }
+                    if (typeof value === 'object') {
+                        // Datas ISO vão como string
+                        if (value instanceof Date) {
+                            out[fullKey] = value.toISOString();
+                            return;
+                        }
+                        flatten(value, fullKey, out);
+                        return;
+                    }
+                    out[fullKey] = value;
+                });
+                return out;
+            }
+
+            function getAllKeys(rows) {
+                const set = new Set();
+                rows.slice(0, 50).forEach(r => Object.keys(r || {}).forEach(k => set.add(k)));
+                return Array.from(set).sort((a,b) => a.localeCompare(b, 'pt-BR'));
+            }
+
+            function getPreferredKeys(keys, moduleKey) {
+                const prefs = [];
+                const tryAdd = (k) => { if (keys.includes(k)) prefs.push(k); };
+
+                // defaults comuns
+                ['id', 'codigo', 'nome', 'email', 'status', 'ativo', 'ultimo_login', 'data_inicio', 'data_fim', 'titulo', 'descricao'].forEach(tryAdd);
+
+                if (moduleKey === 'agenda') {
+                    ['titulo', 'data_inicio', 'data_fim', 'visibilidade', 'evento_paroquial', 'comunidades.nome', 'pastorais.nome', 'pilares.nome', 'locais.nome', 'acoes.nome', 'pessoas.nome', 'usuario_lancamento_nome', 'usuario_lancamento_email'].forEach(tryAdd);
+                }
+
+                // Garante pelo menos 6 colunas
+                if (prefs.length < 6) {
+                    keys.slice(0, 6).forEach(k => { if (!prefs.includes(k)) prefs.push(k); });
+                }
+
+                // Limita para não poluir
+                return prefs.slice(0, 12);
+            }
+
+            function humanizeKey(k) {
+                if (!k) return '';
+                const cleaned = k.replace(/\./g, ' ').replace(/_/g, ' ').trim();
+                return cleaned.split(/\s+/).map(w => w ? (w.charAt(0).toUpperCase() + w.slice(1)) : '').join(' ');
+            }
+
+            function looksLikeDateKey(k) {
+                const s = String(k || '').toLowerCase();
+                return s.includes('data') || s.endsWith('_at') || s.includes('login') || s.includes('created') || s.includes('updated');
+            }
+
+            function parseDateValue(v) {
+                if (!v) return null;
+                if (v instanceof Date) return v;
+                const d = new Date(v);
+                if (Number.isNaN(d.getTime())) return null;
+                return d;
+            }
+
+            function getStatusFromRow(r) {
+                // tenta campos comuns
+                const ativo = r['ativo'];
+                if (typeof ativo === 'boolean') return ativo ? 'ativo' : 'inativo';
+                const status = (r['status'] || r['Status'] || '').toString().toLowerCase();
+                if (status.includes('inativo')) return 'inativo';
+                if (status.includes('ativo')) return 'ativo';
+                return 'ativo'; // default
+            }
+
+            function stringifyCell(v) {
+                if (v === null || v === undefined) return '';
+                if (typeof v === 'boolean') return v ? 'Sim' : 'Não';
+                return String(v);
+            }
+
+            function csvEscape(val) {
+                const s = (val === null || val === undefined) ? '' : String(val);
+                const needs = /[",\n]/.test(s);
+                const escaped = s.replace(/"/g, '""');
+                return needs ? `"${escaped}"` : escaped;
+            }
+
+            function downloadText(text, filename, mime) {
+                const blob = new Blob([text], { type: mime || 'text/plain;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
+            }
+
+            function escapeHtml(s) {
+                return String(s ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+        }
+    </script>
+</body>
+</html>
