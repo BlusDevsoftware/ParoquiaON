@@ -17,6 +17,7 @@
             margin: 0;
             background: #ffffff;
             overflow-x: hidden;
+            overflow-y: hidden;
         }
 
         .main-content {
@@ -24,6 +25,9 @@
             padding: 0;
             width: 100%;
             max-width: 100%;
+            height: calc(100vh - 80px);
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         /* Menu Hamburger e Menu Mobile (mesmo padrão das telas CRUD) */
@@ -144,6 +148,11 @@
 
         .page-wrap {
             padding: 20px 24px 28px 24px;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .page-title {
@@ -172,6 +181,8 @@
             grid-template-columns: 360px 1fr;
             gap: 16px;
             align-items: stretch;
+            flex: 1 1 auto;
+            min-height: 0;
         }
 
         @media (max-width: 1024px) {
