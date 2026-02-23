@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="template-menu-superior.css">
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="scripts/auth-guard.js"></script>
     <script src="scripts/apply-auth-protection.js"></script>
     <script src="scripts/config/api.js"></script>
@@ -766,6 +767,7 @@
                 keys: [],
                 selectedKeys: new Set(),
                 lastResult: [],
+                lastSelected: [],
                 page: 1,
                 pageSize: 50
             };
@@ -835,6 +837,29 @@
                     els.mainLoader.style.display = 'none';
                 }
             });
+
+            // Permitir arrastar para reordenar colunas no cabeçalho
+            if (window.Sortable && els.theadRow) {
+                Sortable.create(els.theadRow, {
+                    animation: 150,
+                    onEnd: function (evt) {
+                        if (!state.lastSelected || state.lastSelected.length === 0) return;
+                        const oldIndex = evt.oldIndex;
+                        const newIndex = evt.newIndex;
+                        if (oldIndex === newIndex || oldIndex == null || newIndex == null) return;
+
+                        const current = state.lastSelected.slice();
+                        const moved = current.splice(oldIndex, 1)[0];
+                        current.splice(newIndex, 0, moved);
+                        state.lastSelected = current;
+
+                        // Reordenar state.keys para refletir a nova ordem das colunas selecionadas
+                        const others = state.keys.filter(k => !state.lastSelected.includes(k));
+                        state.keys = state.lastSelected.concat(others);
+                        render();
+                    }
+                });
+            }
 
             async function loadModuleData(force = false) {
                 els.loader.classList.add('show');
@@ -910,7 +935,7 @@
             }
 
             function render() {
-                const selected = Array.from(state.selectedKeys);
+                const selected = state.keys.filter(k => state.selectedKeys.has(k));
                 if (selected.length === 0) {
                     els.theadRow.innerHTML = '';
                     els.tbody.innerHTML = '';
@@ -971,6 +996,8 @@
                     return `<tr>` + selected.map(k => `<td>${escapeHtml(stringifyCell(r[k], k))}</td>`).join('') + `</tr>`;
                 }).join('');
 
+                state.lastSelected = selected.slice();
+
                 // Empty + paginação
                 if (total === 0) {
                     els.empty.textContent = 'Nenhum resultado encontrado com os filtros atuais.';
@@ -992,7 +1019,7 @@
             }
 
             function exportCsv() {
-                const selected = Array.from(state.selectedKeys);
+                const selected = state.keys.filter(k => state.selectedKeys.has(k));
                 const rows = state.lastResult || [];
                 const header = selected.map(k => csvEscape(humanizeKey(k))).join(',');
                 const body = rows.map(r => selected.map(k => csvEscape(stringifyCell(r[k], k))).join(',')).join('\n');
