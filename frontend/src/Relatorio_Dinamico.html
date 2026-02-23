@@ -434,6 +434,11 @@
             font-weight: 500;
         }
 
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         .pagination {
             padding: 10px 16px 14px 16px;
             border-top: 1px solid #f1f5f9;
@@ -1050,6 +1055,9 @@
                     const isVisibility = base.includes('visibilidade') || base.includes('visibility');
                     const isUpdated = base.includes('updated') || base.includes('update');
                     const isPlainStatus = base === 'status';
+                    const isUsuarioLancamentoEmail = base === 'usuario_lancamento_email' || base === 'usuario lancamento email';
+                    const isUsuarioLancamentoNome = base === 'usuario_lancamento_nome' || base === 'usuario lancamento nome';
+                    const isUsuarios = base === 'usuarios' || base === 'usuario' || base === 'users';
                     return !(
                         isIdToken ||
                         isIdSuffix ||
@@ -1057,7 +1065,10 @@
                         isResponsavelId ||
                         isVisibility ||
                         isUpdated ||
-                        isPlainStatus
+                        isPlainStatus ||
+                        isUsuarioLancamentoEmail ||
+                        isUsuarioLancamentoNome ||
+                        isUsuarios
                     );
                 });
                 return filtered.sort((a,b) => a.localeCompare(b, 'pt-BR'));
