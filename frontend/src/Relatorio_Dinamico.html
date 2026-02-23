@@ -963,7 +963,7 @@
 
                 // Render body (paginação)
                 els.tbody.innerHTML = slice.map(r => {
-                    return `<tr>` + selected.map(k => `<td>${escapeHtml(stringifyCell(r[k]))}</td>`).join('') + `</tr>`;
+                    return `<tr>` + selected.map(k => `<td>${escapeHtml(stringifyCell(r[k], k))}</td>`).join('') + `</tr>`;
                 }).join('');
 
                 // Empty + paginação
@@ -990,7 +990,7 @@
                 const selected = Array.from(state.selectedKeys);
                 const rows = state.lastResult || [];
                 const header = selected.map(k => csvEscape(humanizeKey(k))).join(',');
-                const body = rows.map(r => selected.map(k => csvEscape(stringifyCell(r[k]))).join(',')).join('\n');
+                const body = rows.map(r => selected.map(k => csvEscape(stringifyCell(r[k], k))).join(',')).join('\n');
                 const csv = header + '\n' + body;
 
                 const modLabel = MODULES.find(m => m.key === state.moduleKey)?.key || 'modulo';
@@ -1037,10 +1037,28 @@
                 const set = new Set();
                 rows.slice(0, 50).forEach(r => Object.keys(r || {}).forEach(k => set.add(k)));
                 const raw = Array.from(set);
-                // Remove colunas genéricas pouco úteis
+                // Remove colunas genéricas/pouco úteis: ids, status, visibilidade, updated, etc.
                 const filtered = raw.filter(k => {
                     const base = String(k || '').toLowerCase();
-                    return base !== 'id' && base !== 'status';
+                    const noDots = base.replace(/\./g, ' ');
+                    const tokens = noDots.split(/\s+/);
+                    // remove id/ids isolados ou campos terminando com _id / .id
+                    const isIdToken = tokens.some(t => t === 'id' || t === 'ids');
+                    const isIdSuffix = /(^|[._])(id|.*_id)$/.test(base);
+                    const isStatusId = base.includes('status_id') || base.includes('status id');
+                    const isResponsavelId = base.includes('responsavel_id') || base.includes('responsavel id');
+                    const isVisibility = base.includes('visibilidade') || base.includes('visibility');
+                    const isUpdated = base.includes('updated') || base.includes('update');
+                    const isPlainStatus = base === 'status';
+                    return !(
+                        isIdToken ||
+                        isIdSuffix ||
+                        isStatusId ||
+                        isResponsavelId ||
+                        isVisibility ||
+                        isUpdated ||
+                        isPlainStatus
+                    );
                 });
                 return filtered.sort((a,b) => a.localeCompare(b, 'pt-BR'));
             }
@@ -1094,9 +1112,23 @@
                 return 'ativo'; // default
             }
 
-            function stringifyCell(v) {
+            function stringifyCell(v, keyHint) {
                 if (v === null || v === undefined) return '';
                 if (typeof v === 'boolean') return v ? 'Sim' : 'Não';
+
+                // Formatação especial para datas com hora
+                if (keyHint && looksLikeDateKey(keyHint)) {
+                    const d = parseDateValue(v);
+                    if (d) {
+                        const dd = String(d.getDate()).padStart(2, '0');
+                        const mm = String(d.getMonth() + 1).padStart(2, '0');
+                        const yyyy = d.getFullYear();
+                        const hh = String(d.getHours()).padStart(2, '0');
+                        const mi = String(d.getMinutes()).padStart(2, '0');
+                        return `${dd}/${mm}/${yyyy} : ${hh}:${mi}`;
+                    }
+                }
+
                 return String(v);
             }
 
