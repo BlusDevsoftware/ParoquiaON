@@ -171,7 +171,7 @@
             display: grid;
             grid-template-columns: 360px 1fr;
             gap: 16px;
-            align-items: start;
+            align-items: stretch;
         }
 
         @media (max-width: 1024px) {
@@ -184,6 +184,12 @@
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.04);
             overflow: hidden;
+        }
+
+        .panel.results-panel {
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 140px);
         }
 
         .panel-header {
@@ -332,6 +338,7 @@
         .table-wrap {
             width: 100%;
             overflow: auto;
+            flex: 1 1 auto;
         }
 
         table {
@@ -378,6 +385,47 @@
             font-size: 13px;
         }
         .loader.show { display: block; }
+
+        .pagination {
+            padding: 10px 16px 14px 16px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 12px;
+            color: #4b5563;
+        }
+
+        .pagination .pagination-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination button {
+            padding: 6px 10px;
+            border-radius: 9999px;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #111827;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
     </style>
 </head>
 <body>
@@ -471,7 +519,7 @@
             </div>
 
             <div class="builder">
-                <div class="panel">
+                <div class="panel results-panel">
                     <div class="panel-header">
                         <h2><i class="fas fa-sliders-h"></i> Configuração</h2>
                     </div>
@@ -570,6 +618,17 @@
                         </table>
                         <div class="empty-state" id="rdEmpty">Selecione um módulo e clique em “Gerar”.</div>
                     </div>
+                    <div class="pagination" id="rdPagination" style="display:none;">
+                        <div class="pagination-info" id="rdPaginationInfo"></div>
+                        <div class="pagination-buttons">
+                            <button type="button" id="rdPrevPageBtn">
+                                <i class="fas fa-chevron-left"></i> Anterior
+                            </button>
+                            <button type="button" id="rdNextPageBtn">
+                                Próxima <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -645,7 +704,11 @@
                 theadRow: document.getElementById('rdTheadRow'),
                 tbody: document.getElementById('rdTbody'),
                 empty: document.getElementById('rdEmpty'),
-                loader: document.getElementById('rdLoader')
+                loader: document.getElementById('rdLoader'),
+                pagination: document.getElementById('rdPagination'),
+                paginationInfo: document.getElementById('rdPaginationInfo'),
+                prevPageBtn: document.getElementById('rdPrevPageBtn'),
+                nextPageBtn: document.getElementById('rdNextPageBtn')
             };
 
             const MODULES = [
@@ -666,7 +729,9 @@
                 flat: [],
                 keys: [],
                 selectedKeys: new Set(),
-                lastResult: []
+                lastResult: [],
+                page: 1,
+                pageSize: 50
             };
 
             // Popular módulos
@@ -678,6 +743,7 @@
             els.module.addEventListener('change', async () => {
                 state.moduleKey = els.module.value;
                 els.chipModule.textContent = `Módulo: ${MODULES.find(m => m.key === state.moduleKey)?.label || '-'}`;
+                state.page = 1;
                 await loadModuleData();
                 render();
             });
@@ -691,17 +757,38 @@
                 state.selectedKeys.clear();
                 renderColumns();
             });
-            els.runBtn.addEventListener('click', () => render());
-            els.reloadBtn.addEventListener('click', async () => { await loadModuleData(true); render(); });
+            els.runBtn.addEventListener('click', () => {
+                state.page = 1;
+                render();
+            });
+            els.reloadBtn.addEventListener('click', async () => {
+                state.page = 1;
+                await loadModuleData(true);
+                render();
+            });
             els.clearFiltersBtn.addEventListener('click', () => {
                 els.search.value = '';
                 els.status.value = 'todos';
                 els.dateField.value = '';
                 els.dateFrom.value = '';
                 els.dateTo.value = '';
+                state.page = 1;
                 render();
             });
             els.exportCsvBtn.addEventListener('click', () => exportCsv());
+
+            if (els.prevPageBtn && els.nextPageBtn) {
+                els.prevPageBtn.addEventListener('click', () => {
+                    if (state.page > 1) {
+                        state.page -= 1;
+                        render();
+                    }
+                });
+                els.nextPageBtn.addEventListener('click', () => {
+                    state.page += 1;
+                    render();
+                });
+            }
 
             // Carrega inicial
             loadModuleData().then(() => render());
@@ -821,27 +908,43 @@
                 });
 
                 state.lastResult = rows;
-                els.chipShown.textContent = `Exibindo: ${rows.length}`;
-                els.exportCsvBtn.disabled = rows.length === 0;
+
+                const total = rows.length;
+                const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
+                if (state.page > totalPages) state.page = totalPages;
+                if (state.page < 1) state.page = 1;
+                const start = (state.page - 1) * state.pageSize;
+                const end = start + state.pageSize;
+                const slice = rows.slice(start, end);
+
+                els.chipShown.textContent = `Exibindo: ${slice.length} de ${total} (pág. ${total === 0 ? 0 : state.page}/${total === 0 ? 0 : totalPages})`;
+                els.exportCsvBtn.disabled = total === 0;
 
                 // Render header
                 els.theadRow.innerHTML = selected.map(k => `<th title="${escapeHtml(k)}">${escapeHtml(humanizeKey(k))}</th>`).join('');
 
-                // Render body (limite para performance)
-                const LIMIT = 500;
-                const slice = rows.slice(0, LIMIT);
+                // Render body (paginação)
                 els.tbody.innerHTML = slice.map(r => {
                     return `<tr>` + selected.map(k => `<td>${escapeHtml(stringifyCell(r[k]))}</td>`).join('') + `</tr>`;
                 }).join('');
 
-                if (rows.length === 0) {
+                // Empty + paginação
+                if (total === 0) {
                     els.empty.textContent = 'Nenhum resultado encontrado com os filtros atuais.';
-                    els.empty.style.display = 'block';
-                } else if (rows.length > LIMIT) {
-                    els.empty.textContent = `Mostrando os primeiros ${LIMIT} de ${rows.length} resultados (para performance). Exporte CSV para obter todos.`;
                     els.empty.style.display = 'block';
                 } else {
                     els.empty.style.display = 'none';
+                }
+
+                if (els.pagination && els.paginationInfo) {
+                    if (total <= state.pageSize) {
+                        els.pagination.style.display = 'none';
+                    } else {
+                        els.pagination.style.display = 'flex';
+                        els.paginationInfo.textContent = `Página ${state.page} de ${totalPages}`;
+                        if (els.prevPageBtn) els.prevPageBtn.disabled = state.page <= 1;
+                        if (els.nextPageBtn) els.nextPageBtn.disabled = state.page >= totalPages;
+                    }
                 }
             }
 
