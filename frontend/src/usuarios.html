@@ -1085,7 +1085,7 @@
         }
         .usuarios-header {
             display: grid;
-            grid-template-columns: 56px 1fr 1fr 1fr 1fr 120px auto;
+            grid-template-columns: 56px 1fr 1fr 1fr 120px auto;
             gap: 16px;
             padding: 14px 0;
             background: #ffffff; /* sem fundo cinza */
@@ -1094,7 +1094,7 @@
             font-size: 14px;
         }
         .usuarios-header > div:nth-child(1),
-        .usuarios-header > div:nth-child(6) { text-align: center; }
+        .usuarios-header > div:nth-child(5) { text-align: center; }
 
         .rows {
             display: flex;
@@ -1106,7 +1106,7 @@
         }
         .row-card {
             display: grid;
-            grid-template-columns: 56px 1fr 1fr 1fr 1fr 120px auto;
+            grid-template-columns: 56px 1fr 1fr 1fr 120px auto;
             gap: 16px;
             align-items: center;
             padding: 12px 12px;
@@ -1264,7 +1264,10 @@
     <div class="modal" id="usuarioModal" style="overflow: hidden;">
         <div class="modal-content" style="max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
             <div class="modal-header">
-                <h2 id="usuarioModalTitle"><i class="fas fa-user-cog"></i> Novo Usuário</h2>
+                <div>
+                    <h2 id="usuarioModalTitle"><i class="fas fa-user-cog"></i> Novo Usuário</h2>
+                    <div id="usuarioLastAccess" style="font-size: 12px; color: #6b7280; margin-top: 4px; display: none;"></div>
+                </div>
                 <div class="modal-header-actions">
                     <div class="status-toggle-modal">
                         <label class="switch-modal">
@@ -1548,6 +1551,7 @@
             const modal = document.getElementById('usuarioModal');
             const modalTitle = document.getElementById('usuarioModalTitle');
             const form = document.getElementById('usuarioForm');
+            const lastAccessEl = document.getElementById('usuarioLastAccess');
             modalTitle.innerHTML = `<i class='fas fa-user-cog'></i> ${titulo}`;
             form.reset();
             form.dataset.id = '';
@@ -1561,6 +1565,10 @@
             if (statusToggle) statusToggle.checked = true;
             if (statusInput) statusInput.value = 'ativo';
             if (statusLabel) statusLabel.textContent = 'Ativo';
+            if (lastAccessEl) {
+                lastAccessEl.textContent = '';
+                lastAccessEl.style.display = 'none';
+            }
             
             // Preencher dados se for edição ou visualização
             if (usuario) {
@@ -1574,6 +1582,20 @@
                 if (statusToggle) statusToggle.checked = status === 'Ativo';
                 if (statusInput) statusInput.value = status === 'Ativo' ? 'ativo' : 'inativo';
                 if (statusLabel) statusLabel.textContent = status === 'Ativo' ? 'Ativo' : 'Inativo';
+                // Exibir último acesso apenas em edição/visualização, se houver dado
+                if (lastAccessEl && usuario.ultimo_login && (modo === 'editar' || modo === 'visualizar')) {
+                    const d = new Date(usuario.ultimo_login);
+                    if (!Number.isNaN(d.getTime())) {
+                        let texto = '';
+                        try {
+                            texto = d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+                        } catch {
+                            texto = d.toLocaleString('pt-BR');
+                        }
+                        lastAccessEl.textContent = `Último acesso: ${texto}`;
+                        lastAccessEl.style.display = 'block';
+                    }
+                }
                 // Exibir botão de reset de senha apenas em edição
                 const resetBtn = document.getElementById('resetSenhaBtn');
                 if (resetBtn) resetBtn.style.display = '';
@@ -1663,22 +1685,6 @@
             const statusClass = ativo ? 'ativo' : 'inativo';
             const id = usuario?.id ?? usuario?.codigo ?? '';
 
-            // Formatar último login (se houver)
-            let ultimoLoginTexto = '-';
-            if (usuario?.ultimo_login) {
-                const d = new Date(usuario.ultimo_login);
-                if (!Number.isNaN(d.getTime())) {
-                    try {
-                        ultimoLoginTexto = d.toLocaleString('pt-BR', {
-                            dateStyle: 'short',
-                            timeStyle: 'short'
-                        });
-                    } catch {
-                        ultimoLoginTexto = d.toLocaleString('pt-BR');
-                    }
-                }
-            }
-
             const el = document.createElement('div');
             el.className = 'row-card';
             const inicial = (email || '?').charAt(0).toUpperCase();
@@ -1695,7 +1701,6 @@
                 <div>${email}</div>
                 <div>-</div>
                 <div>${perfilNome}</div>
-                <div>${ultimoLoginTexto}</div>
                 <div style="text-align:center;"><span class="status ${statusClass}">${statusText}</span></div>
                 <div style="display:flex; gap:8px; justify-content:center;">
                     <button class="btn-icon btn-view" onclick="visualizarUsuario?.('${id}')" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
