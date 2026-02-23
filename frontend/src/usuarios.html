@@ -1586,6 +1586,8 @@
                 if (lastAccessEl && usuario.ultimo_login && (modo === 'editar' || modo === 'visualizar')) {
                     const d = new Date(usuario.ultimo_login);
                     if (!Number.isNaN(d.getTime())) {
+                        // Ajuste de fuso: menos 3 horas (horário de Brasília)
+                        d.setHours(d.getHours() - 3);
                         let texto = '';
                         try {
                             texto = d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
