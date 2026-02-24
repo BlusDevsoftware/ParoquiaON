@@ -173,6 +173,14 @@
             flex: 1;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+            padding-right: 16px;
+        }
+
         @media (max-width: 768px) {
             .top-header {
                 padding: 0;
@@ -182,6 +190,10 @@
                 padding-left: 12px;
                 gap: 0;
                 flex: 0 0 auto;
+            }
+            .header-right {
+                padding-right: 12px;
+                gap: 12px;
             }
             .main-content {
                 margin-top: 60px;
