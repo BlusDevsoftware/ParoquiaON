@@ -699,6 +699,9 @@
                             <button class="btn btn-secondary" id="rdExportCsvBtn" type="button" disabled>
                                 <i class="fas fa-file-csv"></i> Exportar CSV
                             </button>
+                            <button class="btn btn-secondary" id="rdExportPdfBtn" type="button" disabled>
+                                <i class="fas fa-file-pdf"></i> Exportar PDF
+                            </button>
                             <button class="btn btn-danger" id="rdClearFiltersBtn" type="button">
                                 <i class="fas fa-broom"></i> Limpar filtros
                             </button>
@@ -803,6 +806,7 @@
                 runBtn: document.getElementById('rdRunBtn'),
                 reloadBtn: document.getElementById('rdReloadBtn'),
                 exportCsvBtn: document.getElementById('rdExportCsvBtn'),
+                exportPdfBtn: document.getElementById('rdExportPdfBtn'),
                 clearFiltersBtn: document.getElementById('rdClearFiltersBtn'),
                 chipModule: document.getElementById('rdChipModule'),
                 chipTotal: document.getElementById('rdChipTotal'),
@@ -884,6 +888,9 @@
                 render();
             });
             els.exportCsvBtn.addEventListener('click', () => exportCsv());
+            if (els.exportPdfBtn) {
+                els.exportPdfBtn.addEventListener('click', () => exportPdf());
+            }
 
             if (els.prevPageBtn && els.nextPageBtn) {
                 els.prevPageBtn.addEventListener('click', () => {
@@ -937,6 +944,7 @@
                 els.tbody.innerHTML = '';
                 els.theadRow.innerHTML = '';
                 els.exportCsvBtn.disabled = true;
+                if (els.exportPdfBtn) els.exportPdfBtn.disabled = true;
 
                 try {
                     const m = MODULES.find(x => x.key === state.moduleKey);
@@ -1013,6 +1021,7 @@
                     els.empty.style.display = 'block';
                     els.chipShown.textContent = 'Exibindo: 0';
                     els.exportCsvBtn.disabled = true;
+                    if (els.exportPdfBtn) els.exportPdfBtn.disabled = true;
                     return;
                 }
 
@@ -1057,6 +1066,7 @@
 
                 els.chipShown.textContent = `Exibindo: ${slice.length} de ${total} (pág. ${total === 0 ? 0 : state.page}/${total === 0 ? 0 : totalPages})`;
                 els.exportCsvBtn.disabled = total === 0;
+                if (els.exportPdfBtn) els.exportPdfBtn.disabled = total === 0;
 
                 // Render header
                 els.theadRow.innerHTML = selected.map(k => `<th title="${escapeHtml(k)}">${escapeHtml(humanizeKey(k))}</th>`).join('');
@@ -1109,6 +1119,101 @@
                 const mm = String(now.getMonth() + 1).padStart(2, '0');
                 const dd = String(now.getDate()).padStart(2, '0');
                 downloadText(csv, `relatorio_dinamico_${modLabel}_${yyyy}-${mm}-${dd}.csv`, 'text/csv;charset=utf-8;');
+            }
+
+            function exportPdf() {
+                const selected = state.keys.filter(k => state.selectedKeys.has(k));
+                const rows = state.lastResult || [];
+                if (!selected.length || !rows.length) return;
+
+                const modLabel = MODULES.find(m => m.key === state.moduleKey)?.label || 'Relatório Dinâmico';
+                const now = new Date();
+                const yyyy = now.getFullYear();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mi = String(now.getMinutes()).padStart(2, '0');
+
+                const title = `${modLabel} - ${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+
+                const headHtml = selected.map(k => `<th style="padding:6px 8px; font-size:11px; text-align:left; border-bottom:1px solid #e5e7eb; white-space:nowrap;">${escapeHtml(humanizeKey(k))}</th>`).join('');
+                const bodyHtml = rows.map(r => {
+                    const tds = selected.map(k => {
+                        const raw = r[k];
+                        const text = stringifyCell(raw, k);
+                        return `<td style="padding:4px 8px; font-size:11px; border-bottom:1px solid #f3f4f6; vertical-align:top; word-break:break-word;">${escapeHtml(text)}</td>`;
+                    }).join('');
+                    return `<tr>${tds}</tr>`;
+                }).join('');
+
+                const html = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>${escapeHtml(title)}</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 11px;
+            color: #111827;
+            margin: 20px;
+        }
+        h1 {
+            font-size: 16px;
+            margin: 0 0 4px 0;
+        }
+        .meta {
+            font-size: 11px;
+            color: #4b5563;
+            margin-bottom: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: none;
+        }
+        @media print {
+            body {
+                margin: 10mm;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>${escapeHtml(modLabel)}</h1>
+    <div class="meta">Gerado em ${dd}/${mm}/${yyyy} ${hh}:${mi} • Registros: ${rows.length}</div>
+    <table>
+        <thead>
+            <tr>${headHtml}</tr>
+        </thead>
+        <tbody>
+            ${bodyHtml}
+        </tbody>
+    </table>
+    <script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
+</body>
+</html>
+                `;
+
+                const w = window.open('', '_blank');
+                if (!w) return;
+                w.document.open();
+                w.document.write(html);
+                w.document.close();
             }
 
             function flatten(obj, prefix = '', out = {}) {
