@@ -288,6 +288,10 @@
             margin-top: 12px;
         }
 
+        .actions-main {
+            margin-top: 0;
+        }
+
         .btn {
             border: 1px solid transparent;
             border-radius: 8px;
@@ -303,8 +307,26 @@
         }
 
         .actions .btn {
-            flex: 1 1 0;
-            min-width: 0;
+            width: 100%;
+        }
+
+        .actions-main .btn {
+            font-size: 13px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .actions-secondary {
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        @media (max-width: 520px) {
+            .actions-secondary {
+                grid-template-columns: 1fr;
+            }
         }
 
         .btn:active { transform: scale(0.98); }
@@ -693,10 +715,12 @@
 
                     </div>
                     <div class="panel-footer">
-                        <div class="actions" style="margin-top: 0;">
+                        <div class="actions actions-main">
                             <button class="btn btn-primary" id="rdRunBtn" type="button">
                                 <i class="fas fa-play"></i> Gerar
                             </button>
+                        </div>
+                        <div class="actions actions-secondary">
                             <button class="btn btn-secondary" id="rdReloadBtn" type="button">
                                 <i class="fas fa-sync-alt"></i> Recarregar dados
                             </button>
