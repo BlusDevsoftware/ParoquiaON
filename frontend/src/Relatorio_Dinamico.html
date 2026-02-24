@@ -323,7 +323,7 @@
         }
 
         .cols-list {
-            max-height: 280px;
+            max-height: 260px;
             overflow: auto;
             border: 1px solid #f1f5f9;
             border-radius: 10px;
@@ -379,7 +379,8 @@
 
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0 6px;
             min-width: 760px;
         }
 
@@ -407,14 +408,31 @@
         }
 
         tbody td {
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: none;
             padding: 10px 12px;
             font-size: 13px;
             color: #111827;
             vertical-align: top;
         }
 
-        tbody tr:hover { background: #f8fafc; }
+        tbody tr.rd-row {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(15,23,42,0.08);
+        }
+
+        tbody tr.rd-row:hover {
+            box-shadow: 0 4px 10px rgba(15,23,42,0.12);
+        }
+
+        tbody tr.rd-row td:first-child {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        tbody tr.rd-row td:last-child {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
 
         .rd-avatar-wrapper {
             display: flex;
@@ -1045,7 +1063,7 @@
 
                 // Render body (paginação)
                 els.tbody.innerHTML = slice.map(r => {
-                    return `<tr>` + selected.map(k => {
+                    return `<tr class="rd-row">` + selected.map(k => {
                         const raw = r[k];
                         if (looksLikeImageKey(k) && isSafeImageUrl(raw)) {
                             const url = escapeHtml(String(raw));
