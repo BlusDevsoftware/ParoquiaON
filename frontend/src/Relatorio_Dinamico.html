@@ -201,9 +201,7 @@
             max-height: calc(100vh - 120px);
         }
 
-        .panel.results-panel {
-            /* mantém a classe para semântica, mas herda o comportamento principal de .panel */
-        }
+        .panel.results-panel { /* classe reservada para estilos futuros */ }
 
         .panel-header {
             padding: 14px 16px;
@@ -1200,11 +1198,6 @@
             ${bodyHtml}
         </tbody>
     </table>
-    <script>
-        window.onload = function() {
-            window.print();
-        };
-    </script>
 </body>
 </html>
                 `;
@@ -1214,6 +1207,14 @@
                 w.document.open();
                 w.document.write(html);
                 w.document.close();
+                try {
+                    w.focus();
+                    setTimeout(() => {
+                        try { w.print(); } catch (e) { console.error('Erro ao imprimir PDF do relatório dinâmico:', e); }
+                    }, 300);
+                } catch (e) {
+                    console.error('Erro ao preparar impressão do relatório dinâmico:', e);
+                }
             }
 
             function flatten(obj, prefix = '', out = {}) {
