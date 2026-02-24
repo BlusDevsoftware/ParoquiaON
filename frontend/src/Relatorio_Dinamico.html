@@ -349,7 +349,7 @@
         }
 
         .cols-list {
-            max-height: 320px;
+            max-height: 290px;
             overflow: auto;
             border: 1px solid #f1f5f9;
             border-radius: 8px;
@@ -458,6 +458,13 @@
         tbody tr.rd-row td:last-child {
             border-top-right-radius: 10px;
             border-bottom-right-radius: 10px;
+        }
+
+        .rd-datetime {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
         }
 
         .rd-avatar-wrapper {
@@ -573,6 +580,24 @@
         .pagination button:disabled {
             opacity: 0.5;
             cursor: default;
+        }
+
+        /* Garantir que a barra superior desta tela alinhe igual às demais abas */
+        html, body {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        .top-header,
+        .main-content {
+            width: 100%;
+            max-width: 100%;
+            margin-left: 0;
+            margin-right: 0;
         }
     </style>
 </head>
@@ -1103,11 +1128,27 @@
                 els.tbody.innerHTML = slice.map(r => {
                     return `<tr class="rd-row">` + selected.map(k => {
                         const raw = r[k];
+
                         if (looksLikeImageKey(k) && isSafeImageUrl(raw)) {
                             const url = escapeHtml(String(raw));
                             const alt = escapeHtml(humanizeKey(k));
                             return `<td><div class="rd-avatar-wrapper"><div class="rd-avatar"><img src="${url}" alt="${alt}"></div></div></td>`;
                         }
+
+                        if (looksLikeDateKey(k)) {
+                            const d = parseDateValue(raw);
+                            if (d) {
+                                const dd = String(d.getDate()).padStart(2, '0');
+                                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                                const yyyy = d.getFullYear();
+                                const hh = String(d.getHours()).padStart(2, '0');
+                                const mi = String(d.getMinutes()).padStart(2, '0');
+                                const dateStr = `${dd}/${mm}/${yyyy}`;
+                                const timeStr = `${hh}:${mi}`;
+                                return `<td><span class="rd-datetime"><span>${escapeHtml(dateStr)}</span><span>${escapeHtml(timeStr)}</span></span></td>`;
+                            }
+                        }
+
                         return `<td>${escapeHtml(stringifyCell(raw, k))}</td>`;
                     }).join('') + `</tr>`;
                 }).join('');
