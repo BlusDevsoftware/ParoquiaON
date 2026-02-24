@@ -323,7 +323,7 @@
         }
 
         .cols-list {
-            max-height: 260px;
+            max-height: 280px;
             overflow: auto;
             border: 1px solid #f1f5f9;
             border-radius: 10px;
@@ -415,6 +415,29 @@
         }
 
         tbody tr:hover { background: #f8fafc; }
+
+        .rd-avatar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rd-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 9999px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            background: #f1f5f9;
+            flex-shrink: 0;
+        }
+
+        .rd-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
         .empty-state {
             padding: 40px 16px;
@@ -1022,7 +1045,15 @@
 
                 // Render body (paginação)
                 els.tbody.innerHTML = slice.map(r => {
-                    return `<tr>` + selected.map(k => `<td>${escapeHtml(stringifyCell(r[k], k))}</td>`).join('') + `</tr>`;
+                    return `<tr>` + selected.map(k => {
+                        const raw = r[k];
+                        if (looksLikeImageKey(k) && isSafeImageUrl(raw)) {
+                            const url = escapeHtml(String(raw));
+                            const alt = escapeHtml(humanizeKey(k));
+                            return `<td><div class="rd-avatar-wrapper"><div class="rd-avatar"><img src="${url}" alt="${alt}"></div></div></td>`;
+                        }
+                        return `<td>${escapeHtml(stringifyCell(raw, k))}</td>`;
+                    }).join('') + `</tr>`;
                 }).join('');
 
                 state.lastSelected = selected.slice();
@@ -1163,6 +1194,34 @@
             function looksLikeDateKey(k) {
                 const s = String(k || '').toLowerCase();
                 return s.includes('data') || s.endsWith('_at') || s.includes('login') || s.includes('created') || s.includes('updated');
+            }
+
+            function looksLikeImageKey(k) {
+                const s = String(k || '').toLowerCase();
+                return (
+                    s.includes('imagem') ||
+                    s.includes('image') ||
+                    s.includes('foto') ||
+                    s.includes('avatar') ||
+                    s.endsWith('_url') ||
+                    s.endsWith('_img') ||
+                    s.endsWith('_image')
+                );
+            }
+
+            function isSafeImageUrl(url) {
+                if (!url) return false;
+                const s = String(url).trim();
+                if (!s) return false;
+                const lower = s.toLowerCase();
+                return (
+                    lower.startsWith('http://') ||
+                    lower.startsWith('https://') ||
+                    lower.startsWith('/') ||
+                    lower.startsWith('./') ||
+                    lower.startsWith('../') ||
+                    lower.startsWith('data:image')
+                );
             }
 
             function parseDateValue(v) {
