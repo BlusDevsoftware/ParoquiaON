@@ -283,22 +283,28 @@
 
         .actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
             margin-top: 12px;
         }
 
         .btn {
             border: 1px solid transparent;
-            border-radius: 10px;
-            padding: 10px 12px;
-            font-weight: 700;
-            font-size: 13px;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-weight: 600;
+            font-size: 12px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 6px;
             transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+        }
+
+        .actions .btn {
+            flex: 1 1 0;
+            min-width: 0;
         }
 
         .btn:active { transform: scale(0.98); }
