@@ -234,6 +234,23 @@
             overflow: auto;
         }
 
+        .panel.config-panel .panel-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+        }
+
+        .panel-footer {
+            padding: 12px 16px 14px 16px;
+            border-top: 1px solid #f1f5f9;
+            background: #ffffff;
+        }
+
+        .panel.config-panel .panel-footer {
+            position: sticky;
+            bottom: 0;
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -582,7 +599,7 @@
     <div class="main-content">
         <div class="page-wrap">
             <div class="builder">
-                <div class="panel results-panel">
+                <div class="panel config-panel">
                     <div class="panel-header">
                         <h2><i class="fas fa-sliders-h"></i> Configuração</h2>
                     </div>
@@ -629,7 +646,9 @@
                             </div>
                         </div>
 
-                        <div class="actions">
+                    </div>
+                    <div class="panel-footer">
+                        <div class="actions" style="margin-top: 0;">
                             <button class="btn btn-primary" id="rdRunBtn" type="button">
                                 <i class="fas fa-play"></i> Gerar
                             </button>
@@ -1092,6 +1111,8 @@
                     const isVisibility = base.includes('visibilidade') || base.includes('visibility');
                     const isUpdated = base.includes('updated') || base.includes('update');
                     const isPlainStatus = base === 'status';
+                    const isLembrete = base === 'lembrete';
+                    const isCapacidade = base === 'capacidade';
                     const isUsuarioLancamentoEmail = base === 'usuario_lancamento_email' || base === 'usuario lancamento email';
                     const isUsuarioLancamentoNome = base === 'usuario_lancamento_nome' || base === 'usuario lancamento nome';
                     const isUsuarios = base === 'usuarios' || base === 'usuario' || base === 'users';
@@ -1105,7 +1126,9 @@
                         isPlainStatus ||
                         isUsuarioLancamentoEmail ||
                         isUsuarioLancamentoNome ||
-                        isUsuarios
+                        isUsuarios ||
+                        isLembrete ||
+                        isCapacidade
                     );
                 });
                 return filtered.sort((a,b) => a.localeCompare(b, 'pt-BR'));
