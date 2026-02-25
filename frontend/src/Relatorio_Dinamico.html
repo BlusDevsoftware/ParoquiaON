@@ -322,12 +322,6 @@
             min-width: 0;
         }
 
-        .form-row.dates-row select,
-        .form-row.dates-row input[type="date"] {
-            font-size: 11px;
-            padding: 5px 8px;
-        }
-
         label {
             display: block;
             font-size: 11px;
@@ -336,19 +330,24 @@
             margin-bottom: 4px;
         }
 
-        select, input[type="text"], input[type="date"] {
+        /* Inputs e selects no mesmo padrão visual dos formulários (comunidade/tela agenda) */
+        select,
+        input[type="text"],
+        input[type="date"] {
             width: 100%;
-            padding: 7px 10px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
             outline: none;
-            font-size: 12px;
+            font-size: 14px;
             background: #fff;
         }
 
-        select:focus, input[type="text"]:focus, input[type="date"]:focus {
-            border-color: #1e3a8a;
-            box-shadow: 0 0 0 3px rgba(30,58,138,0.12);
+        select:focus,
+        input[type="text"]:focus,
+        input[type="date"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.10);
         }
 
         .actions {
@@ -1501,6 +1500,13 @@
 
             function humanizeKey(k) {
                 if (!k) return '';
+                const normalized = String(k).toLowerCase();
+
+                // Nomes mais amigáveis para alguns campos específicos
+                if (normalized === 'created_at' || normalized === 'created at' || normalized === 'criado_em') {
+                    return 'Criação';
+                }
+
                 const cleaned = k.replace(/\./g, ' ').replace(/_/g, ' ').trim();
                 return cleaned.split(/\s+/).map(w => w ? (w.charAt(0).toUpperCase() + w.slice(1)) : '').join(' ');
             }
