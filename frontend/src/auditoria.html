@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="template-menu-superior.css">
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="scripts/auth-guard.js"></script>
     <script src="scripts/apply-auth-protection.js"></script>
     <script src="scripts/config/api.js"></script>
@@ -17,6 +18,7 @@
             margin: 0;
             background: #ffffff;
             overflow-x: hidden;
+            overflow-y: hidden;
         }
 
         .main-content {
@@ -24,8 +26,180 @@
             padding: 0;
             width: 100%;
             max-width: 100%;
-            min-height: calc(100vh - 80px);
+            height: calc(100vh - 80px);
             box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* Menu Hamburger e Menu Mobile (mesmo padrão das telas CRUD) */
+        .hamburger-menu {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        .hamburger-menu:hover { background: rgba(255, 255, 255, 0.1); }
+        .hamburger-menu:active { background: rgba(255, 255, 255, 0.2); }
+
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .mobile-menu-overlay.show { opacity: 1; }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            z-index: 1501;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+        }
+        .mobile-menu.open { left: 0; }
+
+        .mobile-menu-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .mobile-menu-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .mobile-menu-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        .mobile-menu-close:hover { background: rgba(255, 255, 255, 0.1); }
+
+        .mobile-menu-links {
+            padding: 0;
+            list-style: none;
+            margin: 0;
+        }
+        .mobile-menu-links li { border-bottom: none; }
+        .mobile-menu-links a {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .mobile-menu-links a:hover,
+        .mobile-menu-links a.active {
+            background: #f0f4ff;
+            color: #1e3a8a;
+        }
+        .mobile-menu-links a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Header superior igual às demais abas (comunidades, agenda, etc.) */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: #1e3a8a;
+            color: white;
+            padding: 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            flex: 1;
+            padding-left: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+            padding-right: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .top-header {
+                padding: 0;
+                height: 60px;
+            }
+            .header-left {
+                padding-left: 12px;
+                gap: 0;
+                flex: 0 0 auto;
+            }
+            .header-right {
+                padding-right: 12px;
+                gap: 12px;
+            }
+            .main-content {
+                margin-top: 60px;
+            }
+            .nav-links { display: none; }
+            .hamburger-menu { display: inline-flex; }
         }
 
         .page-wrap {
@@ -61,6 +235,8 @@
             max-height: calc(100vh - 120px);
         }
 
+        .panel.results-panel { /* classe reservada para estilos futuros */ }
+
         .panel-header {
             padding: 14px 16px;
             border-bottom: 1px solid #f1f5f9;
@@ -84,6 +260,29 @@
             padding: 14px 16px 16px 16px;
         }
 
+        .panel.results-panel .panel-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+        }
+
+        .panel.config-panel .panel-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+        }
+
+        .panel-footer {
+            padding: 12px 16px 14px 16px;
+            border-top: 1px solid #f1f5f9;
+            background: #ffffff;
+        }
+
+        .panel.config-panel .panel-footer {
+            position: sticky;
+            bottom: 0;
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -91,8 +290,21 @@
             margin-bottom: 8px;
         }
 
-        .form-row.one {
-            grid-template-columns: 1fr;
+        .form-row.one { grid-template-columns: 1fr; }
+
+        .form-row.dates-row {
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 6px;
+        }
+
+        .form-row.dates-row > div {
+            min-width: 0;
+        }
+
+        .form-row.dates-row input[type="date"] {
+            font-size: 11px;
+            padding: 4px 6px;
+            text-align: center;
         }
 
         label {
@@ -103,6 +315,7 @@
             margin-bottom: 4px;
         }
 
+        /* Inputs e selects no mesmo padrão visual dos formulários (comunidade/tela agenda) */
         select,
         input[type="text"],
         input[type="date"] {
@@ -124,11 +337,129 @@
             background-color: #ffffff;
         }
 
+        select:disabled,
+        input[type="text"]:disabled,
+        input[type="date"]:disabled {
+            background-color: #ffffff;
+            color: #9ca3af;
+        }
+
+        /* Força fundo branco apenas nos campos desta tela (sobrepõe CSS global cinza) */
+        .config-panel input[type="text"],
+        .config-panel input[type="date"],
+        .config-panel select {
+            background-color: #ffffff !important;
+        }
+
+        .cols-search input[type="text"] {
+            background-color: #ffffff !important;
+        }
+
+        /* Dropdown customizado para o campo "Tipo de data" (visual idêntico ao modal de agenda) */
+        .rd-select-wrapper {
+            position: relative;
+        }
+
+        .rd-select-native {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .rd-select-display {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 12px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            cursor: pointer;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.2s ease;
+        }
+
+        .rd-select-display:hover {
+            background: #f8fafc;
+        }
+
+        .rd-select-wrapper.rd-open .rd-select-display {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.10);
+        }
+
+        .rd-select-display-label {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #111827;
+        }
+
+        .rd-select-display-placeholder {
+            color: #6b7280;
+        }
+
+        .rd-select-display-icon {
+            flex-shrink: 0;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .rd-select-wrapper.rd-open .rd-select-display-icon {
+            transform: rotate(180deg);
+        }
+
+        .rd-select-list {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 24px rgba(2, 6, 23, 0.12);
+            border: 1px solid #e5e7eb;
+            max-height: 260px;
+            overflow: auto;
+            padding: 4px 0;
+            z-index: 1200;
+            display: none;
+        }
+
+        .rd-select-wrapper.rd-open .rd-select-list {
+            display: block;
+        }
+
+        .rd-select-option {
+            padding: 6px 10px;
+            font-size: 12px;
+            color: #111827;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .rd-select-option:hover {
+            background: #eff6ff;
+        }
+
+        .rd-select-option.rd-selected {
+            background: #e0ebff;
+            font-weight: 600;
+        }
+
         .actions {
-            margin-top: 10px;
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .actions-main {
+            margin-top: 0;
         }
 
         .btn {
@@ -145,44 +476,100 @@
             transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
         }
 
-        .btn:active {
-            transform: scale(0.98);
+        .actions .btn {
+            width: 100%;
         }
 
-        .btn-primary {
-            background: #1e3a8a;
-            color: #fff;
+        .actions-main .btn {
+            font-size: 13px;
+            padding-top: 10px;
+            padding-bottom: 10px;
         }
 
-        .btn-primary:hover {
-            box-shadow: 0 8px 18px rgba(30,58,138,0.22);
-        }
-
-        .btn-secondary {
-            background: #f8fafc;
-            color: #111827;
-            border-color: #e5e7eb;
-        }
-
-        .btn-secondary:hover {
-            box-shadow: 0 8px 18px rgba(15,23,42,0.10);
-        }
-
-        .auditoria-tags {
-            display: flex;
-            flex-wrap: wrap;
+        .actions-secondary {
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 8px;
-            font-size: 11px;
-            color: #4b5563;
-            margin-top: 4px;
         }
 
-        .tag {
-            padding: 4px 8px;
-            border-radius: 999px;
-            background: #f3f4ff;
-            border: 1px solid #e5e7eb;
-            font-weight: 500;
+        @media (max-width: 520px) {
+            .actions-secondary {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: #1e3a8a; color: #fff; }
+        .btn-primary:hover { box-shadow: 0 8px 18px rgba(30,58,138,0.22); }
+        .btn-secondary { background: #f8fafc; color: #111827; border-color: #e5e7eb; }
+        .btn-secondary:hover { box-shadow: 0 8px 18px rgba(15,23,42,0.10); }
+        .btn-danger { background: #fff5f5; color: #991b1b; border-color: #fecaca; }
+
+        .muted {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .cols-search {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin: 6px 0 8px 0;
+        }
+
+        .cols-search input[type="text"] {
+            padding: 6px 8px;
+            font-size: 12px;
+        }
+
+        .cols-list {
+            max-height: 285px;
+            overflow: auto;
+            border: 1px solid #f1f5f9;
+            border-radius: 8px;
+            padding: 8px;
+            background: #fff;
+        }
+
+        .col-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 6px 6px;
+            border-radius: 8px;
+        }
+
+        .col-item:hover { background: #f8fafc; }
+
+        .col-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .results-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .results-top .kpis {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+            border-radius: 9999px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 700;
         }
 
         .table-wrap {
@@ -199,63 +586,178 @@
         }
 
         thead th {
+            position: sticky;
+            top: 0;
             background: #ffffff;
+            z-index: 1;
             border-bottom: 1px solid #e5e7eb;
             font-size: 12px;
             text-align: left;
-            padding: 8px 10px;
+            padding: 10px 12px;
             color: #0f172a;
             white-space: nowrap;
+            cursor: move;
+            user-select: none;
+        }
+
+        thead th::after {
+            content: '⋮⋮';
+            font-size: 9px;
+            opacity: 0.35;
+            margin-left: 6px;
+            letter-spacing: -1px;
         }
 
         tbody td {
             border-bottom: none;
-            padding: 8px 10px;
-            font-size: 12px;
+            padding: 10px 12px;
+            font-size: 13px;
             color: #111827;
             vertical-align: top;
         }
 
-        tbody tr {
+        tbody tr.rd-row {
             background: #ffffff;
             box-shadow: 0 1px 3px rgba(15,23,42,0.08);
         }
 
-        tbody tr:hover {
+        tbody tr.rd-row:hover {
             box-shadow: 0 4px 10px rgba(15,23,42,0.12);
         }
 
-        .badge {
+        tbody tr.rd-row td:first-child {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        tbody tr.rd-row td:last-child {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .rd-datetime {
             display: inline-flex;
             align-items: center;
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 600;
+            gap: 4px;
+            white-space: nowrap;
         }
 
-        .badge-insert {
-            background: #ecfdf3;
-            color: #166534;
+        .rd-avatar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .badge-update {
-            background: #eff6ff;
-            color: #1d4ed8;
+        .rd-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 9999px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            background: #f1f5f9;
+            flex-shrink: 0;
         }
 
-        .badge-delete {
-            background: #fef2f2;
-            color: #b91c1c;
+        .rd-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .empty-state {
-            padding: 32px 16px;
+            padding: 40px 16px;
             text-align: center;
             color: #6b7280;
-            font-size: 13px;
         }
 
+        .loader {
+            display: none;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e3a8a;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .loader.show { display: block; }
+
+        .loader-overlay-main {
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spinner-main {
+            border: 8px solid #e3f2fd;
+            border-top: 8px solid #1e3a8a;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .pagination {
+            padding: 10px 16px 14px 16px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 12px;
+            color: #4b5563;
+        }
+
+        .pagination .pagination-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination button {
+            padding: 6px 10px;
+            border-radius: 9999px;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #111827;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        /* Garantir que a barra superior desta tela alinhe igual às demais abas */
         html, body {
             width: 100%;
             max-width: 100%;
@@ -354,108 +856,134 @@
         </ul>
     </div>
 
+    <!-- Spinner Centralizado de Carregamento -->
+    <div id="loader-relatorio-dinamico" class="loader-overlay-main">
+        <div class="spinner-main"></div>
+        <div class="loading-text">Carregando dados...</div>
+    </div>
+
     <!-- Main Content -->
     <div class="main-content">
         <div class="page-wrap">
             <div class="builder">
-                <!-- Filtros -->
-                <div class="panel">
+                <div class="panel config-panel">
                     <div class="panel-header">
-                        <h2><i class="fas fa-filter"></i> Filtros</h2>
+                        <h2><i class="fas fa-sliders-h"></i> Configuração</h2>
                     </div>
                     <div class="panel-body">
                         <div class="form-row one">
                             <div>
-                                <label for="auModule">Módulo</label>
-                                <select id="auModule">
-                                    <option value="">Todos</option>
-                                    <option value="agenda">Agenda</option>
-                                    <option value="comunidades">Comunidades</option>
-                                    <option value="pastorais">Pastorais</option>
-                                    <option value="pilares">Pilares</option>
-                                    <option value="locais">Locais</option>
-                                    <option value="acoes">Ações</option>
-                                    <option value="pessoas">Pessoas</option>
-                                    <option value="usuarios">Usuários</option>
-                                    <option value="perfil">Perfil</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div>
-                                <label for="auUser">Usuário</label>
-                                <input id="auUser" type="text" placeholder="Nome ou e-mail do usuário" />
-                            </div>
-                            <div>
-                                <label for="auAction">Ação</label>
-                                <select id="auAction">
-                                    <option value="">Todas</option>
-                                    <option value="insert">Criação</option>
-                                    <option value="update">Alteração</option>
-                                    <option value="delete">Exclusão</option>
-                                    <option value="login">Login</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div>
-                                <label for="auDateFrom">De</label>
-                                <input id="auDateFrom" type="date" />
-                            </div>
-                            <div>
-                                <label for="auDateTo">Até</label>
-                                <input id="auDateTo" type="date" />
+                                <label for="rdModule">Módulo</label>
+                                <div class="rd-select-wrapper" id="rdModuleWrapper">
+                                    <button type="button" class="rd-select-display" id="rdModuleDisplay">
+                                        <span class="rd-select-display-label rd-select-display-placeholder">Selecione o módulo</span>
+                                        <span class="rd-select-display-icon"><i class="fas fa-chevron-down"></i></span>
+                                    </button>
+                                    <select id="rdModule" class="rd-select-native"></select>
+                                    <div class="rd-select-list" id="rdModuleList"></div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-row one">
                             <div>
-                                <label for="auSearch">Pesquisar (texto livre)</label>
-                                <input id="auSearch" type="text" placeholder="Usuário, módulo, detalhe..." />
+                                <label for="rdSearch">Pesquisar (texto)</label>
+                                <input id="rdSearch" type="text" placeholder="Ex.: maria, comunidade, evento, email..." />
                             </div>
                         </div>
 
-                        <div class="auditoria-tags">
-                            <span class="tag"><i class="fas fa-info-circle"></i> Auditoria apenas leitura</span>
-                            <span class="tag"><i class="fas fa-lock"></i> Registros não podem ser alterados</span>
+                        <div class="form-row dates-row">
+                            <div>
+                                <label for="rdDateField">Tipo de data</label>
+                                <div class="rd-select-wrapper" id="rdDateFieldWrapper">
+                                    <button type="button" class="rd-select-display" id="rdDateFieldDisplay">
+                                        <span class="rd-select-display-label rd-select-display-placeholder">(sem filtro)</span>
+                                        <span class="rd-select-display-icon"><i class="fas fa-chevron-down"></i></span>
+                                    </button>
+                                    <select id="rdDateField" class="rd-select-native">
+                                        <option value="">(sem filtro)</option>
+                                    </select>
+                                    <div class="rd-select-list" id="rdDateFieldList"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="rdDateFrom">De</label>
+                                <input id="rdDateFrom" type="date" disabled />
+                            </div>
+                            <div>
+                                <label for="rdDateTo">Até</label>
+                                <input id="rdDateTo" type="date" disabled />
+                            </div>
                         </div>
 
-                        <div class="actions">
-                            <button class="btn btn-primary" id="auRunBtn" type="button">
-                                <i class="fas fa-search"></i> Filtrar
+                        <div class="form-row one">
+                            <div>
+                                <label>Colunas</label>
+                                <div class="cols-search">
+                                    <input id="rdColsSearch" type="text" placeholder="Filtrar colunas..." />
+                                    <button class="btn btn-secondary" id="rdSelectAllBtn" type="button" title="Selecionar tudo">
+                                        <i class="fas fa-check-double"></i>
+                                    </button>
+                                    <button class="btn btn-secondary" id="rdClearColsBtn" type="button" title="Limpar seleção">
+                                        <i class="fas fa-eraser"></i>
+                                    </button>
+                                </div>
+                                <div class="cols-list" id="rdColsList"></div>
+                                <div class="muted" style="margin-top:8px;" id="rdColsHint"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer">
+                        <div class="actions actions-main">
+                            <button class="btn btn-primary" id="rdRunBtn" type="button">
+                                <i class="fas fa-play"></i> Gerar
                             </button>
-                            <button class="btn btn-secondary" id="auClearBtn" type="button">
+                        </div>
+                        <div class="actions actions-secondary">
+                            <button class="btn btn-secondary" id="rdReloadBtn" type="button">
+                                <i class="fas fa-sync-alt"></i> Recarregar dados
+                            </button>
+                            <button class="btn btn-secondary" id="rdExportCsvBtn" type="button" disabled>
+                                <i class="fas fa-file-excel"></i> Exportar Excel
+                            </button>
+                            <button class="btn btn-secondary" id="rdExportPdfBtn" type="button" disabled>
+                                <i class="fas fa-file-pdf"></i> Exportar PDF
+                            </button>
+                            <button class="btn btn-danger" id="rdClearFiltersBtn" type="button">
                                 <i class="fas fa-broom"></i> Limpar filtros
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Resultados -->
                 <div class="panel">
-                    <div class="panel-header">
-                        <h2><i class="fas fa-clipboard-check"></i> Registros de Auditoria</h2>
-                    </div>
-                    <div class="panel-body">
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Data / Hora</th>
-                                        <th>Usuário</th>
-                                        <th>Ação</th>
-                                        <th>Módulo</th>
-                                        <th>Recurso</th>
-                                        <th>Detalhes</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="auTbody"></tbody>
-                            </table>
+                    <div class="results-top">
+                        <div class="kpis">
+                            <div class="chip" id="rdChipModule">Módulo: -</div>
+                            <div class="chip" id="rdChipTotal">Total: 0</div>
+                            <div class="chip" id="rdChipShown">Exibindo: 0</div>
                         </div>
-                        <div class="empty-state" id="auEmpty">
-                            Use os filtros ao lado para consultar as ações realizadas no sistema.
+                    </div>
+                    <div class="loader" id="rdLoader">Carregando dados...</div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr id="rdTheadRow"></tr>
+                            </thead>
+                            <tbody id="rdTbody"></tbody>
+                        </table>
+                        <div class="empty-state" id="rdEmpty">Selecione um módulo e clique em “Gerar”.</div>
+                    </div>
+                    <div class="pagination" id="rdPagination" style="display:none;">
+                        <div class="pagination-info" id="rdPaginationInfo"></div>
+                        <div class="pagination-buttons">
+                            <button type="button" id="rdPrevPageBtn">
+                                <i class="fas fa-chevron-left"></i> Anterior
+                            </button>
+                            <button type="button" id="rdNextPageBtn">
+                                Próxima <i class="fas fa-chevron-right"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -464,7 +992,7 @@
     </div>
 
     <script>
-        // Menu Mobile (mesmo padrão das outras páginas)
+        // Menu Mobile (reaproveitando padrão das outras páginas)
         function openMobileMenu() {
             const overlay = document.getElementById('mobileMenuOverlay');
             const menu = document.getElementById('mobileMenu');
@@ -506,157 +1034,909 @@
                 overlay.addEventListener('click', closeMobileMenu);
             }
 
-            initAuditoriaPage();
+            // Relatório dinâmico
+            initDynamicReport();
         });
 
-        function initAuditoriaPage() {
+        function initDynamicReport() {
             const els = {
-                module: document.getElementById('auModule'),
-                user: document.getElementById('auUser'),
-                action: document.getElementById('auAction'),
-                dateFrom: document.getElementById('auDateFrom'),
-                dateTo: document.getElementById('auDateTo'),
-                search: document.getElementById('auSearch'),
-                runBtn: document.getElementById('auRunBtn'),
-                clearBtn: document.getElementById('auClearBtn'),
-                tbody: document.getElementById('auTbody'),
-                empty: document.getElementById('auEmpty')
+                module: document.getElementById('rdModule'),
+                moduleWrapper: document.getElementById('rdModuleWrapper'),
+                moduleDisplay: document.getElementById('rdModuleDisplay'),
+                moduleList: document.getElementById('rdModuleList'),
+                search: document.getElementById('rdSearch'),
+                status: document.getElementById('rdStatus'),
+                dateField: document.getElementById('rdDateField'),
+                dateFieldWrapper: document.getElementById('rdDateFieldWrapper'),
+                dateFieldDisplay: document.getElementById('rdDateFieldDisplay'),
+                dateFieldList: document.getElementById('rdDateFieldList'),
+                dateFrom: document.getElementById('rdDateFrom'),
+                dateTo: document.getElementById('rdDateTo'),
+                colsSearch: document.getElementById('rdColsSearch'),
+                colsList: document.getElementById('rdColsList'),
+                colsHint: document.getElementById('rdColsHint'),
+                selectAllBtn: document.getElementById('rdSelectAllBtn'),
+                clearColsBtn: document.getElementById('rdClearColsBtn'),
+                runBtn: document.getElementById('rdRunBtn'),
+                reloadBtn: document.getElementById('rdReloadBtn'),
+                exportCsvBtn: document.getElementById('rdExportCsvBtn'),
+                exportPdfBtn: document.getElementById('rdExportPdfBtn'),
+                clearFiltersBtn: document.getElementById('rdClearFiltersBtn'),
+                chipModule: document.getElementById('rdChipModule'),
+                chipTotal: document.getElementById('rdChipTotal'),
+                chipShown: document.getElementById('rdChipShown'),
+                theadRow: document.getElementById('rdTheadRow'),
+                tbody: document.getElementById('rdTbody'),
+                empty: document.getElementById('rdEmpty'),
+                loader: document.getElementById('rdLoader'),
+                mainLoader: document.getElementById('loader-relatorio-dinamico'),
+                pagination: document.getElementById('rdPagination'),
+                paginationInfo: document.getElementById('rdPaginationInfo'),
+                prevPageBtn: document.getElementById('rdPrevPageBtn'),
+                nextPageBtn: document.getElementById('rdNextPageBtn')
             };
+
+            const MODULES = [
+                { key: 'agenda', label: 'Agenda (Agendamentos)', endpoint: () => window.endpoints.agenda.list },
+                { key: 'comunidades', label: 'Comunidades', endpoint: () => window.endpoints.comunidades.list },
+                { key: 'pastorais', label: 'Pastorais', endpoint: () => window.endpoints.pastorais.list },
+                { key: 'pilares', label: 'Pilares', endpoint: () => window.endpoints.pilares.list },
+                { key: 'locais', label: 'Locais', endpoint: () => window.endpoints.locais.list },
+                { key: 'acoes', label: 'Ações', endpoint: () => window.endpoints.acoes.list },
+                { key: 'pessoas', label: 'Pessoas', endpoint: () => window.endpoints.pessoas.list },
+                { key: 'usuarios', label: 'Usuários', endpoint: () => window.endpoints.usuarios.list },
+                { key: 'perfis', label: 'Perfis', endpoint: () => window.endpoints.perfis.list }
+            ];
 
             const state = {
-                rows: []
+                moduleKey: 'agenda',
+                raw: [],
+                flat: [],
+                keys: [],
+                selectedKeys: new Set(),
+                lastResult: [],
+                lastSelected: [],
+                page: 1,
+                pageSize: 50
             };
 
-            // Por enquanto, usamos dados simulados para estruturar a tela.
-            // Futuramente, esta função pode chamar uma API real de auditoria.
-            function loadMockData() {
-                const now = new Date();
-                state.rows = [
-                    {
-                        datetime: new Date(now.getTime() - 1000 * 60 * 5),
-                        user: 'Administrador',
-                        email: 'admin@paroquiaon.com',
-                        action: 'insert',
-                        module: 'Agenda',
-                        resource: 'Novo agendamento',
-                        detail: 'Agendamento criado para a comunidade Matriz.'
-                    },
-                    {
-                        datetime: new Date(now.getTime() - 1000 * 60 * 20),
-                        user: 'Secretaria Paroquial',
-                        email: 'secretaria@paroquiaon.com',
-                        action: 'update',
-                        module: 'Pessoas',
-                        resource: 'Cadastro de fiel',
-                        detail: 'Atualização de telefone e endereço.'
-                    },
-                    {
-                        datetime: new Date(now.getTime() - 1000 * 60 * 60),
-                        user: 'Administrador',
-                        email: 'admin@paroquiaon.com',
-                        action: 'delete',
-                        module: 'Locais',
-                        resource: 'Sala 03',
-                        detail: 'Local excluído por não ser mais utilizado.'
+            // Popular módulos
+            els.module.innerHTML = MODULES.map(m => `<option value="${m.key}">${m.label}</option>`).join('');
+            els.module.value = state.moduleKey;
+            els.chipModule.textContent = `Módulo: ${MODULES.find(m => m.key === state.moduleKey)?.label || '-'}`;
+            buildCustomModuleDropdown();
+
+            // Eventos
+            els.module.addEventListener('change', async () => {
+                state.moduleKey = els.module.value;
+                els.chipModule.textContent = `Módulo: ${MODULES.find(m => m.key === state.moduleKey)?.label || '-'}`;
+                state.page = 1;
+                await loadModuleData();
+                render();
+                buildCustomModuleDropdown();
+            });
+
+            els.colsSearch.addEventListener('input', () => renderColumns());
+            els.selectAllBtn.addEventListener('click', () => {
+                state.keys.forEach(k => state.selectedKeys.add(k));
+                renderColumns();
+            });
+            els.clearColsBtn.addEventListener('click', () => {
+                state.selectedKeys.clear();
+                renderColumns();
+            });
+            els.runBtn.addEventListener('click', () => {
+                state.page = 1;
+                render();
+            });
+            els.reloadBtn.addEventListener('click', async () => {
+                state.page = 1;
+                await loadModuleData(true);
+                render();
+            });
+            els.clearFiltersBtn.addEventListener('click', () => {
+                els.search.value = '';
+                if (els.status) els.status.value = 'todos';
+                if (els.dateField) els.dateField.value = '';
+                els.dateFrom.value = '';
+                els.dateTo.value = '';
+                els.dateFrom.disabled = true;
+                els.dateTo.disabled = true;
+                state.page = 1;
+                render();
+            });
+
+            if (els.dateField) {
+                els.dateField.addEventListener('change', () => {
+                    const hasField = !!els.dateField.value;
+                    els.dateFrom.disabled = !hasField;
+                    els.dateTo.disabled = !hasField;
+                    if (!hasField) {
+                        els.dateFrom.value = '';
+                        els.dateTo.value = '';
                     }
-                ];
+                });
+            }
+            els.exportCsvBtn.addEventListener('click', () => exportCsv());
+            if (els.exportPdfBtn) {
+                els.exportPdfBtn.addEventListener('click', () => exportPdf());
             }
 
-            function applyFilters() {
-                const mod = (els.module.value || '').toLowerCase();
-                const user = (els.user.value || '').trim().toLowerCase();
-                const action = (els.action.value || '').toLowerCase();
-                const search = (els.search.value || '').trim().toLowerCase();
+            if (els.prevPageBtn && els.nextPageBtn) {
+                els.prevPageBtn.addEventListener('click', () => {
+                    if (state.page > 1) {
+                        state.page -= 1;
+                        render();
+                    }
+                });
+                els.nextPageBtn.addEventListener('click', () => {
+                    state.page += 1;
+                    render();
+                });
+            }
+
+            // Carrega inicial com spinner global
+            if (els.mainLoader) {
+                els.mainLoader.style.display = 'flex';
+            }
+            loadModuleData().then(() => render()).finally(() => {
+                if (els.mainLoader) {
+                    els.mainLoader.style.display = 'none';
+                }
+            });
+
+            // Permitir arrastar para reordenar colunas no cabeçalho
+            if (window.Sortable && els.theadRow) {
+                Sortable.create(els.theadRow, {
+                    animation: 150,
+                    onEnd: function (evt) {
+                        if (!state.lastSelected || state.lastSelected.length === 0) return;
+                        const oldIndex = evt.oldIndex;
+                        const newIndex = evt.newIndex;
+                        if (oldIndex === newIndex || oldIndex == null || newIndex == null) return;
+
+                        const current = state.lastSelected.slice();
+                        const moved = current.splice(oldIndex, 1)[0];
+                        current.splice(newIndex, 0, moved);
+                        state.lastSelected = current;
+
+                        // Reordenar state.keys para refletir a nova ordem das colunas selecionadas
+                        const others = state.keys.filter(k => !state.lastSelected.includes(k));
+                        state.keys = state.lastSelected.concat(others);
+                        render();
+                    }
+                });
+            }
+
+            async function loadModuleData(force = false) {
+                els.loader.classList.add('show');
+                els.empty.style.display = 'none';
+                els.tbody.innerHTML = '';
+                els.theadRow.innerHTML = '';
+                els.exportCsvBtn.disabled = true;
+                if (els.exportPdfBtn) els.exportPdfBtn.disabled = true;
+
+                try {
+                    const m = MODULES.find(x => x.key === state.moduleKey);
+                    if (!m) throw new Error('Módulo inválido');
+                    const endpoint = m.endpoint();
+                    const { data, error } = await window.api.get(endpoint);
+                    if (error) throw error;
+
+                    state.raw = Array.isArray(data) ? data : [];
+                    state.flat = state.raw.map(r => flatten(r));
+                    state.keys = getAllKeys(state.flat);
+
+                    // Heurística: selecionar um conjunto pequeno inicial
+                    state.selectedKeys.clear();
+                    const preferred = getPreferredKeys(state.keys, state.moduleKey);
+                    preferred.forEach(k => state.selectedKeys.add(k));
+
+                    // Atualiza dropdown de campos de data
+                    const dateKeys = state.keys.filter(k => looksLikeDateKey(k));
+                    els.dateField.innerHTML = `<option value="">(sem filtro)</option>` + dateKeys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(humanizeKey(k))}</option>`).join('');
+                    buildCustomDateDropdown();
+
+                    els.chipTotal.textContent = `Total: ${state.raw.length}`;
+                } catch (e) {
+                    console.error('Erro ao carregar dados do relatório dinâmico:', e);
+                    els.empty.textContent = 'Erro ao carregar dados. Verifique sua conexão/permissões.';
+                    els.empty.style.display = 'block';
+                } finally {
+                    els.loader.classList.remove('show');
+                    renderColumns();
+                }
+            }
+
+            function renderColumns() {
+                const q = (els.colsSearch.value || '').trim().toLowerCase();
+                const filteredKeys = state.keys.filter(k => {
+                    if (!q) return true;
+                    const h = humanizeKey(k).toLowerCase();
+                    return k.toLowerCase().includes(q) || h.includes(q);
+                });
+
+                els.colsList.innerHTML = filteredKeys.map(k => {
+                    const checked = state.selectedKeys.has(k);
+                    return `
+                        <label class="col-item">
+                            <input type="checkbox" data-key="${escapeHtml(k)}" ${checked ? 'checked' : ''} />
+                            <div style="min-width:0;">
+                                <div style="font-weight:700; font-size:12px; color:#111827; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    ${escapeHtml(humanizeKey(k))}
+                                </div>
+                                <div class="muted" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(k)}</div>
+                            </div>
+                        </label>
+                    `;
+                }).join('');
+
+                els.colsHint.textContent = `${state.selectedKeys.size} colunas selecionadas • ${state.keys.length} disponíveis`;
+
+                els.colsList.querySelectorAll('input[type="checkbox"][data-key]').forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        const key = cb.getAttribute('data-key');
+                        if (!key) return;
+                        if (cb.checked) state.selectedKeys.add(key);
+                        else state.selectedKeys.delete(key);
+                    });
+                });
+            }
+
+            function buildCustomDateDropdown() {
+                if (!els.dateField || !els.dateFieldWrapper || !els.dateFieldDisplay || !els.dateFieldList) return;
+
+                // Limpa lista atual
+                els.dateFieldList.innerHTML = '';
+
+                const selectedValue = els.dateField.value || '';
+
+                Array.from(els.dateField.options).forEach(opt => {
+                    const value = opt.value;
+                    const label = opt.textContent || '';
+                    const div = document.createElement('div');
+                    div.className = 'rd-select-option' + (value === selectedValue ? ' rd-selected' : '');
+                    div.dataset.value = value;
+                    div.textContent = label;
+                    div.addEventListener('click', () => {
+                        els.dateField.value = value;
+                        const event = new Event('change', { bubbles: true });
+                        els.dateField.dispatchEvent(event);
+                        els.dateFieldWrapper.classList.remove('rd-open');
+                        updateDateDisplay();
+                    });
+                    els.dateFieldList.appendChild(div);
+                });
+
+                updateDateDisplay();
+
+                if (!els.dateFieldWrapper.dataset.rdEnhanced) {
+                    els.dateFieldWrapper.dataset.rdEnhanced = '1';
+
+                    els.dateFieldDisplay.addEventListener('click', () => {
+                        const isOpen = els.dateFieldWrapper.classList.contains('rd-open');
+                        document.querySelectorAll('.rd-select-wrapper.rd-open').forEach(el => el.classList.remove('rd-open'));
+                        if (!isOpen) {
+                            els.dateFieldWrapper.classList.add('rd-open');
+                        }
+                    });
+
+                    document.addEventListener('click', (ev) => {
+                        if (!els.dateFieldWrapper.contains(ev.target)) {
+                            els.dateFieldWrapper.classList.remove('rd-open');
+                        }
+                    });
+
+                    els.dateField.addEventListener('change', () => {
+                        updateDateDisplay();
+                        // Sincroniza seleção visual
+                        const current = els.dateField.value || '';
+                        els.dateFieldList.querySelectorAll('.rd-select-option').forEach(opt => {
+                            if (opt.dataset.value === current) opt.classList.add('rd-selected');
+                            else opt.classList.remove('rd-selected');
+                        });
+                    });
+                }
+            }
+
+            function updateDateDisplay() {
+                if (!els.dateField || !els.dateFieldDisplay) return;
+                const value = els.dateField.value || '';
+                const opt = Array.from(els.dateField.options).find(o => o.value === value);
+                const labelEl = els.dateFieldDisplay.querySelector('.rd-select-display-label');
+                if (!labelEl) return;
+                if (!opt || !value) {
+                    labelEl.textContent = '(sem filtro)';
+                    labelEl.classList.add('rd-select-display-placeholder');
+                } else {
+                    labelEl.textContent = opt.textContent || '';
+                    labelEl.classList.remove('rd-select-display-placeholder');
+                }
+            }
+
+            function buildCustomModuleDropdown() {
+                if (!els.module || !els.moduleWrapper || !els.moduleDisplay || !els.moduleList) return;
+
+                els.moduleList.innerHTML = '';
+                const selectedValue = els.module.value || '';
+
+                Array.from(els.module.options).forEach(opt => {
+                    const value = opt.value;
+                    const label = opt.textContent || '';
+                    const div = document.createElement('div');
+                    div.className = 'rd-select-option' + (value === selectedValue ? ' rd-selected' : '');
+                    div.dataset.value = value;
+                    div.textContent = label;
+                    div.addEventListener('click', () => {
+                        els.module.value = value;
+                        const event = new Event('change', { bubbles: true });
+                        els.module.dispatchEvent(event);
+                        els.moduleWrapper.classList.remove('rd-open');
+                        updateModuleDisplay();
+                    });
+                    els.moduleList.appendChild(div);
+                });
+
+                updateModuleDisplay();
+
+                if (!els.moduleWrapper.dataset.rdEnhanced) {
+                    els.moduleWrapper.dataset.rdEnhanced = '1';
+
+                    els.moduleDisplay.addEventListener('click', () => {
+                        const isOpen = els.moduleWrapper.classList.contains('rd-open');
+                        document.querySelectorAll('.rd-select-wrapper.rd-open').forEach(el => el.classList.remove('rd-open'));
+                        if (!isOpen) {
+                            els.moduleWrapper.classList.add('rd-open');
+                        }
+                    });
+
+                    document.addEventListener('click', (ev) => {
+                        if (!els.moduleWrapper.contains(ev.target)) {
+                            els.moduleWrapper.classList.remove('rd-open');
+                        }
+                    });
+
+                    els.module.addEventListener('change', () => {
+                        updateModuleDisplay();
+                        const current = els.module.value || '';
+                        els.moduleList.querySelectorAll('.rd-select-option').forEach(opt => {
+                            if (opt.dataset.value === current) opt.classList.add('rd-selected');
+                            else opt.classList.remove('rd-selected');
+                        });
+                    });
+                }
+            }
+
+            function updateModuleDisplay() {
+                if (!els.module || !els.moduleDisplay) return;
+                const value = els.module.value || '';
+                const opt = Array.from(els.module.options).find(o => o.value === value);
+                const labelEl = els.moduleDisplay.querySelector('.rd-select-display-label');
+                if (!labelEl) return;
+                if (!opt || !value) {
+                    labelEl.textContent = 'Selecione o módulo';
+                    labelEl.classList.add('rd-select-display-placeholder');
+                } else {
+                    labelEl.textContent = opt.textContent || '';
+                    labelEl.classList.remove('rd-select-display-placeholder');
+                }
+            }
+
+            function render() {
+                const selected = state.keys.filter(k => state.selectedKeys.has(k));
+                if (selected.length === 0) {
+                    els.theadRow.innerHTML = '';
+                    els.tbody.innerHTML = '';
+                    els.empty.textContent = 'Selecione ao menos 1 coluna para gerar o relatório.';
+                    els.empty.style.display = 'block';
+                    els.chipShown.textContent = 'Exibindo: 0';
+                    els.exportCsvBtn.disabled = true;
+                    if (els.exportPdfBtn) els.exportPdfBtn.disabled = true;
+                    return;
+                }
+
+                const searchText = (els.search.value || '').trim().toLowerCase();
+                const statusFilter = els.status ? (els.status.value || 'todos').toLowerCase() : 'todos';
+                const dateField = els.dateField ? (els.dateField.value || '') : '';
                 const from = els.dateFrom.value ? new Date(els.dateFrom.value + 'T00:00:00') : null;
                 const to = els.dateTo.value ? new Date(els.dateTo.value + 'T23:59:59') : null;
 
-                const filtered = state.rows.filter(r => {
-                    if (mod && r.module.toLowerCase() !== mod) return false;
-                    if (user) {
-                        const hay = (r.user + ' ' + r.email).toLowerCase();
-                        if (!hay.includes(user)) return false;
+                const rows = state.flat.filter(r => {
+                    if (searchText) {
+                        const hay = selected.map(k => (r[k] ?? '')).join(' ').toLowerCase();
+                        if (!hay.includes(searchText)) return false;
                     }
-                    if (action && r.action.toLowerCase() !== action) return false;
-                    if (search) {
-                        const hay = (r.user + ' ' + r.email + ' ' + r.module + ' ' + r.resource + ' ' + r.detail).toLowerCase();
-                        if (!hay.includes(search)) return false;
+
+                    if (statusFilter !== 'todos') {
+                        const s = getStatusFromRow(r);
+                        if (statusFilter === 'ativo' && s !== 'ativo') return false;
+                        if (statusFilter === 'inativo' && s !== 'inativo') return false;
                     }
-                    if (from || to) {
-                        const d = r.datetime;
+
+                    if (dateField && (from || to)) {
+                        const v = r[dateField];
+                        if (!v) return false;
+                        const d = parseDateValue(v);
+                        if (!d) return false;
                         if (from && d < from) return false;
                         if (to && d > to) return false;
                     }
                     return true;
                 });
 
-                renderTable(filtered);
-            }
+                state.lastResult = rows;
 
-            function renderTable(rows) {
-                if (!els.tbody || !els.empty) return;
+                const total = rows.length;
+                const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
+                if (state.page > totalPages) state.page = totalPages;
+                if (state.page < 1) state.page = 1;
+                const start = (state.page - 1) * state.pageSize;
+                const end = start + state.pageSize;
+                const slice = rows.slice(start, end);
 
-                if (!rows.length) {
-                    els.tbody.innerHTML = '';
+                els.chipShown.textContent = `Exibindo: ${slice.length} de ${total} (pág. ${total === 0 ? 0 : state.page}/${total === 0 ? 0 : totalPages})`;
+                els.exportCsvBtn.disabled = total === 0;
+                if (els.exportPdfBtn) els.exportPdfBtn.disabled = total === 0;
+
+                // Render header
+                els.theadRow.innerHTML = selected.map(k => `<th title="${escapeHtml(k)}">${escapeHtml(humanizeKey(k))}</th>`).join('');
+
+                // Render body (paginação)
+                els.tbody.innerHTML = slice.map(r => {
+                    return `<tr class="rd-row">` + selected.map(k => {
+                        const raw = r[k];
+
+                        if (looksLikeImageKey(k) && isSafeImageUrl(raw)) {
+                            const url = escapeHtml(String(raw));
+                            const alt = escapeHtml(humanizeKey(k));
+                            return `<td><div class="rd-avatar-wrapper"><div class="rd-avatar"><img src="${url}" alt="${alt}"></div></div></td>`;
+                        }
+
+                        if (looksLikeDateKey(k)) {
+                            const d = parseDateValue(raw);
+                            if (d) {
+                                const dd = String(d.getDate()).padStart(2, '0');
+                                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                                const yyyy = d.getFullYear();
+                                const hh = String(d.getHours()).padStart(2, '0');
+                                const mi = String(d.getMinutes()).padStart(2, '0');
+                                const dateStr = `${dd}/${mm}/${yyyy}`;
+                                const timeStr = `${hh}:${mi}`;
+                                return `<td><span class="rd-datetime"><span>${escapeHtml(dateStr)}</span><span>${escapeHtml(timeStr)}</span></span></td>`;
+                            }
+                        }
+
+                        return `<td>${escapeHtml(stringifyCell(raw, k))}</td>`;
+                    }).join('') + `</tr>`;
+                }).join('');
+
+                state.lastSelected = selected.slice();
+
+                // Empty + paginação
+                if (total === 0) {
+                    els.empty.textContent = 'Nenhum resultado encontrado com os filtros atuais.';
                     els.empty.style.display = 'block';
-                    return;
+                } else {
+                    els.empty.style.display = 'none';
                 }
 
-                els.empty.style.display = 'none';
+                if (els.pagination && els.paginationInfo) {
+                    if (total <= state.pageSize) {
+                        els.pagination.style.display = 'none';
+                    } else {
+                        els.pagination.style.display = 'flex';
+                        els.paginationInfo.textContent = `Página ${state.page} de ${totalPages}`;
+                        if (els.prevPageBtn) els.prevPageBtn.disabled = state.page <= 1;
+                        if (els.nextPageBtn) els.nextPageBtn.disabled = state.page >= totalPages;
+                    }
+                }
+            }
 
-                els.tbody.innerHTML = rows.map(r => {
-                    const d = r.datetime;
-                    const dd = String(d.getDate()).padStart(2, '0');
-                    const mm = String(d.getMonth() + 1).padStart(2, '0');
-                    const yyyy = d.getFullYear();
-                    const hh = String(d.getHours()).padStart(2, '0');
-                    const mi = String(d.getMinutes()).padStart(2, '0');
-                    const dateStr = `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+            function exportCsv() {
+                const selected = state.keys.filter(k => state.selectedKeys.has(k));
+                const rows = state.lastResult || [];
+                const header = selected.map(k => csvEscape(humanizeKey(k))).join(',');
+                const body = rows.map(r => selected.map(k => csvEscape(stringifyCell(r[k], k))).join(',')).join('\n');
+                const csv = header + '\n' + body;
 
-                    const actionLabel = r.action === 'insert' ? 'Criação'
-                        : r.action === 'update' ? 'Alteração'
-                        : r.action === 'delete' ? 'Exclusão'
-                        : r.action === 'login' ? 'Login'
-                        : r.action;
+                const modLabel = MODULES.find(m => m.key === state.moduleKey)?.key || 'modulo';
+                const now = new Date();
+                const yyyy = now.getFullYear();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                // Gera arquivo em formato compatível com Excel (planilha simples)
+                downloadText(
+                    csv,
+                    `relatorio_dinamico_${modLabel}_${yyyy}-${mm}-${dd}.xlsx`,
+                    'application/vnd.ms-excel;charset=utf-8;'
+                );
+            }
 
-                    const badgeClass = r.action === 'insert' ? 'badge-insert'
-                        : r.action === 'update' ? 'badge-update'
-                        : r.action === 'delete' ? 'badge-delete'
-                        : 'badge-update';
+            function exportPdf() {
+                const selected = state.keys.filter(k => state.selectedKeys.has(k));
+                const rows = state.lastResult || [];
+                if (!selected.length || !rows.length) return;
 
-                    return `
-                        <tr>
-                            <td>${dateStr}</td>
-                            <td>
-                                <div style="font-weight:600;">${r.user}</div>
-                                <div style="font-size:11px; color:#6b7280;">${r.email}</div>
-                            </td>
-                            <td><span class="badge ${badgeClass}">${actionLabel}</span></td>
-                            <td>${r.module}</td>
-                            <td>${r.resource}</td>
-                            <td>${r.detail}</td>
-                        </tr>
-                    `;
+                const modLabel = MODULES.find(m => m.key === state.moduleKey)?.label || 'Relatório Dinâmico';
+                const now = new Date();
+                const yyyy = now.getFullYear();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mi = String(now.getMinutes()).padStart(2, '0');
+
+                const title = `${modLabel} - ${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+
+                const headHtml = selected.map(k => `<th style="padding:6px 8px; font-size:11px; text-align:left; border-bottom:1px solid #e5e7eb; white-space:nowrap;">${escapeHtml(humanizeKey(k))}</th>`).join('');
+                const bodyHtml = rows.map(r => {
+                    const tds = selected.map(k => {
+                        const raw = r[k];
+
+                        if (looksLikeImageKey(k) && isSafeImageUrl(raw)) {
+                            const url = escapeHtml(String(raw));
+                            const alt = escapeHtml(humanizeKey(k));
+                            return `<td style="padding:4px 8px; font-size:11px; border-bottom:1px solid #f3f4f6; vertical-align:top; word-break:break-word;">
+    <div class="rd-avatar-pdf"><img src="${url}" alt="${alt}"></div>
+</td>`;
+                        }
+
+                        const text = stringifyCell(raw, k);
+                        return `<td style="padding:4px 8px; font-size:11px; border-bottom:1px solid #f3f4f6; vertical-align:top; word-break:break-word;">${escapeHtml(text)}</td>`;
+                    }).join('');
+                    return `<tr>${tds}</tr>`;
                 }).join('');
+
+                const html = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>${escapeHtml(title)}</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 11px;
+            color: #111827;
+            margin: 20px;
+        }
+        h1 {
+            font-size: 16px;
+            margin: 0 0 4px 0;
+        }
+        .meta {
+            font-size: 11px;
+            color: #4b5563;
+            margin-bottom: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: none;
+        }
+        .rd-avatar-pdf {
+            width: 24px;
+            height: 24px;
+            border-radius: 9999px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            background: #f1f5f9;
+            display: inline-block;
+        }
+        .rd-avatar-pdf img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        @media print {
+            body {
+                margin: 10mm;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>${escapeHtml(modLabel)}</h1>
+    <div class="meta">Gerado em ${dd}/${mm}/${yyyy} ${hh}:${mi} • Registros: ${rows.length}</div>
+    <table>
+        <thead>
+            <tr>${headHtml}</tr>
+        </thead>
+        <tbody>
+            ${bodyHtml}
+        </tbody>
+    </table>
+</body>
+</html>
+                `;
+
+                const w = window.open('', '_blank');
+                if (!w) return;
+                w.document.open();
+                w.document.write(html);
+                w.document.close();
+                try {
+                    w.focus();
+                    setTimeout(() => {
+                        try { w.print(); } catch (e) { console.error('Erro ao imprimir PDF do relatório dinâmico:', e); }
+                    }, 300);
+                } catch (e) {
+                    console.error('Erro ao preparar impressão do relatório dinâmico:', e);
+                }
             }
 
-            if (els.runBtn) {
-                els.runBtn.addEventListener('click', applyFilters);
+            function flatten(obj, prefix = '', out = {}) {
+                if (!obj || typeof obj !== 'object') return out;
+                Object.keys(obj).forEach(key => {
+                    const value = obj[key];
+                    const fullKey = prefix ? `${prefix}.${key}` : key;
+                    if (value === null || value === undefined) {
+                        out[fullKey] = '';
+                        return;
+                    }
+                    if (Array.isArray(value)) {
+                        // Arrays de primitivos: junta. Arrays de objetos: JSON compactado.
+                        if (value.every(v => v === null || ['string', 'number', 'boolean'].includes(typeof v))) {
+                            out[fullKey] = value.filter(v => v != null).join(', ');
+                        } else {
+                            try { out[fullKey] = JSON.stringify(value); } catch { out[fullKey] = String(value); }
+                        }
+                        return;
+                    }
+                    if (typeof value === 'object') {
+                        // Datas ISO vão como string
+                        if (value instanceof Date) {
+                            out[fullKey] = value.toISOString();
+                            return;
+                        }
+                        flatten(value, fullKey, out);
+                        return;
+                    }
+                    out[fullKey] = value;
+                });
+                return out;
             }
-            if (els.clearBtn) {
-                els.clearBtn.addEventListener('click', () => {
-                    if (els.module) els.module.value = '';
-                    if (els.user) els.user.value = '';
-                    if (els.action) els.action.value = '';
-                    if (els.dateFrom) els.dateFrom.value = '';
-                    if (els.dateTo) els.dateTo.value = '';
-                    if (els.search) els.search.value = '';
-                    applyFilters();
+
+            function getAllKeys(rows) {
+                const set = new Set();
+                rows.slice(0, 50).forEach(r => Object.keys(r || {}).forEach(k => set.add(k)));
+                const raw = Array.from(set);
+                // Remove colunas genéricas/pouco úteis: ids, status, visibilidade, updated, etc.
+                const filtered = raw.filter(k => {
+                    const base = String(k || '').toLowerCase();
+                    const noDots = base.replace(/\./g, ' ');
+                    const tokens = noDots.split(/\s+/);
+                    // remove id/ids isolados ou campos terminando com _id / .id
+                    const isIdToken = tokens.some(t => t === 'id' || t === 'ids');
+                    const isIdSuffix = /(^|[._])(id|.*_id)$/.test(base);
+                    const isStatusId = base.includes('status_id') || base.includes('status id');
+                    const isResponsavelId = base.includes('responsavel_id') || base.includes('responsavel id');
+                    const isVisibility = base.includes('visibilidade') || base.includes('visibility');
+                    const isUpdated = base.includes('updated') || base.includes('update');
+                    const isPlainStatus = base === 'status';
+                    const isLembrete = base === 'lembrete';
+                    const isCapacidade = base === 'capacidade';
+                    const isUsuarioLancamentoEmail = base === 'usuario_lancamento_email' || base === 'usuario lancamento email';
+                    const isUsuarioLancamentoNome = base === 'usuario_lancamento_nome' || base === 'usuario lancamento nome';
+                    const isUsuarios = base === 'usuarios' || base === 'usuario' || base === 'users';
+                    return !(
+                        isIdToken ||
+                        isIdSuffix ||
+                        isStatusId ||
+                        isResponsavelId ||
+                        isVisibility ||
+                        isUpdated ||
+                        isPlainStatus ||
+                        isUsuarioLancamentoEmail ||
+                        isUsuarioLancamentoNome ||
+                        isUsuarios ||
+                        isLembrete ||
+                        isCapacidade
+                    );
+                });
+
+                // Ordenação amigável para o módulo de agenda:
+                // segue a mesma sequência visual do modal de novo agendamento
+                const preferredOrder = [
+                    'titulo',
+                    'comunidades.nome',
+                    'pastorais.nome',
+                    'pilares.nome',
+                    'locais.nome',
+                    'acoes.nome',
+                    'data_inicio',
+                    'data_fim',
+                    'evento_paroquial',
+                    'visibilidade'
+                ];
+                const orderMap = new Map();
+                preferredOrder.forEach((k, idx) => orderMap.set(k, idx));
+
+                return filtered.sort((a, b) => {
+                    const ia = orderMap.has(a) ? orderMap.get(a) : Infinity;
+                    const ib = orderMap.has(b) ? orderMap.get(b) : Infinity;
+                    if (ia !== ib) return ia - ib;
+                    return a.localeCompare(b, 'pt-BR');
                 });
             }
 
-            // Inicializa com dados simulados para dar contexto visual
-            loadMockData();
-            applyFilters();
+            function getPreferredKeys(keys, moduleKey) {
+                const prefs = [];
+                const tryAdd = (k) => { if (keys.includes(k)) prefs.push(k); };
+
+                // defaults comuns
+                ['codigo', 'nome', 'email', 'ativo', 'ultimo_login', 'data_inicio', 'data_fim', 'titulo', 'descricao'].forEach(tryAdd);
+
+                if (moduleKey === 'agenda') {
+                    // Ordem de colunas inspirada na sequência do modal de novo agendamento
+                    [
+                        'titulo',
+                        'comunidades.nome',
+                        'pastorais.nome',
+                        'pilares.nome',
+                        'locais.nome',
+                        'acoes.nome',
+                        'data_inicio',
+                        'data_fim',
+                        'evento_paroquial',
+                        'visibilidade',
+                        'pessoas.nome',
+                        'usuario_lancamento_nome',
+                        'usuario_lancamento_email'
+                    ].forEach(tryAdd);
+                }
+
+                // Garante pelo menos 6 colunas
+                if (prefs.length < 6) {
+                    keys.slice(0, 6).forEach(k => { if (!prefs.includes(k)) prefs.push(k); });
+                }
+
+                // Limita para não poluir
+                return prefs.slice(0, 12);
+            }
+
+            function humanizeKey(k) {
+                if (!k) return '';
+                const normalized = String(k).toLowerCase();
+
+                // Nomes mais amigáveis para alguns campos específicos
+                if (normalized === 'created_at' || normalized === 'created at' || normalized === 'criado_em') {
+                    return 'Criação';
+                }
+
+                const cleaned = k.replace(/\./g, ' ').replace(/_/g, ' ').trim();
+                return cleaned.split(/\s+/).map(w => w ? (w.charAt(0).toUpperCase() + w.slice(1)) : '').join(' ');
+            }
+
+            function looksLikeDateKey(k) {
+                const s = String(k || '').toLowerCase();
+                return s.includes('data') || s.endsWith('_at') || s.includes('login') || s.includes('created') || s.includes('updated');
+            }
+
+            function looksLikeImageKey(k) {
+                const s = String(k || '').toLowerCase();
+                return (
+                    s.includes('imagem') ||
+                    s.includes('image') ||
+                    s.includes('foto') ||
+                    s.includes('avatar') ||
+                    s.endsWith('_url') ||
+                    s.endsWith('_img') ||
+                    s.endsWith('_image')
+                );
+            }
+
+            function isSafeImageUrl(url) {
+                if (!url) return false;
+                const s = String(url).trim();
+                if (!s) return false;
+                const lower = s.toLowerCase();
+                return (
+                    lower.startsWith('http://') ||
+                    lower.startsWith('https://') ||
+                    lower.startsWith('/') ||
+                    lower.startsWith('./') ||
+                    lower.startsWith('../') ||
+                    lower.startsWith('data:image')
+                );
+            }
+
+            function parseDateValue(v) {
+                if (!v) return null;
+                if (v instanceof Date) return v;
+
+                if (typeof v === 'string') {
+                    const s = v.trim();
+
+                    // ISO / formato padrão JS
+                    const iso = new Date(s);
+                    if (!Number.isNaN(iso.getTime())) return iso;
+
+                    // Formato brasileiro: dd/mm/aaaa ou dd/mm/aaaa HH:MM
+                    const brDateTime = /^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{2}):(\d{2}))?$/;
+                    const m = s.match(brDateTime);
+                    if (m) {
+                        const day = parseInt(m[1], 10);
+                        const month = parseInt(m[2], 10) - 1;
+                        const year = parseInt(m[3], 10);
+                        const hour = m[4] ? parseInt(m[4], 10) : 0;
+                        const min = m[5] ? parseInt(m[5], 10) : 0;
+                        const d = new Date(year, month, day, hour, min, 0, 0);
+                        if (!Number.isNaN(d.getTime())) return d;
+                    }
+                }
+
+                const d = new Date(v);
+                if (Number.isNaN(d.getTime())) return null;
+                return d;
+            }
+
+            function getStatusFromRow(r) {
+                // tenta campos comuns
+                const ativo = r['ativo'];
+                if (typeof ativo === 'boolean') return ativo ? 'ativo' : 'inativo';
+                const status = (r['status'] || r['Status'] || '').toString().toLowerCase();
+                if (status.includes('inativo')) return 'inativo';
+                if (status.includes('ativo')) return 'ativo';
+                return 'ativo'; // default
+            }
+
+            function stringifyCell(v, keyHint) {
+                if (v === null || v === undefined) return '';
+                if (typeof v === 'boolean') return v ? 'Sim' : 'Não';
+
+                // Formatação especial para datas com hora
+                if (keyHint && looksLikeDateKey(keyHint)) {
+                    const d = parseDateValue(v);
+                    if (d) {
+                        const dd = String(d.getDate()).padStart(2, '0');
+                        const mm = String(d.getMonth() + 1).padStart(2, '0');
+                        const yyyy = d.getFullYear();
+                        const hh = String(d.getHours()).padStart(2, '0');
+                        const mi = String(d.getMinutes()).padStart(2, '0');
+                        return `${dd}/${mm}/${yyyy} : ${hh}:${mi}`;
+                    }
+                }
+
+                return String(v);
+            }
+
+            function csvEscape(val) {
+                const s = (val === null || val === undefined) ? '' : String(val);
+                const needs = /[",\n]/.test(s);
+                const escaped = s.replace(/"/g, '""');
+                return needs ? `"${escaped}"` : escaped;
+            }
+
+            function downloadText(text, filename, mime) {
+                const blob = new Blob([text], { type: mime || 'text/plain;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
+            }
+
+            function escapeHtml(s) {
+                return String(s ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
         }
     </script>
 </body>
