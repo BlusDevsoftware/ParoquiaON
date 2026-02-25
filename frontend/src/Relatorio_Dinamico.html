@@ -322,6 +322,12 @@
             min-width: 0;
         }
 
+        .form-row.dates-row input[type="date"] {
+            font-size: 11px;
+            padding: 4px 6px;
+            text-align: center;
+        }
+
         label {
             display: block;
             font-size: 11px;
@@ -340,8 +346,8 @@
             border-radius: 6px;
             outline: none;
             font-size: 12px;
-            background: #fff;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #ffffff;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.2s ease;
         }
 
         select:focus,
@@ -349,6 +355,14 @@
         input[type="date"]:focus {
             border-color: #007bff;
             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.10);
+            background-color: #ffffff;
+        }
+
+        select:disabled,
+        input[type="text"]:disabled,
+        input[type="date"]:disabled {
+            background-color: #ffffff;
+            color: #9ca3af;
         }
 
         /* Dropdown customizado para o campo "Tipo de data" (visual idêntico ao modal de agenda) */
