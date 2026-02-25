@@ -870,7 +870,14 @@
                         <div class="form-row one">
                             <div>
                                 <label for="rdModule">Módulo</label>
-                                <select id="rdModule"></select>
+                                <div class="rd-select-wrapper" id="rdModuleWrapper">
+                                    <button type="button" class="rd-select-display" id="rdModuleDisplay">
+                                        <span class="rd-select-display-label rd-select-display-placeholder">Selecione o módulo</span>
+                                        <span class="rd-select-display-icon"><i class="fas fa-chevron-down"></i></span>
+                                    </button>
+                                    <select id="rdModule" class="rd-select-native"></select>
+                                    <div class="rd-select-list" id="rdModuleList"></div>
+                                </div>
                             </div>
                         </div>
 
@@ -1030,6 +1037,9 @@
         function initDynamicReport() {
             const els = {
                 module: document.getElementById('rdModule'),
+                moduleWrapper: document.getElementById('rdModuleWrapper'),
+                moduleDisplay: document.getElementById('rdModuleDisplay'),
+                moduleList: document.getElementById('rdModuleList'),
                 search: document.getElementById('rdSearch'),
                 status: document.getElementById('rdStatus'),
                 dateField: document.getElementById('rdDateField'),
@@ -1090,6 +1100,7 @@
             els.module.innerHTML = MODULES.map(m => `<option value="${m.key}">${m.label}</option>`).join('');
             els.module.value = state.moduleKey;
             els.chipModule.textContent = `Módulo: ${MODULES.find(m => m.key === state.moduleKey)?.label || '-'}`;
+            buildCustomModuleDropdown();
 
             // Eventos
             els.module.addEventListener('change', async () => {
@@ -1098,6 +1109,7 @@
                 state.page = 1;
                 await loadModuleData();
                 render();
+                buildCustomModuleDropdown();
             });
 
             els.colsSearch.addEventListener('input', () => renderColumns());
@@ -1331,6 +1343,74 @@
                 if (!labelEl) return;
                 if (!opt || !value) {
                     labelEl.textContent = '(sem filtro)';
+                    labelEl.classList.add('rd-select-display-placeholder');
+                } else {
+                    labelEl.textContent = opt.textContent || '';
+                    labelEl.classList.remove('rd-select-display-placeholder');
+                }
+            }
+
+            function buildCustomModuleDropdown() {
+                if (!els.module || !els.moduleWrapper || !els.moduleDisplay || !els.moduleList) return;
+
+                els.moduleList.innerHTML = '';
+                const selectedValue = els.module.value || '';
+
+                Array.from(els.module.options).forEach(opt => {
+                    const value = opt.value;
+                    const label = opt.textContent || '';
+                    const div = document.createElement('div');
+                    div.className = 'rd-select-option' + (value === selectedValue ? ' rd-selected' : '');
+                    div.dataset.value = value;
+                    div.textContent = label;
+                    div.addEventListener('click', () => {
+                        els.module.value = value;
+                        const event = new Event('change', { bubbles: true });
+                        els.module.dispatchEvent(event);
+                        els.moduleWrapper.classList.remove('rd-open');
+                        updateModuleDisplay();
+                    });
+                    els.moduleList.appendChild(div);
+                });
+
+                updateModuleDisplay();
+
+                if (!els.moduleWrapper.dataset.rdEnhanced) {
+                    els.moduleWrapper.dataset.rdEnhanced = '1';
+
+                    els.moduleDisplay.addEventListener('click', () => {
+                        const isOpen = els.moduleWrapper.classList.contains('rd-open');
+                        document.querySelectorAll('.rd-select-wrapper.rd-open').forEach(el => el.classList.remove('rd-open'));
+                        if (!isOpen) {
+                            els.moduleWrapper.classList.add('rd-open');
+                        }
+                    });
+
+                    document.addEventListener('click', (ev) => {
+                        if (!els.moduleWrapper.contains(ev.target)) {
+                            els.moduleWrapper.classList.remove('rd-open');
+                        }
+                    });
+
+                    els.module.addEventListener('change', () => {
+                        updateModuleDisplay();
+                        const current = els.module.value || '';
+                        els.moduleList.querySelectorAll('.rd-select-option').forEach(opt => {
+                            if (opt.dataset.value === current) opt.classList.add('rd-selected');
+                            else opt.classList.remove('rd-selected');
+                        });
+                    });
+                }
+            }
+
+            function updateModuleDisplay() {
+                if (!els.module || !els.moduleDisplay) return;
+                const value = els.module.value || '';
+                const opt = Array.from(els.module.options).find(o => o.value === value);
+                const labelEl = els.moduleDisplay.querySelector('.rd-select-display-label');
+                if (!labelEl) return;
+                if (!opt || !value) {
+                    labelEl.textContent = 'Selecione o módulo';
                     labelEl.classList.add('rd-select-display-placeholder');
                 } else {
                     labelEl.textContent = opt.textContent || '';
