@@ -27,7 +27,7 @@ class AuthGuard {
             'perfil.html': 'perfis_ver',
             'Relatorio_Dinamico.html': 'relatorios_ver',
             'recebimento.html': 'relatorios_ver',
-            'conferencia.html': 'relatorios_ver',
+            'auditoria.html': 'relatorios_ver',
             'manutencao-bd.html': 'configuracoes_manutencao_ver',
             'sincronizar.html': 'configuracoes_sincronizar_ver',
             'index.html': 'minha_comunidade_ver'
@@ -185,7 +185,7 @@ class AuthGuard {
             'locais.html',
             'acoes.html',
             'Relatorio_Dinamico.html',
-            'conferencia.html'
+            'auditoria.html'
         ];
         for (const page of order) {
             const flag = this.PAGE_PERMISSION_MAP[page];

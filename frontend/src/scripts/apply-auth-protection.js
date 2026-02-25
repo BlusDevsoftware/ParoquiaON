@@ -597,7 +597,7 @@ function aplicarPermissoesNoMenu() {
         { selector: 'a[href="perfil.html"]', flag: 'perfis_ver' },
         { selector: 'a[href="Relatorio_Dinamico.html"]', flag: 'relatorios_ver' },
         { selector: 'a[href="recebimento.html"]', flag: 'relatorios_ver' }, // retrocompatibilidade
-        { selector: 'a[href="conferencia.html"]', flag: 'relatorios_ver' }
+        { selector: 'a[href="auditoria.html"]', flag: 'relatorios_ver' }
     ];
     itens.forEach(function(item) {
         var el = document.querySelector(item.selector);
