@@ -22,6 +22,7 @@ const statusRoutes = require('./routes/statusRoutes');
 const relatorioRoutes = require('./routes/relatorioRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const auditoriaRoutes = require('./routes/auditoriaRoutes');
 
 const app = express();
 
@@ -79,6 +80,7 @@ app.use('/api/status-agendamento', statusRoutes);
 app.use('/api/relatorios', relatorioRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/auditoria', auditoriaRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

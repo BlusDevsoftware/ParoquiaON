@@ -1,6 +1,7 @@
 const { supabase } = require('../config/supabase');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { logEvento } = require('../utils/auditoriaService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'paroquiaon-secret-key';
 
@@ -129,6 +130,21 @@ const login = async (req, res) => {
             JWT_SECRET,
             { expiresIn: '24h' }
         );
+
+        // Auditoria: login bem-sucedido
+        logEvento({
+            req,
+            acao: 'LOGIN_SUCCESS',
+            modulo: 'auth',
+            recurso: 'usuarios',
+            entidadeId: usuario.id,
+            descricao: 'Login realizado com sucesso',
+            detalhes: {
+                email: usuario.email,
+                perfil_id: usuario.perfil_id ?? null,
+                pessoa_id: usuario.pessoa_id ?? null
+            }
+        });
 
         return res.json({
             success: true,

@@ -1,4 +1,5 @@
 const { supabase } = require('../config/supabase');
+const { logEvento } = require('../utils/auditoriaService');
 
 // Helpers de upload para Supabase Storage (bucket: "pessoas")
 // Importante: o nome aqui deve bater exatamente com o nome do balde no Supabase
@@ -165,6 +166,19 @@ async function criarPessoa(req, res) {
             }
         }
 
+        // Auditoria: criação de pessoa
+        logEvento({
+            req,
+            acao: 'CREATE',
+            modulo: 'pessoas',
+            recurso: 'pessoas',
+            entidadeId: pessoaCriada.id,
+            descricao: 'Pessoa criada',
+            detalhes: {
+                after: pessoaCriada
+            }
+        });
+
         res.status(201).json(pessoaCriada);
     } catch (error) {
         console.error('Erro ao criar pessoa:', error);
@@ -230,6 +244,20 @@ async function atualizarPessoa(req, res) {
 
         if (updateResult.error) throw updateResult.error;
         if (!updateResult.data) return res.status(404).json({ error: 'Pessoa não encontrada' });
+
+        // Auditoria: atualização de pessoa
+        logEvento({
+            req,
+            acao: 'UPDATE',
+            modulo: 'pessoas',
+            recurso: 'pessoas',
+            entidadeId: updateResult.data.id,
+            descricao: 'Pessoa atualizada',
+            detalhes: {
+                after: updateResult.data
+            }
+        });
+
         res.json(updateResult.data);
     } catch (error) {
         console.error('Erro ao atualizar pessoa:', error);
@@ -243,6 +271,20 @@ async function excluirPessoa(req, res) {
         const { data, error } = await supabase.from('pessoas').delete().eq('id', id).select();
         if (error) throw error;
         if (!data || data.length === 0) return res.status(404).json({ error: 'Pessoa não encontrada' });
+
+        // Auditoria: exclusão de pessoa (logando o registro removido em detalhes.before)
+        logEvento({
+            req,
+            acao: 'DELETE',
+            modulo: 'pessoas',
+            recurso: 'pessoas',
+            entidadeId: data[0]?.id ?? null,
+            descricao: 'Pessoa excluída',
+            detalhes: {
+                before: data[0] || null
+            }
+        });
+
         res.json({ message: 'Pessoa excluída com sucesso', data });
     } catch (error) {
         console.error('Erro ao excluir pessoa:', error);
