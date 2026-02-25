@@ -12,7 +12,7 @@ const listarAuditoria = async (req, res) => {
 
         let query = supabase
             .from('auditoria')
-            .select('acao, created_at, descricao, modulo, recurso, foto_usuario')
+            .select('acao, created_at, descricao, modulo, recurso, foto_usuario, usuario')
             .order('created_at', { ascending: false })
             .limit(1000); // limite de segurança
 

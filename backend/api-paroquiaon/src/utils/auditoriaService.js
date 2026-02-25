@@ -15,6 +15,16 @@ async function logEvento({
     try {
         const userFromReq = req && req.user ? req.user : {};
         let fotoUsuario = null;
+        let usuario = null;
+
+        // Montar identificação textual do usuário (nome ou email)
+        if (userFromReq) {
+            usuario =
+                userFromReq.nome ||
+                userFromReq.login ||
+                userFromReq.email ||
+                null;
+        }
 
         // Tentar buscar a foto da pessoa vinculada ao usuário autenticado
         if (userFromReq.pessoa_id) {
@@ -37,7 +47,8 @@ async function logEvento({
             modulo,
             recurso,
             descricao: descricao || null,
-            foto_usuario: fotoUsuario
+            foto_usuario: fotoUsuario,
+            usuario
         };
 
         const { error } = await supabase.from('auditoria').insert([payload]);
