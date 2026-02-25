@@ -202,6 +202,11 @@ const endpoints = {
   statusAgendamento: {
     list: '/status-agendamento',
     get: (id) => `/status-agendamento/${id}`
+  },
+
+  // Auditoria do sistema
+  auditoria: {
+    list: '/auditoria'
   }
 }
 

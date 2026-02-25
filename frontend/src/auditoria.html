@@ -868,7 +868,7 @@
             <div class="builder">
                 <div class="panel config-panel">
                     <div class="panel-header">
-                        <h2><i class="fas fa-sliders-h"></i> Configuração</h2>
+                        <h2><i class="fas fa-clipboard-check"></i> Auditoria do Sistema</h2>
                     </div>
                     <div class="panel-body">
                         <div class="form-row one">
@@ -887,8 +887,8 @@
 
                         <div class="form-row one">
                             <div>
-                                <label for="rdSearch">Pesquisar (texto)</label>
-                                <input id="rdSearch" type="text" placeholder="Ex.: maria, comunidade, evento, email..." />
+                                <label for="rdSearch">Pesquisar (usuário, módulo, detalhes...)</label>
+                                <input id="rdSearch" type="text" placeholder="Usuário, módulo, ação, detalhes..." />
                             </div>
                         </div>
 
@@ -973,7 +973,7 @@
                             </thead>
                             <tbody id="rdTbody"></tbody>
                         </table>
-                        <div class="empty-state" id="rdEmpty">Selecione um módulo e clique em “Gerar”.</div>
+                        <div class="empty-state" id="rdEmpty">Clique em “Gerar” para carregar os registros de auditoria.</div>
                     </div>
                     <div class="pagination" id="rdPagination" style="display:none;">
                         <div class="pagination-info" id="rdPaginationInfo"></div>
@@ -1077,19 +1077,11 @@
             };
 
             const MODULES = [
-                { key: 'agenda', label: 'Agenda (Agendamentos)', endpoint: () => window.endpoints.agenda.list },
-                { key: 'comunidades', label: 'Comunidades', endpoint: () => window.endpoints.comunidades.list },
-                { key: 'pastorais', label: 'Pastorais', endpoint: () => window.endpoints.pastorais.list },
-                { key: 'pilares', label: 'Pilares', endpoint: () => window.endpoints.pilares.list },
-                { key: 'locais', label: 'Locais', endpoint: () => window.endpoints.locais.list },
-                { key: 'acoes', label: 'Ações', endpoint: () => window.endpoints.acoes.list },
-                { key: 'pessoas', label: 'Pessoas', endpoint: () => window.endpoints.pessoas.list },
-                { key: 'usuarios', label: 'Usuários', endpoint: () => window.endpoints.usuarios.list },
-                { key: 'perfis', label: 'Perfis', endpoint: () => window.endpoints.perfis.list }
+                { key: 'auditoria', label: 'Auditoria do Sistema', endpoint: () => window.endpoints.auditoria.list }
             ];
 
             const state = {
-                moduleKey: 'agenda',
+                moduleKey: 'auditoria',
                 raw: [],
                 flat: [],
                 keys: [],
@@ -1773,6 +1765,28 @@
                 const prefs = [];
                 const tryAdd = (k) => { if (keys.includes(k)) prefs.push(k); };
 
+                // Colunas mais comuns esperadas para auditoria
+                if (moduleKey === 'auditoria') {
+                    [
+                        'datetime',
+                        'data',
+                        'created_at',
+                        'user',
+                        'usuario',
+                        'email',
+                        'acao',
+                        'action',
+                        'modulo',
+                        'module',
+                        'recurso',
+                        'resource',
+                        'detalhe',
+                        'detalhes',
+                        'detail',
+                        'descricao'
+                    ].forEach(tryAdd);
+                }
+
                 // defaults comuns
                 ['codigo', 'nome', 'email', 'ativo', 'ultimo_login', 'data_inicio', 'data_fim', 'titulo', 'descricao'].forEach(tryAdd);
 
@@ -1819,7 +1833,17 @@
 
             function looksLikeDateKey(k) {
                 const s = String(k || '').toLowerCase();
-                return s.includes('data') || s.endsWith('_at') || s.includes('login') || s.includes('created') || s.includes('updated');
+                return (
+                    s.includes('data') ||
+                    s.includes('date') ||
+                    s.includes('hora') ||
+                    s.includes('time') ||
+                    s.includes('datetime') ||
+                    s.endsWith('_at') ||
+                    s.includes('login') ||
+                    s.includes('created') ||
+                    s.includes('updated')
+                );
             }
 
             function looksLikeImageKey(k) {
