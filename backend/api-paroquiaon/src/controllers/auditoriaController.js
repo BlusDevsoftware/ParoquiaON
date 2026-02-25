@@ -7,12 +7,12 @@ const { supabase } = require('../config/supabase');
  */
 const listarAuditoria = async (req, res) => {
     try {
-        // Opcionalmente, aceitar filtros simples via query string (modulo, acao, email)
-        const { modulo, acao, email } = req.query || {};
+        // Opcionalmente, aceitar filtros simples via query string (modulo, acao)
+        const { modulo, acao } = req.query || {};
 
         let query = supabase
             .from('auditoria')
-            .select('*')
+            .select('acao, created_at, descricao, modulo, recurso, foto_usuario')
             .order('created_at', { ascending: false })
             .limit(1000); // limite de segurança
 
@@ -21,9 +21,6 @@ const listarAuditoria = async (req, res) => {
         }
         if (acao) {
             query = query.ilike('acao', acao);
-        }
-        if (email) {
-            query = query.ilike('email', `%${email}%`);
         }
 
         const { data, error } = await query;

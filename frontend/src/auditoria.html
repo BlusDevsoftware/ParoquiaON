@@ -1702,6 +1702,25 @@
                 const set = new Set();
                 rows.slice(0, 50).forEach(r => Object.keys(r || {}).forEach(k => set.add(k)));
                 const raw = Array.from(set);
+
+                // Se for módulo de auditoria, limitar estritamente às colunas desejadas
+                const allowedAuditoriaKeys = [
+                    'acao',
+                    'created_at',
+                    'descricao',
+                    'modulo',
+                    'recurso',
+                    'foto_usuario'
+                ];
+
+                // Detecta se os dados parecem ser de auditoria (presença de "acao" e "modulo")
+                const isAuditoriaData = set.has('acao') && set.has('modulo');
+
+                if (isAuditoriaData) {
+                    return allowedAuditoriaKeys.filter(k => set.has(k));
+                }
+
+                // Comportamento padrão (para outros módulos, se reutilizado)
                 // Remove colunas genéricas/pouco úteis: ids, status, visibilidade, updated, etc.
                 const filtered = raw.filter(k => {
                     const base = String(k || '').toLowerCase();
