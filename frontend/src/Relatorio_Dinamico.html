@@ -314,7 +314,18 @@
         .form-row.one { grid-template-columns: 1fr; }
 
         .form-row.dates-row {
-            grid-template-columns: 1.3fr 1fr 1fr;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 6px;
+        }
+
+        .form-row.dates-row > div {
+            min-width: 0;
+        }
+
+        .form-row.dates-row select,
+        .form-row.dates-row input[type="date"] {
+            font-size: 11px;
+            padding: 5px 8px;
         }
 
         label {
