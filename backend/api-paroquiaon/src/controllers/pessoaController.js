@@ -173,7 +173,7 @@ async function criarPessoa(req, res) {
             modulo: 'pessoas',
             recurso: 'pessoas',
             entidadeId: pessoaCriada.id,
-            descricao: 'Pessoa criada',
+            descricao: `Pessoa criada: ${pessoaCriada.nome || ''}`.trim(),
             detalhes: {
                 after: pessoaCriada
             }
@@ -193,6 +193,21 @@ async function atualizarPessoa(req, res) {
         const normalizedStatus = typeof body.status === 'string'
             ? (String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo')
             : undefined;
+
+        // Buscar estado atual para comparação em auditoria
+        let pessoaAntes = null;
+        try {
+            const { data: atual, error: erroAtual } = await supabase
+                .from('pessoas')
+                .select('*')
+                .eq('id', id)
+                .single();
+            if (!erroAtual && atual) {
+                pessoaAntes = atual;
+            }
+        } catch (e) {
+            console.warn('Não foi possível buscar pessoa antes da atualização para auditoria:', e);
+        }
 
         // Se houver foto base64, faz upload para o Storage e troca por URL
         // Se vier base64, sempre processa (mesmo que já exista URL no banco)
@@ -245,20 +260,44 @@ async function atualizarPessoa(req, res) {
         if (updateResult.error) throw updateResult.error;
         if (!updateResult.data) return res.status(404).json({ error: 'Pessoa não encontrada' });
 
+        const pessoaDepois = updateResult.data;
+
+        // Montar descrição amigável com base nas mudanças detectadas
+        let descricao = 'Pessoa atualizada';
+        const camposAlterados = [];
+
+        if (pessoaAntes) {
+            const camposParaChecar = ['nome', 'telefone', 'endereco', 'status', 'ativo'];
+            camposParaChecar.forEach((campo) => {
+                if (pessoaAntes[campo] !== pessoaDepois[campo]) {
+                    camposAlterados.push(campo);
+                }
+            });
+
+            if (camposAlterados.length === 1 && camposAlterados[0] === 'telefone') {
+                const antigo = pessoaAntes.telefone || 'vazio';
+                const novo = pessoaDepois.telefone || 'vazio';
+                descricao = `Telefone atualizado de ${antigo} para ${novo}`;
+            } else if (camposAlterados.length > 0) {
+                descricao = `Pessoa atualizada (campos alterados: ${camposAlterados.join(', ')})`;
+            }
+        }
+
         // Auditoria: atualização de pessoa
         logEvento({
             req,
             acao: 'UPDATE',
             modulo: 'pessoas',
             recurso: 'pessoas',
-            entidadeId: updateResult.data.id,
-            descricao: 'Pessoa atualizada',
+            entidadeId: pessoaDepois.id,
+            descricao,
             detalhes: {
-                after: updateResult.data
+                before: pessoaAntes,
+                after: pessoaDepois
             }
         });
 
-        res.json(updateResult.data);
+        res.json(pessoaDepois);
     } catch (error) {
         console.error('Erro ao atualizar pessoa:', error);
         res.status(500).json({ error: 'Erro ao atualizar pessoa', details: error?.message });
@@ -272,16 +311,18 @@ async function excluirPessoa(req, res) {
         if (error) throw error;
         if (!data || data.length === 0) return res.status(404).json({ error: 'Pessoa não encontrada' });
 
+        const pessoaRemovida = data[0] || null;
+
         // Auditoria: exclusão de pessoa (logando o registro removido em detalhes.before)
         logEvento({
             req,
             acao: 'DELETE',
             modulo: 'pessoas',
             recurso: 'pessoas',
-            entidadeId: data[0]?.id ?? null,
-            descricao: 'Pessoa excluída',
+            entidadeId: pessoaRemovida?.id ?? null,
+            descricao: `Pessoa excluída${pessoaRemovida?.nome ? `: ${pessoaRemovida.nome}` : ''}`,
             detalhes: {
-                before: data[0] || null
+                before: pessoaRemovida
             }
         });
 
