@@ -339,8 +339,9 @@
             border: 1px solid #ddd;
             border-radius: 6px;
             outline: none;
-            font-size: 14px;
+            font-size: 1rem;
             background: #fff;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         select:focus,
@@ -348,6 +349,102 @@
         input[type="date"]:focus {
             border-color: #007bff;
             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.10);
+        }
+
+        /* Dropdown customizado para o campo "Tipo de data" (visual idêntico ao modal de agenda) */
+        .rd-select-wrapper {
+            position: relative;
+        }
+
+        .rd-select-native {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .rd-select-display {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 1rem;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            cursor: pointer;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.2s ease;
+        }
+
+        .rd-select-display:hover {
+            background: #f8fafc;
+        }
+
+        .rd-select-wrapper.rd-open .rd-select-display {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.10);
+        }
+
+        .rd-select-display-label {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #111827;
+        }
+
+        .rd-select-display-placeholder {
+            color: #6b7280;
+        }
+
+        .rd-select-display-icon {
+            flex-shrink: 0;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .rd-select-wrapper.rd-open .rd-select-display-icon {
+            transform: rotate(180deg);
+        }
+
+        .rd-select-list {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 24px rgba(2, 6, 23, 0.12);
+            border: 1px solid #e5e7eb;
+            max-height: 260px;
+            overflow: auto;
+            padding: 4px 0;
+            z-index: 1200;
+            display: none;
+        }
+
+        .rd-select-wrapper.rd-open .rd-select-list {
+            display: block;
+        }
+
+        .rd-select-option {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #111827;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .rd-select-option:hover {
+            background: #eff6ff;
+        }
+
+        .rd-select-option.rd-selected {
+            background: #e0ebff;
+            font-weight: 600;
         }
 
         .actions {
@@ -782,9 +879,16 @@
                         <div class="form-row dates-row">
                             <div>
                                 <label for="rdDateField">Tipo de data</label>
-                                <select id="rdDateField">
-                                    <option value="">(sem filtro)</option>
-                                </select>
+                                <div class="rd-select-wrapper" id="rdDateFieldWrapper">
+                                    <button type="button" class="rd-select-display" id="rdDateFieldDisplay">
+                                        <span class="rd-select-display-label rd-select-display-placeholder">(sem filtro)</span>
+                                        <span class="rd-select-display-icon"><i class="fas fa-chevron-down"></i></span>
+                                    </button>
+                                    <select id="rdDateField" class="rd-select-native">
+                                        <option value="">(sem filtro)</option>
+                                    </select>
+                                    <div class="rd-select-list" id="rdDateFieldList"></div>
+                                </div>
                             </div>
                             <div>
                                 <label for="rdDateFrom">De</label>
@@ -924,6 +1028,9 @@
                 search: document.getElementById('rdSearch'),
                 status: document.getElementById('rdStatus'),
                 dateField: document.getElementById('rdDateField'),
+                dateFieldWrapper: document.getElementById('rdDateFieldWrapper'),
+                dateFieldDisplay: document.getElementById('rdDateFieldDisplay'),
+                dateFieldList: document.getElementById('rdDateFieldList'),
                 dateFrom: document.getElementById('rdDateFrom'),
                 dateTo: document.getElementById('rdDateTo'),
                 colsSearch: document.getElementById('rdColsSearch'),
@@ -1107,6 +1214,7 @@
                     // Atualiza dropdown de campos de data
                     const dateKeys = state.keys.filter(k => looksLikeDateKey(k));
                     els.dateField.innerHTML = `<option value="">(sem filtro)</option>` + dateKeys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(humanizeKey(k))}</option>`).join('');
+                    buildCustomDateDropdown();
 
                     els.chipTotal.textContent = `Total: ${state.raw.length}`;
                 } catch (e) {
@@ -1152,6 +1260,77 @@
                         else state.selectedKeys.delete(key);
                     });
                 });
+            }
+
+            function buildCustomDateDropdown() {
+                if (!els.dateField || !els.dateFieldWrapper || !els.dateFieldDisplay || !els.dateFieldList) return;
+
+                // Limpa lista atual
+                els.dateFieldList.innerHTML = '';
+
+                const selectedValue = els.dateField.value || '';
+
+                Array.from(els.dateField.options).forEach(opt => {
+                    const value = opt.value;
+                    const label = opt.textContent || '';
+                    const div = document.createElement('div');
+                    div.className = 'rd-select-option' + (value === selectedValue ? ' rd-selected' : '');
+                    div.dataset.value = value;
+                    div.textContent = label;
+                    div.addEventListener('click', () => {
+                        els.dateField.value = value;
+                        const event = new Event('change', { bubbles: true });
+                        els.dateField.dispatchEvent(event);
+                        els.dateFieldWrapper.classList.remove('rd-open');
+                        updateDateDisplay();
+                    });
+                    els.dateFieldList.appendChild(div);
+                });
+
+                updateDateDisplay();
+
+                if (!els.dateFieldWrapper.dataset.rdEnhanced) {
+                    els.dateFieldWrapper.dataset.rdEnhanced = '1';
+
+                    els.dateFieldDisplay.addEventListener('click', () => {
+                        const isOpen = els.dateFieldWrapper.classList.contains('rd-open');
+                        document.querySelectorAll('.rd-select-wrapper.rd-open').forEach(el => el.classList.remove('rd-open'));
+                        if (!isOpen) {
+                            els.dateFieldWrapper.classList.add('rd-open');
+                        }
+                    });
+
+                    document.addEventListener('click', (ev) => {
+                        if (!els.dateFieldWrapper.contains(ev.target)) {
+                            els.dateFieldWrapper.classList.remove('rd-open');
+                        }
+                    });
+
+                    els.dateField.addEventListener('change', () => {
+                        updateDateDisplay();
+                        // Sincroniza seleção visual
+                        const current = els.dateField.value || '';
+                        els.dateFieldList.querySelectorAll('.rd-select-option').forEach(opt => {
+                            if (opt.dataset.value === current) opt.classList.add('rd-selected');
+                            else opt.classList.remove('rd-selected');
+                        });
+                    });
+                }
+            }
+
+            function updateDateDisplay() {
+                if (!els.dateField || !els.dateFieldDisplay) return;
+                const value = els.dateField.value || '';
+                const opt = Array.from(els.dateField.options).find(o => o.value === value);
+                const labelEl = els.dateFieldDisplay.querySelector('.rd-select-display-label');
+                if (!labelEl) return;
+                if (!opt || !value) {
+                    labelEl.textContent = '(sem filtro)';
+                    labelEl.classList.add('rd-select-display-placeholder');
+                } else {
+                    labelEl.textContent = opt.textContent || '';
+                    labelEl.classList.remove('rd-select-display-placeholder');
+                }
             }
 
             function render() {
