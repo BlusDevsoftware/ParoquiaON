@@ -1764,7 +1764,30 @@
                         isCapacidade
                     );
                 });
-                return filtered.sort((a,b) => a.localeCompare(b, 'pt-BR'));
+
+                // Ordenação amigável para o módulo de agenda:
+                // segue a mesma sequência visual do modal de novo agendamento
+                const preferredOrder = [
+                    'titulo',
+                    'comunidades.nome',
+                    'pastorais.nome',
+                    'pilares.nome',
+                    'locais.nome',
+                    'acoes.nome',
+                    'data_inicio',
+                    'data_fim',
+                    'evento_paroquial',
+                    'visibilidade'
+                ];
+                const orderMap = new Map();
+                preferredOrder.forEach((k, idx) => orderMap.set(k, idx));
+
+                return filtered.sort((a, b) => {
+                    const ia = orderMap.has(a) ? orderMap.get(a) : Infinity;
+                    const ib = orderMap.has(b) ? orderMap.get(b) : Infinity;
+                    if (ia !== ib) return ia - ib;
+                    return a.localeCompare(b, 'pt-BR');
+                });
             }
 
             function getPreferredKeys(keys, moduleKey) {
@@ -1775,7 +1798,22 @@
                 ['codigo', 'nome', 'email', 'ativo', 'ultimo_login', 'data_inicio', 'data_fim', 'titulo', 'descricao'].forEach(tryAdd);
 
                 if (moduleKey === 'agenda') {
-                    ['titulo', 'data_inicio', 'data_fim', 'visibilidade', 'evento_paroquial', 'comunidades.nome', 'pastorais.nome', 'pilares.nome', 'locais.nome', 'acoes.nome', 'pessoas.nome', 'usuario_lancamento_nome', 'usuario_lancamento_email'].forEach(tryAdd);
+                    // Ordem de colunas inspirada na sequência do modal de novo agendamento
+                    [
+                        'titulo',
+                        'comunidades.nome',
+                        'pastorais.nome',
+                        'pilares.nome',
+                        'locais.nome',
+                        'acoes.nome',
+                        'data_inicio',
+                        'data_fim',
+                        'evento_paroquial',
+                        'visibilidade',
+                        'pessoas.nome',
+                        'usuario_lancamento_nome',
+                        'usuario_lancamento_email'
+                    ].forEach(tryAdd);
                 }
 
                 // Garante pelo menos 6 colunas
