@@ -365,6 +365,17 @@
             color: #9ca3af;
         }
 
+        /* Força fundo branco apenas nos campos desta tela (sobrepõe CSS global cinza) */
+        .config-panel input[type="text"],
+        .config-panel input[type="date"],
+        .config-panel select {
+            background-color: #ffffff !important;
+        }
+
+        .cols-search input[type="text"] {
+            background-color: #ffffff !important;
+        }
+
         /* Dropdown customizado para o campo "Tipo de data" (visual idêntico ao modal de agenda) */
         .rd-select-wrapper {
             position: relative;
