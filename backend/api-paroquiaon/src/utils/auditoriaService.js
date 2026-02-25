@@ -10,39 +10,34 @@ async function logEvento({
     acao,
     modulo,
     recurso,
-    entidadeId,
-    descricao,
-    detalhes
+    descricao
 }) {
     try {
         const userFromReq = req && req.user ? req.user : {};
-        const email = userFromReq.email || null;
-        const usuario =
-            userFromReq.nome ||
-            userFromReq.login ||
-            userFromReq.email ||
-            null;
+        let fotoUsuario = null;
 
-        // IP e user-agent (pensando em ambiente com proxy / Vercel)
-        const forwarded = req?.headers?.['x-forwarded-for'];
-        const ip =
-            (typeof forwarded === 'string' && forwarded.split(',')[0].trim()) ||
-            req?.ip ||
-            null;
-
-        const userAgent = req?.headers?.['user-agent'] || null;
+        // Tentar buscar a foto da pessoa vinculada ao usuário autenticado
+        if (userFromReq.pessoa_id) {
+            try {
+                const { data: pessoa, error } = await supabase
+                    .from('pessoas')
+                    .select('foto')
+                    .eq('id', userFromReq.pessoa_id)
+                    .maybeSingle();
+                if (!error && pessoa && pessoa.foto) {
+                    fotoUsuario = pessoa.foto;
+                }
+            } catch (e) {
+                console.warn('Não foi possível buscar foto da pessoa para auditoria:', e);
+            }
+        }
 
         const payload = {
             acao,
             modulo,
             recurso,
-            entidade_id: entidadeId ?? null,
-            email,
-            usuario,
             descricao: descricao || null,
-            detalhes: detalhes || null,
-            ip,
-            user_agent: userAgent
+            foto_usuario: fotoUsuario
         };
 
         const { error } = await supabase.from('auditoria').insert([payload]);
