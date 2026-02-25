@@ -313,6 +313,10 @@
 
         .form-row.one { grid-template-columns: 1fr; }
 
+        .form-row.dates-row {
+            grid-template-columns: 1.3fr 1fr 1fr;
+        }
+
         label {
             display: block;
             font-size: 11px;
@@ -765,23 +769,20 @@
                             </div>
                         </div>
 
-                        <div class="form-row one">
+                        <div class="form-row dates-row">
                             <div>
-                                <label for="rdDateField">Campo de data</label>
+                                <label for="rdDateField">Tipo de data</label>
                                 <select id="rdDateField">
                                     <option value="">(sem filtro)</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="form-row">
                             <div>
                                 <label for="rdDateFrom">De</label>
-                                <input id="rdDateFrom" type="date" />
+                                <input id="rdDateFrom" type="date" disabled />
                             </div>
                             <div>
                                 <label for="rdDateTo">Até</label>
-                                <input id="rdDateTo" type="date" />
+                                <input id="rdDateTo" type="date" disabled />
                             </div>
                         </div>
 
@@ -1001,9 +1002,23 @@
                 if (els.dateField) els.dateField.value = '';
                 els.dateFrom.value = '';
                 els.dateTo.value = '';
+                els.dateFrom.disabled = true;
+                els.dateTo.disabled = true;
                 state.page = 1;
                 render();
             });
+
+            if (els.dateField) {
+                els.dateField.addEventListener('change', () => {
+                    const hasField = !!els.dateField.value;
+                    els.dateFrom.disabled = !hasField;
+                    els.dateTo.disabled = !hasField;
+                    if (!hasField) {
+                        els.dateFrom.value = '';
+                        els.dateTo.value = '';
+                    }
+                });
+            }
             els.exportCsvBtn.addEventListener('click', () => exportCsv());
             if (els.exportPdfBtn) {
                 els.exportPdfBtn.addEventListener('click', () => exportPdf());
@@ -1515,6 +1530,28 @@
             function parseDateValue(v) {
                 if (!v) return null;
                 if (v instanceof Date) return v;
+
+                if (typeof v === 'string') {
+                    const s = v.trim();
+
+                    // ISO / formato padrão JS
+                    const iso = new Date(s);
+                    if (!Number.isNaN(iso.getTime())) return iso;
+
+                    // Formato brasileiro: dd/mm/aaaa ou dd/mm/aaaa HH:MM
+                    const brDateTime = /^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{2}):(\d{2}))?$/;
+                    const m = s.match(brDateTime);
+                    if (m) {
+                        const day = parseInt(m[1], 10);
+                        const month = parseInt(m[2], 10) - 1;
+                        const year = parseInt(m[3], 10);
+                        const hour = m[4] ? parseInt(m[4], 10) : 0;
+                        const min = m[5] ? parseInt(m[5], 10) : 0;
+                        const d = new Date(year, month, day, hour, min, 0, 0);
+                        if (!Number.isNaN(d.getTime())) return d;
+                    }
+                }
+
                 const d = new Date(v);
                 if (Number.isNaN(d.getTime())) return null;
                 return d;
