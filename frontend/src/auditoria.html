@@ -894,14 +894,14 @@
 
                         <div class="form-row dates-row">
                             <div>
-                                <label for="rdDateField">Tipo de data</label>
+                                <label for="rdDateField">Tipo</label>
                                 <div class="rd-select-wrapper" id="rdDateFieldWrapper">
                                     <button type="button" class="rd-select-display" id="rdDateFieldDisplay">
-                                        <span class="rd-select-display-label rd-select-display-placeholder">(sem filtro)</span>
+                                        <span class="rd-select-display-label rd-select-display-placeholder">Todos</span>
                                         <span class="rd-select-display-icon"><i class="fas fa-chevron-down"></i></span>
                                     </button>
                                     <select id="rdDateField" class="rd-select-native">
-                                        <option value="">(sem filtro)</option>
+                                        <option value="">Todos</option>
                                     </select>
                                     <div class="rd-select-list" id="rdDateFieldList"></div>
                                 </div>
@@ -1076,12 +1076,7 @@
                 nextPageBtn: document.getElementById('rdNextPageBtn')
             };
 
-            const MODULES = [
-                { key: 'auditoria', label: 'Auditoria do Sistema', endpoint: () => window.endpoints.auditoria.list }
-            ];
-
             const state = {
-                moduleKey: 'auditoria',
                 raw: [],
                 flat: [],
                 keys: [],
@@ -1089,24 +1084,14 @@
                 lastResult: [],
                 lastSelected: [],
                 page: 1,
-                pageSize: 50
+                pageSize: 50,
+                moduleFilter: '', // filtro pelo campo "modulo" dos registros de auditoria
+                actionFilter: ''  // filtro pelo campo "acao" (CREATE, UPDATE, DELETE, LOGIN_SUCCESS)
             };
 
-            // Popular módulos
-            els.module.innerHTML = MODULES.map(m => `<option value="${m.key}">${m.label}</option>`).join('');
-            els.module.value = state.moduleKey;
-            els.chipModule.textContent = `Módulo: ${MODULES.find(m => m.key === state.moduleKey)?.label || '-'}`;
-            buildCustomModuleDropdown();
-
-            // Eventos
-            els.module.addEventListener('change', async () => {
-                state.moduleKey = els.module.value;
-                els.chipModule.textContent = `Módulo: ${MODULES.find(m => m.key === state.moduleKey)?.label || '-'}`;
-                state.page = 1;
-                await loadModuleData();
-                render();
-                buildCustomModuleDropdown();
-            });
+            // Filtro inicial de módulo vindo da URL (?modulo=pessoas, por exemplo)
+            const urlParams = new URLSearchParams(window.location.search);
+            state.moduleFilter = (urlParams.get('modulo') || '').trim();
 
             els.colsSearch.addEventListener('input', () => renderColumns());
             els.selectAllBtn.addEventListener('click', () => {
@@ -1134,19 +1119,30 @@
                 els.dateTo.value = '';
                 els.dateFrom.disabled = true;
                 els.dateTo.disabled = true;
+                if (els.module) els.module.value = '';
+                state.moduleFilter = '';
+                state.actionFilter = '';
+                updateModuleChip();
+                updateDateDisplay();
                 state.page = 1;
                 render();
             });
 
+            // Mudança no filtro de módulo (campo "modulo" da auditoria)
+            els.module.addEventListener('change', () => {
+                state.moduleFilter = els.module.value || '';
+                state.page = 1;
+                updateModuleChip();
+                render();
+                buildCustomModuleDropdown();
+            });
+
             if (els.dateField) {
                 els.dateField.addEventListener('change', () => {
-                    const hasField = !!els.dateField.value;
-                    els.dateFrom.disabled = !hasField;
-                    els.dateTo.disabled = !hasField;
-                    if (!hasField) {
-                        els.dateFrom.value = '';
-                        els.dateTo.value = '';
-                    }
+                    state.actionFilter = els.dateField.value || '';
+                    state.page = 1;
+                    render();
+                    updateDateDisplay();
                 });
             }
             els.exportCsvBtn.addEventListener('click', () => exportCsv());
@@ -1209,9 +1205,7 @@
                 if (els.exportPdfBtn) els.exportPdfBtn.disabled = true;
 
                 try {
-                    const m = MODULES.find(x => x.key === state.moduleKey);
-                    if (!m) throw new Error('Módulo inválido');
-                    const endpoint = m.endpoint();
+                    const endpoint = window.endpoints.auditoria.list;
                     const { data, error } = await window.api.get(endpoint);
                     if (error) throw error;
 
@@ -1219,14 +1213,51 @@
                     state.flat = state.raw.map(r => flatten(r));
                     state.keys = getAllKeys(state.flat);
 
+                    // Popular filtro de módulo (campo "modulo" dos registros)
+                    const moduloValues = Array.from(
+                        new Set(
+                            (state.flat || [])
+                                .map(r => r.modulo)
+                                .filter(v => v != null && v !== '')
+                        )
+                    ).sort((a, b) => String(a).localeCompare(String(b), 'pt-BR'));
+
+                    const optionsHtml = ['<option value=\"\">Todos</option>']
+                        .concat(
+                            moduloValues.map(v => `<option value=\"${escapeHtml(String(v))}\">${escapeHtml(humanizeKey(String(v)))}</option>`)
+                        )
+                        .join('');
+
+                    els.module.innerHTML = optionsHtml;
+
+                    // Aplicar filtro inicial vindo da URL, se existir
+                    if (state.moduleFilter) {
+                        const exists = moduloValues.some(v => String(v) === state.moduleFilter);
+                        els.module.value = exists ? state.moduleFilter : '';
+                        if (!exists) state.moduleFilter = '';
+                    } else {
+                        els.module.value = '';
+                    }
+
+                    updateModuleChip();
+                    buildCustomModuleDropdown();
+
                     // Heurística: selecionar um conjunto pequeno inicial
                     state.selectedKeys.clear();
-                    const preferred = getPreferredKeys(state.keys, state.moduleKey);
+                    const preferred = getPreferredKeys(state.keys, 'auditoria');
                     preferred.forEach(k => state.selectedKeys.add(k));
 
-                    // Atualiza dropdown de campos de data
-                    const dateKeys = state.keys.filter(k => looksLikeDateKey(k));
-                    els.dateField.innerHTML = `<option value="">(sem filtro)</option>` + dateKeys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(humanizeKey(k))}</option>`).join('');
+                    // Popular dropdown de tipos de ação (campo "acao" da auditoria)
+                    els.dateField.innerHTML =
+                        '<option value="">Todos</option>' +
+                        [
+                            { value: 'CREATE', label: 'Criação' },
+                            { value: 'UPDATE', label: 'Edição' },
+                            { value: 'DELETE', label: 'Exclusão' },
+                            { value: 'LOGIN_SUCCESS', label: 'Login' }
+                        ]
+                        .map(t => `<option value="${escapeHtml(t.value)}">${escapeHtml(t.label)}</option>`)
+                        .join('');
                     buildCustomDateDropdown();
 
                     els.chipTotal.textContent = `Total: ${state.raw.length}`;
@@ -1338,7 +1369,7 @@
                 const labelEl = els.dateFieldDisplay.querySelector('.rd-select-display-label');
                 if (!labelEl) return;
                 if (!opt || !value) {
-                    labelEl.textContent = '(sem filtro)';
+                    labelEl.textContent = 'Todos';
                     labelEl.classList.add('rd-select-display-placeholder');
                 } else {
                     labelEl.textContent = opt.textContent || '';
@@ -1406,12 +1437,19 @@
                 const labelEl = els.moduleDisplay.querySelector('.rd-select-display-label');
                 if (!labelEl) return;
                 if (!opt || !value) {
-                    labelEl.textContent = 'Selecione o módulo';
+                    labelEl.textContent = 'Todos os módulos';
                     labelEl.classList.add('rd-select-display-placeholder');
                 } else {
                     labelEl.textContent = opt.textContent || '';
                     labelEl.classList.remove('rd-select-display-placeholder');
                 }
+            }
+
+            function updateModuleChip() {
+                const current = state.moduleFilter || '';
+                els.chipModule.textContent = current
+                    ? `Módulo: ${humanizeKey(current)}`
+                    : 'Módulo: Todos';
             }
 
             function render() {
@@ -1429,11 +1467,14 @@
 
                 const searchText = (els.search.value || '').trim().toLowerCase();
                 const statusFilter = els.status ? (els.status.value || 'todos').toLowerCase() : 'todos';
-                const dateField = els.dateField ? (els.dateField.value || '') : '';
-                const from = els.dateFrom.value ? new Date(els.dateFrom.value + 'T00:00:00') : null;
-                const to = els.dateTo.value ? new Date(els.dateTo.value + 'T23:59:59') : null;
+                const moduloFilter = state.moduleFilter || '';
+                const actionFilter = state.actionFilter || '';
 
                 const rows = state.flat.filter(r => {
+                    if (moduloFilter) {
+                        const rowModulo = (r['modulo'] || '').toString();
+                        if (rowModulo !== moduloFilter) return false;
+                    }
                     if (searchText) {
                         const hay = selected.map(k => (r[k] ?? '')).join(' ').toLowerCase();
                         if (!hay.includes(searchText)) return false;
@@ -1445,13 +1486,9 @@
                         if (statusFilter === 'inativo' && s !== 'inativo') return false;
                     }
 
-                    if (dateField && (from || to)) {
-                        const v = r[dateField];
-                        if (!v) return false;
-                        const d = parseDateValue(v);
-                        if (!d) return false;
-                        if (from && d < from) return false;
-                        if (to && d > to) return false;
+                    if (actionFilter) {
+                        const acao = (r['acao'] || '').toString().toUpperCase();
+                        if (acao !== actionFilter) return false;
                     }
                     return true;
                 });
@@ -1531,7 +1568,7 @@
                 const body = rows.map(r => selected.map(k => csvEscape(stringifyCell(r[k], k))).join(',')).join('\n');
                 const csv = header + '\n' + body;
 
-                const modLabel = MODULES.find(m => m.key === state.moduleKey)?.key || 'modulo';
+                const modLabel = 'auditoria';
                 const now = new Date();
                 const yyyy = now.getFullYear();
                 const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -1549,7 +1586,7 @@
                 const rows = state.lastResult || [];
                 if (!selected.length || !rows.length) return;
 
-                const modLabel = MODULES.find(m => m.key === state.moduleKey)?.label || 'Relatório Dinâmico';
+                const modLabel = 'Auditoria do Sistema';
                 const now = new Date();
                 const yyyy = now.getFullYear();
                 const mm = String(now.getMonth() + 1).padStart(2, '0');
