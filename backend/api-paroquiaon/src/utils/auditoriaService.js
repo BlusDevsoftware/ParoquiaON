@@ -17,7 +17,7 @@ async function logEvento({
         let fotoUsuario = null;
         let usuario = null;
 
-        // Montar identificação textual do usuário (nome ou email)
+        // Montar identificação textual do usuário (nome, login ou email)
         if (userFromReq) {
             usuario =
                 userFromReq.nome ||
@@ -42,11 +42,17 @@ async function logEvento({
             }
         }
 
+        // Se houver usuário e descrição, embute o usuário no texto
+        let descricaoFinal = descricao || null;
+        if (usuario && descricaoFinal) {
+            descricaoFinal = `Usuário ${usuario} - ${descricaoFinal}`;
+        }
+
         const payload = {
             acao,
             modulo,
             recurso,
-            descricao: descricao || null,
+            descricao: descricaoFinal,
             foto_usuario: fotoUsuario,
             usuario
         };
