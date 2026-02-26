@@ -40,12 +40,29 @@ async function logEvento({
 
             // 3) Se ainda não tiver usuário, tenta extrair de "detalhes"
             if (!usuario && detalhes && typeof detalhes === 'object') {
-                usuario =
-                    detalhes.email ||
-                    detalhes.usuario_email ||
-                    detalhes.user_email ||
-                    detalhes.login ||
-                    null;
+                const tentarExtrair = (obj) => {
+                    if (!obj || typeof obj !== 'object') return null;
+                    return (
+                        obj.criado_por_email ||
+                        obj.atualizado_por_email ||
+                        obj.email ||
+                        obj.usuario_email ||
+                        obj.user_email ||
+                        obj.login ||
+                        null
+                    );
+                };
+
+                // primeiro no próprio objeto detalhes
+                usuario = tentarExtrair(detalhes);
+
+                // depois em detalhes.before / detalhes.after, se existir
+                if (!usuario && detalhes.before) {
+                    usuario = tentarExtrair(detalhes.before);
+                }
+                if (!usuario && detalhes.after) {
+                    usuario = tentarExtrair(detalhes.after);
+                }
             }
 
             // 4) Último fallback: tentar no req.body (ex.: criado_por_email)
