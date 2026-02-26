@@ -941,12 +941,6 @@
                             </button>
                         </div>
                         <div class="actions actions-secondary">
-                            <button class="btn btn-secondary" id="rdReloadBtn" type="button">
-                                <i class="fas fa-sync-alt"></i> Recarregar dados
-                            </button>
-                            <button class="btn btn-secondary" id="rdExportCsvBtn" type="button" disabled>
-                                <i class="fas fa-file-excel"></i> Exportar Excel
-                            </button>
                             <button class="btn btn-secondary" id="rdExportPdfBtn" type="button" disabled>
                                 <i class="fas fa-file-pdf"></i> Exportar PDF
                             </button>
@@ -1058,8 +1052,6 @@
                 selectAllBtn: document.getElementById('rdSelectAllBtn'),
                 clearColsBtn: document.getElementById('rdClearColsBtn'),
                 runBtn: document.getElementById('rdRunBtn'),
-                reloadBtn: document.getElementById('rdReloadBtn'),
-                exportCsvBtn: document.getElementById('rdExportCsvBtn'),
                 exportPdfBtn: document.getElementById('rdExportPdfBtn'),
                 clearFiltersBtn: document.getElementById('rdClearFiltersBtn'),
                 chipModule: document.getElementById('rdChipModule'),
@@ -1102,13 +1094,9 @@
                 state.selectedKeys.clear();
                 renderColumns();
             });
-            els.runBtn.addEventListener('click', () => {
+            els.runBtn.addEventListener('click', async () => {
                 state.page = 1;
-                render();
-            });
-            els.reloadBtn.addEventListener('click', async () => {
-                state.page = 1;
-                await loadModuleData(true);
+                await loadModuleData(true); // refaz a consulta na API com dados atualizados
                 render();
             });
             els.clearFiltersBtn.addEventListener('click', () => {
@@ -1117,8 +1105,8 @@
                 if (els.dateField) els.dateField.value = '';
                 els.dateFrom.value = '';
                 els.dateTo.value = '';
-                els.dateFrom.disabled = true;
-                els.dateTo.disabled = true;
+                els.dateFrom.disabled = false;
+                els.dateTo.disabled = false;
                 if (els.module) els.module.value = '';
                 state.moduleFilter = '';
                 state.actionFilter = '';
@@ -1145,7 +1133,6 @@
                     updateDateDisplay();
                 });
             }
-            els.exportCsvBtn.addEventListener('click', () => exportCsv());
             if (els.exportPdfBtn) {
                 els.exportPdfBtn.addEventListener('click', () => exportPdf());
             }
@@ -1162,6 +1149,10 @@
                     render();
                 });
             }
+
+            // Habilitar campos de data para filtro por período (sempre em created_at)
+            if (els.dateFrom) els.dateFrom.disabled = false;
+            if (els.dateTo) els.dateTo.disabled = false;
 
             // Carrega inicial com spinner global
             if (els.mainLoader) {
@@ -1201,7 +1192,6 @@
                 els.empty.style.display = 'none';
                 els.tbody.innerHTML = '';
                 els.theadRow.innerHTML = '';
-                els.exportCsvBtn.disabled = true;
                 if (els.exportPdfBtn) els.exportPdfBtn.disabled = true;
 
                 try {
@@ -1469,6 +1459,8 @@
                 const statusFilter = els.status ? (els.status.value || 'todos').toLowerCase() : 'todos';
                 const moduloFilter = state.moduleFilter || '';
                 const actionFilter = state.actionFilter || '';
+                const from = els.dateFrom && els.dateFrom.value ? new Date(els.dateFrom.value + 'T00:00:00') : null;
+                const to = els.dateTo && els.dateTo.value ? new Date(els.dateTo.value + 'T23:59:59') : null;
 
                 const rows = state.flat.filter(r => {
                     if (moduloFilter) {
@@ -1490,6 +1482,16 @@
                         const acao = (r['acao'] || '').toString().toUpperCase();
                         if (acao !== actionFilter) return false;
                     }
+
+                    // Filtro por intervalo de datas (sempre usando created_at da auditoria)
+                    if (from || to) {
+                        const v = r['created_at'];
+                        if (!v) return false;
+                        const d = parseDateValue(v);
+                        if (!d) return false;
+                        if (from && d < from) return false;
+                        if (to && d > to) return false;
+                    }
                     return true;
                 });
 
@@ -1504,7 +1506,6 @@
                 const slice = rows.slice(start, end);
 
                 els.chipShown.textContent = `Exibindo: ${slice.length} de ${total} (pág. ${total === 0 ? 0 : state.page}/${total === 0 ? 0 : totalPages})`;
-                els.exportCsvBtn.disabled = total === 0;
                 if (els.exportPdfBtn) els.exportPdfBtn.disabled = total === 0;
 
                 // Render header
@@ -1559,26 +1560,6 @@
                         if (els.nextPageBtn) els.nextPageBtn.disabled = state.page >= totalPages;
                     }
                 }
-            }
-
-            function exportCsv() {
-                const selected = state.keys.filter(k => state.selectedKeys.has(k));
-                const rows = state.lastResult || [];
-                const header = selected.map(k => csvEscape(humanizeKey(k))).join(',');
-                const body = rows.map(r => selected.map(k => csvEscape(stringifyCell(r[k], k))).join(',')).join('\n');
-                const csv = header + '\n' + body;
-
-                const modLabel = 'auditoria';
-                const now = new Date();
-                const yyyy = now.getFullYear();
-                const mm = String(now.getMonth() + 1).padStart(2, '0');
-                const dd = String(now.getDate()).padStart(2, '0');
-                // Gera arquivo em formato compatível com Excel (planilha simples)
-                downloadText(
-                    csv,
-                    `relatorio_dinamico_${modLabel}_${yyyy}-${mm}-${dd}.xlsx`,
-                    'application/vnd.ms-excel;charset=utf-8;'
-                );
             }
 
             function exportPdf() {
@@ -1747,8 +1728,7 @@
                     'descricao',
                     'modulo',
                     'recurso',
-                    'usuario',
-                    'foto_usuario'
+                    'usuario'
                 ];
 
                 // Detecta se os dados parecem ser de auditoria (presença de "acao" e "modulo")
@@ -1830,8 +1810,7 @@
                         'descricao',
                         'modulo',
                         'recurso',
-                        'usuario',
-                        'foto_usuario'
+                        'usuario'
                     ].forEach(tryAdd);
                 }
 
