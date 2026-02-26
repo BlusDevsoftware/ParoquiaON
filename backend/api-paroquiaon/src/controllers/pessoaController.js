@@ -274,12 +274,30 @@ async function atualizarPessoa(req, res) {
                 }
             });
 
-            if (camposAlterados.length === 1 && camposAlterados[0] === 'telefone') {
-                const antigo = pessoaAntes.telefone || 'vazio';
-                const novo = pessoaDepois.telefone || 'vazio';
-                descricao = `Telefone atualizado de ${antigo} para ${novo}`;
-            } else if (camposAlterados.length > 0) {
-                descricao = `Pessoa atualizada (campos alterados: ${camposAlterados.join(', ')})`;
+            if (camposAlterados.length > 0) {
+                // Texto detalhado: mostra valor antigo e novo de cada campo alterado
+                const labelMap = {
+                    nome: 'Nome',
+                    telefone: 'Telefone',
+                    endereco: 'Endereço',
+                    status: 'Status',
+                    ativo: 'Ativo'
+                };
+
+                const formatValor = (v) => {
+                    if (v === null || v === undefined || v === '') return 'vazio';
+                    if (typeof v === 'boolean') return v ? 'ativo' : 'inativo';
+                    return String(v);
+                };
+
+                const partes = camposAlterados.map((campo) => {
+                    const label = labelMap[campo] || campo;
+                    const antigo = formatValor(pessoaAntes[campo]);
+                    const novo = formatValor(pessoaDepois[campo]);
+                    return `${label}: ${antigo} → ${novo}`;
+                });
+
+                descricao = `Pessoa atualizada - ${partes.join(' | ')}`;
             }
         }
 
