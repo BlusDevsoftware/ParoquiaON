@@ -75,11 +75,8 @@ async function logEvento({
             }
         }
 
-        // Se houver usuário e descrição, embute o usuário no texto
-        let descricaoFinal = descricao || null;
-        if (usuario && descricaoFinal) {
-            descricaoFinal = `Usuário ${usuario} - ${descricaoFinal}`;
-        }
+        // Descrição permanece apenas com o texto enviado pelos controllers
+        const descricaoFinal = descricao || null;
 
         const payload = {
             acao,

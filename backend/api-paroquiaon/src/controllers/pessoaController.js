@@ -334,6 +334,7 @@ async function excluirPessoa(req, res) {
         // Auditoria: exclusão de pessoa (logando o registro removido em detalhes.before)
         logEvento({
             req,
+            usuario: (req.user && (req.user.email || req.user.login || req.user.nome)) || null,
             acao: 'DELETE',
             modulo: 'pessoas',
             recurso: 'pessoas',
