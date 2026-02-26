@@ -1188,6 +1188,10 @@
             }
 
             async function loadModuleData(force = false) {
+                // Guardar estado atual de colunas e filtros para não limpar ao recarregar
+                const previousSelectedKeys = new Set(state.selectedKeys || []);
+                const previousActionFilter = state.actionFilter || '';
+
                 els.loader.classList.add('show');
                 els.empty.style.display = 'none';
                 els.tbody.innerHTML = '';
@@ -1232,10 +1236,23 @@
                     updateModuleChip();
                     buildCustomModuleDropdown();
 
-                    // Heurística: selecionar um conjunto pequeno inicial
-                    state.selectedKeys.clear();
-                    const preferred = getPreferredKeys(state.keys, 'auditoria');
-                    preferred.forEach(k => state.selectedKeys.add(k));
+                    // Heurística: selecionar um conjunto pequeno inicial,
+                    // mas preservando seleção atual quando for recarregamento (force === true)
+                    if (!force || previousSelectedKeys.size === 0) {
+                        state.selectedKeys.clear();
+                        const preferred = getPreferredKeys(state.keys, 'auditoria');
+                        preferred.forEach(k => state.selectedKeys.add(k));
+                    } else {
+                        // Mantém apenas chaves que ainda existem
+                        state.selectedKeys = new Set(
+                            Array.from(previousSelectedKeys).filter(k => state.keys.includes(k))
+                        );
+                        // Se por algum motivo ficar vazio, aplica heurística padrão
+                        if (state.selectedKeys.size === 0) {
+                            const preferred = getPreferredKeys(state.keys, 'auditoria');
+                            preferred.forEach(k => state.selectedKeys.add(k));
+                        }
+                    }
 
                     // Popular dropdown de tipos de ação (campo "acao" da auditoria)
                     els.dateField.innerHTML =
@@ -1248,6 +1265,17 @@
                         ]
                         .map(t => `<option value="${escapeHtml(t.value)}">${escapeHtml(t.label)}</option>`)
                         .join('');
+
+                    // Restaurar filtro de tipo selecionado, se existir
+                    const actionToApply = force ? previousActionFilter : state.actionFilter;
+                    if (actionToApply && Array.from(els.dateField.options).some(o => o.value === actionToApply)) {
+                        els.dateField.value = actionToApply;
+                        state.actionFilter = actionToApply;
+                    } else {
+                        els.dateField.value = '';
+                        if (!force) state.actionFilter = '';
+                    }
+
                     buildCustomDateDropdown();
 
                     els.chipTotal.textContent = `Total: ${state.raw.length}`;
