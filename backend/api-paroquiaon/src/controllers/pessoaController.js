@@ -1,5 +1,8 @@
 const { supabase } = require('../config/supabase');
 const { logEvento } = require('../utils/auditoriaService');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'paroquiaon-secret-key';
 
 // Helpers de upload para Supabase Storage (bucket: "pessoas")
 // Importante: o nome aqui deve bater exatamente com o nome do balde no Supabase
@@ -49,6 +52,26 @@ async function uploadFotoIfNeeded(dados, identificador) {
         : dados.foto;
 
     return { ...dados, foto: urlComVersao };
+}
+
+// Helper para extrair o usuário (email) direto do token JWT,
+// sem depender do middleware de autenticação. Se não houver token ou for inválido,
+// retorna undefined para permitir que o serviço de auditoria use os fallbacks normais.
+function getUsuarioExecutorFromToken(req) {
+    try {
+        const authHeader = req.headers && req.headers.authorization;
+        if (!authHeader) return undefined;
+        const token = authHeader.replace('Bearer ', '').trim();
+        if (!token) return undefined;
+
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded && decoded.email) {
+            return decoded.email;
+        }
+        return undefined;
+    } catch (e) {
+        return undefined;
+    }
 }
 
 async function listarPessoas(req, res) {
@@ -166,10 +189,13 @@ async function criarPessoa(req, res) {
             }
         }
 
-        // Auditoria: criação de pessoa (registrando o usuário que executou a operação)
+        // Determinar usuário executor via token (se disponível)
+        const usuarioExecutorCriacao = getUsuarioExecutorFromToken(req);
+
+        // Auditoria: criação de pessoa (registrando o usuário que executou a operação, se houver)
         logEvento({
             req,
-            usuario: (req.user && (req.user.email || req.user.login || req.user.nome)) || null,
+            usuario: usuarioExecutorCriacao,
             acao: 'CREATE',
             modulo: 'pessoas',
             recurso: 'pessoas',
@@ -301,10 +327,13 @@ async function atualizarPessoa(req, res) {
             }
         }
 
-        // Auditoria: atualização de pessoa (registrando o usuário que executou a operação)
+        // Determinar usuário executor via token (se disponível)
+        const usuarioExecutorAtualizacao = getUsuarioExecutorFromToken(req);
+
+        // Auditoria: atualização de pessoa (registrando o usuário que executou a operação, se houver)
         logEvento({
             req,
-            usuario: (req.user && (req.user.email || req.user.login || req.user.nome)) || null,
+            usuario: usuarioExecutorAtualizacao,
             acao: 'UPDATE',
             modulo: 'pessoas',
             recurso: 'pessoas',
@@ -332,10 +361,13 @@ async function excluirPessoa(req, res) {
 
         const pessoaRemovida = data[0] || null;
 
+        // Determinar usuário executor via token (se disponível)
+        const usuarioExecutorExclusao = getUsuarioExecutorFromToken(req);
+
         // Auditoria: exclusão de pessoa (logando o registro removido em detalhes.before)
         logEvento({
             req,
-            usuario: (req.user && (req.user.email || req.user.login || req.user.nome)) || null,
+            usuario: usuarioExecutorExclusao,
             acao: 'DELETE',
             modulo: 'pessoas',
             recurso: 'pessoas',
