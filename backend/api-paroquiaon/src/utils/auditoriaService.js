@@ -25,11 +25,20 @@ async function logEvento({
         let fotoUsuario = null;
         let usuario = null;
 
-        // 1) Se veio explicitamente em usuarioParam, usa ele
-        if (usuarioParam) {
+        /**
+         * Regra importante:
+         * - Se o controller enviou explicitamente a propriedade "usuario" (mesmo que null),
+         *   usamos ESSA informação como verdade absoluta e NÃO tentamos extrair de detalhes/body.
+         *   Isso evita que o criador do registro (criado_por_email, etc.) sobrescreva o executor.
+         * - Somente quando "usuario" NÃO for enviado (undefined) é que aplicamos os fallbacks.
+         */
+
+        if (typeof usuarioParam !== 'undefined') {
+            // Controller passou "usuario": pode ser string (executor) ou null (desconhecido),
+            // mas em ambos os casos não usamos fallbacks.
             usuario = usuarioParam;
         } else {
-            // 2) Tentar via req.user (nome, login ou email)
+            // 1) Tentar via req.user (nome, login ou email)
             if (userFromReq) {
                 usuario =
                     userFromReq.nome ||
@@ -38,7 +47,7 @@ async function logEvento({
                     null;
             }
 
-            // 3) Se ainda não tiver usuário, tenta extrair de "detalhes"
+            // 2) Se ainda não tiver usuário, tenta extrair de "detalhes"
             if (!usuario && detalhes && typeof detalhes === 'object') {
                 const tentarExtrair = (obj) => {
                     if (!obj || typeof obj !== 'object') return null;
@@ -65,7 +74,7 @@ async function logEvento({
                 }
             }
 
-            // 4) Último fallback: tentar no req.body (ex.: criado_por_email)
+            // 3) Último fallback: tentar no req.body (ex.: criado_por_email)
             const body = req && req.body ? req.body : null;
             if (!usuario && body && typeof body === 'object') {
                 usuario =
