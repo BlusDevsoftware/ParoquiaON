@@ -69,7 +69,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cadastros', cadastroRoutes);
 app.use('/api/perfis', perfilRoutes);
 app.use('/api/usuarios', usuarioRoutes);
-app.use('/api/pessoas', pessoaRoutes);
+
+// Primeiro teste: aplicar autenticação apenas na rota de pessoas
+app.use('/api/pessoas', authMiddleware, pessoaRoutes);
 app.use('/api/comunidades', comunidadeRoutes);
 app.use('/api/pastorais', pastoralRoutes);
 app.use('/api/pilares', pilarRoutes);
