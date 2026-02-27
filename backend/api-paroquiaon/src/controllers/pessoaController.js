@@ -166,9 +166,10 @@ async function criarPessoa(req, res) {
             }
         }
 
-        // Auditoria: criação de pessoa
+        // Auditoria: criação de pessoa (registrando o usuário que executou a operação)
         logEvento({
             req,
+            usuario: (req.user && (req.user.email || req.user.login || req.user.nome)) || null,
             acao: 'CREATE',
             modulo: 'pessoas',
             recurso: 'pessoas',
@@ -225,15 +226,14 @@ async function atualizarPessoa(req, res) {
             }
         }
 
+        // Importante: NÃO alterar campos de autoria (usuario_id, criado_por_email, criado_por_nome)
+        // para preservar o usuário que criou o registro na própria tabela.
         const updateData = {
             ...(body.nome !== undefined ? { nome: body.nome } : {}),
             ...(body.telefone !== undefined ? { telefone: body.telefone } : {}),
             ...(body.endereco !== undefined ? { endereco: body.endereco } : {}),
             ...(normalizedStatus !== undefined ? { status: normalizedStatus } : {}),
-            ...(fotoParaSalvar !== undefined ? { foto: fotoParaSalvar } : {}),
-            ...(body.usuario_id !== undefined ? { usuario_id: body.usuario_id } : {}),
-            ...(body.criado_por_email !== undefined ? { criado_por_email: body.criado_por_email } : {}),
-            ...(body.criado_por_nome !== undefined ? { criado_por_nome: body.criado_por_nome } : {})
+            ...(fotoParaSalvar !== undefined ? { foto: fotoParaSalvar } : {})
         };
 
         let updateResult = await supabase
@@ -301,9 +301,10 @@ async function atualizarPessoa(req, res) {
             }
         }
 
-        // Auditoria: atualização de pessoa
+        // Auditoria: atualização de pessoa (registrando o usuário que executou a operação)
         logEvento({
             req,
+            usuario: (req.user && (req.user.email || req.user.login || req.user.nome)) || null,
             acao: 'UPDATE',
             modulo: 'pessoas',
             recurso: 'pessoas',
