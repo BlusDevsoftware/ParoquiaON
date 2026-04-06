@@ -554,10 +554,10 @@
             .calendar-info-container .info-today-btn { display: none !important; }
 
             /* Comunidade ocupa 100% quando visão some */
-            .calendar-info-container .community-dropdown { width: 100% !important; }
+            .calendar-info-container .community-filter-btn { width: 100% !important; }
 
             /* Esconder seleção de comunidade no mobile */
-            .calendar-info-container .community-dropdown { display: none !important; }
+            .calendar-info-container .community-filter-btn { display: none !important; }
 
             /* FAB de criar evento no mobile */
             .fab-create-event {
@@ -601,7 +601,7 @@
             .calendar-info-container .info-left,
             .calendar-info-container .info-right { width: 100%; display: contents; }
             /* Mostrar comunidade e visão (sobrescreve ocultações anteriores) */
-            .calendar-info-container .community-dropdown {
+            .calendar-info-container .community-filter-btn {
                 display: flex !important;
                 width: 100% !important;
                 grid-area: community !important;
@@ -614,7 +614,7 @@
             /* Data abaixo ocupando toda a largura */
             .calendar-info-container .date-navigation { grid-area: date !important; }
             /* Ajustes de tamanho/legibilidade do gatilho */
-            .calendar-info-container .community-dropdown-trigger,
+            .calendar-info-container .community-filter-btn,
             .calendar-info-container .view-dropdown-trigger {
                 min-width: 0 !important;
                 max-width: 480px;
@@ -623,7 +623,7 @@
                 font-size: 14px !important;
                 box-sizing: border-box;
             }
-            .calendar-info-container .community-dropdown-trigger i,
+            .calendar-info-container .community-filter-btn i,
             .calendar-info-container .view-dropdown-trigger i { font-size: 10px !important; }
         }
 
@@ -2677,6 +2677,167 @@
             color: #1e3a8a;
         }
 
+        /* Novo: Filtro de comunidades (ícone + painel multi-seleção) */
+        .community-filter-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            min-width: 200px;
+            color: #111827;
+        }
+        .community-filter-btn:hover {
+            border-color: #1e3a8a;
+            background: #f8f9fa;
+        }
+        .community-filter-btn i {
+            font-size: 14px;
+            color: #1e3a8a;
+        }
+        .community-filter-summary {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+        }
+
+        .community-filter-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 10002;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .community-filter-overlay.open {
+            display: flex;
+        }
+        .community-filter-panel {
+            width: 92vw;
+            max-width: 420px;
+            max-height: 80vh;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+            border: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .community-filter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-bottom: 1px solid #eef2f7;
+            background: #ffffff;
+        }
+        .community-filter-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            color: #111827;
+            font-size: 14px;
+        }
+        .community-filter-title i {
+            color: #1e3a8a;
+        }
+        .community-filter-close {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+        }
+        .community-filter-close:hover {
+            background: #f3f4f6;
+        }
+        .community-filter-actions {
+            display: flex;
+            gap: 8px;
+            padding: 10px 14px;
+            border-bottom: 1px solid #eef2f7;
+        }
+        .community-filter-action {
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            color: #111827;
+            font-weight: 700;
+            font-size: 12px;
+            border-radius: 10px;
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+        .community-filter-action:hover {
+            border-color: #1e3a8a;
+            color: #1e3a8a;
+            background: #f8fafc;
+        }
+        .community-filter-list {
+            padding: 10px 14px;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .community-filter-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 10px;
+            border: 1px solid #eef2f7;
+            border-radius: 10px;
+            background: #fff;
+        }
+        .community-filter-item:hover {
+            background: #f9fafb;
+            border-color: #e5e7eb;
+        }
+        .community-filter-item label {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            min-width: 0;
+        }
+        .community-filter-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1e3a8a;
+        }
+        .community-filter-name {
+            font-weight: 700;
+            font-size: 13px;
+            color: #111827;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 280px;
+        }
+        .community-filter-loading {
+            padding: 14px;
+            color: #6b7280;
+            font-size: 13px;
+            text-align: center;
+        }
+
         /* Calendário semanal */
         .weekly-calendar {
             background: white;
@@ -2706,6 +2867,14 @@
                 border-left: none;
                 border-right: none;
                 border-radius: 0;
+            }
+            .community-filter-btn {
+                min-width: 0;
+                width: 100%;
+                justify-content: center;
+            }
+            .community-filter-summary {
+                max-width: 180px;
             }
         }
 
@@ -3914,7 +4083,7 @@
             }
             .calendar-info-container .info-left,
             .calendar-info-container .info-right { width: 100% !important; display: contents !important; }
-            .calendar-info-container .community-dropdown {
+            .calendar-info-container .community-filter-btn {
                 display: flex !important;
                 width: auto !important; /* não ocupar 100% */
                 justify-content: center !important;
@@ -3975,7 +4144,7 @@
                 display: inline-flex !important;
             }
             
-            .calendar-info-container .community-dropdown-trigger,
+            .calendar-info-container .community-filter-btn,
             .calendar-info-container .view-dropdown-trigger {
                 min-width: 120px !important;
                 max-width: 200px !important;
@@ -3988,7 +4157,7 @@
                 align-self: center !important;
                 justify-self: center !important;
             }
-            .calendar-info-container .community-dropdown-trigger i,
+            .calendar-info-container .community-filter-btn i,
             .calendar-info-container .view-dropdown-trigger i { font-size: 9px !important; }
         }
 
@@ -4573,15 +4742,10 @@
                         </div>
                         <div class="info-location">
                             <div class="info-location-container">
-                                <div class="community-dropdown">
-                                    <div class="community-dropdown-trigger">
-                                        <span id="currentCommunityText">Carregando comunidades...</span>
-                                        <i class="fas fa-chevron-down"></i>
-                        </div>
-                                    <div class="community-dropdown-menu">
-                                        <a href="#" class="community-dropdown-item" data-community-id="">Todas as comunidades</a>
-                                    </div>
-                                </div>
+                                <button class="community-filter-btn" type="button" onclick="openCommunityFilter()" aria-label="Filtrar comunidades" title="Filtrar comunidades">
+                                    <i class="fas fa-filter"></i>
+                                    <span class="community-filter-summary" id="communityFilterSummary">Carregando...</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -4653,6 +4817,28 @@
                         <!-- Horários e eventos serão inseridos via JavaScript -->
         </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtro de comunidades (multi-seleção) -->
+    <div class="community-filter-overlay" id="communityFilterOverlay" aria-hidden="true">
+        <div class="community-filter-panel" role="dialog" aria-modal="true" aria-label="Filtro de comunidades">
+            <div class="community-filter-header">
+                <div class="community-filter-title">
+                    <i class="fas fa-filter"></i>
+                    Filtrar comunidades
+                </div>
+                <button class="community-filter-close" type="button" onclick="closeCommunityFilter()" aria-label="Fechar filtro">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="community-filter-actions">
+                <button class="community-filter-action" type="button" onclick="selectAllCommunities(true)">Selecionar todas</button>
+                <button class="community-filter-action" type="button" onclick="selectAllCommunities(false)">Limpar</button>
+            </div>
+            <div class="community-filter-list" id="communityFilterList">
+                <div class="community-filter-loading">Carregando comunidades...</div>
             </div>
         </div>
     </div>
@@ -5307,7 +5493,80 @@
                 item.style.display = (v === currentView) ? 'none' : 'block';
             });
         }
-        let selectedCommunityId = null; // ID da comunidade selecionada
+        // Filtro de comunidades (multi-seleção)
+        let selectedCommunityIds = new Set(); // ids selecionados
+        let allCommunitiesList = []; // lista completa carregada da API (para UI/contagem)
+
+        function openCommunityFilter() {
+            const overlay = document.getElementById('communityFilterOverlay');
+            if (overlay) {
+                overlay.classList.add('open');
+                overlay.setAttribute('aria-hidden', 'false');
+            }
+        }
+
+        function closeCommunityFilter() {
+            const overlay = document.getElementById('communityFilterOverlay');
+            if (overlay) {
+                overlay.classList.remove('open');
+                overlay.setAttribute('aria-hidden', 'true');
+            }
+        }
+
+        function updateCommunityFilterSummary() {
+            const el = document.getElementById('communityFilterSummary');
+            if (!el) return;
+
+            const total = Array.isArray(allCommunitiesList) ? allCommunitiesList.length : 0;
+            const selectedCount = selectedCommunityIds instanceof Set ? selectedCommunityIds.size : 0;
+
+            if (total === 0) {
+                el.textContent = 'Sem comunidades';
+                return;
+            }
+            if (selectedCount === total) {
+                el.textContent = 'Todas as comunidades';
+                return;
+            }
+            // Regra: nenhuma marcada = sem filtro (mostrar tudo)
+            if (selectedCount === 0) {
+                el.textContent = 'Todas as comunidades';
+                return;
+            }
+            el.textContent = `${selectedCount} selecionada${selectedCount !== 1 ? 's' : ''}`;
+        }
+
+        function selectAllCommunities(checked) {
+            // Atualiza Set
+            selectedCommunityIds = new Set();
+            if (checked && Array.isArray(allCommunitiesList)) {
+                allCommunitiesList.forEach(c => {
+                    if (c && c.id != null) selectedCommunityIds.add(Number(c.id));
+                });
+            }
+            // Atualiza UI (checkboxes)
+            const list = document.getElementById('communityFilterList');
+            if (list) {
+                const inputs = list.querySelectorAll('input[type="checkbox"][data-community-id]');
+                inputs.forEach(inp => {
+                    inp.checked = !!checked;
+                });
+            }
+            updateCommunityFilterSummary();
+            filterEventsByCommunity();
+        }
+
+        // Fechar filtro ao clicar fora do painel
+        document.addEventListener('click', function(e) {
+            const overlay = document.getElementById('communityFilterOverlay');
+            const panel = overlay ? overlay.querySelector('.community-filter-panel') : null;
+            const btn = document.querySelector('.community-filter-btn');
+            if (!overlay || !panel) return;
+            if (!overlay.classList.contains('open')) return;
+
+            if (panel.contains(e.target) || (btn && btn.contains(e.target))) return;
+            closeCommunityFilter();
+        });
 
         // Funções para controlar o spinner da agenda
         function mostrarSpinnerAgenda() {
@@ -7727,50 +7986,58 @@
                 const { data, error } = await window.api.get(window.endpoints.comunidades.list);
                 if (error) throw error;
                 const lista = Array.isArray(data) ? data : [];
-                
-                // Atualizar dropdown de comunidades
-                const communityDropdownMenu = document.querySelector('.community-dropdown-menu');
-                const currentCommunityText = document.getElementById('currentCommunityText');
-                
-                if (communityDropdownMenu && currentCommunityText) {
-                    // Criar opção "Todas as comunidades"
-                    let menuHTML = '<a href="#" class="community-dropdown-item" data-community-id="">Todas as comunidades</a>';
-                    
-                    // Adicionar comunidades
-                    menuHTML += lista.map(comunidade => 
-                        `<a href="#" class="community-dropdown-item" data-community-id="${comunidade.id}">${comunidade.nome}</a>`
-                    ).join('');
-                    
-                    communityDropdownMenu.innerHTML = menuHTML;
-                    currentCommunityText.textContent = 'Todas as comunidades';
-                    
-                    // Event listeners para os itens do dropdown
-                    const communityItems = document.querySelectorAll('.community-dropdown-item');
-                    communityItems.forEach(item => {
-                        item.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            const communityId = this.getAttribute('data-community-id');
-                            const communityName = this.textContent;
-                            
-                            // Atualizar texto do trigger
-                            currentCommunityText.textContent = communityName;
-                            
-                            // Atualizar filtro
-                            selectedCommunityId = communityId ? parseInt(communityId) : null;
-                            filterEventsByCommunity();
-                            
-                            if (typeof showToast === 'function') {
-                                showToast(`Filtrando por: ${communityName}`, 'info');
-                            }
-                        });
-                    });
+
+                // Guardar lista completa para UI/contagem
+                allCommunitiesList = lista;
+
+                // Por padrão, iniciar sem seleção (sem filtro => mostra tudo)
+                if (!(selectedCommunityIds instanceof Set)) {
+                    selectedCommunityIds = new Set();
                 }
+
+                // Renderizar painel de checkboxes
+                const listEl = document.getElementById('communityFilterList');
+                if (listEl) {
+                    if (!lista.length) {
+                        listEl.innerHTML = '<div class="community-filter-loading">Nenhuma comunidade encontrada</div>';
+                    } else {
+                        listEl.innerHTML = lista.map(c => {
+                            const id = Number(c.id);
+                            const name = String(c.nome || 'Comunidade');
+                            const checked = selectedCommunityIds.has(id) ? 'checked' : '';
+                            return `
+                                <div class="community-filter-item">
+                                    <label>
+                                        <input type="checkbox" ${checked} data-community-id="${id}" />
+                                        <span class="community-filter-name" title="${name}">${name}</span>
+                                    </label>
+                                </div>
+                            `;
+                        }).join('');
+
+                        // listeners
+                        const inputs = listEl.querySelectorAll('input[type="checkbox"][data-community-id]');
+                        inputs.forEach(inp => {
+                            inp.addEventListener('change', function() {
+                                const id = Number(this.getAttribute('data-community-id'));
+                                if (this.checked) selectedCommunityIds.add(id);
+                                else selectedCommunityIds.delete(id);
+                                updateCommunityFilterSummary();
+                                filterEventsByCommunity();
+                            });
+                        });
+                    }
+                }
+
+                updateCommunityFilterSummary();
             } catch (err) {
                 console.error('Erro ao carregar comunidades:', err);
-                const currentCommunityText = document.getElementById('currentCommunityText');
-                if (currentCommunityText) {
-                    currentCommunityText.textContent = 'Erro ao carregar';
-                }
+                allCommunitiesList = [];
+                selectedCommunityIds = new Set();
+                const summary = document.getElementById('communityFilterSummary');
+                if (summary) summary.textContent = 'Erro ao carregar';
+                const listEl = document.getElementById('communityFilterList');
+                if (listEl) listEl.innerHTML = '<div class="community-filter-loading">Erro ao carregar comunidades</div>';
             }
         }
 
@@ -7806,18 +8073,22 @@
                 });
             }
             
-            // Filtrar por comunidade se houver seleção
-            if (selectedCommunityId !== null) {
+            // Filtrar por comunidade (multi-seleção).
+            const totalComunidades = Array.isArray(allCommunitiesList) ? allCommunitiesList.length : 0;
+            const selectedCount = selectedCommunityIds instanceof Set ? selectedCommunityIds.size : 0;
+            // Regra: nenhuma marcada = sem filtro (mostrar tudo).
+            // Só filtra quando houver 1+ comunidades selecionadas.
+            const hasActiveFilter = selectedCount > 0;
+
+            if (hasActiveFilter) {
                 filteredEvents = filteredEvents.filter(event => {
-                    // Verificar se o evento tem vínculo com a comunidade selecionada
+                    // 1) Relacionamento N:N via "vinculos"
                     if (event.vinculos && Array.isArray(event.vinculos)) {
-                        return event.vinculos.some(vinculo => 
-                            vinculo.comunidade_id === selectedCommunityId
-                        );
+                        return event.vinculos.some(v => selectedCommunityIds.has(Number(v.comunidade_id)));
                     }
-                    // Se não tem vinculos, verificar se tem comunidade_id diretamente
-                    if (event.comunidade_id) {
-                        return event.comunidade_id === selectedCommunityId;
+                    // 2) Fallback via comunidade_id direto
+                    if (event.comunidade_id != null) {
+                        return selectedCommunityIds.has(Number(event.comunidade_id));
                     }
                     return false;
                 });
