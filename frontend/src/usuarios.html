@@ -526,14 +526,14 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: #1e3a8a;
-            color: white;
+            background: #ffffff;
+            color: #1e3a8a;
             padding: 0; /* sem espaçamento lateral */
             height: 80px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: none;
         }
 
         .header-left {
@@ -555,7 +555,7 @@
             display: none;
             background: transparent;
             border: none;
-            color: white;
+            color: #1e3a8a;
             font-size: 20px;
             cursor: pointer;
             padding: 8px;
@@ -568,11 +568,11 @@
         }
         
         .hamburger-menu:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 58, 138, 0.08);
         }
         
         .hamburger-menu:active {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(30, 58, 138, 0.16);
         }
         
         /* Menu Lateral Mobile */
@@ -697,7 +697,7 @@
         }
 
         .nav-link {
-            color: white;
+            color: #1e3a8a;
             text-decoration: none;
             font-weight: 500;
             padding: 12px 0;
@@ -721,7 +721,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: #ffffff;
+            background: #1e3a8a;
             border-radius: 2px;
         }
 
@@ -809,7 +809,7 @@
         .header-icon {
             width: 44px;
             height: 44px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 58, 138, 0.08);
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -818,10 +818,11 @@
             transition: background 0.2s ease;
             position: relative;
             font-size: 16px;
+            color: #1e3a8a;
         }
 
         .header-icon:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(30, 58, 138, 0.16);
         }
 
         .notification-badge {
