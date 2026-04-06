@@ -2814,11 +2814,40 @@
             padding: 0 14px;
             text-transform: uppercase;
             letter-spacing: 0.06em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .community-filter-toggle {
+            border: none;
+            background: transparent;
+            color: #1e3a8a;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        .community-filter-toggle:hover {
+            background: #eef2ff;
+        }
+        .community-filter-toggle[aria-expanded="true"] i {
+            transform: rotate(180deg);
+        }
+        .community-filter-toggle i {
+            transition: transform 0.2s ease;
         }
         .community-filter-section .community-filter-list {
             padding-top: 0;
             padding-bottom: 0;
             max-height: 220px;
+        }
+        .community-filter-list.collapsed {
+            display: none;
         }
         .community-filter-item {
             display: flex;
@@ -4799,36 +4828,61 @@
 
                                         <div class="community-filter-sections">
                                             <div class="community-filter-section">
-                                                <div class="community-filter-section-title">Comunidades</div>
-                                                <div class="community-filter-list" id="communityFilterList">
+                                                <div class="community-filter-section-title">
+                                                    <span>Comunidades</span>
+                                                    <button class="community-filter-toggle" type="button" data-target="communityFilterList" aria-expanded="false" aria-label="Expandir comunidades">
+                                                        <i class="fas fa-chevron-down"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="community-filter-list collapsed" id="communityFilterList">
                                                     <div class="community-filter-loading">Carregando comunidades...</div>
                                                 </div>
                                             </div>
 
                                             <div class="community-filter-section">
-                                                <div class="community-filter-section-title">Pastorais</div>
-                                                <div class="community-filter-list" id="pastoralFilterList">
+                                                <div class="community-filter-section-title">
+                                                    <span>Pastorais</span>
+                                                    <button class="community-filter-toggle" type="button" data-target="pastoralFilterList" aria-expanded="false" aria-label="Expandir pastorais">
+                                                        <i class="fas fa-chevron-down"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="community-filter-list collapsed" id="pastoralFilterList">
                                                     <div class="community-filter-loading">Carregando pastorais...</div>
                                                 </div>
                                             </div>
 
                                             <div class="community-filter-section">
-                                                <div class="community-filter-section-title">Pilares</div>
-                                                <div class="community-filter-list" id="pilarFilterList">
+                                                <div class="community-filter-section-title">
+                                                    <span>Pilares</span>
+                                                    <button class="community-filter-toggle" type="button" data-target="pilarFilterList" aria-expanded="false" aria-label="Expandir pilares">
+                                                        <i class="fas fa-chevron-down"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="community-filter-list collapsed" id="pilarFilterList">
                                                     <div class="community-filter-loading">Carregando pilares...</div>
                                                 </div>
                                             </div>
 
                                             <div class="community-filter-section">
-                                                <div class="community-filter-section-title">Locais</div>
-                                                <div class="community-filter-list" id="localFilterList">
+                                                <div class="community-filter-section-title">
+                                                    <span>Locais</span>
+                                                    <button class="community-filter-toggle" type="button" data-target="localFilterList" aria-expanded="false" aria-label="Expandir locais">
+                                                        <i class="fas fa-chevron-down"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="community-filter-list collapsed" id="localFilterList">
                                                     <div class="community-filter-loading">Carregando locais...</div>
                                                 </div>
                                             </div>
 
                                             <div class="community-filter-section">
-                                                <div class="community-filter-section-title">Ações</div>
-                                                <div class="community-filter-list" id="acaoFilterList">
+                                                <div class="community-filter-section-title">
+                                                    <span>Ações</span>
+                                                    <button class="community-filter-toggle" type="button" data-target="acaoFilterList" aria-expanded="false" aria-label="Expandir ações">
+                                                        <i class="fas fa-chevron-down"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="community-filter-list collapsed" id="acaoFilterList">
                                                     <div class="community-filter-loading">Carregando ações...</div>
                                                 </div>
                                             </div>
@@ -5670,6 +5724,22 @@
             });
         }
 
+        function setupFilterSectionToggles() {
+            const toggles = document.querySelectorAll('.community-filter-toggle[data-target]');
+            toggles.forEach(btn => {
+                if (btn.dataset.bound === '1') return;
+                btn.dataset.bound = '1';
+                btn.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const target = targetId ? document.getElementById(targetId) : null;
+                    if (!target) return;
+                    const isCollapsed = target.classList.contains('collapsed');
+                    target.classList.toggle('collapsed', !isCollapsed);
+                    this.setAttribute('aria-expanded', isCollapsed ? 'true' : 'false');
+                });
+            });
+        }
+
         function renderFilterCheckboxList(containerId, list, selectedSet, labelEmpty) {
             const el = document.getElementById(containerId);
             if (!el) return;
@@ -5872,6 +5942,7 @@
                 ]);
 
                 // Bind do toggle "Somente eventos paroquiais"
+                setupFilterSectionToggles();
                 setupEventoParoquialFilterToggle();
             } catch (error) {
                 console.error('❌ Erro ao carregar dados:', error);
