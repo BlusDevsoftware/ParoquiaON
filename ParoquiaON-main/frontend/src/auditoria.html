@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParoquiaON - Auditoria</title>
+    <link rel="icon" type="image/png" href="assets/images/logo2.png">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="template-menu-superior.css">
+    <link rel="stylesheet" href="styles/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="scripts/auth-guard.js"></script>
+    <script src="scripts/apply-auth-protection.js"></script>
+    <script src="scripts/config/api.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #ffffff;
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+
+        .main-content {
+            margin-top: 80px;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            height: calc(100vh - 80px);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* Menu Hamburger e Menu Mobile (mesmo padrão das telas CRUD) */
+        .hamburger-menu {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        .hamburger-menu:hover { background: rgba(255, 255, 255, 0.1); }
+        .hamburger-menu:active { background: rgba(255, 255, 255, 0.2); }
+
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .mobile-menu-overlay.show { opacity: 1; }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            z-index: 1501;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+        }
+        .mobile-menu.open { left: 0; }
+
+        .mobile-menu-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .mobile-menu-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .mobile-menu-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        .mobile-menu-close:hover { background: rgba(255, 255, 255, 0.1); }
+
+        .mobile-menu-links {
+            padding: 0;
+            list-style: none;
+            margin: 0;
+        }
+        .mobile-menu-links li { border-bottom: none; }
+        .mobile-menu-links a {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .mobile-menu-links a:hover,
+        .mobile-menu-links a.active {
+            background: #f0f4ff;
+            color: #1e3a8a;
+        }
+        .mobile-menu-links a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Header superior igual às demais abas (comunidades, agenda, etc.) */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: #1e3a8a;
+            color: white;
+            padding: 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            flex: 1;
+            padding-left: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+            padding-right: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .top-header {
+                padding: 0;
+                height: 60px;
+            }
+            .header-left {
+                padding-left: 12px;
+                gap: 0;
+                flex: 0 0 auto;
+            }
+            .header-right {
+                padding-right: 12px;
+                gap: 12px;
+            }
+            .main-content {
+                margin-top: 60px;
+            }
+            .nav-links { display: none; }
+            .hamburger-menu { display: inline-flex; }
+        }
+
+        .page-wrap {
+            padding: 20px 24px 28px 24px;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .builder {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 16px;
+            align-items: stretch;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .builder { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 120px);
+        }
+
+        .panel.results-panel { /* classe reservada para estilos futuros */ }
+
+        .panel-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-body {
+            padding: 14px 16px 16px 16px;
+        }
+
+        .panel.results-panel .panel-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+        }
+
+        .panel.config-panel .panel-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+        }
+
+        .panel-footer {
+            padding: 12px 16px 14px 16px;
+            border-top: 1px solid #f1f5f9;
+            background: #ffffff;
+        }
+
+        .panel.config-panel .panel-footer {
+            position: sticky;
+            bottom: 0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .form-row.one { grid-template-columns: 1fr; }
+
+        .form-row.dates-row {
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 6px;
+        }
+
+        .form-row.dates-row > div {
+            min-width: 0;
+        }
+
+        .form-row.dates-row input[type="date"] {
+            font-size: 11px;
+            padding: 4px 6px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        /* Inputs e selects no mesmo padrão visual dos formulários (comunidade/tela agenda) */
+        select,
+        input[type="text"],
+        input[type="date"] {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+            font-size: 12px;
+            background-color: #ffffff;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.2s ease;
+        }
+
+        select:focus,
+        input[type="text"]:focus,
+        input[type="date"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.10);
+            background-color: #ffffff;
+        }
+
+        select:disabled,
+        input[type="text"]:disabled,
+        input[type="date"]:disabled {
+            background-color: #ffffff;
+            color: #9ca3af;
+        }
+
+        /* Força fundo branco apenas nos campos desta tela (sobrepõe CSS global cinza) */
+        .config-panel input[type="text"],
+        .config-panel input[type="date"],
+        .config-panel select {
+            background-color: #ffffff !important;
+        }
+
+        .cols-search input[type="text"] {
+            background-color: #ffffff !important;
+        }
+
+        /* Dropdown customizado para o campo "Tipo de data" (visual idêntico ao modal de agenda) */
+        .rd-select-wrapper {
+            position: relative;
+        }
+
+        .rd-select-native {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .rd-select-display {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 12px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            cursor: pointer;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.2s ease;
+        }
+
+        .rd-select-display:hover {
+            background: #f8fafc;
+        }
+
+        .rd-select-wrapper.rd-open .rd-select-display {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.10);
+        }
+
+        .rd-select-display-label {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #111827;
+        }
+
+        .rd-select-display-placeholder {
+            color: #6b7280;
+        }
+
+        .rd-select-display-icon {
+            flex-shrink: 0;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .rd-select-wrapper.rd-open .rd-select-display-icon {
+            transform: rotate(180deg);
+        }
+
+        .rd-select-list {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 24px rgba(2, 6, 23, 0.12);
+            border: 1px solid #e5e7eb;
+            max-height: 260px;
+            overflow: auto;
+            padding: 4px 0;
+            z-index: 1200;
+            display: none;
+        }
+
+        .rd-select-wrapper.rd-open .rd-select-list {
+            display: block;
+        }
+
+        .rd-select-option {
+            padding: 6px 10px;
+            font-size: 12px;
+            color: #111827;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .rd-select-option:hover {
+            background: #eff6ff;
+        }
+
+        .rd-select-option.rd-selected {
+            background: #e0ebff;
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .actions-main {
+            margin-top: 0;
+        }
+
+        .btn {
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+        }
+
+        .actions .btn {
+            width: 100%;
+        }
+
+        .actions-main .btn {
+            font-size: 13px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .actions-secondary {
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        @media (max-width: 520px) {
+            .actions-secondary {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: #1e3a8a; color: #fff; }
+        .btn-primary:hover { box-shadow: 0 8px 18px rgba(30,58,138,0.22); }
+        .btn-secondary { background: #f8fafc; color: #111827; border-color: #e5e7eb; }
+        .btn-secondary:hover { box-shadow: 0 8px 18px rgba(15,23,42,0.10); }
+        .btn-danger { background: #fff5f5; color: #991b1b; border-color: #fecaca; }
+
+        .muted {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .cols-search {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin: 6px 0 8px 0;
+        }
+
+        .cols-search input[type="text"] {
+            padding: 6px 8px;
+            font-size: 12px;
+        }
+
+        .cols-list {
+            max-height: 285px;
+            overflow: auto;
+            border: 1px solid #f1f5f9;
+            border-radius: 8px;
+            padding: 8px;
+            background: #fff;
+        }
+
+        .col-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 6px 6px;
+            border-radius: 8px;
+        }
+
+        .col-item:hover { background: #f8fafc; }
+
+        .col-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .results-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .results-top .kpis {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+            border-radius: 9999px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow: auto;
+            flex: 1 1 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 6px;
+            min-width: 760px;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 1;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 12px;
+            text-align: left;
+            padding: 10px 12px;
+            color: #0f172a;
+            white-space: nowrap;
+            cursor: move;
+            user-select: none;
+        }
+
+        thead th::after {
+            content: '⋮⋮';
+            font-size: 9px;
+            opacity: 0.35;
+            margin-left: 6px;
+            letter-spacing: -1px;
+        }
+
+        tbody td {
+            border-bottom: none;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #111827;
+            vertical-align: top;
+        }
+
+        tbody tr.rd-row {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(15,23,42,0.08);
+        }
+
+        tbody tr.rd-row:hover {
+            box-shadow: 0 4px 10px rgba(15,23,42,0.12);
+        }
+
+        tbody tr.rd-row td:first-child {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        tbody tr.rd-row td:last-child {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .rd-datetime {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .rd-avatar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rd-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 9999px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            background: #f1f5f9;
+            flex-shrink: 0;
+        }
+
+        .rd-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .empty-state {
+            padding: 40px 16px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .loader {
+            display: none;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e3a8a;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .loader.show { display: block; }
+
+        .loader-overlay-main {
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spinner-main {
+            border: 8px solid #e3f2fd;
+            border-top: 8px solid #1e3a8a;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .pagination {
+            padding: 10px 16px 14px 16px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 12px;
+            color: #4b5563;
+        }
+
+        .pagination .pagination-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination button {
+            padding: 6px 10px;
+            border-radius: 9999px;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #111827;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        /* Garantir que a barra superior desta tela alinhe igual às demais abas */
+        html, body {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        .top-header,
+        .main-content {
+            width: 100%;
+            max-width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Superior (mesmo padrão do sistema) -->
+    <div class="top-header">
+        <div class="header-left">
+            <div class="logo-section">
+                <button class="hamburger-menu" id="hamburgerMenu" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span style="font-size: 20px; font-weight: 600;">ParoquiaON</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Minha Comunidade</a>
+                <a href="agenda.html" class="nav-link">Agenda</a>
+                <a href="comunidades.html" class="nav-link">Comunidades</a>
+                <a href="pastorais.html" class="nav-link">Pastorais</a>
+                <a href="pilares.html" class="nav-link">Pilares</a>
+                <a href="locais.html" class="nav-link">Locais</a>
+                <a href="acoes.html" class="nav-link">Ações</a>
+                <a href="pessoas.html" class="nav-link">Pessoas</a>
+                <a href="usuarios.html" class="nav-link">Usuários</a>
+                <a href="perfil.html" class="nav-link">Perfil</a>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-trigger">Relatórios <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="Relatorio_Dinamico.html" class="dropdown-item">Dinâmico</a>
+                        <a href="auditoria.html" class="dropdown-item">Auditoria</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-icon">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="user-avatar-dropdown">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="user-dropdown-menu" id="userDropdownMenu">
+                    <div class="user-dropdown-header">
+                        <div class="user-dropdown-avatar" id="userDropdownAvatar">A</div>
+                        <div class="user-dropdown-info">
+                            <div class="user-dropdown-name" id="userDropdownName">Usuário</div>
+                            <div class="user-dropdown-email" id="userDropdownEmail">usuario@email.com</div>
+                        </div>
+                    </div>
+                    <div class="user-dropdown-divider"></div>
+                    <a href="#" class="user-dropdown-item logout" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sair</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Lateral Mobile (mesmo padrão) -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3>Menu</h3>
+            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Fechar menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-menu-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Minha Comunidade</a></li>
+            <li><a href="agenda.html"><i class="fas fa-calendar"></i> Agenda</a></li>
+            <li><a href="comunidades.html"><i class="fas fa-users"></i> Comunidades</a></li>
+            <li><a href="pastorais.html"><i class="fas fa-church"></i> Pastorais</a></li>
+            <li><a href="pilares.html"><i class="fas fa-layer-group"></i> Pilares</a></li>
+            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i> Locais</a></li>
+            <li><a href="acoes.html"><i class="fas fa-tasks"></i> Ações</a></li>
+            <li><a href="pessoas.html"><i class="fas fa-user-friends"></i> Pessoas</a></li>
+            <li><a href="usuarios.html"><i class="fas fa-user-cog"></i> Usuários</a></li>
+            <li><a href="perfil.html"><i class="fas fa-user-circle"></i> Perfil</a></li>
+            <li><a href="Relatorio_Dinamico.html"><i class="fas fa-file-invoice-dollar"></i> Dinâmico</a></li>
+            <li><a href="auditoria.html"><i class="fas fa-clipboard-check"></i> Auditoria</a></li>
+        </ul>
+    </div>
+
+    <!-- Spinner Centralizado de Carregamento -->
+    <div id="loader-relatorio-dinamico" class="loader-overlay-main">
+        <div class="spinner-main"></div>
+        <div class="loading-text">Carregando dados...</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-wrap">
+            <div class="builder">
+                <div class="panel config-panel">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-clipboard-check"></i> Auditoria do Sistema</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-row one">
+                            <div>
+                                <label for="rdModule">Módulo</label>
+                                <div class="rd-select-wrapper" id="rdModuleWrapper">
+                                    <button type="button" class="rd-select-display" id="rdModuleDisplay">
+                                        <span class="rd-select-display-label rd-select-display-placeholder">Selecione o módulo</span>
+                                        <span class="rd-select-display-icon"><i class="fas fa-chevron-down"></i></span>
+                                    </button>
+                                    <select id="rdModule" class="rd-select-native"></select>
+                                    <div class="rd-select-list" id="rdModuleList"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row one">
+                            <div>
+                                <label for="rdSearch">Pesquisar (usuário, módulo, detalhes...)</label>
+                                <input id="rdSearch" type="text" placeholder="Usuário, módulo, ação, detalhes..." />
+                            </div>
+                        </div>
+
+                        <div class="form-row dates-row">
+                            <div>
+                                <label for="rdDateField">Tipo</label>
+                                <div class="rd-select-wrapper" id="rdDateFieldWrapper">
+                                    <button type="button" class="rd-select-display" id="rdDateFieldDisplay">
+                                        <span class="rd-select-display-label rd-select-display-placeholder">Todos</span>
+                                        <span class="rd-select-display-icon"><i class="fas fa-chevron-down"></i></span>
+                                    </button>
+                                    <select id="rdDateField" class="rd-select-native">
+                                        <option value="">Todos</option>
+                                    </select>
+                                    <div class="rd-select-list" id="rdDateFieldList"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="rdDateFrom">De</label>
+                                <input id="rdDateFrom" type="date" disabled />
+                            </div>
+                            <div>
+                                <label for="rdDateTo">Até</label>
+                                <input id="rdDateTo" type="date" disabled />
+                            </div>
+                        </div>
+
+                        <div class="form-row one">
+                            <div>
+                                <label>Colunas</label>
+                                <div class="cols-search">
+                                    <input id="rdColsSearch" type="text" placeholder="Filtrar colunas..." />
+                                    <button class="btn btn-secondary" id="rdSelectAllBtn" type="button" title="Selecionar tudo">
+                                        <i class="fas fa-check-double"></i>
+                                    </button>
+                                    <button class="btn btn-secondary" id="rdClearColsBtn" type="button" title="Limpar seleção">
+                                        <i class="fas fa-eraser"></i>
+                                    </button>
+                                </div>
+                                <div class="cols-list" id="rdColsList"></div>
+                                <div class="muted" style="margin-top:8px;" id="rdColsHint"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer">
+                        <div class="actions actions-main">
+                            <button class="btn btn-primary" id="rdRunBtn" type="button">
+                                <i class="fas fa-play"></i> Gerar
+                            </button>
+                        </div>
+                        <div class="actions actions-secondary">
+                            <button class="btn btn-secondary" id="rdExportPdfBtn" type="button" disabled>
+                                <i class="fas fa-file-pdf"></i> Exportar PDF
+                            </button>
+                            <button class="btn btn-danger" id="rdClearFiltersBtn" type="button">
+                                <i class="fas fa-broom"></i> Limpar filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="results-top">
+                        <div class="kpis">
+                            <div class="chip" id="rdChipModule">Módulo: -</div>
+                            <div class="chip" id="rdChipTotal">Total: 0</div>
+                            <div class="chip" id="rdChipShown">Exibindo: 0</div>
+                        </div>
+                    </div>
+                    <div class="loader" id="rdLoader">Carregando dados...</div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr id="rdTheadRow"></tr>
+                            </thead>
+                            <tbody id="rdTbody"></tbody>
+                        </table>
+                        <div class="empty-state" id="rdEmpty">Clique em “Gerar” para carregar os registros de auditoria.</div>
+                    </div>
+                    <div class="pagination" id="rdPagination" style="display:none;">
+                        <div class="pagination-info" id="rdPaginationInfo"></div>
+                        <div class="pagination-buttons">
+                            <button type="button" id="rdPrevPageBtn">
+                                <i class="fas fa-chevron-left"></i> Anterior
+                            </button>
+                            <button type="button" id="rdNextPageBtn">
+                                Próxima <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Menu Mobile (reaproveitando padrão das outras páginas)
+        function openMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.style.display = 'block';
+                menu.classList.add('open');
+                setTimeout(() => overlay.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.classList.remove('show');
+                menu.classList.remove('open');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 300);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerBtn = document.getElementById('hamburgerMenu');
+            const closeBtn = document.getElementById('mobileMenuClose');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', openMobileMenu);
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeMobileMenu);
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', closeMobileMenu);
+            }
+
+            // Relatório dinâmico
+            initDynamicReport();
+        });
+
+        function initDynamicReport() {
+            const els = {
+                module: document.getElementById('rdModule'),
+                moduleWrapper: document.getElementById('rdModuleWrapper'),
+                moduleDisplay: document.getElementById('rdModuleDisplay'),
+                moduleList: document.getElementById('rdModuleList'),
+                search: document.getElementById('rdSearch'),
+                status: document.getElementById('rdStatus'),
+                dateField: document.getElementById('rdDateField'),
+                dateFieldWrapper: document.getElementById('rdDateFieldWrapper'),
+                dateFieldDisplay: document.getElementById('rdDateFieldDisplay'),
+                dateFieldList: document.getElementById('rdDateFieldList'),
+                dateFrom: document.getElementById('rdDateFrom'),
+                dateTo: document.getElementById('rdDateTo'),
+                colsSearch: document.getElementById('rdColsSearch'),
+                colsList: document.getElementById('rdColsList'),
+                colsHint: document.getElementById('rdColsHint'),
+                selectAllBtn: document.getElementById('rdSelectAllBtn'),
+                clearColsBtn: document.getElementById('rdClearColsBtn'),
+                runBtn: document.getElementById('rdRunBtn'),
+                exportPdfBtn: document.getElementById('rdExportPdfBtn'),
+                clearFiltersBtn: document.getElementById('rdClearFiltersBtn'),
+                chipModule: document.getElementById('rdChipModule'),
+                chipTotal: document.getElementById('rdChipTotal'),
+                chipShown: document.getElementById('rdChipShown'),
+                theadRow: document.getElementById('rdTheadRow'),
+                tbody: document.getElementById('rdTbody'),
+                empty: document.getElementById('rdEmpty'),
+                loader: document.getElementById('rdLoader'),
+                mainLoader: document.getElementById('loader-relatorio-dinamico'),
+                pagination: document.getElementById('rdPagination'),
+                paginationInfo: document.getElementById('rdPaginationInfo'),
+                prevPageBtn: document.getElementById('rdPrevPageBtn'),
+                nextPageBtn: document.getElementById('rdNextPageBtn')
+            };
+
+            const state = {
+                raw: [],
+                flat: [],
+                keys: [],
+                selectedKeys: new Set(),
+                lastResult: [],
+                lastSelected: [],
+                page: 1,
+                pageSize: 50,
+                moduleFilter: '', // filtro pelo campo "modulo" dos registros de auditoria
+                actionFilter: ''  // filtro pelo campo "acao" (CREATE, UPDATE, DELETE, LOGIN_SUCCESS)
+            };
+
+            // Filtro inicial de módulo vindo da URL (?modulo=pessoas, por exemplo)
+            const urlParams = new URLSearchParams(window.location.search);
+            state.moduleFilter = (urlParams.get('modulo') || '').trim();
+
+            els.colsSearch.addEventListener('input', () => renderColumns());
+            els.selectAllBtn.addEventListener('click', () => {
+                state.keys.forEach(k => state.selectedKeys.add(k));
+                renderColumns();
+            });
+            els.clearColsBtn.addEventListener('click', () => {
+                state.selectedKeys.clear();
+                renderColumns();
+            });
+            els.runBtn.addEventListener('click', async () => {
+                state.page = 1;
+                await loadModuleData(true); // refaz a consulta na API com dados atualizados
+                render();
+            });
+            els.clearFiltersBtn.addEventListener('click', () => {
+                els.search.value = '';
+                if (els.status) els.status.value = 'todos';
+                if (els.dateField) els.dateField.value = '';
+                els.dateFrom.value = '';
+                els.dateTo.value = '';
+                els.dateFrom.disabled = false;
+                els.dateTo.disabled = false;
+                if (els.module) els.module.value = '';
+                state.moduleFilter = '';
+                state.actionFilter = '';
+                updateModuleChip();
+                updateDateDisplay();
+                state.page = 1;
+                render();
+            });
+
+            // Mudança no filtro de módulo (campo "modulo" da auditoria)
+            els.module.addEventListener('change', () => {
+                state.moduleFilter = els.module.value || '';
+                state.page = 1;
+                updateModuleChip();
+                render();
+                buildCustomModuleDropdown();
+            });
+
+            if (els.dateField) {
+                els.dateField.addEventListener('change', () => {
+                    state.actionFilter = els.dateField.value || '';
+                    state.page = 1;
+                    render();
+                    updateDateDisplay();
+                });
+            }
+            if (els.exportPdfBtn) {
+                els.exportPdfBtn.addEventListener('click', () => exportPdf());
+            }
+
+            if (els.prevPageBtn && els.nextPageBtn) {
+                els.prevPageBtn.addEventListener('click', () => {
+                    if (state.page > 1) {
+                        state.page -= 1;
+                        render();
+                    }
+                });
+                els.nextPageBtn.addEventListener('click', () => {
+                    state.page += 1;
+                    render();
+                });
+            }
+
+            // Habilitar campos de data para filtro por período (sempre em created_at)
+            if (els.dateFrom) els.dateFrom.disabled = false;
+            if (els.dateTo) els.dateTo.disabled = false;
+
+            // Carrega inicial com spinner global
+            if (els.mainLoader) {
+                els.mainLoader.style.display = 'flex';
+            }
+            loadModuleData().then(() => render()).finally(() => {
+                if (els.mainLoader) {
+                    els.mainLoader.style.display = 'none';
+                }
+            });
+
+            // Permitir arrastar para reordenar colunas no cabeçalho
+            if (window.Sortable && els.theadRow) {
+                Sortable.create(els.theadRow, {
+                    animation: 150,
+                    onEnd: function (evt) {
+                        if (!state.lastSelected || state.lastSelected.length === 0) return;
+                        const oldIndex = evt.oldIndex;
+                        const newIndex = evt.newIndex;
+                        if (oldIndex === newIndex || oldIndex == null || newIndex == null) return;
+
+                        const current = state.lastSelected.slice();
+                        const moved = current.splice(oldIndex, 1)[0];
+                        current.splice(newIndex, 0, moved);
+                        state.lastSelected = current;
+
+                        // Reordenar state.keys para refletir a nova ordem das colunas selecionadas
+                        const others = state.keys.filter(k => !state.lastSelected.includes(k));
+                        state.keys = state.lastSelected.concat(others);
+                        render();
+                    }
+                });
+            }
+
+            async function loadModuleData(force = false) {
+                // Guardar estado atual de colunas e filtros para não limpar ao recarregar
+                const previousSelectedKeys = new Set(state.selectedKeys || []);
+                const previousActionFilter = state.actionFilter || '';
+
+                els.loader.classList.add('show');
+                els.empty.style.display = 'none';
+                els.tbody.innerHTML = '';
+                els.theadRow.innerHTML = '';
+                if (els.exportPdfBtn) els.exportPdfBtn.disabled = true;
+
+                try {
+                    const endpoint = window.endpoints.auditoria.list;
+                    const { data, error } = await window.api.get(endpoint);
+                    if (error) throw error;
+
+                    state.raw = Array.isArray(data) ? data : [];
+                    state.flat = state.raw.map(r => flatten(r));
+                    state.keys = getAllKeys(state.flat);
+
+                    // Popular filtro de módulo (campo "modulo" dos registros)
+                    const moduloValues = Array.from(
+                        new Set(
+                            (state.flat || [])
+                                .map(r => r.modulo)
+                                .filter(v => v != null && v !== '')
+                        )
+                    ).sort((a, b) => String(a).localeCompare(String(b), 'pt-BR'));
+
+                    const optionsHtml = ['<option value=\"\">Todos</option>']
+                        .concat(
+                            moduloValues.map(v => `<option value=\"${escapeHtml(String(v))}\">${escapeHtml(humanizeKey(String(v)))}</option>`)
+                        )
+                        .join('');
+
+                    els.module.innerHTML = optionsHtml;
+
+                    // Aplicar filtro inicial vindo da URL, se existir
+                    if (state.moduleFilter) {
+                        const exists = moduloValues.some(v => String(v) === state.moduleFilter);
+                        els.module.value = exists ? state.moduleFilter : '';
+                        if (!exists) state.moduleFilter = '';
+                    } else {
+                        els.module.value = '';
+                    }
+
+                    updateModuleChip();
+                    buildCustomModuleDropdown();
+
+                    // Heurística: selecionar um conjunto pequeno inicial,
+                    // mas preservando seleção atual quando for recarregamento (force === true)
+                    if (!force || previousSelectedKeys.size === 0) {
+                        state.selectedKeys.clear();
+                        const preferred = getPreferredKeys(state.keys, 'auditoria');
+                        preferred.forEach(k => state.selectedKeys.add(k));
+                    } else {
+                        // Mantém apenas chaves que ainda existem
+                        state.selectedKeys = new Set(
+                            Array.from(previousSelectedKeys).filter(k => state.keys.includes(k))
+                        );
+                        // Se por algum motivo ficar vazio, aplica heurística padrão
+                        if (state.selectedKeys.size === 0) {
+                            const preferred = getPreferredKeys(state.keys, 'auditoria');
+                            preferred.forEach(k => state.selectedKeys.add(k));
+                        }
+                    }
+
+                    // Popular dropdown de tipos de ação (campo "acao" da auditoria)
+                    els.dateField.innerHTML =
+                        '<option value="">Todos</option>' +
+                        [
+                            { value: 'CREATE', label: 'Criação' },
+                            { value: 'UPDATE', label: 'Edição' },
+                            { value: 'DELETE', label: 'Exclusão' },
+                            { value: 'LOGIN_SUCCESS', label: 'Login' }
+                        ]
+                        .map(t => `<option value="${escapeHtml(t.value)}">${escapeHtml(t.label)}</option>`)
+                        .join('');
+
+                    // Restaurar filtro de tipo selecionado, se existir
+                    const actionToApply = force ? previousActionFilter : state.actionFilter;
+                    if (actionToApply && Array.from(els.dateField.options).some(o => o.value === actionToApply)) {
+                        els.dateField.value = actionToApply;
+                        state.actionFilter = actionToApply;
+                    } else {
+                        els.dateField.value = '';
+                        if (!force) state.actionFilter = '';
+                    }
+
+                    buildCustomDateDropdown();
+
+                    els.chipTotal.textContent = `Total: ${state.raw.length}`;
+                } catch (e) {
+                    console.error('Erro ao carregar dados do relatório dinâmico:', e);
+                    els.empty.textContent = 'Erro ao carregar dados. Verifique sua conexão/permissões.';
+                    els.empty.style.display = 'block';
+                } finally {
+                    els.loader.classList.remove('show');
+                    renderColumns();
+                }
+            }
+
+            function renderColumns() {
+                const q = (els.colsSearch.value || '').trim().toLowerCase();
+                const filteredKeys = state.keys.filter(k => {
+                    if (!q) return true;
+                    const h = humanizeKey(k).toLowerCase();
+                    return k.toLowerCase().includes(q) || h.includes(q);
+                });
+
+                els.colsList.innerHTML = filteredKeys.map(k => {
+                    const checked = state.selectedKeys.has(k);
+                    return `
+                        <label class="col-item">
+                            <input type="checkbox" data-key="${escapeHtml(k)}" ${checked ? 'checked' : ''} />
+                            <div style="min-width:0;">
+                                <div style="font-weight:700; font-size:12px; color:#111827; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    ${escapeHtml(humanizeKey(k))}
+                                </div>
+                                <div class="muted" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(k)}</div>
+                            </div>
+                        </label>
+                    `;
+                }).join('');
+
+                els.colsHint.textContent = `${state.selectedKeys.size} colunas selecionadas • ${state.keys.length} disponíveis`;
+
+                els.colsList.querySelectorAll('input[type="checkbox"][data-key]').forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        const key = cb.getAttribute('data-key');
+                        if (!key) return;
+                        if (cb.checked) state.selectedKeys.add(key);
+                        else state.selectedKeys.delete(key);
+                    });
+                });
+            }
+
+            function buildCustomDateDropdown() {
+                if (!els.dateField || !els.dateFieldWrapper || !els.dateFieldDisplay || !els.dateFieldList) return;
+
+                // Limpa lista atual
+                els.dateFieldList.innerHTML = '';
+
+                const selectedValue = els.dateField.value || '';
+
+                Array.from(els.dateField.options).forEach(opt => {
+                    const value = opt.value;
+                    const label = opt.textContent || '';
+                    const div = document.createElement('div');
+                    div.className = 'rd-select-option' + (value === selectedValue ? ' rd-selected' : '');
+                    div.dataset.value = value;
+                    div.textContent = label;
+                    div.addEventListener('click', () => {
+                        els.dateField.value = value;
+                        const event = new Event('change', { bubbles: true });
+                        els.dateField.dispatchEvent(event);
+                        els.dateFieldWrapper.classList.remove('rd-open');
+                        updateDateDisplay();
+                    });
+                    els.dateFieldList.appendChild(div);
+                });
+
+                updateDateDisplay();
+
+                if (!els.dateFieldWrapper.dataset.rdEnhanced) {
+                    els.dateFieldWrapper.dataset.rdEnhanced = '1';
+
+                    els.dateFieldDisplay.addEventListener('click', () => {
+                        const isOpen = els.dateFieldWrapper.classList.contains('rd-open');
+                        document.querySelectorAll('.rd-select-wrapper.rd-open').forEach(el => el.classList.remove('rd-open'));
+                        if (!isOpen) {
+                            els.dateFieldWrapper.classList.add('rd-open');
+                        }
+                    });
+
+                    document.addEventListener('click', (ev) => {
+                        if (!els.dateFieldWrapper.contains(ev.target)) {
+                            els.dateFieldWrapper.classList.remove('rd-open');
+                        }
+                    });
+
+                    els.dateField.addEventListener('change', () => {
+                        updateDateDisplay();
+                        // Sincroniza seleção visual
+                        const current = els.dateField.value || '';
+                        els.dateFieldList.querySelectorAll('.rd-select-option').forEach(opt => {
+                            if (opt.dataset.value === current) opt.classList.add('rd-selected');
+                            else opt.classList.remove('rd-selected');
+                        });
+                    });
+                }
+            }
+
+            function updateDateDisplay() {
+                if (!els.dateField || !els.dateFieldDisplay) return;
+                const value = els.dateField.value || '';
+                const opt = Array.from(els.dateField.options).find(o => o.value === value);
+                const labelEl = els.dateFieldDisplay.querySelector('.rd-select-display-label');
+                if (!labelEl) return;
+                if (!opt || !value) {
+                    labelEl.textContent = 'Todos';
+                    labelEl.classList.add('rd-select-display-placeholder');
+                } else {
+                    labelEl.textContent = opt.textContent || '';
+                    labelEl.classList.remove('rd-select-display-placeholder');
+                }
+            }
+
+            function buildCustomModuleDropdown() {
+                if (!els.module || !els.moduleWrapper || !els.moduleDisplay || !els.moduleList) return;
+
+                els.moduleList.innerHTML = '';
+                const selectedValue = els.module.value || '';
+
+                Array.from(els.module.options).forEach(opt => {
+                    const value = opt.value;
+                    const label = opt.textContent || '';
+                    const div = document.createElement('div');
+                    div.className = 'rd-select-option' + (value === selectedValue ? ' rd-selected' : '');
+                    div.dataset.value = value;
+                    div.textContent = label;
+                    div.addEventListener('click', () => {
+                        els.module.value = value;
+                        const event = new Event('change', { bubbles: true });
+                        els.module.dispatchEvent(event);
+                        els.moduleWrapper.classList.remove('rd-open');
+                        updateModuleDisplay();
+                    });
+                    els.moduleList.appendChild(div);
+                });
+
+                updateModuleDisplay();
+
+                if (!els.moduleWrapper.dataset.rdEnhanced) {
+                    els.moduleWrapper.dataset.rdEnhanced = '1';
+
+                    els.moduleDisplay.addEventListener('click', () => {
+                        const isOpen = els.moduleWrapper.classList.contains('rd-open');
+                        document.querySelectorAll('.rd-select-wrapper.rd-open').forEach(el => el.classList.remove('rd-open'));
+                        if (!isOpen) {
+                            els.moduleWrapper.classList.add('rd-open');
+                        }
+                    });
+
+                    document.addEventListener('click', (ev) => {
+                        if (!els.moduleWrapper.contains(ev.target)) {
+                            els.moduleWrapper.classList.remove('rd-open');
+                        }
+                    });
+
+                    els.module.addEventListener('change', () => {
+                        updateModuleDisplay();
+                        const current = els.module.value || '';
+                        els.moduleList.querySelectorAll('.rd-select-option').forEach(opt => {
+                            if (opt.dataset.value === current) opt.classList.add('rd-selected');
+                            else opt.classList.remove('rd-selected');
+                        });
+                    });
+                }
+            }
+
+            function updateModuleDisplay() {
+                if (!els.module || !els.moduleDisplay) return;
+                const value = els.module.value || '';
+                const opt = Array.from(els.module.options).find(o => o.value === value);
+                const labelEl = els.moduleDisplay.querySelector('.rd-select-display-label');
+                if (!labelEl) return;
+                if (!opt || !value) {
+                    labelEl.textContent = 'Todos os módulos';
+                    labelEl.classList.add('rd-select-display-placeholder');
+                } else {
+                    labelEl.textContent = opt.textContent || '';
+                    labelEl.classList.remove('rd-select-display-placeholder');
+                }
+            }
+
+            function updateModuleChip() {
+                const current = state.moduleFilter || '';
+                els.chipModule.textContent = current
+                    ? `Módulo: ${humanizeKey(current)}`
+                    : 'Módulo: Todos';
+            }
+
+            function render() {
+                const selected = state.keys.filter(k => state.selectedKeys.has(k));
+                if (selected.length === 0) {
+                    els.theadRow.innerHTML = '';
+                    els.tbody.innerHTML = '';
+                    els.empty.textContent = 'Selecione ao menos 1 coluna para gerar o relatório.';
+                    els.empty.style.display = 'block';
+                    els.chipShown.textContent = 'Exibindo: 0';
+                    els.exportCsvBtn.disabled = true;
+                    if (els.exportPdfBtn) els.exportPdfBtn.disabled = true;
+                    return;
+                }
+
+                const searchText = (els.search.value || '').trim().toLowerCase();
+                const statusFilter = els.status ? (els.status.value || 'todos').toLowerCase() : 'todos';
+                const moduloFilter = state.moduleFilter || '';
+                const actionFilter = state.actionFilter || '';
+                const from = els.dateFrom && els.dateFrom.value ? new Date(els.dateFrom.value + 'T00:00:00') : null;
+                const to = els.dateTo && els.dateTo.value ? new Date(els.dateTo.value + 'T23:59:59') : null;
+
+                const rows = state.flat.filter(r => {
+                    if (moduloFilter) {
+                        const rowModulo = (r['modulo'] || '').toString();
+                        if (rowModulo !== moduloFilter) return false;
+                    }
+                    if (searchText) {
+                        const hay = selected.map(k => (r[k] ?? '')).join(' ').toLowerCase();
+                        if (!hay.includes(searchText)) return false;
+                    }
+
+                    if (statusFilter !== 'todos') {
+                        const s = getStatusFromRow(r);
+                        if (statusFilter === 'ativo' && s !== 'ativo') return false;
+                        if (statusFilter === 'inativo' && s !== 'inativo') return false;
+                    }
+
+                    if (actionFilter) {
+                        const acao = (r['acao'] || '').toString().toUpperCase();
+                        if (acao !== actionFilter) return false;
+                    }
+
+                    // Filtro por intervalo de datas (sempre usando created_at da auditoria)
+                    if (from || to) {
+                        const v = r['created_at'];
+                        if (!v) return false;
+                        const d = parseDateValue(v);
+                        if (!d) return false;
+                        if (from && d < from) return false;
+                        if (to && d > to) return false;
+                    }
+                    return true;
+                });
+
+                state.lastResult = rows;
+
+                const total = rows.length;
+                const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
+                if (state.page > totalPages) state.page = totalPages;
+                if (state.page < 1) state.page = 1;
+                const start = (state.page - 1) * state.pageSize;
+                const end = start + state.pageSize;
+                const slice = rows.slice(start, end);
+
+                els.chipShown.textContent = `Exibindo: ${slice.length} de ${total} (pág. ${total === 0 ? 0 : state.page}/${total === 0 ? 0 : totalPages})`;
+                if (els.exportPdfBtn) els.exportPdfBtn.disabled = total === 0;
+
+                // Render header
+                els.theadRow.innerHTML = selected.map(k => `<th title="${escapeHtml(k)}">${escapeHtml(humanizeKey(k))}</th>`).join('');
+
+                // Render body (paginação)
+                els.tbody.innerHTML = slice.map(r => {
+                    return `<tr class="rd-row">` + selected.map(k => {
+                        const raw = r[k];
+
+                        if (looksLikeImageKey(k) && isSafeImageUrl(raw)) {
+                            const url = escapeHtml(String(raw));
+                            const alt = escapeHtml(humanizeKey(k));
+                            return `<td><div class="rd-avatar-wrapper"><div class="rd-avatar"><img src="${url}" alt="${alt}"></div></div></td>`;
+                        }
+
+                        if (looksLikeDateKey(k)) {
+                            const d = parseDateValue(raw);
+                            if (d) {
+                                const dd = String(d.getDate()).padStart(2, '0');
+                                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                                const yyyy = d.getFullYear();
+                                const hh = String(d.getHours()).padStart(2, '0');
+                                const mi = String(d.getMinutes()).padStart(2, '0');
+                                const dateStr = `${dd}/${mm}/${yyyy}`;
+                                const timeStr = `${hh}:${mi}`;
+                                return `<td><span class="rd-datetime"><span>${escapeHtml(dateStr)}</span><span>${escapeHtml(timeStr)}</span></span></td>`;
+                            }
+                        }
+
+                        return `<td>${escapeHtml(stringifyCell(raw, k))}</td>`;
+                    }).join('') + `</tr>`;
+                }).join('');
+
+                state.lastSelected = selected.slice();
+
+                // Empty + paginação
+                if (total === 0) {
+                    els.empty.textContent = 'Nenhum resultado encontrado com os filtros atuais.';
+                    els.empty.style.display = 'block';
+                } else {
+                    els.empty.style.display = 'none';
+                }
+
+                if (els.pagination && els.paginationInfo) {
+                    if (total <= state.pageSize) {
+                        els.pagination.style.display = 'none';
+                    } else {
+                        els.pagination.style.display = 'flex';
+                        els.paginationInfo.textContent = `Página ${state.page} de ${totalPages}`;
+                        if (els.prevPageBtn) els.prevPageBtn.disabled = state.page <= 1;
+                        if (els.nextPageBtn) els.nextPageBtn.disabled = state.page >= totalPages;
+                    }
+                }
+            }
+
+            function exportPdf() {
+                const selected = state.keys.filter(k => state.selectedKeys.has(k));
+                const rows = state.lastResult || [];
+                if (!selected.length || !rows.length) return;
+
+                const modLabel = 'Auditoria do Sistema';
+                const now = new Date();
+                const yyyy = now.getFullYear();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mi = String(now.getMinutes()).padStart(2, '0');
+
+                const title = `${modLabel} - ${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+
+                const headHtml = selected.map(k => `<th style="padding:6px 8px; font-size:11px; text-align:left; border-bottom:1px solid #e5e7eb; white-space:nowrap;">${escapeHtml(humanizeKey(k))}</th>`).join('');
+                const bodyHtml = rows.map(r => {
+                    const tds = selected.map(k => {
+                        const raw = r[k];
+
+                        if (looksLikeImageKey(k) && isSafeImageUrl(raw)) {
+                            const url = escapeHtml(String(raw));
+                            const alt = escapeHtml(humanizeKey(k));
+                            return `<td style="padding:4px 8px; font-size:11px; border-bottom:1px solid #f3f4f6; vertical-align:top; word-break:break-word;">
+    <div class="rd-avatar-pdf"><img src="${url}" alt="${alt}"></div>
+</td>`;
+                        }
+
+                        const text = stringifyCell(raw, k);
+                        return `<td style="padding:4px 8px; font-size:11px; border-bottom:1px solid #f3f4f6; vertical-align:top; word-break:break-word;">${escapeHtml(text)}</td>`;
+                    }).join('');
+                    return `<tr>${tds}</tr>`;
+                }).join('');
+
+                const html = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>${escapeHtml(title)}</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 11px;
+            color: #111827;
+            margin: 20px;
+        }
+        h1 {
+            font-size: 16px;
+            margin: 0 0 4px 0;
+        }
+        .meta {
+            font-size: 11px;
+            color: #4b5563;
+            margin-bottom: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: none;
+        }
+        .rd-avatar-pdf {
+            width: 24px;
+            height: 24px;
+            border-radius: 9999px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            background: #f1f5f9;
+            display: inline-block;
+        }
+        .rd-avatar-pdf img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        @media print {
+            body {
+                margin: 10mm;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>${escapeHtml(modLabel)}</h1>
+    <div class="meta">Gerado em ${dd}/${mm}/${yyyy} ${hh}:${mi} • Registros: ${rows.length}</div>
+    <table>
+        <thead>
+            <tr>${headHtml}</tr>
+        </thead>
+        <tbody>
+            ${bodyHtml}
+        </tbody>
+    </table>
+</body>
+</html>
+                `;
+
+                const w = window.open('', '_blank');
+                if (!w) return;
+                w.document.open();
+                w.document.write(html);
+                w.document.close();
+                try {
+                    w.focus();
+                    setTimeout(() => {
+                        try { w.print(); } catch (e) { console.error('Erro ao imprimir PDF do relatório dinâmico:', e); }
+                    }, 300);
+                } catch (e) {
+                    console.error('Erro ao preparar impressão do relatório dinâmico:', e);
+                }
+            }
+
+            function flatten(obj, prefix = '', out = {}) {
+                if (!obj || typeof obj !== 'object') return out;
+                Object.keys(obj).forEach(key => {
+                    const value = obj[key];
+                    const fullKey = prefix ? `${prefix}.${key}` : key;
+                    if (value === null || value === undefined) {
+                        out[fullKey] = '';
+                        return;
+                    }
+                    if (Array.isArray(value)) {
+                        // Arrays de primitivos: junta. Arrays de objetos: JSON compactado.
+                        if (value.every(v => v === null || ['string', 'number', 'boolean'].includes(typeof v))) {
+                            out[fullKey] = value.filter(v => v != null).join(', ');
+                        } else {
+                            try { out[fullKey] = JSON.stringify(value); } catch { out[fullKey] = String(value); }
+                        }
+                        return;
+                    }
+                    if (typeof value === 'object') {
+                        // Datas ISO vão como string
+                        if (value instanceof Date) {
+                            out[fullKey] = value.toISOString();
+                            return;
+                        }
+                        flatten(value, fullKey, out);
+                        return;
+                    }
+                    out[fullKey] = value;
+                });
+                return out;
+            }
+
+            function getAllKeys(rows) {
+                const set = new Set();
+                rows.slice(0, 50).forEach(r => Object.keys(r || {}).forEach(k => set.add(k)));
+                const raw = Array.from(set);
+
+                // Se for módulo de auditoria, limitar estritamente às colunas desejadas
+                const allowedAuditoriaKeys = [
+                    'acao',
+                    'created_at',
+                    'descricao',
+                    'modulo',
+                    'recurso',
+                    'usuario'
+                ];
+
+                // Detecta se os dados parecem ser de auditoria (presença de "acao" e "modulo")
+                const isAuditoriaData = set.has('acao') && set.has('modulo');
+
+                if (isAuditoriaData) {
+                    return allowedAuditoriaKeys.filter(k => set.has(k));
+                }
+
+                // Comportamento padrão (para outros módulos, se reutilizado)
+                // Remove colunas genéricas/pouco úteis: ids, status, visibilidade, updated, etc.
+                const filtered = raw.filter(k => {
+                    const base = String(k || '').toLowerCase();
+                    const noDots = base.replace(/\./g, ' ');
+                    const tokens = noDots.split(/\s+/);
+                    // remove id/ids isolados ou campos terminando com _id / .id
+                    const isIdToken = tokens.some(t => t === 'id' || t === 'ids');
+                    const isIdSuffix = /(^|[._])(id|.*_id)$/.test(base);
+                    const isStatusId = base.includes('status_id') || base.includes('status id');
+                    const isResponsavelId = base.includes('responsavel_id') || base.includes('responsavel id');
+                    const isVisibility = base.includes('visibilidade') || base.includes('visibility');
+                    const isUpdated = base.includes('updated') || base.includes('update');
+                    const isPlainStatus = base === 'status';
+                    const isLembrete = base === 'lembrete';
+                    const isCapacidade = base === 'capacidade';
+                    const isUsuarioLancamentoEmail = base === 'usuario_lancamento_email' || base === 'usuario lancamento email';
+                    const isUsuarioLancamentoNome = base === 'usuario_lancamento_nome' || base === 'usuario lancamento nome';
+                    const isUsuarios = base === 'usuarios' || base === 'usuario' || base === 'users';
+                    return !(
+                        isIdToken ||
+                        isIdSuffix ||
+                        isStatusId ||
+                        isResponsavelId ||
+                        isVisibility ||
+                        isUpdated ||
+                        isPlainStatus ||
+                        isUsuarioLancamentoEmail ||
+                        isUsuarioLancamentoNome ||
+                        isUsuarios ||
+                        isLembrete ||
+                        isCapacidade
+                    );
+                });
+
+                // Ordenação amigável para o módulo de agenda:
+                // segue a mesma sequência visual do modal de novo agendamento
+                const preferredOrder = [
+                    'titulo',
+                    'comunidades.nome',
+                    'pastorais.nome',
+                    'pilares.nome',
+                    'locais.nome',
+                    'acoes.nome',
+                    'data_inicio',
+                    'data_fim',
+                    'evento_paroquial',
+                    'visibilidade'
+                ];
+                const orderMap = new Map();
+                preferredOrder.forEach((k, idx) => orderMap.set(k, idx));
+
+                return filtered.sort((a, b) => {
+                    const ia = orderMap.has(a) ? orderMap.get(a) : Infinity;
+                    const ib = orderMap.has(b) ? orderMap.get(b) : Infinity;
+                    if (ia !== ib) return ia - ib;
+                    return a.localeCompare(b, 'pt-BR');
+                });
+            }
+
+            function getPreferredKeys(keys, moduleKey) {
+                const prefs = [];
+                const tryAdd = (k) => { if (keys.includes(k)) prefs.push(k); };
+
+                // Colunas mais comuns esperadas para auditoria
+                if (moduleKey === 'auditoria') {
+                    [
+                        'acao',
+                        'created_at',
+                        'descricao',
+                        'modulo',
+                        'recurso',
+                        'usuario'
+                    ].forEach(tryAdd);
+                }
+
+                // defaults comuns
+                ['codigo', 'nome', 'email', 'ativo', 'ultimo_login', 'data_inicio', 'data_fim', 'titulo', 'descricao'].forEach(tryAdd);
+
+                if (moduleKey === 'agenda') {
+                    // Ordem de colunas inspirada na sequência do modal de novo agendamento
+                    [
+                        'titulo',
+                        'comunidades.nome',
+                        'pastorais.nome',
+                        'pilares.nome',
+                        'locais.nome',
+                        'acoes.nome',
+                        'data_inicio',
+                        'data_fim',
+                        'evento_paroquial',
+                        'visibilidade',
+                        'pessoas.nome',
+                        'usuario_lancamento_nome',
+                        'usuario_lancamento_email'
+                    ].forEach(tryAdd);
+                }
+
+                // Garante pelo menos 6 colunas
+                if (prefs.length < 6) {
+                    keys.slice(0, 6).forEach(k => { if (!prefs.includes(k)) prefs.push(k); });
+                }
+
+                // Limita para não poluir
+                return prefs.slice(0, 12);
+            }
+
+            function humanizeKey(k) {
+                if (!k) return '';
+                const normalized = String(k).toLowerCase();
+
+                // Nomes mais amigáveis para alguns campos específicos
+                if (normalized === 'created_at' || normalized === 'created at' || normalized === 'criado_em') {
+                    return 'Criação';
+                }
+
+                const cleaned = k.replace(/\./g, ' ').replace(/_/g, ' ').trim();
+                return cleaned.split(/\s+/).map(w => w ? (w.charAt(0).toUpperCase() + w.slice(1)) : '').join(' ');
+            }
+
+            function looksLikeDateKey(k) {
+                const s = String(k || '').toLowerCase();
+                return (
+                    s.includes('data') ||
+                    s.includes('date') ||
+                    s.includes('hora') ||
+                    s.includes('time') ||
+                    s.includes('datetime') ||
+                    s.endsWith('_at') ||
+                    s.includes('login') ||
+                    s.includes('created') ||
+                    s.includes('updated')
+                );
+            }
+
+            function looksLikeImageKey(k) {
+                const s = String(k || '').toLowerCase();
+                return (
+                    s.includes('imagem') ||
+                    s.includes('image') ||
+                    s.includes('foto') ||
+                    s.includes('avatar') ||
+                    s.endsWith('_url') ||
+                    s.endsWith('_img') ||
+                    s.endsWith('_image')
+                );
+            }
+
+            function isSafeImageUrl(url) {
+                if (!url) return false;
+                const s = String(url).trim();
+                if (!s) return false;
+                const lower = s.toLowerCase();
+                return (
+                    lower.startsWith('http://') ||
+                    lower.startsWith('https://') ||
+                    lower.startsWith('/') ||
+                    lower.startsWith('./') ||
+                    lower.startsWith('../') ||
+                    lower.startsWith('data:image')
+                );
+            }
+
+            function parseDateValue(v) {
+                if (!v) return null;
+                if (v instanceof Date) return v;
+
+                if (typeof v === 'string') {
+                    const s = v.trim();
+
+                    // ISO / formato padrão JS
+                    const iso = new Date(s);
+                    if (!Number.isNaN(iso.getTime())) return iso;
+
+                    // Formato brasileiro: dd/mm/aaaa ou dd/mm/aaaa HH:MM
+                    const brDateTime = /^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{2}):(\d{2}))?$/;
+                    const m = s.match(brDateTime);
+                    if (m) {
+                        const day = parseInt(m[1], 10);
+                        const month = parseInt(m[2], 10) - 1;
+                        const year = parseInt(m[3], 10);
+                        const hour = m[4] ? parseInt(m[4], 10) : 0;
+                        const min = m[5] ? parseInt(m[5], 10) : 0;
+                        const d = new Date(year, month, day, hour, min, 0, 0);
+                        if (!Number.isNaN(d.getTime())) return d;
+                    }
+                }
+
+                const d = new Date(v);
+                if (Number.isNaN(d.getTime())) return null;
+                return d;
+            }
+
+            function getStatusFromRow(r) {
+                // tenta campos comuns
+                const ativo = r['ativo'];
+                if (typeof ativo === 'boolean') return ativo ? 'ativo' : 'inativo';
+                const status = (r['status'] || r['Status'] || '').toString().toLowerCase();
+                if (status.includes('inativo')) return 'inativo';
+                if (status.includes('ativo')) return 'ativo';
+                return 'ativo'; // default
+            }
+
+            function stringifyCell(v, keyHint) {
+                if (v === null || v === undefined) return '';
+                if (typeof v === 'boolean') return v ? 'Sim' : 'Não';
+
+                // Formatação especial para datas com hora
+                if (keyHint && looksLikeDateKey(keyHint)) {
+                    const d = parseDateValue(v);
+                    if (d) {
+                        const dd = String(d.getDate()).padStart(2, '0');
+                        const mm = String(d.getMonth() + 1).padStart(2, '0');
+                        const yyyy = d.getFullYear();
+                        const hh = String(d.getHours()).padStart(2, '0');
+                        const mi = String(d.getMinutes()).padStart(2, '0');
+                        return `${dd}/${mm}/${yyyy} : ${hh}:${mi}`;
+                    }
+                }
+
+                return String(v);
+            }
+
+            function csvEscape(val) {
+                const s = (val === null || val === undefined) ? '' : String(val);
+                const needs = /[",\n]/.test(s);
+                const escaped = s.replace(/"/g, '""');
+                return needs ? `"${escaped}"` : escaped;
+            }
+
+            function downloadText(text, filename, mime) {
+                const blob = new Blob([text], { type: mime || 'text/plain;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
+            }
+
+            function escapeHtml(s) {
+                return String(s ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+        }
+    </script>
+</body>
+</html>
+

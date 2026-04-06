@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Apresentação - Agendamento Dinâmico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: rgba(15, 23, 42, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #0f172a;
+        }
+
+        .onboarding-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at top, rgba(59,130,246,0.28), transparent 55%),
+                        rgba(15,23,42,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 9999;
+        }
+
+        .onboarding-card {
+            background: #ffffff;
+            max-width: 1040px;
+            width: 100%;
+            border-radius: 18px;
+            box-shadow: 0 24px 70px rgba(15,23,42,0.55);
+            padding: 28px 32px 24px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+            gap: 28px;
+            position: relative;
+        }
+
+        @media (max-width: 820px) {
+            .onboarding-card {
+                grid-template-columns: 1fr;
+                padding: 20px 18px 16px;
+            }
+        }
+
+        .onboarding-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+        }
+
+        .onboarding-close:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .onboarding-close:active {
+            transform: scale(0.96);
+        }
+
+        .onboarding-header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .onboarding-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            color: #1d4ed8;
+            background: #eff6ff;
+            padding: 4px 9px;
+            border-radius: 999px;
+        }
+
+        .onboarding-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .onboarding-title i {
+            color: #1d4ed8;
+        }
+
+        .onboarding-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            max-width: 420px;
+        }
+
+        .onboarding-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 18px 0 12px;
+        }
+
+        .onboarding-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+            color: #0f172a;
+        }
+
+        .onboarding-step-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .onboarding-step strong {
+            font-weight: 600;
+        }
+
+        .onboarding-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .onboarding-checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12px;
+            color: #64748b;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .onboarding-checkbox input {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            border: 1px solid #cbd5f5;
+            cursor: pointer;
+        }
+
+        .onboarding-primary {
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+            color: #ffffff;
+            padding: 9px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(37,99,235,0.4);
+            transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+        }
+
+        .onboarding-primary:hover {
+            filter: brightness(1.03);
+            box-shadow: 0 12px 36px rgba(37,99,235,0.55);
+        }
+
+        .onboarding-primary:active {
+            transform: translateY(1px);
+            box-shadow: 0 6px 18px rgba(37,99,235,0.4);
+        }
+
+        /* Lado direito: animação visual */
+        .onboarding-visual {
+            position: relative;
+            border-radius: 16px;
+            background: radial-gradient(circle at top left, rgba(59,130,246,0.26), transparent 55%),
+                        #0f172a;
+            padding: 16px 16px 14px;
+            overflow: hidden;
+        }
+
+        .onboarding-visual-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #e2e8f0;
+            font-size: 12px;
+        }
+
+        .onboarding-visual-toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+        }
+
+        .toggle-pill {
+            width: 32px;
+            height: 16px;
+            border-radius: 999px;
+            background: rgba(148,163,184,0.6);
+            position: relative;
+        }
+
+        .toggle-pill::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            animation: toggleSlide 4s infinite ease-in-out;
+        }
+
+        @keyframes toggleSlide {
+            0%, 15% { transform: translateX(0); }
+            20%, 40% { transform: translateX(16px); }
+            45%, 100% { transform: translateX(16px); }
+        }
+
+        .calendar-shell {
+            background: rgba(15,23,42,0.88);
+            border-radius: 14px;
+            padding: 10px;
+            border: 1px solid rgba(148,163,184,0.35);
+            backdrop-filter: blur(6px);
+        }
+
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            color: #e5e7eb;
+            font-size: 11px;
+        }
+
+        .calendar-header-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .calendar-header-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .calendar-mini-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            border: none;
+            background: rgba(148,163,184,0.24);
+            color: #e5e7eb;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+            font-size: 9px;
+            margin-bottom: 8px;
+        }
+
+        .weekday-label {
+            color: #9ca3af;
+            text-align: center;
+            padding-bottom: 2px;
+        }
+
+        .day-cell {
+            height: 18px;
+            border-radius: 6px;
+            background: rgba(15,23,42,0.9);
+            border: 1px solid rgba(55,65,81,0.9);
+            color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-cell.highlight-1,
+        .day-cell.highlight-2,
+        .day-cell.highlight-3 {
+            border-color: rgba(129,140,248,0.9);
+        }
+
+        .day-cell.highlight-1::before,
+        .day-cell.highlight-2::before,
+        .day-cell.highlight-3::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(96,165,250,0.95), rgba(129,140,248,0.95));
+            opacity: 0;
+        }
+
+        /* Sequência: marcar dias diferentes ao longo do tempo */
+        .day-cell.highlight-1::after,
+        .day-cell.highlight-2::after,
+        .day-cell.highlight-3::after {
+            content: attr(data-day);
+            position: relative;
+            z-index: 2;
+        }
+
+        .day-cell.highlight-1 {
+            animation: pickDay1 4s infinite ease-in-out;
+        }
+        .day-cell.highlight-2 {
+            animation: pickDay2 4s infinite ease-in-out;
+        }
+        .day-cell.highlight-3 {
+            animation: pickDay3 4s infinite ease-in-out;
+        }
+
+        @keyframes pickDay1 {
+            0%, 10% { background: rgba(15,23,42,0.9); }
+            15%, 55% { background: linear-gradient(135deg, #1d4ed8, #22c55e); }
+            60%, 100% { background: rgba(15,23,42,0.9); }
+        }
+
+        @keyframes pickDay2 {
+            0%, 22% { background: rgba(15,23,42,0.9); }
+            27%, 67% { background: linear-gradient(135deg, #1d4ed8, #22c55e); }
+            72%, 100% { background: rgba(15,23,42,0.9); }
+        }
+
+        @keyframes pickDay3 {
+            0%, 34% { background: rgba(15,23,42,0.9); }
+            39%, 79% { background: linear-gradient(135deg, #1d4ed8, #22c55e); }
+            84%, 100% { background: rgba(15,23,42,0.9); }
+        }
+
+        .time-strip {
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #cbd5f5;
+        }
+
+        .time-strip-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(30,64,175,0.9);
+            border-radius: 999px;
+            padding: 3px 8px;
+            box-shadow: 0 0 0 1px rgba(129,140,248,0.8);
+            animation: timeStripPulse 4s infinite ease-in-out;
+        }
+
+        @keyframes timeStripPulse {
+            0%, 35% { transform: translateY(0); opacity: 0.4; }
+            40%, 70% { transform: translateY(-1px); opacity: 1; }
+            75%, 100% { transform: translateY(0); opacity: 0.4; }
+        }
+
+        .time-strip-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: #bbf7d0;
+        }
+
+        .preview-periods {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .preview-period-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 6px;
+            background: rgba(15,23,42,0.96);
+            border: 1px solid rgba(148,163,184,0.6);
+            color: #e5e7eb;
+            opacity: 0;
+        }
+
+        .preview-period-item:nth-child(1) { animation: showPeriod 4s infinite ease-in-out; animation-delay: 1.3s; }
+        .preview-period-item:nth-child(2) { animation: showPeriod 4s infinite ease-in-out; animation-delay: 1.6s; }
+        .preview-period-item:nth-child(3) { animation: showPeriod 4s infinite ease-in-out; animation-delay: 1.9s; }
+
+        @keyframes showPeriod {
+            0%, 40% { opacity: 0; transform: translateY(4px); }
+            45%, 80% { opacity: 1; transform: translateY(0); }
+            85%, 100% { opacity: 0; transform: translateY(-2px); }
+        }
+
+        .preview-period-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #a5b4fc;
+        }
+
+        .preview-period-time {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-overlay" id="onboardingAgendamentoDinamico">
+        <div class="onboarding-card">
+            <button class="onboarding-close" type="button" id="onboardingCloseBtn">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <!-- Lado esquerdo: texto e fluxo -->
+            <div>
+                <div class="onboarding-header">
+                    <div class="onboarding-badge">
+                        <i class="fas fa-bolt"></i>
+                        Novidade
+                    </div>
+                    <h1 class="onboarding-title">
+                        <i class="fas fa-calendar-plus"></i>
+                        Agendamento Dinâmico
+                    </h1>
+                    <p class="onboarding-subtitle">
+                        Selecione vários dias de uma só vez, informe o horário, e deixe o ParoquiaON criar todos os períodos automaticamente para você.
+                    </p>
+                </div>
+
+                <div class="onboarding-steps">
+                    <div class="onboarding-step">
+                        <div class="onboarding-step-icon">1</div>
+                        <div>
+                            <strong>Ative o Agendamento Dinâmico no modal de Novo Agendamento.</strong><br>
+                            O formulário de período muda para o modo com mini calendário + horário.
+                        </div>
+                    </div>
+                    <div class="onboarding-step">
+                        <div class="onboarding-step-icon">2</div>
+                        <div>
+                            <strong>Clique em todos os dias que vão usar o mesmo horário.</strong><br>
+                            Os dias selecionados ficam destacados no mini calendário.
+                        </div>
+                    </div>
+                    <div class="onboarding-step">
+                        <div class="onboarding-step-icon">3</div>
+                        <div>
+                            <strong>Defina o horário de início e fim e clique em “Adicionar”.</strong><br>
+                            A lista “Períodos do Agendamento” será preenchida com um período para cada dia escolhido.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="onboarding-footer">
+                    <label class="onboarding-checkbox">
+                        <input type="checkbox" id="onboardingDontShowAgain">
+                        <span>Não mostrar novamente para este navegador</span>
+                    </label>
+
+                    <button class="onboarding-primary" type="button" id="onboardingPrimaryBtn">
+                        Entendi, quero usar agora
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lado direito: animação visual do fluxo -->
+            <div class="onboarding-visual">
+                <div class="onboarding-visual-header">
+                    <span style="font-size:11px; color:#cbd5f5;">Fluxo visual</span>
+                    <div class="onboarding-visual-toggle-row">
+                        <span style="font-size:10px; color:#cbd5f5;">Agendamento Dinâmico</span>
+                        <div class="toggle-pill"></div>
+                    </div>
+                </div>
+
+                <div class="calendar-shell">
+                    <div class="calendar-header">
+                        <div class="calendar-header-title">
+                            <i class="fas fa-calendar-week" style="font-size:11px;color:#93c5fd;"></i>
+                            <span>Mini calendário</span>
+                        </div>
+                        <div class="calendar-header-controls">
+                            <button class="calendar-mini-btn">
+                                <i class="fas fa-chevron-left" style="font-size:9px;"></i>
+                            </button>
+                            <button class="calendar-mini-btn">
+                                <i class="fas fa-chevron-right" style="font-size:9px;"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="calendar-grid">
+                        <div class="weekday-label">D</div>
+                        <div class="weekday-label">S</div>
+                        <div class="weekday-label">T</div>
+                        <div class="weekday-label">Q</div>
+                        <div class="weekday-label">Q</div>
+                        <div class="weekday-label">S</div>
+                        <div class="weekday-label">S</div>
+
+                        <!-- Linha 1 -->
+                        <div class="day-cell" data-day="1"></div>
+                        <div class="day-cell" data-day="2"></div>
+                        <div class="day-cell" data-day="3"></div>
+                        <div class="day-cell" data-day="4"></div>
+                        <div class="day-cell" data-day="5"></div>
+                        <div class="day-cell" data-day="6"></div>
+                        <div class="day-cell" data-day="7"></div>
+
+                        <!-- Linha 2 -->
+                        <div class="day-cell" data-day="8"></div>
+                        <div class="day-cell highlight-1" data-day="9"></div>
+                        <div class="day-cell" data-day="10"></div>
+                        <div class="day-cell" data-day="11"></div>
+                        <div class="day-cell highlight-2" data-day="12"></div>
+                        <div class="day-cell" data-day="13"></div>
+                        <div class="day-cell" data-day="14"></div>
+
+                        <!-- Linha 3 -->
+                        <div class="day-cell" data-day="15"></div>
+                        <div class="day-cell" data-day="16"></div>
+                        <div class="day-cell highlight-3" data-day="17"></div>
+                        <div class="day-cell" data-day="18"></div>
+                        <div class="day-cell" data-day="19"></div>
+                        <div class="day-cell" data-day="20"></div>
+                        <div class="day-cell" data-day="21"></div>
+
+                        <!-- Linha 4 -->
+                        <div class="day-cell" data-day="22"></div>
+                        <div class="day-cell" data-day="23"></div>
+                        <div class="day-cell" data-day="24"></div>
+                        <div class="day-cell" data-day="25"></div>
+                        <div class="day-cell" data-day="26"></div>
+                        <div class="day-cell" data-day="27"></div>
+                        <div class="day-cell" data-day="28"></div>
+
+                        <!-- Linha 5 -->
+                        <div class="day-cell" data-day="29"></div>
+                        <div class="day-cell" data-day="30"></div>
+                        <div class="day-cell" data-day="31"></div>
+                        <div class="day-cell"></div>
+                        <div class="day-cell"></div>
+                        <div class="day-cell"></div>
+                        <div class="day-cell"></div>
+                    </div>
+
+                    <div class="time-strip">
+                        <div class="time-strip-main">
+                            <span class="time-strip-dot"></span>
+                            <span>19:00 - 20:00</span>
+                        </div>
+                        <span style="font-size:9px; color:#9ca3af;">Horário aplicado</span>
+                    </div>
+
+                    <div class="preview-periods">
+                        <div class="preview-period-item">
+                            <div class="preview-period-badge">
+                                <i class="fas fa-calendar-day" style="font-size:9px;"></i>
+                                <span>09/08</span>
+                            </div>
+                            <span class="preview-period-time">19:00 - 20:00</span>
+                        </div>
+                        <div class="preview-period-item">
+                            <div class="preview-period-badge">
+                                <i class="fas fa-calendar-day" style="font-size:9px;"></i>
+                                <span>12/08</span>
+                            </div>
+                            <span class="preview-period-time">19:00 - 20:00</span>
+                        </div>
+                        <div class="preview-period-item">
+                            <div class="preview-period-badge">
+                                <i class="fas fa-calendar-day" style="font-size:9px;"></i>
+                                <span>17/08</span>
+                            </div>
+                            <span class="preview-period-time">19:00 - 20:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Apenas comportamento local do exemplo: fechar overlay (a persistência será implementada na tela real)
+        (function() {
+            const overlay = document.getElementById('onboardingAgendamentoDinamico');
+            const closeBtn = document.getElementById('onboardingCloseBtn');
+            const primaryBtn = document.getElementById('onboardingPrimaryBtn');
+
+            function closeOverlay() {
+                if (!overlay) return;
+                overlay.style.opacity = '0';
+                overlay.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 200);
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeOverlay);
+            }
+            if (primaryBtn) {
+                primaryBtn.addEventListener('click', closeOverlay);
+            }
+        })();
+    </script>
+</body>
+</html>
+
+

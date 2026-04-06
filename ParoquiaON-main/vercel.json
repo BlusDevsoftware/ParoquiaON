@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/api-paroquiaon/src/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "frontend/src/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/api-paroquiaon/src/index.js"
+    },
+    {
+      "src": "/",
+      "dest": "/frontend/src/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/src/$1"
+    }
+  ]
+}

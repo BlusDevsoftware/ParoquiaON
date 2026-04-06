@@ -1,0 +1,729 @@
+<!-- Modais da Agenda - ParoquiaON -->
+<!-- Este arquivo contém todos os modais relacionados à funcionalidade de agenda -->
+
+<!-- Modal removido - usando apenas o modal padrão -->
+
+<!-- Estilos específicos para o botão de IA (ícone inspirado no Gemini) -->
+<style>
+    .ai-objetivo-actions .gemini-icon {
+        position: relative;
+        width: 20px;
+        height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 6px;
+    }
+
+    .ai-objetivo-actions .gemini-star {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform: rotate(45deg);
+        border-radius: 40%;
+        border: 3px solid #1d9bf0;
+        background: radial-gradient(circle at 50% 50%, #e0f2ff 0%, #bfdbfe 40%, #eff6ff 80%);
+        box-shadow:
+            0 0 4px rgba(59, 130, 246, 0.7),
+            0 0 10px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Anel de loading em volta do ícone (mostrado apenas enquanto gera) */
+    .ai-objetivo-actions .gemini-loading-ring {
+        position: absolute;
+        border-radius: 999px;
+        width: 26px;
+        height: 26px;
+        border: 2px solid rgba(191, 219, 254, 0.4);
+        border-top-color: #1d9bf0;
+        border-right-color: #1d4ed8;
+        opacity: 0;
+        transform-origin: center;
+        pointer-events: none;
+    }
+
+    /* Quando o botão estiver carregando, mostrar animação de rotação */
+    #btnGerarObjetivoIA.ai-loading .gemini-loading-ring {
+        opacity: 1;
+        animation: gemini-spin 0.9s linear infinite;
+    }
+
+    /* Estilização específica do botão de IA */
+    #btnGerarObjetivoIA {
+        border-radius: 999px;
+        border: 1px solid rgba(147, 197, 253, 0.7);
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        color: #1d4ed8;
+        font-weight: 600;
+        padding-inline: 14px;
+    }
+
+    #btnGerarObjetivoIA:hover {
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        border-color: #60a5fa;
+        color: #1d4ed8;
+        box-shadow: 0 0 0 1px rgba(191, 219, 254, 0.9);
+    }
+
+    @keyframes gemini-spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<!-- Modal de Novo Agendamento (versão padrão) -->
+<div id="eventModal" class="modal active" style="display: none;">
+    <div class="modal-content new-appointment-modal">
+        <div class="modal-header new-appointment-header">
+            <h2 class="modal-title"><i class="fas fa-calendar-plus"></i> Novo Agendamento</h2>
+            <button class="close-modal" onclick="closeEventModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body new-appointment-body">
+            <form id="eventForm">
+                <!-- Seção: Informações da Comunidade -->
+                <div class="form-section patient-section">
+                    <h3 class="section-title">Informações da Comunidade</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Título do Evento *</label>
+                            <input type="text" id="eventTitle" name="titulo" required placeholder="Digite o título do evento">
+                        </div>
+                        <div class="form-group">
+                            <label>Comunidade</label>
+                            <select id="eventCommunity" name="comunidade">
+                                <option value="">Selecione a comunidade</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Pastoral *</label>
+                            <select id="eventPastoral" name="pastoral" required>
+                                <option value="">Selecione a pastoral</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Pilar *</label>
+                            <select id="eventPilares" name="pilares" required>
+                                <option value="">Selecione o pilar</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Local *</label>
+                            <select id="eventLocation" name="local" required>
+                                <option value="">Selecione o local</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ação *</label>
+                            <select id="eventAcao" name="acao" required>
+                                <option value="">Selecione a ação</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção: Informações do agendamento -->
+                <div class="form-section appointment-section">
+                    <h3 class="section-title">Informações do agendamento</h3>
+                    
+                    <!-- Toggles -->
+                    <div class="form-row toggles-row">
+                        <div class="toggle-group">
+                            <label>Evento Paroquial:</label>
+                            <label class="switch">
+                                <input type="checkbox" id="eventParoquial" name="evento_paroquial">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-group">
+                            <label>Múltiplos dias:</label>
+                            <label class="switch">
+                                <input type="checkbox" id="eventMultiplos" name="multiplos">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-group">
+                            <label class="dynamic-mode-toggle-label">
+                                Agendamento Dinâmico:
+                                <span class="novidade-badge" title="Nova funcionalidade!">
+                                    <i class="fas fa-bolt"></i>
+                                    <span>NOVO</span>
+                                </span>
+                            </label>
+                            <label class="switch">
+                                <input type="checkbox" id="eventDinamico" name="agendamento_dinamico">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Modo padrão de períodos (um período por vez) -->
+                    <div class="add-period-section" id="periodModeSimple">
+                        <h4 class="subsection-title">Adicionar Período</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label id="labelNewPeriodDate">Data: *</label>
+                                <input type="date" id="newPeriodDate" required>
+                            </div>
+                            <div class="form-group" id="groupNewPeriodEndDate" style="display:none;">
+                                <label>Data fim: *</label>
+                                <input type="date" id="newPeriodEndDate">
+                            </div>
+                            <div class="form-group">
+                                <label>De: *</label>
+                                <input type="time" id="newPeriodStartTime" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Até: *</label>
+                                <input type="time" id="newPeriodEndTime" required>
+                            </div>
+                            <div class="form-group add-period-btn-group">
+                                <label>&nbsp;</label>
+                                <button type="button" class="btn-add-period" id="btnAddPeriod">
+                                    <i class="fas fa-plus"></i> Adicionar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modo dinâmico: seleção de vários dias em mini calendário + hora única -->
+                    <div class="add-period-section" id="periodModeDynamic" style="display: none;">
+                        <h4 class="subsection-title">Agendamento Dinâmico</h4>
+                        <div class="dynamic-periods-container">
+                            <!-- Mini calendário para seleção de múltiplos dias -->
+                            <div class="dynamic-mini-calendar">
+                                <div class="dynamic-mini-calendar-header">
+                                    <button type="button" class="dynamic-mini-nav-btn" id="dynamicPrevMonthBtn">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <span id="dynamicMiniCalendarTitle">Mês Atual</span>
+                                    <button type="button" class="dynamic-mini-nav-btn" id="dynamicNextMonthBtn">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <div class="dynamic-mini-calendar-grid" id="dynamicMiniCalendarGrid">
+                                    <!-- Cabeçalho de dias da semana -->
+                                    <div class="dynamic-mini-weekday">D</div>
+                                    <div class="dynamic-mini-weekday">S</div>
+                                    <div class="dynamic-mini-weekday">T</div>
+                                    <div class="dynamic-mini-weekday">Q</div>
+                                    <div class="dynamic-mini-weekday">Q</div>
+                                    <div class="dynamic-mini-weekday">S</div>
+                                    <div class="dynamic-mini-weekday">S</div>
+                                    <!-- Dias serão inseridos via JavaScript futuramente -->
+                                </div>
+                                <div class="dynamic-info-text">
+                                    Selecione um ou mais dias no calendário para aplicar o mesmo horário.
+                                </div>
+                            </div>
+
+                            <!-- Campos de horário para aplicar aos dias selecionados -->
+                            <div class="dynamic-time-form">
+                                <div class="dynamic-time-row">
+                                    <div class="form-group">
+                                        <label>De: *</label>
+                                        <input type="time" id="dynamicStartTime">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Até: *</label>
+                                        <input type="time" id="dynamicEndTime">
+                                    </div>
+                                    <div class="form-group dynamic-add-btn-group">
+                                        <label>&nbsp;</label>
+                                        <button type="button" class="btn-add-period" id="btnAddDynamicPeriods">
+                                            <i class="fas fa-plus"></i> Adicionar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="dynamic-info-text">
+                                    Este botão criará vários períodos de uma só vez usando os dias selecionados.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de períodos adicionados -->
+                    <div class="periods-list-section">
+                        <h4 class="subsection-title">Períodos do Agendamento</h4>
+                        <div class="periods-list" id="periodsList">
+                            <div class="no-periods-message">
+                                <i class="fas fa-calendar-plus"></i>
+                                <p>Nenhum período adicionado ainda.</p>
+                                <small>Adicione pelo menos um período para continuar.</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label>Objetivo/Descrição:</label>
+                            <div class="ai-objetivo-actions" style="display:flex; gap:10px; align-items:center; margin: 6px 0 10px 0; flex-wrap: wrap;">
+                                <button type="button" class="btn-secondary" id="btnGerarObjetivoIA" title="Gerar um texto de objetivo automaticamente com IA">
+                                    <span class="gemini-icon">
+                                        <span class="gemini-star"></span>
+                                        <span class="gemini-loading-ring"></span>
+                                    </span>
+                                    Gerar objetivo com IA
+                                </button>
+                                <small id="aiObjetivoStatus" style="color:#6b7280;"></small>
+                            </div>
+                            <textarea id="eventObjetivo" name="objetivo" rows="3" placeholder="Digite o objetivo ou descrição do evento"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions new-appointment-actions">
+                    <button type="button" class="btn-secondary" onclick="closeEventModal()">
+                        Fechar
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Salvar Evento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Visualização de Agendamento -->
+<div id="modalEdicaoAgendamento" class="modal-view-overlay" style="display: none;">
+    <div class="modal-view-container">
+        <!-- Header roxo com gradiente -->
+        <div class="modal-view-header">
+            <div class="modal-view-header-left">
+                <div class="modal-view-icon">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="modal-view-title-group">
+                    <div class="modal-view-title-row">
+                        <h2 class="modal-view-title" id="editEventTitle">Sem título</h2>
+                        <span class="modal-view-badge-paroquial" id="editEventParoquialBadge" style="display: none;" title="Evento oficial da paróquia">
+                            <i class="fas fa-church"></i>
+                            <span>Evento Paroquial</span>
+                        </span>
+                    </div>
+                    <p class="modal-view-subtitle">
+                        <i class="fas fa-sparkles"></i> Detalhes do agendamento
+                    </p>
+                    <p class="modal-view-subtitle" style="font-size: 12px; opacity: 0.9;">
+                        <i class="fas fa-clock"></i>
+                        <span>Criado em&nbsp;</span>
+                        <span id="editEventCreatedAt">Não informado</span>
+                    </p>
+                </div>
+            </div>
+            <button class="modal-view-close-btn" onclick="closeEditEventModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- Conteúdo branco -->
+        <div class="modal-view-body">
+            <!-- Usuário Agendador -->
+            <div class="modal-view-detail-item">
+                <div class="modal-view-detail-icon">
+                    <!-- Foto do usuário agendador -->
+                    <img id="editEventUsuarioAgendadorFoto" src="" alt="Usuário agendador" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;">
+                    <!-- Ícone padrão (fallback quando não houver foto) -->
+                    <i class="fas fa-user" id="editEventUsuarioAgendadorIcon"></i>
+                </div>
+                <div class="modal-view-detail-content">
+                    <label class="modal-view-detail-label">USUÁRIO AGENDADOR</label>
+                    <span class="modal-view-detail-value" id="editEventUsuarioAgendador">Não informado</span>
+                </div>
+            </div>
+
+            <!-- Data e Hora -->
+            <div class="modal-view-detail-item">
+                <div class="modal-view-detail-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="modal-view-detail-content">
+                    <label class="modal-view-detail-label">DATA E HORA</label>
+                    <span class="modal-view-detail-value" id="editEventDateTime">Não informado</span>
+                </div>
+            </div>
+            
+            <!-- Local -->
+            <div class="modal-view-detail-item">
+                <div class="modal-view-detail-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="modal-view-detail-content">
+                    <label class="modal-view-detail-label">LOCAL</label>
+                    <span class="modal-view-detail-value" id="editEventLocal">Não informado</span>
+                </div>
+            </div>
+            
+            <!-- Pilar -->
+            <div class="modal-view-detail-item">
+                <div class="modal-view-detail-icon">
+                    <i class="fas fa-bookmark"></i>
+                </div>
+                <div class="modal-view-detail-content">
+                    <label class="modal-view-detail-label">PILAR</label>
+                    <span class="modal-view-detail-value" id="editEventPilar">Não informado</span>
+                </div>
+            </div>
+            
+            <!-- Ação -->
+            <div class="modal-view-detail-item">
+                <div class="modal-view-detail-icon">
+                    <i class="far fa-heart"></i>
+                </div>
+                <div class="modal-view-detail-content">
+                    <label class="modal-view-detail-label">AÇÃO</label>
+                    <span class="modal-view-detail-value" id="editEventAcao">Não informado</span>
+                </div>
+            </div>
+            
+            <!-- Comunidade -->
+            <div class="modal-view-detail-item">
+                <div class="modal-view-detail-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="modal-view-detail-content">
+                    <label class="modal-view-detail-label">COMUNIDADE</label>
+                    <span class="modal-view-detail-value" id="editEventComunidade">Não informado</span>
+                </div>
+            </div>
+            
+            <!-- Pastoral -->
+            <div class="modal-view-detail-item">
+                <div class="modal-view-detail-icon">
+                    <i class="far fa-heart"></i>
+                </div>
+                <div class="modal-view-detail-content">
+                    <label class="modal-view-detail-label">PASTORAL</label>
+                    <span class="modal-view-detail-value" id="editEventPastoral">Não informado</span>
+                </div>
+            </div>
+            
+            <!-- Objetivo (seção destacada) -->
+            <div class="modal-view-objetivo-box" id="editEventObjetivoRow" style="display: none;">
+                <div class="modal-view-objetivo-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="modal-view-objetivo-content">
+                    <label class="modal-view-objetivo-label">
+                        <i class="fas fa-sparkles"></i> OBJETIVO
+                    </label>
+                    <p class="modal-view-objetivo-value" id="editEventObjetivo"></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer com botões -->
+        <div class="modal-view-footer">
+            <button class="modal-view-btn modal-view-btn-edit" id="btnEditEvent">
+                <i class="fas fa-pen"></i> Editar
+            </button>
+            <button class="modal-view-btn modal-view-btn-whatsapp" id="btnShareEvent">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </button>
+            <button class="modal-view-btn modal-view-btn-delete" id="btnDeleteEvent">
+                <i class="fas fa-trash"></i> Excluir
+            </button>
+            <button class="modal-view-btn" id="btnCloseViewEvent" onclick="closeEditEventModal()">
+                <i class="fas fa-times"></i> Fechar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de apresentação do Agendamento Dinâmico (onboarding) -->
+<div id="onboardingAgendamentoDinamicoModal" class="modal" style="display: none;">
+    <div class="modal-content new-appointment-modal" style="max-width: 900px;">
+        <div class="modal-header new-appointment-header">
+            <h2 class="modal-title">
+                <i class="fas fa-bolt"></i>
+                Agendamento Dinâmico
+            </h2>
+            <button class="close-modal" id="onboardingAgendamentoCloseBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body new-appointment-body" style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr); gap: 20px; align-items: stretch;">
+            <!-- Lado esquerdo: texto explicativo -->
+            <div>
+                <p style="font-size: 14px; color: #4b5563; margin-bottom: 14px;">
+                    Com o <strong>Agendamento Dinâmico</strong> você pode selecionar vários dias no mini calendário,
+                    informar um único horário de início e fim, e deixar o sistema criar todos os períodos de uma só vez.
+                </p>
+
+                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #374151;">
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">1</span>
+                        <span><strong>Ative o Agendamento Dinâmico</strong> no modal de Novo Agendamento.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">2</span>
+                        <span><strong>Clique em todos os dias</strong> que vão usar o mesmo horário no mini calendário.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">3</span>
+                        <span>
+                            <strong>Defina o horário de início e fim</strong> e clique em <strong>Adicionar</strong> no bloco de Agendamento Dinâmico.
+                            A lista <em>Períodos do Agendamento</em> receberá um período para cada dia escolhido.
+                        </span>
+                    </li>
+                </ul>
+
+            </div>
+
+            <!-- Lado direito: mini ilustração do fluxo -->
+            <div style="border-radius: 12px; border: 1px solid #e5e7eb; padding: 12px; background: linear-gradient(135deg, #eef2ff, #eff6ff);">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:11px; color:#4b5563;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <i class="fas fa-calendar-week" style="color:#6366f1; font-size:11px;"></i>
+                        <span>Mini calendário</span>
+                    </div>
+                    <span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; color:#1f2937;">
+                        <i class="fas fa-toggle-on" style="color:#16a34a;"></i>
+                        Dinâmico
+                    </span>
+                </div>
+
+                <!-- Grade simples de dias com destaque em 3 dias -->
+                <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:3px; font-size:9px; margin-bottom:8px;">
+                    <span style="text-align:center; color:#6b7280;">D</span>
+                    <span style="text-align:center; color:#6b7280;">S</span>
+                    <span style="text-align:center; color:#6b7280;">T</span>
+                    <span style="text-align:center; color:#6b7280;">Q</span>
+                    <span style="text-align:center; color:#6b7280;">Q</span>
+                    <span style="text-align:center; color:#6b7280;">S</span>
+                    <span style="text-align:center; color:#6b7280;">S</span>
+
+                    <!-- Linha 1 -->
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px; border-radius:6px; border:1px solid #c7d2fe; background:#e0ebff; text-align:center; line-height:18px; font-weight:600; color:#1d4ed8;">9</div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px; border-radius:6px; border:1px solid #c7d2fe; background:#e0ebff; text-align:center; line-height:18px; font-weight:600; color:#1d4ed8;">12</div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+
+                    <!-- Linha 2 -->
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px; border-radius:6px; border:1px solid #c7d2fe; background:#e0ebff; text-align:center; line-height:18px; font-weight:600; color:#1d4ed8;">17</div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+                    <div style="height:18px;"></div>
+                </div>
+
+                <!-- Horário aplicado -->
+                <div style="display:flex; align-items:center; justify-content:space-between; font-size:10px; margin-bottom:8px;">
+                    <div style="display:inline-flex; align-items:center; gap:6px; border-radius:999px; background:#1d4ed8; color:#eef2ff; padding:3px 8px;">
+                        <span style="width:6px; height:6px; border-radius:999px; background:#bbf7d0;"></span>
+                        <span>19:00 - 20:00</span>
+                    </div>
+                    <span style="color:#6b7280;">Horário aplicado</span>
+                </div>
+
+                <!-- Pré-visualização dos períodos criados -->
+                <div style="display:flex; flex-direction:column; gap:4px; font-size:10px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 6px; border-radius:6px; background:#ffffff; border:1px solid #e5e7eb;">
+                        <span style="display:inline-flex; align-items:center; gap:4px; color:#4b5563;">
+                            <i class="fas fa-calendar-day" style="font-size:9px; color:#4f46e5;"></i>
+                            09/08
+                        </span>
+                        <span style="font-variant-numeric:tabular-nums; color:#374151;">19:00 - 20:00</span>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 6px; border-radius:6px; background:#ffffff; border:1px solid #e5e7eb;">
+                        <span style="display:inline-flex; align-items:center; gap:4px; color:#4b5563;">
+                            <i class="fas fa-calendar-day" style="font-size:9px; color:#4f46e5;"></i>
+                            12/08
+                        </span>
+                        <span style="font-variant-numeric:tabular-nums; color:#374151;">19:00 - 20:00</span>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 6px; border-radius:6px; background:#ffffff; border:1px solid #e5e7eb;">
+                        <span style="display:inline-flex; align-items:center; gap:4px; color:#4b5563;">
+                            <i class="fas fa-calendar-day" style="font-size:9px; color:#4f46e5;"></i>
+                            17/08
+                        </span>
+                        <span style="font-variant-numeric:tabular-nums; color:#374151;">19:00 - 20:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid #e5e7eb; margin-top:8px;">
+            <div style="font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 8px; margin-left: 8px;">
+                <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <input type="checkbox" id="onboardingAgendamentoDontShowAgain" style="width: 13px; height: 13px;">
+                    <span>Não mostrar novamente para este navegador</span>
+                </label>
+            </div>
+            <button type="button" class="btn-primary" id="onboardingAgendamentoPrimaryBtn" style="padding: 8px 16px; font-size: 13px; margin-right: 8px;">
+                Entendi
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de apresentação do Gerador de Objetivo com IA (onboarding) -->
+<div id="onboardingIAObjetivoModal" class="modal" style="display: none;">
+    <div class="modal-content new-appointment-modal" style="max-width: 900px;">
+        <div class="modal-header new-appointment-header">
+            <h2 class="modal-title">
+                <span class="gemini-icon">
+                    <span class="gemini-star"></span>
+                </span>
+                Gerador de Objetivo com IA
+            </h2>
+            <button class="close-modal" id="onboardingIAObjetivoCloseBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body new-appointment-body" style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr); gap: 20px; align-items: stretch;">
+            <!-- Lado esquerdo: texto explicativo -->
+            <div>
+                <p style="font-size: 14px; color: #4b5563; margin-bottom: 14px;">
+                    Apresentamos o <strong>Gerador de Objetivo com IA</strong>: uma ajuda rápida para escrever o objetivo/descrição
+                    dos seus eventos com qualidade pastoral e linguagem acolhedora.
+                </p>
+
+                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #374151;">
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">1</span>
+                        <span><strong>Preencha os campos principais</strong> (título, comunidade, pastoral, pilar, local e ação).</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">2</span>
+                        <span>Clique em <strong>Gerar objetivo com IA</strong> ao lado do campo Objetivo/Descrição.</span>
+                    </li>
+                    <li style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="width: 22px; height: 22px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">3</span>
+                        <span>
+                            <strong>Revise e ajuste o texto sugerido</strong> antes de salvar o evento. A decisão final é sempre sua.
+                        </span>
+                    </li>
+                </ul>
+
+                <div style="margin-top: 16px; padding: 10px 12px; border-radius: 10px; background:#eff6ff; border:1px solid #bfdbfe; font-size:12px; color:#1e3a8a; display:flex; gap:8px; align-items:flex-start;">
+                    <i class="fas fa-info-circle" style="margin-top:2px;"></i>
+                    <span>
+                        A IA usa apenas as informações deste formulário para sugerir o objetivo.
+                        Você pode editar tudo livremente e nada é enviado para outras pessoas.
+                    </span>
+                </div>
+            </div>
+
+            <!-- Lado direito: mini ilustração do botão + campo objetivo -->
+            <div style="border-radius: 12px; border: 1px solid #e5e7eb; padding: 14px; background: linear-gradient(135deg, #f9fafb, #eff6ff); display:flex; flex-direction:column; gap:10px;">
+                <div style="font-size:12px; font-weight:600; color:#1f2937; display:flex; align-items:center; gap:6px;">
+                    <span class="gemini-icon">
+                        <span class="gemini-star"></span>
+                    </span>
+                    <span>Objetivo/Descrição</span>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center; margin-top:2px;">
+                    <button type="button" style="border-radius:999px; border:1px solid #bfdbfe; background:#e0f2fe; color:#1d4ed8; font-size:11px; padding:4px 10px; display:inline-flex; align-items:center; gap:6px;">
+                        <span class="gemini-icon" style="width:16px; height:16px;">
+                            <span class="gemini-star"></span>
+                        </span>
+                        Gerar com IA
+                    </button>
+                    <span style="font-size:11px; color:#6b7280;">Preencha os dados do evento e clique aqui</span>
+                </div>
+                <div style="margin-top:8px;">
+                    <div style="border-radius:10px; border:1px dashed #cbd5f5; background:#ffffff; padding:10px; font-size:11px; color:#4b5563;">
+                        “Fortalecer a comunhão e a missão da comunidade por meio deste encontro, promovendo
+                        oração, formação e partilha entre os participantes.”
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid #e5e7eb; margin-top:8px;">
+            <div style="font-size: 12px; color: #4b5563; display: flex; align-items: center; gap: 8px; margin-left: 8px;">
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                    <input type="checkbox" id="onboardingIAObjetivoDontShowAgain" style="width:13px; height:13px; accent-color:#1d4ed8;">
+                    <span>Não mostrar novamente para este navegador</span>
+                </label>
+            </div>
+            <button class="btn-primary" id="onboardingIAObjetivoGotItBtn" style="padding:8px 16px; border-radius:999px; font-size:13px; margin-right:8px;">
+                Entendi
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos específicos para mobile e badge de novidade -->
+<style>
+    /* Badge de novidade no Agendamento Dinâmico */
+    .novidade-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #ffffff;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 6px;
+        box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+        animation: pulse-badge 2s ease-in-out infinite;
+    }
+
+    .novidade-badge i {
+        font-size: 8px;
+        animation: flash-icon 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-badge {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+        }
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 3px 6px rgba(251, 191, 36, 0.5);
+        }
+    }
+
+    @keyframes flash-icon {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.6;
+        }
+    }
+
+    @media (max-width: 768px) {
+        #onboardingAgendamentoPrimaryBtn {
+            padding: 6px 12px !important;
+            font-size: 12px !important;
+            margin-right: 4px !important;
+        }
+
+        .novidade-badge {
+            font-size: 8px;
+            padding: 2px 5px;
+            margin-left: 4px;
+        }
+
+        .novidade-badge i {
+            font-size: 7px;
+        }
+    }
+</style>
+
+<!-- Scripts movidos para agenda.html -->

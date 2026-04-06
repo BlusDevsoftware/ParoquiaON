@@ -1,0 +1,11 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Executa o linter
+npm run lint
+
+# Executa o formatter
+npm run format
+
+# Executa os testes
+npm test 

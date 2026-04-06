@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParoquiaON - Minha Comunidade</title>
+    
+    <link rel="icon" type="image/png" href="assets/images/logo2.png">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="template-menu-superior.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="scripts/auth-guard.js"></script>
+    <script src="scripts/apply-auth-protection.js"></script>
+    
+    <style>
+        /* Spinner de carregamento */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            border: 6px solid #e3f2fd;
+            border-top: 6px solid #1976D2;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 2;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+        }
+
+        .loader-overlay-main {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spinner-main {
+            border: 8px solid #e3f2fd;
+            border-top: 8px solid #1976D2;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: #1976D2;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Rolagem na tabela de Últimas Comissões com cabeçalho fixo */
+        /* (removido) estilos da lista de últimas comissões */
+
+        /* Barra superior ocupando toda a largura */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: #1e3a8a;
+            color: white;
+            padding: 0 30px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            flex: 1;
+            padding-left: 16px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Menu Hamburger - Oculto por padrão (desktop) */
+        .hamburger-menu {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        
+        .hamburger-menu:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .hamburger-menu:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Menu Lateral Mobile */
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .mobile-menu-overlay.show {
+            opacity: 1;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            z-index: 1501;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE e Edge */
+        }
+        
+        .mobile-menu::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        
+        .mobile-menu.open {
+            left: 0;
+        }
+        
+        .mobile-menu-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .mobile-menu-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .mobile-menu-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        
+        .mobile-menu-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-menu-links {
+            padding: 0;
+            list-style: none;
+            margin: 0;
+        }
+        
+        .mobile-menu-links li {
+            border-bottom: none;
+        }
+        
+        .mobile-menu-links a {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        
+        .mobile-menu-links a:hover,
+        .mobile-menu-links a.active {
+            background: #f0f4ff;
+            color: #1e3a8a;
+        }
+        
+        .mobile-menu-links a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .mobile-menu-links .beta-tag {
+            background: #ff9800;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 12px 0;
+            position: relative;
+            transition: opacity 0.2s ease;
+            font-size: 16px;
+        }
+
+        .nav-link:hover {
+            opacity: 0.8;
+        }
+
+        .nav-link.active {
+            opacity: 1;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #ffffff;
+            border-radius: 2px;
+        }
+
+        /* Dropdown styles */
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dropdown-trigger i {
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-dropdown:hover .dropdown-trigger i {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1000;
+            border: 1px solid #e0e0e0;
+        }
+
+        .nav-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+            color: #1976d2;
+        }
+
+        .beta-tag {
+            background: #ff9800;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        .header-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            position: relative;
+            font-size: 16px;
+        }
+
+        .header-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #f44336;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+
+        /* Esconder barras de rolagem */
+        * {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE e Edge */
+        }
+        
+        *::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        
+        html, body {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE e Edge */
+        }
+        
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        /* Ajustar main-content para compensar header fixo */
+        .main-content {
+            margin-top: 80px;
+            padding: 20px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE e Edge */
+        }
+
+        /* Estilos específicos do card "Eventos por Comunidade" (Minha Comunidade) */
+        #eventos-comunidade-card {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: #ffffff;
+        }
+
+        #eventos-comunidade-card .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        #eventos-comunidade-card .chart-header > div {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        #eventos-comunidade-card .chart-header h2 {
+            margin: 0;
+            padding-left: 0;
+        }
+
+        #eventos-comunidade-card .chart-subtitle {
+            margin: 4px 0 0 0;
+            padding-left: 0;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        #eventos-comunidade-card .chart-total-badge {
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #ecfdf3;
+            color: #166534;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #eventos-comunidade-card .chart-total-badge::before {
+            content: '↗';
+            font-size: 13px;
+        }
+
+        #eventos-comunidade-card .chart-legend-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        #eventos-comunidade-card .chart-legend-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #f9fafb;
+            font-size: 12px;
+            color: #0f172a;
+            border: 1px solid #e5e7eb;
+            max-width: 220px;
+        }
+
+        #eventos-comunidade-card .chart-legend-chip-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: #3b82f6;
+        }
+
+        #eventos-comunidade-card .chart-legend-chip-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        #eventos-comunidade-card .chart-legend-chip-value {
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        #eventos-comunidade-card .chart-body {
+            height: 260px;
+        }
+
+        #eventos-comunidade-card .chart-footer-metrics {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            padding-top: 8px;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 4px;
+        }
+
+        #eventos-comunidade-card .chart-footer-metrics .metric {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        #eventos-comunidade-card .metric-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #9ca3af;
+        }
+
+        #eventos-comunidade-card .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+        
+        .main-content::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        
+        /* Reduzir espaçamento entre cards e gráficos */
+        .dashboard-cards {
+            margin-bottom: 12px !important;
+        }
+        
+        .charts-section {
+            margin-top: 0 !important;
+            margin-bottom: 12px !important;
+        }
+        
+        .charts-section:last-child {
+            margin-bottom: 2rem !important;
+        }
+
+        /* Media Query: Tablets e Mobile (max-width: 768px) */
+        @media (max-width: 768px) {
+            * {
+                box-sizing: border-box;
+            }
+
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .main-content {
+                overflow-x: hidden;
+                margin-top: 60px;
+                height: calc(100vh - 60px);
+                padding: 16px 4px !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            /* Header responsivo */
+            .top-header { 
+                padding: 0; 
+                height: 60px;
+            }
+            .header-left { 
+                padding-left: 12px; 
+                gap: 0;
+                flex: 0 0 auto;
+            }
+            .logo-section {
+                font-size: 18px;
+                gap: 8px;
+            }
+            .hamburger-menu {
+                display: flex !important;
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .header-right { 
+                padding-right: 12px; 
+                gap: 12px;
+            }
+            .header-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+
+            /* Cards do dashboard - 2 cards por linha */
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px;
+                padding: 0;
+                margin-bottom: 8px !important;
+            }
+            
+            .dashboard-cards .card {
+                padding: 1rem 0.75rem;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 0;
+                margin-top: 0 !important;
+                margin-bottom: 8px !important;
+            }
+            
+            .charts-section:last-child {
+                margin-bottom: 2rem !important;
+            }
+
+            .chart-container {
+                padding: 12px;
+            }
+
+            /* Ajuste específico para o card de Eventos por Comunidade no mobile/tablet */
+            #eventos-comunidade-card {
+                height: auto;
+            }
+            #eventos-comunidade-card .chart-body {
+                height: 220px;
+            }
+            #eventos-comunidade-card .chart-footer-metrics {
+                flex-wrap: wrap;
+                row-gap: 8px;
+            }
+        }
+
+        /* Media Query: Mobile pequeno (max-width: 480px) */
+        @media (max-width: 480px) {
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .main-content {
+                margin-top: 60px;
+                padding: 12px 4px !important;
+                width: 100%;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                height: calc(100vh - 60px);
+            }
+
+            /* Header responsivo */
+            .top-header {
+                padding: 0;
+                height: 60px;
+                width: 100%;
+                margin: 0;
+                left: 0;
+                right: 0;
+            }
+
+            /* Cards do dashboard - 2 cards por linha */
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 6px;
+                padding: 0;
+                margin-bottom: 6px !important;
+            }
+
+            .dashboard-cards .card {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 0;
+                margin-top: 0 !important;
+                margin-bottom: 6px !important;
+            }
+            
+            .charts-section:last-child {
+                margin-bottom: 2rem !important;
+            }
+
+            .chart-container {
+                padding: 10px;
+                height: 250px;
+            }
+
+            /* Garantir que o card de Eventos por Comunidade não corte o gráfico nem os totalizadores no mobile pequeno */
+            #eventos-comunidade-card {
+                height: auto;
+            }
+            #eventos-comunidade-card .chart-body {
+                height: 220px;
+            }
+            #eventos-comunidade-card .chart-footer-metrics {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Superior -->
+    <div class="top-header">
+        <div class="header-left">
+            <div class="logo-section">
+                <button class="hamburger-menu" id="hamburgerMenu" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span style="font-size: 20px; font-weight: 600;">ParoquiaON</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Minha Comunidade</a>
+                <a href="agenda.html" class="nav-link">Agenda</a>
+                <a href="comunidades.html" class="nav-link">Comunidades</a>
+                <a href="pastorais.html" class="nav-link">Pastorais</a>
+                <a href="pilares.html" class="nav-link">Pilares</a>
+                <a href="locais.html" class="nav-link">Locais</a>
+                <a href="acoes.html" class="nav-link">Ações</a>
+                <a href="pessoas.html" class="nav-link">Pessoas</a>
+                <a href="usuarios.html" class="nav-link">Usuários</a>
+                <a href="perfil.html" class="nav-link">Perfil</a>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-trigger">Relatórios <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="Relatorio_Dinamico.html" class="dropdown-item">Dinâmico</a>
+                        <a href="auditoria.html" class="dropdown-item">Auditoria</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-icon">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="user-avatar-dropdown">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="user-dropdown-menu" id="userDropdownMenu">
+                    <div class="user-dropdown-header">
+                        <div class="user-dropdown-avatar" id="userDropdownAvatar">A</div>
+                        <div class="user-dropdown-info">
+                            <div class="user-dropdown-name" id="userDropdownName">Usuário</div>
+                            <div class="user-dropdown-email" id="userDropdownEmail">usuario@email.com</div>
+                        </div>
+                    </div>
+                    <div class="user-dropdown-divider"></div>
+                    <a href="#" class="user-dropdown-item logout" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sair</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Lateral Mobile -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3>Menu</h3>
+            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Fechar menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-menu-links">
+            <li><a href="index.html" class="active"><i class="fas fa-home"></i> Minha Comunidade</a></li>
+            <li><a href="agenda.html"><i class="fas fa-calendar"></i> Agenda</a></li>
+            <li><a href="comunidades.html"><i class="fas fa-users"></i> Comunidades</a></li>
+            <li><a href="pastorais.html"><i class="fas fa-church"></i> Pastorais</a></li>
+            <li><a href="pilares.html"><i class="fas fa-layer-group"></i> Pilares</a></li>
+            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i> Locais</a></li>
+            <li><a href="acoes.html"><i class="fas fa-tasks"></i> Ações</a></li>
+            <li><a href="pessoas.html"><i class="fas fa-user-friends"></i> Pessoas</a></li>
+            <li><a href="usuarios.html"><i class="fas fa-user-cog"></i> Usuários</a></li>
+            <li><a href="perfil.html"><i class="fas fa-user-circle"></i> Perfil</a></li>
+            <li><a href="Relatorio_Dinamico.html"><i class="fas fa-file-invoice-dollar"></i> Dinâmico</a></li>
+            <li><a href="auditoria.html"><i class="fas fa-clipboard-check"></i> Auditoria</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        <!-- Spinner Centralizado de Carregamento -->
+        <div id="loader-minha-comunidade" class="loader-overlay-main">
+            <div class="spinner-main"></div>
+            <div class="loading-text">Carregando dados...</div>
+        </div>
+
+        <!-- Cards da Minha Comunidade -->
+        <div class="dashboard-cards" id="minha-comunidade-cards">
+            <div class="card" draggable="true">
+                <div class="card-header">
+                    <h3>Total de Comunidades</h3>
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="card-value" id="total-comunidades">-</div>
+                <div class="card-change" id="crescimento-comunidades">Carregando...</div>
+            </div>
+            <div class="card" draggable="true">
+                <div class="card-header">
+                    <h3>Pastorais Ativas</h3>
+                    <i class="fas fa-church"></i>
+                </div>
+                <div class="card-value" id="pastorais-ativas">-</div>
+                <div class="card-change" id="crescimento-pastorais">Carregando...</div>
+            </div>
+            <div class="card" draggable="true">
+                <div class="card-header">
+                    <h3>Pessoas Cadastradas</h3>
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="card-value" id="pessoas-cadastradas">-</div>
+                <div class="card-change" id="crescimento-pessoas">Carregando...</div>
+            </div>
+            <div class="card" draggable="true">
+                <div class="card-header">
+                    <h3>Eventos do Mês</h3>
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="card-value" id="eventos-mes">-</div>
+                <div class="card-change" id="qtd-eventos">Carregando...</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container" id="eventos-comunidade-card">
+                <div class="chart-header">
+                    <div>
+                        <h2>Eventos por Comunidade</h2>
+                        <p class="chart-subtitle">Distribuição de eventos entre as comunidades</p>
+                    </div>
+                    <div class="chart-total-badge" id="eventos-comunidade-total">- total</div>
+                </div>
+                <div class="chart-legend-chips" id="eventos-comunidade-chips"></div>
+                <div class="chart-body">
+                    <canvas id="pessoasChart"></canvas>
+                </div>
+                <div class="chart-footer-metrics" id="eventos-comunidade-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Comunidades</span>
+                        <span class="metric-value" id="eventos-comunidade-qtd-comunidades">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Maior quantidade</span>
+                        <span class="metric-value" id="eventos-comunidade-maior-quantidade">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Média por comunidade</span>
+                        <span class="metric-value" id="eventos-comunidade-media">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <h2>Distribuição por Pastorais</h2>
+                <canvas id="pastoraisChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Insights Adicionais -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h2>Eventos por Mês</h2>
+                <canvas id="eventosChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Top 5 Comunidades</h2>
+                <canvas id="comunidadesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/navigation.js"></script>
+    <script src="scripts/config/api.js"></script>
+    <script>
+        // Variáveis globais
+        let pessoasChart, pastoraisChart, eventosChart, comunidadesChart;
+        let minhaComunidadeData = {};
+
+        // Inicializar Minha Comunidade
+        // Funções para controlar menu mobile
+        function openMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.style.display = 'block';
+                menu.classList.add('open');
+                setTimeout(() => overlay.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileMenu');
+            if (overlay && menu) {
+                overlay.classList.remove('show');
+                menu.classList.remove('open');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 300);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Logout handler será gerenciado pelo apply-auth-protection.js
+
+            // Inicializar menu mobile
+            const hamburgerBtn = document.getElementById('hamburgerMenu');
+            const closeBtn = document.getElementById('mobileMenuClose');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', openMobileMenu);
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeMobileMenu);
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', closeMobileMenu);
+            }
+
+            // Limpar gráficos apenas quando a página for fechada/recarregada
+            window.addEventListener('beforeunload', function() {
+                destruirGraficos();
+            });
+
+        // Funções para controlar o spinner centralizado
+        function mostrarSpinner() {
+            document.getElementById('loader-minha-comunidade').style.display = 'flex';
+        }
+        
+        function ocultarSpinner() {
+            document.getElementById('loader-minha-comunidade').style.display = 'none';
+        }
+
+        // Função para debug dos gráficos (logs removidos para produção)
+        function debugGraficos() {
+            // Logs removidos para reduzir poluição do console
+        }
+
+        // Função para destruir gráficos existentes
+        function destruirGraficos() {
+            try {
+                if (pessoasChart && typeof pessoasChart.destroy === 'function') {
+                    pessoasChart.destroy();
+                    pessoasChart = null;
+                }
+                if (pastoraisChart && typeof pastoraisChart.destroy === 'function') {
+                    pastoraisChart.destroy();
+                    pastoraisChart = null;
+                }
+                if (eventosChart && typeof eventosChart.destroy === 'function') {
+                    eventosChart.destroy();
+                    eventosChart = null;
+                }
+                if (comunidadesChart && typeof comunidadesChart.destroy === 'function') {
+                    comunidadesChart.destroy();
+                    comunidadesChart = null;
+                }
+            } catch (error) {
+                console.error('Erro ao destruir gráficos:', error);
+            }
+        }
+
+        // Função para inicializar a aba Minha Comunidade
+        async function inicializarMinhaComunidade() {
+            try {
+                // Mostrar spinner centralizado ao iniciar
+                mostrarSpinner();
+                
+                // Destruir gráficos existentes apenas se já existirem
+                if (pessoasChart || pastoraisChart || eventosChart || comunidadesChart) {
+                    destruirGraficos();
+                }
+                
+                // Buscar dados uma única vez e reutilizar para cards e gráficos
+                const raw = await buscarDadosUnificados();
+                const dadosCards = montarDadosParaCards(raw);
+                const dadosGraficos = montarDadosParaGraficos(raw);
+                carregarDadosCards(dadosCards);
+                await inicializarGraficos(dadosGraficos);
+                
+                // Ocultar spinner centralizado quando tudo carregar
+                ocultarSpinner();
+                
+            } catch (error) {
+                console.error('Erro ao inicializar Minha Comunidade:', error);
+                mostrarToast('Erro ao carregar dados da Minha Comunidade', 'error');
+                // Ocultar spinner mesmo em caso de erro
+                ocultarSpinner();
+            }
+        }
+
+        // Chamar inicialização
+        inicializarMinhaComunidade();
+        });
+
+        // Função para carregar dados dos cards da Minha Comunidade (recebe dados já buscados)
+        function carregarDadosCards(dados) {
+            try {
+                if (!dados) return;
+                
+                // Atualizar cards
+                document.getElementById('total-comunidades').textContent = dados.comunidades.total;
+                document.getElementById('crescimento-comunidades').textContent = dados.comunidades.crescimento;
+                
+                document.getElementById('pastorais-ativas').textContent = dados.pastorais.total;
+                document.getElementById('crescimento-pastorais').textContent = dados.pastorais.crescimento;
+                
+                document.getElementById('pessoas-cadastradas').textContent = dados.pessoas.total;
+                document.getElementById('crescimento-pessoas').textContent = dados.pessoas.crescimento;
+                
+                document.getElementById('eventos-mes').textContent = dados.eventos.total;
+                document.getElementById('qtd-eventos').textContent = dados.eventos.detalhes;
+
+                // Aplicar classes de cor baseadas no crescimento
+                aplicarClassesCrescimento();
+                
+            } catch (error) {
+                console.error('Erro ao carregar dados dos cards da Minha Comunidade:', error);
+                mostrarToast('Erro ao carregar dados da Minha Comunidade', 'error');
+            }
+        }
+
+        // Busca única às 4 APIs (reutilizada para cards e gráficos). ?leve=1 evita enviar fotos no payload.
+        async function buscarDadosUnificados() {
+            const [comunidadesRes, pastoraisRes, pessoasRes, agendaRes] = await Promise.all([
+                window.api.get('/comunidades?leve=1'),
+                window.api.get('/pastorais?leve=1'),
+                window.api.get('/pessoas?leve=1'),
+                window.api.get('/agenda?leve=1')
+            ]);
+            if (comunidadesRes?.error || pastoraisRes?.error || pessoasRes?.error || agendaRes?.error) {
+                throw new Error(comunidadesRes?.error?.message || pastoraisRes?.error?.message || pessoasRes?.error?.message || agendaRes?.error?.message || 'Erro ao carregar dados');
+            }
+            const comunidades = Array.isArray(comunidadesRes) ? comunidadesRes : (comunidadesRes?.data || []);
+            const pastorais = Array.isArray(pastoraisRes) ? pastoraisRes : (pastoraisRes?.data || []);
+            const pessoas = Array.isArray(pessoasRes) ? pessoasRes : (pessoasRes?.data || []);
+            const agenda = Array.isArray(agendaRes) ? agendaRes : (agendaRes?.data || []);
+            return { comunidades, pastorais, pessoas, agenda };
+        }
+
+        // Monta o objeto usado pelos cards a partir dos dados brutos
+        function montarDadosParaCards(raw) {
+            if (!raw) return { comunidades: { total: 0, crescimento: 'Erro ao carregar' }, pastorais: { total: 0, crescimento: 'Erro ao carregar' }, pessoas: { total: 0, crescimento: 'Erro ao carregar' }, eventos: { total: 0, detalhes: 'Erro ao carregar' } };
+            const { comunidades, pastorais, pessoas, agenda } = raw;
+            
+            // Calcular eventos do mês atual
+            const hoje = new Date();
+            const mesAtual = hoje.getMonth();
+            const anoAtual = hoje.getFullYear();
+            
+            const eventosDoMes = (agenda || []).filter(evento => {
+                if (!evento || !evento.data_inicio) return false;
+                const dataEvento = new Date(evento.data_inicio);
+                if (isNaN(dataEvento.getTime())) return false;
+                return dataEvento.getMonth() === mesAtual && 
+                       dataEvento.getFullYear() === anoAtual;
+            });
+            
+            const eventosAtivosDoMes = eventosDoMes.filter(e => e.status === 'Ativo' || e.status_id === 1).length;
+            const totalEventosDoMes = eventosDoMes.length;
+            
+            return {
+                comunidades: { total: (comunidades || []).length, crescimento: '+12% este mês' },
+                pastorais: { total: (pastorais || []).length, crescimento: '+8% este mês' },
+                pessoas: { total: (pessoas || []).length, crescimento: '+15% este mês' },
+                eventos: { total: totalEventosDoMes, detalhes: `${eventosAtivosDoMes} eventos ativos` }
+            };
+        }
+
+        // Função para calcular crescimento percentual
+        function calcularCrescimento(dados, campoData) {
+            if (!dados || dados.length === 0) return '0% este mês';
+
+            const mesAtual = new Date().getMonth();
+            const anoAtual = new Date().getFullYear();
+            const mesAnterior = mesAtual === 0 ? 11 : mesAtual - 1;
+            const anoAnterior = mesAtual === 0 ? anoAtual - 1 : anoAtual;
+
+            const dadosMesAtual = dados.filter(item => {
+                const data = new Date(item[campoData]);
+                return data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
+            });
+
+            const dadosMesAnterior = dados.filter(item => {
+                const data = new Date(item[campoData]);
+                return data.getMonth() === mesAnterior && data.getFullYear() === anoAnterior;
+            });
+
+            const totalAtual = dadosMesAtual.length;
+            const totalAnterior = dadosMesAnterior.length;
+
+            if (totalAnterior === 0) {
+                return totalAtual > 0 ? '+100% este mês' : '0% este mês';
+            }
+
+            const crescimento = ((totalAtual - totalAnterior) / totalAnterior) * 100;
+            const sinal = crescimento >= 0 ? '+' : '';
+            return `${sinal}${Math.round(crescimento)}% este mês`;
+        }
+
+        // Função para aplicar classes de cor baseadas no crescimento
+        function aplicarClassesCrescimento() {
+            const elementos = [
+                { id: 'crescimento-comunidades', texto: '+12% este mês' },
+                { id: 'crescimento-pastorais', texto: '+8% este mês' },
+                { id: 'crescimento-pessoas', texto: '-3% este mês' }
+            ];
+
+            elementos.forEach(item => {
+                const elemento = document.getElementById(item.id);
+                if (elemento && elemento.textContent.includes('-')) {
+                    elemento.classList.add('negative');
+                } else if (elemento) {
+                    elemento.classList.remove('negative');
+                }
+            });
+        }
+
+
+        // Função para inicializar gráficos da Minha Comunidade (aceita dados pré-calculados para evitar nova requisição)
+        async function inicializarGraficos(dadosPreCalculados) {
+            try {
+                const dadosGraficos = dadosPreCalculados != null ? dadosPreCalculados : await buscarDadosGraficos();
+                
+                // Validar dados antes de criar gráficos
+                if (!dadosGraficos) {
+                    throw new Error('Dados dos gráficos inválidos');
+                }
+
+                // Gráfico de eventos por comunidade
+                const eventosPorComunidade = dadosGraficos.eventosPorComunidade || { labels: [], dados: [], cores: [] };
+                atualizarCardEventosPorComunidade(eventosPorComunidade);
+
+                const ctxPessoas = document.getElementById('pessoasChart').getContext('2d');
+                pessoasChart = new Chart(ctxPessoas, {
+                    type: 'bar',
+                    data: {
+                        labels: dadosGraficos.eventosPorComunidade.labels,
+                        datasets: [{
+                            label: 'Eventos',
+                            data: dadosGraficos.eventosPorComunidade.dados,
+                            // Cada coluna usa a cor da própria comunidade
+                            backgroundColor: dadosGraficos.eventosPorComunidade.cores,
+                            borderRadius: 12,
+                            borderSkipped: false,
+                            maxBarThickness: 40
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.96)',
+                                titleFont: { size: 13, weight: '600', family: 'system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif' },
+                                bodyFont: { size: 12, family: 'system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif' },
+                                padding: 12,
+                                cornerRadius: 12,
+                                displayColors: true,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        const total = eventosPorComunidade.dados.reduce((sum, v) => sum + (v || 0), 0) || 0;
+                                        const value = ctx.parsed.y || 0;
+                                        const plural = value === 1 ? 'evento' : 'eventos';
+                                        const base = `${value} ${plural}`;
+                                        if (!total || !value) return base;
+                                        const perc = ((value / total) * 100).toFixed(1);
+                                        return [`${base}`, `${perc}% do total`];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                },
+                                grid: {
+                                    color: 'rgba(148, 163, 184, 0.25)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                // Sobe um pouco a área útil para dar mais espaço visual aos labels
+                                offset: true,
+                                grid: {
+                                    display: false,
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                    autoSkip: true,
+                                    font: {
+                                        size: 11
+                                    },
+                                    // Encurta nomes muito longos para não vazar do card
+                                    callback: function(value) {
+                                        const label = this.getLabelForValue(value) || '';
+                                        const maxLength = 18;
+                                        if (label.length > maxLength) {
+                                            return label.slice(0, maxLength - 1) + '…';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Gráfico de distribuição por pastorais
+                const ctxPastorais = document.getElementById('pastoraisChart').getContext('2d');
+                pastoraisChart = new Chart(ctxPastorais, {
+                    type: 'doughnut',
+                    data: {
+                        labels: dadosGraficos.pastorais.labels,
+                        datasets: [{
+                            data: dadosGraficos.pastorais.dados,
+                            backgroundColor: [
+                                '#28a745', // Ativa
+                                '#ffc107', // Inativa
+                                '#17a2b8', // Em formação
+                                '#dc3545'  // Suspensa
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+
+                // Gráfico de eventos por mês
+                const ctxEventos = document.getElementById('eventosChart').getContext('2d');
+                eventosChart = new Chart(ctxEventos, {
+                    type: 'bar',
+                    data: {
+                        labels: dadosGraficos.eventos.labels,
+                        datasets: [{
+                            label: 'Eventos',
+                            data: dadosGraficos.eventos.dados,
+                            backgroundColor: '#42a5f5'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
+                // Gráfico de top comunidades
+                const ctxComunidades = document.getElementById('comunidadesChart').getContext('2d');
+                comunidadesChart = new Chart(ctxComunidades, {
+                    type: 'bar',
+                    data: {
+                        labels: dadosGraficos.comunidades.labels,
+                        datasets: [{
+                            label: 'Pessoas',
+                            data: dadosGraficos.comunidades.dados,
+                            backgroundColor: '#66bb6a'
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Erro ao inicializar gráficos da Minha Comunidade:', error);
+                // Criar gráficos com dados padrão em caso de erro
+                criarGraficosPadrao();
+            }
+        }
+
+        // Monta o objeto usado pelos gráficos a partir dos dados brutos (evita segunda rodada de APIs)
+        function montarDadosParaGraficos(raw) {
+            if (!raw) return { eventosPorComunidade: { labels: [], dados: [], cores: [] }, pastorais: { labels: ['Ativa', 'Inativa'], dados: [0, 0] }, eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] }, comunidades: { labels: ['Sem dados'], dados: [0] } };
+            const { comunidades, pastorais, pessoas, agenda } = raw;
+            return {
+                eventosPorComunidade: calcularEventosPorComunidade(agenda || [], comunidades || []),
+                pastorais: calcularDistribuicaoPastorais(pastorais || []),
+                eventos: calcularEventosPorMes(agenda || []),
+                comunidades: calcularTopComunidades(comunidades || [], pessoas || [])
+            };
+        }
+
+        // Fallback: busca dados só para gráficos (usado se inicializarGraficos for chamado sem dados)
+        async function buscarDadosGraficos() {
+            try {
+                const raw = await buscarDadosUnificados();
+                return montarDadosParaGraficos(raw);
+            } catch (error) {
+                console.error('Erro ao buscar dados dos gráficos:', error);
+                return {
+                    eventosPorComunidade: { labels: ['Sem dados'], dados: [0], cores: ['#42a5f5'] },
+                    pastorais: { labels: ['Ativa', 'Inativa'], dados: [0, 0] },
+                    eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] },
+                    comunidades: { labels: ['Sem dados'], dados: [0] }
+                };
+            }
+        }
+
+        // Atualiza título, chips e métricas do card "Eventos por Comunidade"
+        function atualizarCardEventosPorComunidade(eventosPorComunidade) {
+            try {
+                const labels = eventosPorComunidade.labels || [];
+                const dados = eventosPorComunidade.dados || [];
+                const cores = eventosPorComunidade.cores || [];
+                const total = dados.reduce((sum, v) => sum + (v || 0), 0);
+                const qtdComunidades = labels.length;
+                const maiorQuantidade = dados.reduce((max, v) => v > max ? v : max, 0);
+                const media = qtdComunidades ? (total / qtdComunidades) : 0;
+
+                const totalEl = document.getElementById('eventos-comunidade-total');
+                if (totalEl) {
+                    totalEl.textContent = `${total} total`;
+                }
+
+                const comunidadesEl = document.getElementById('eventos-comunidade-qtd-comunidades');
+                if (comunidadesEl) comunidadesEl.textContent = qtdComunidades || '0';
+
+                const maiorQtdEl = document.getElementById('eventos-comunidade-maior-quantidade');
+                if (maiorQtdEl) maiorQtdEl.textContent = maiorQuantidade || '0';
+
+                const mediaEl = document.getElementById('eventos-comunidade-media');
+                if (mediaEl) mediaEl.textContent = media ? Math.round(media) : '0';
+
+                const chipsContainer = document.getElementById('eventos-comunidade-chips');
+                if (chipsContainer) {
+                    chipsContainer.innerHTML = '';
+                    labels.forEach((nome, idx) => {
+                        const valor = dados[idx] || 0;
+                        const cor = cores[idx] || '#3b82f6';
+                        const chip = document.createElement('div');
+                        chip.className = 'chart-legend-chip';
+                        chip.innerHTML = `
+                            <span class=\"chart-legend-chip-color\" style=\"background:${cor}\"></span>
+                            <span class=\"chart-legend-chip-name\" title=\"${nome}\">${nome}</span>
+                            <span class=\"chart-legend-chip-value\">${valor}</span>
+                        `;
+                        chipsContainer.appendChild(chip);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar card Eventos por Comunidade:', error);
+            }
+        }
+
+        // Função para calcular eventos por comunidade
+        // Retorna labels, dados e cor de cada comunidade (para usar a cor da comunidade nas colunas)
+        function calcularEventosPorComunidade(agenda, comunidades) {
+            // Mapa de eventos por comunidade_id
+            const eventosPorComunidade = {};
+
+            (agenda || []).forEach(evento => {
+                const comunidadeId = evento.comunidade_id || evento.comunidade || null;
+                if (!comunidadeId) return;
+                eventosPorComunidade[comunidadeId] = (eventosPorComunidade[comunidadeId] || 0) + 1;
+            });
+
+            const labels = [];
+            const dados = [];
+            const cores = [];
+
+            (comunidades || []).forEach(comunidade => {
+                if (!comunidade || (!comunidade.id && !comunidade.codigo)) return;
+                const id = comunidade.id || comunidade.codigo;
+                const nome = comunidade.nome || comunidade.descricao || `Comunidade ${id}`;
+                const cor = comunidade.cor || comunidade.color || '#3b82f6';
+
+                labels.push(nome);
+                dados.push(eventosPorComunidade[id] || 0);
+                cores.push(cor);
+            });
+
+            return { labels, dados, cores };
+        }
+
+        // Função para calcular distribuição por pastorais
+        function calcularDistribuicaoPastorais(pastorais) {
+            const status = {
+                ativa: 0,
+                inativa: 0,
+                formacao: 0,
+                suspensa: 0
+            };
+
+            (pastorais || []).forEach(pastoral => {
+                const statusPastoral = (pastoral.status || pastoral.ativo || '').toString().trim().toLowerCase();
+                if (statusPastoral === 'ativo' || statusPastoral === 'true') {
+                    status.ativa++;
+                } else if (statusPastoral === 'em formação' || statusPastoral === 'formacao') {
+                    status.formacao++;
+                } else if (statusPastoral === 'suspensa' || statusPastoral === 'suspenso') {
+                    status.suspensa++;
+                } else {
+                    status.inativa++;
+                }
+            });
+
+                return {
+                labels: ['Ativa', 'Inativa', 'Em Formação', 'Suspensa'],
+                dados: [status.ativa, status.inativa, status.formacao, status.suspensa]
+                };
+        }
+
+        // Função para calcular eventos por mês
+        function calcularEventosPorMes(agenda) {
+            const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const dados = new Array(6).fill(0);
+            const labels = [];
+
+            // Pegar os últimos 6 meses
+            const hoje = new Date();
+            for (let i = 5; i >= 0; i--) {
+                const mes = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+                labels.push(meses[mes.getMonth()]);
+                
+                // Filtrar eventos do mês
+                const eventosMes = (agenda || []).filter(evento => {
+                    if (!evento || !evento.data_inicio) return false;
+                    const dataEvento = new Date(evento.data_inicio);
+                    if (isNaN(dataEvento.getTime())) return false;
+                    return dataEvento.getMonth() === mes.getMonth() && 
+                           dataEvento.getFullYear() === mes.getFullYear();
+                });
+
+                dados[5 - i] = eventosMes.length;
+            }
+
+            return { labels, dados };
+        }
+
+        // Função para calcular top comunidades
+        function calcularTopComunidades(comunidades, pessoas) {
+            // Criar mapa de pessoas por comunidade
+            const pessoasPorComunidade = {};
+            
+            pessoas.forEach(pessoa => {
+                if (pessoa.comunidade_id || pessoa.comunidade) {
+                    const comunidadeId = pessoa.comunidade_id || pessoa.comunidade;
+                    pessoasPorComunidade[comunidadeId] = (pessoasPorComunidade[comunidadeId] || 0) + 1;
+                }
+            });
+
+            // Criar mapa de nomes de comunidades
+            const nomesComunidades = {};
+            comunidades.forEach(comunidade => {
+                if (comunidade.id) {
+                    nomesComunidades[comunidade.id] = comunidade.nome || comunidade.descricao || 'Comunidade';
+                }
+            });
+
+            // Ordenar por número de pessoas
+            const topComunidades = Object.entries(pessoasPorComunidade)
+                .map(([id, count]) => ({
+                    nome: nomesComunidades[id] || `Comunidade ${id}`,
+                    count: count
+                }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5);
+
+            return {
+                labels: topComunidades.map(c => c.nome),
+                dados: topComunidades.map(c => c.count)
+            };
+        }
+
+        // Função para criar gráficos padrão em caso de erro
+        function criarGraficosPadrao() {
+            try {
+                // Destruir gráficos existentes apenas se já existirem
+                if (pessoasChart || pastoraisChart || eventosChart || comunidadesChart) {
+                    destruirGraficos();
+                }
+                
+                // Gráfico de eventos por comunidade (padrão)
+                const ctxPessoas = document.getElementById('pessoasChart').getContext('2d');
+                pessoasChart = new Chart(ctxPessoas, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Sem dados'],
+                        datasets: [{
+                            label: 'Eventos',
+                            data: [0],
+                            backgroundColor: '#42a5f5'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
+                        }
+                    }
+                });
+
+                // Gráfico de distribuição por pastorais
+                const ctxPastorais = document.getElementById('pastoraisChart').getContext('2d');
+                pastoraisChart = new Chart(ctxPastorais, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Ativa', 'Inativa'],
+                        datasets: [{
+                            data: [0, 0],
+                            backgroundColor: [
+                                '#28a745',
+                                '#ffc107'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+
+                // Gráfico de eventos por mês
+                const ctxEventos = document.getElementById('eventosChart').getContext('2d');
+                eventosChart = new Chart(ctxEventos, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                        datasets: [{
+                            label: 'Eventos',
+                            data: [0, 0, 0, 0, 0, 0],
+                            backgroundColor: '#42a5f5'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
+                // Gráfico de top comunidades
+                const ctxComunidades = document.getElementById('comunidadesChart').getContext('2d');
+                comunidadesChart = new Chart(ctxComunidades, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Sem dados'],
+                        datasets: [{
+                            label: 'Pessoas',
+                            data: [0],
+                            backgroundColor: '#66bb6a'
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            } catch (error) {
+                console.error('Erro ao criar gráficos padrão:', error);
+            }
+        }
+
+        // Função para inicializar drag and drop
+        function inicializarDragAndDrop() {
+            const container = document.getElementById('minha-comunidade-cards');
+            new Sortable(container, {
+                animation: 150,
+                ghostClass: 'card-ghost',
+                chosenClass: 'card-chosen',
+                dragClass: 'card-drag',
+                onEnd: function() {
+                    salvarOrdemCards();
+                }
+            });
+        }
+
+        // Função para salvar ordem dos cards
+        function salvarOrdemCards() {
+            const cards = document.querySelectorAll('#minha-comunidade-cards .card');
+            const ordem = Array.from(cards).map(card => {
+                const titulo = card.querySelector('h3').textContent;
+                return titulo;
+            });
+            
+            localStorage.setItem('minhaComunidadeCardsOrder', JSON.stringify(ordem));
+        }
+
+        // Funções de ação das comissões (removidas - não aplicáveis ao sistema paroquial)
+        // Funções utilitárias
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+
+        function formatarData(data) {
+            return new Date(data).toLocaleDateString('pt-BR');
+        }
+
+        function mostrarToast(mensagem, tipo = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${tipo}`;
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas fa-${tipo === 'success' ? 'check-circle' : tipo === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${mensagem}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+
+    <!-- Modal de Confirmação de Saída -->
+    <div id="logoutModal" class="logout-modal">
+        <div class="logout-modal-content">
+            <div class="logout-modal-header">
+                <h2><i class="fas fa-sign-out-alt"></i> Confirmar Saída</h2>
+                <button class="logout-close-btn" onclick="closeLogoutModal()">&times;</button>
+            </div>
+            <div class="logout-modal-body">
+                <div class="logout-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <div class="logout-message">
+                    Tem certeza que deseja sair do sistema?
+                </div>
+                <div class="logout-warning">
+                    Você será redirecionado para a tela de login.
+                </div>
+            </div>
+            <div class="logout-modal-actions">
+                <button class="logout-btn-cancel" onclick="closeLogoutModal()">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button class="logout-btn-confirm" onclick="confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sair
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,509 @@
+const { supabase } = require('../config/supabase');
+const { logEvento } = require('../utils/auditoriaService');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'paroquiaon-secret-key';
+
+// Helpers de upload para Supabase Storage (bucket: "pessoas")
+// Importante: o nome aqui deve bater exatamente com o nome do balde no Supabase
+const STORAGE_BUCKET = 'pessoas';
+
+function isBase64DataUrl(value) {
+    return typeof value === 'string' && /^data:image\/(png|jpe?g|webp);base64,/.test(value);
+}
+
+function dataUrlToBuffer(dataUrl) {
+    const base64 = dataUrl.split(',')[1];
+    return Buffer.from(base64, 'base64');
+}
+
+async function uploadFotoIfNeeded(dados, identificador) {
+    if (!dados || !dados.foto || !isBase64DataUrl(dados.foto)) {
+        return dados;
+    }
+
+    const buffer = dataUrlToBuffer(dados.foto);
+    const ext = (dados.foto.match(/^data:image\/(png|jpe?g|webp)/i) || [null, 'jpeg'])[1]
+        .replace('jpg', 'jpeg');
+    const path = `fotos/${identificador}.${ext}`;
+
+    const { error: uploadError } = await supabase
+        .storage
+        .from(STORAGE_BUCKET)
+        .upload(path, buffer, { contentType: `image/${ext}`, upsert: true });
+
+    if (uploadError) {
+        console.error('Erro ao fazer upload da imagem para o Storage (pessoas):', uploadError);
+        return dados;
+    }
+
+    const { data: publicUrlData } = supabase
+        .storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(path);
+    
+    // Importante: adiciona um "cache buster" na URL pública para evitar que o navegador
+    // continue mostrando a foto antiga quando o arquivo é sobrescrito no mesmo caminho.
+    // Assim, sempre que houver um novo upload, a URL gravada no banco muda e força o refresh.
+    const baseUrl = publicUrlData?.publicUrl || dados.foto;
+    const cacheBuster = Date.now();
+    const urlComVersao = baseUrl
+        ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}v=${cacheBuster}`
+        : dados.foto;
+
+    return { ...dados, foto: urlComVersao };
+}
+
+// Helper para extrair o usuário (email) direto do token JWT,
+// sem depender do middleware de autenticação. Se não houver token ou for inválido,
+// retorna undefined para permitir que o serviço de auditoria use os fallbacks normais.
+function getUsuarioExecutorFromToken(req) {
+    try {
+        const authHeader = req.headers && req.headers.authorization;
+        if (!authHeader) return undefined;
+        const token = authHeader.replace('Bearer ', '').trim();
+        if (!token) return undefined;
+
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded && decoded.email) {
+            return decoded.email;
+        }
+        return undefined;
+    } catch (e) {
+        return undefined;
+    }
+}
+
+async function listarPessoas(req, res) {
+    try {
+        const leve = req.query.leve === '1' || req.query.leve === 'true';
+        
+        if (leve) {
+            // Modo leve: id, nome e comunidade_id (necessário para gráfico Top Comunidades)
+            // Tenta buscar com comunidade_id, se não existir, busca apenas id e nome
+            let campos = 'id, nome, comunidade_id';
+            let { data, error } = await supabase.from('pessoas').select(campos).order('id', { ascending: true });
+            
+            // Se erro por comunidade_id não existir, tenta apenas id e nome
+            if (error && (error.code === 'PGRST116' || error.message?.includes('column') || error.message?.includes('does not exist'))) {
+                campos = 'id, nome';
+                const retry = await supabase.from('pessoas').select(campos).order('id', { ascending: true });
+                data = retry.data;
+                error = retry.error;
+            }
+            
+            if (error) throw error;
+            return res.json(data || []);
+        }
+        
+        // Modo completo: todos os campos
+        const { data, error } = await supabase.from('pessoas').select('*').order('id', { ascending: true });
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Erro ao listar pessoas:', error);
+        res.status(500).json({ 
+            error: 'Erro ao listar pessoas',
+            details: error.message 
+        });
+    }
+}
+
+async function buscarPessoa(req, res) {
+    try {
+        const { id } = req.params;
+        const { data, error } = await supabase.from('pessoas').select('*').eq('id', id).single();
+        if (error) throw error;
+        if (!data) return res.status(404).json({ error: 'Pessoa não encontrada' });
+        res.json(data);
+    } catch (error) {
+        console.error('Erro ao buscar pessoa:', error);
+        res.status(500).json({ error: 'Erro ao buscar pessoa' });
+    }
+}
+
+async function criarPessoa(req, res) {
+    try {
+        let body = req.body || {};
+        const normalizedStatus = typeof body.status === 'string'
+            ? (String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo')
+            : 'ativo';
+
+        // Primeiro insere a pessoa sem foto para obter o ID
+        const baseInsert = {
+            nome: body.nome,
+            telefone: body.telefone ?? null,
+            endereco: body.endereco ?? null,
+            status: normalizedStatus,
+            usuario_id: body.usuario_id ?? null,
+            criado_por_email: body.criado_por_email ?? null,
+            criado_por_nome: body.criado_por_nome ?? null
+        };
+
+        let insertResult = await supabase
+            .from('pessoas')
+            .insert([baseInsert])
+            .select()
+            .single();
+
+        if (insertResult.error && insertResult.error.code === '42703') {
+            // Fallback para esquemas com coluna boolean "ativo"
+            const fallbackData = {
+                nome: baseInsert.nome,
+                telefone: baseInsert.telefone,
+                endereco: baseInsert.endereco,
+                ativo: normalizedStatus === 'ativo',
+                usuario_id: baseInsert.usuario_id,
+                criado_por_email: baseInsert.criado_por_email,
+                criado_por_nome: baseInsert.criado_por_nome
+            };
+            insertResult = await supabase
+                .from('pessoas')
+                .insert([fallbackData])
+                .select()
+                .single();
+        }
+
+        if (insertResult.error) throw insertResult.error;
+
+        let pessoaCriada = insertResult.data;
+
+        // Se veio foto, processa: se for base64, faz upload pro Storage e troca por URL
+        if (body.foto) {
+            let fotoParaSalvar = body.foto;
+
+            if (isBase64DataUrl(body.foto)) {
+                const dadosComUrl = await uploadFotoIfNeeded({ foto: body.foto }, pessoaCriada.id);
+                fotoParaSalvar = dadosComUrl.foto || body.foto;
+            }
+
+            const { data: updated, error: updateError } = await supabase
+                .from('pessoas')
+                .update({ foto: fotoParaSalvar })
+                .eq('id', pessoaCriada.id)
+                .select()
+                .single();
+
+            if (!updateError && updated) {
+                pessoaCriada = updated;
+            }
+        }
+
+        // Determinar usuário executor via token (se disponível)
+        const usuarioExecutorCriacao = getUsuarioExecutorFromToken(req);
+
+        // Auditoria: criação de pessoa (registrando o usuário que executou a operação, se houver)
+        logEvento({
+            req,
+            usuario: usuarioExecutorCriacao,
+            acao: 'CREATE',
+            modulo: 'pessoas',
+            recurso: 'pessoas',
+            entidadeId: pessoaCriada.id,
+            descricao: `Pessoa criada: ${pessoaCriada.nome || ''}`.trim(),
+            detalhes: {
+                after: pessoaCriada
+            }
+        });
+
+        res.status(201).json(pessoaCriada);
+    } catch (error) {
+        console.error('Erro ao criar pessoa:', error);
+        res.status(500).json({ error: 'Erro ao criar pessoa', details: error?.message });
+    }
+}
+
+async function atualizarPessoa(req, res) {
+    try {
+        const { id } = req.params;
+        let body = req.body || {};
+        const normalizedStatus = typeof body.status === 'string'
+            ? (String(body.status).toLowerCase() === 'inativo' ? 'inativo' : 'ativo')
+            : undefined;
+
+        // Buscar estado atual para comparação em auditoria
+        let pessoaAntes = null;
+        try {
+            const { data: atual, error: erroAtual } = await supabase
+                .from('pessoas')
+                .select('*')
+                .eq('id', id)
+                .single();
+            if (!erroAtual && atual) {
+                pessoaAntes = atual;
+            }
+        } catch (e) {
+            console.warn('Não foi possível buscar pessoa antes da atualização para auditoria:', e);
+        }
+
+        // Se houver foto base64, faz upload para o Storage e troca por URL
+        // Se vier base64, sempre processa (mesmo que já exista URL no banco)
+        let fotoParaSalvar = body.foto;
+        if (body.foto !== undefined && body.foto !== null && body.foto !== '') {
+            if (isBase64DataUrl(body.foto)) {
+                // Nova foto em base64: fazer upload e substituir por URL
+                console.log('📸 Processando nova foto base64 para pessoa', id);
+                const dadosComUrl = await uploadFotoIfNeeded({ foto: body.foto }, id);
+                fotoParaSalvar = dadosComUrl.foto || body.foto;
+                console.log('✅ Foto processada:', fotoParaSalvar?.substring(0, 50) + '...');
+            } else {
+                // Se não for base64 (é URL), mantém como está
+                console.log('📸 Foto recebida é URL, mantendo:', body.foto?.substring(0, 50) + '...');
+            }
+        }
+
+        // Importante: NÃO alterar campos de autoria (usuario_id, criado_por_email, criado_por_nome)
+        // para preservar o usuário que criou o registro na própria tabela.
+        const updateData = {
+            ...(body.nome !== undefined ? { nome: body.nome } : {}),
+            ...(body.telefone !== undefined ? { telefone: body.telefone } : {}),
+            ...(body.endereco !== undefined ? { endereco: body.endereco } : {}),
+            ...(normalizedStatus !== undefined ? { status: normalizedStatus } : {}),
+            ...(fotoParaSalvar !== undefined ? { foto: fotoParaSalvar } : {})
+        };
+
+        let updateResult = await supabase
+            .from('pessoas')
+            .update(updateData)
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (updateResult.error && updateResult.error.code === '42703' && normalizedStatus !== undefined) {
+            const fallbackUpdate = {
+                ...updateData,
+                status: undefined,
+                ativo: normalizedStatus === 'ativo'
+            };
+            updateResult = await supabase
+                .from('pessoas')
+                .update(fallbackUpdate)
+                .eq('id', id)
+                .select()
+                .single();
+        }
+
+        if (updateResult.error) throw updateResult.error;
+        if (!updateResult.data) return res.status(404).json({ error: 'Pessoa não encontrada' });
+
+        const pessoaDepois = updateResult.data;
+
+        // Montar descrição amigável com base nas mudanças detectadas
+        let descricao = 'Pessoa atualizada';
+        const camposAlterados = [];
+
+        if (pessoaAntes) {
+            const camposParaChecar = ['nome', 'telefone', 'endereco', 'status', 'ativo'];
+            camposParaChecar.forEach((campo) => {
+                if (pessoaAntes[campo] !== pessoaDepois[campo]) {
+                    camposAlterados.push(campo);
+                }
+            });
+
+            if (camposAlterados.length > 0) {
+                // Texto detalhado: mostra valor antigo e novo de cada campo alterado
+                const labelMap = {
+                    nome: 'Nome',
+                    telefone: 'Telefone',
+                    endereco: 'Endereço',
+                    status: 'Status',
+                    ativo: 'Ativo'
+                };
+
+                const formatValor = (v) => {
+                    if (v === null || v === undefined || v === '') return 'vazio';
+                    if (typeof v === 'boolean') return v ? 'ativo' : 'inativo';
+                    return String(v);
+                };
+
+                const partes = camposAlterados.map((campo) => {
+                    const label = labelMap[campo] || campo;
+                    const antigo = formatValor(pessoaAntes[campo]);
+                    const novo = formatValor(pessoaDepois[campo]);
+                    return `${label}: ${antigo} → ${novo}`;
+                });
+
+                descricao = `Pessoa atualizada - ${partes.join(' | ')}`;
+            }
+        }
+
+        // Determinar usuário executor via token (se disponível)
+        const usuarioExecutorAtualizacao = getUsuarioExecutorFromToken(req);
+
+        // Auditoria: atualização de pessoa (registrando o usuário que executou a operação, se houver)
+        logEvento({
+            req,
+            usuario: usuarioExecutorAtualizacao,
+            acao: 'UPDATE',
+            modulo: 'pessoas',
+            recurso: 'pessoas',
+            entidadeId: pessoaDepois.id,
+            descricao,
+            detalhes: {
+                before: pessoaAntes,
+                after: pessoaDepois
+            }
+        });
+
+        res.json(pessoaDepois);
+    } catch (error) {
+        console.error('Erro ao atualizar pessoa:', error);
+        res.status(500).json({ error: 'Erro ao atualizar pessoa', details: error?.message });
+    }
+}
+
+async function excluirPessoa(req, res) {
+    try {
+        const { id } = req.params;
+        const { data, error } = await supabase.from('pessoas').delete().eq('id', id).select();
+        if (error) throw error;
+        if (!data || data.length === 0) return res.status(404).json({ error: 'Pessoa não encontrada' });
+
+        const pessoaRemovida = data[0] || null;
+
+        // Determinar usuário executor via token (se disponível)
+        const usuarioExecutorExclusao = getUsuarioExecutorFromToken(req);
+
+        // Auditoria: exclusão de pessoa (logando o registro removido em detalhes.before)
+        logEvento({
+            req,
+            usuario: usuarioExecutorExclusao,
+            acao: 'DELETE',
+            modulo: 'pessoas',
+            recurso: 'pessoas',
+            entidadeId: pessoaRemovida?.id ?? null,
+            descricao: `Pessoa excluída${pessoaRemovida?.nome ? `: ${pessoaRemovida.nome}` : ''}`,
+            detalhes: {
+                before: pessoaRemovida
+            }
+        });
+
+        res.json({ message: 'Pessoa excluída com sucesso', data });
+    } catch (error) {
+        console.error('Erro ao excluir pessoa:', error);
+        res.status(500).json({ error: 'Erro ao excluir pessoa' });
+    }
+}
+
+// Estatísticas das pessoas
+async function estatisticasPessoas(req, res) {
+    try {
+        const { data: total, error: totalError } = await supabase
+            .from('pessoas')
+            .select('*', { count: 'exact', head: true });
+
+        const { data: ativas, error: ativasError } = await supabase
+            .from('pessoas')
+            .select('*', { count: 'exact', head: true })
+            .eq('ativo', true);
+
+        const { data: inativas, error: inativasError } = await supabase
+            .from('pessoas')
+            .select('*', { count: 'exact', head: true })
+            .eq('ativo', false);
+
+        if (totalError || ativasError || inativasError) {
+            throw new Error('Erro ao buscar estatísticas');
+        }
+
+        res.json({
+            total: total?.length || 0,
+            ativas: ativas?.length || 0,
+            inativas: inativas?.length || 0
+        });
+    } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error);
+        res.status(500).json({ error: 'Erro ao buscar estatísticas' });
+    }
+}
+
+// Dados para gráficos de pessoas
+async function dadosGraficosPessoas(req, res) {
+    try {
+        // Buscar todas as pessoas
+        const { data: pessoas, error: pessoasError } = await supabase
+            .from('pessoas')
+            .select(`
+                id,
+                nome,
+                ativo,
+                created_at,
+                comunidade_id
+            `)
+            .order('created_at', { ascending: true });
+
+        if (pessoasError) throw pessoasError;
+
+        // Calcular evolução de pessoas por mês (últimos 6 meses)
+        const evolucaoPessoas = calcularEvolucaoPessoas(pessoas);
+        
+        // Calcular distribuição por status
+        const distribuicaoStatus = calcularDistribuicaoStatusPessoas(pessoas);
+
+        res.json({
+            evolucao: evolucaoPessoas,
+            distribuicao: distribuicaoStatus,
+            totalPessoas: pessoas?.length || 0
+        });
+
+    } catch (error) {
+        console.error('Erro ao buscar dados dos gráficos:', error);
+        res.status(500).json({ error: 'Erro ao buscar dados dos gráficos' });
+    }
+}
+
+// Função auxiliar para calcular evolução de pessoas
+function calcularEvolucaoPessoas(pessoas) {
+    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const dados = new Array(6).fill(0);
+    const labels = [];
+
+    const hoje = new Date();
+    for (let i = 5; i >= 0; i--) {
+        const mes = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+        labels.push(meses[mes.getMonth()]);
+        
+        const pessoasMes = (pessoas || []).filter(p => {
+            if (!p || !p.created_at) return false;
+            const dataPessoa = new Date(p.created_at);
+            if (isNaN(dataPessoa.getTime())) return false;
+            return dataPessoa.getMonth() === mes.getMonth() && 
+                   dataPessoa.getFullYear() === mes.getFullYear();
+        });
+
+        dados[5 - i] = pessoasMes.length;
+    }
+
+    return { labels, dados };
+}
+
+// Função auxiliar para calcular distribuição por status das pessoas
+function calcularDistribuicaoStatusPessoas(pessoas) {
+    const status = {
+        ativo: 0,
+        inativo: 0
+    };
+
+    (pessoas || []).forEach(pessoa => {
+        if (pessoa.ativo === true) {
+            status.ativo++;
+        } else {
+            status.inativo++;
+        }
+    });
+
+    return {
+        labels: ['Ativo', 'Inativo'],
+        dados: [status.ativo, status.inativo]
+    };
+}
+
+module.exports = { 
+    listarPessoas, 
+    buscarPessoa, 
+    criarPessoa, 
+    atualizarPessoa, 
+    excluirPessoa,
+    estatisticasPessoas,
+    dadosGraficosPessoas
+};

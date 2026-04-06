@@ -1,0 +1,108 @@
+/* Estilos específicos para o modo de Agendamento Dinâmico do modal de agenda */
+
+#eventModal .dynamic-mode-toggle-label {
+    font-weight: 500;
+}
+
+#eventModal .dynamic-periods-container {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+#eventModal .dynamic-mini-calendar {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    width: 260px;
+    box-sizing: border-box;
+}
+
+#eventModal .dynamic-mini-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+#eventModal .dynamic-mini-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    font-size: 11px;
+}
+
+#eventModal .dynamic-mini-weekday {
+    text-align: center;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+#eventModal .dynamic-mini-day {
+    text-align: center;
+    padding: 4px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #111827;
+    border: 1px solid transparent;
+}
+
+#eventModal .dynamic-mini-day:hover {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+#eventModal .dynamic-mini-day.dynamic-selected {
+    background-color: #1e3a8a;
+    color: #ffffff;
+    border-color: #1e3a8a;
+}
+
+#eventModal .dynamic-mini-day.dynamic-today {
+    border-color: #1d4ed8;
+}
+
+#eventModal .dynamic-mini-nav-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #4b5563;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+#eventModal .dynamic-mini-nav-btn:hover {
+    background-color: #e5e7eb;
+}
+
+#eventModal .dynamic-time-form {
+    flex: 1;
+    min-width: 220px;
+}
+
+#eventModal .dynamic-time-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+#eventModal .dynamic-time-row .form-group {
+    flex: 0 0 110px;
+}
+
+#eventModal .dynamic-time-row .form-group.dynamic-add-btn-group {
+    flex: 0 0 auto;
+}
+
+#eventModal .dynamic-info-text {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 6px;
+}
+
+

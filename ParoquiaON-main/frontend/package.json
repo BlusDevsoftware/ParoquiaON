@@ -1,0 +1,14 @@
+{
+  "name": "paroquiaon-frontend",
+  "version": "1.0.0",
+  "description": "Frontend do sistema ParóquiaON",
+  "keywords": [
+    "paroquia",
+    "frontend",
+    "html",
+    "css",
+    "javascript"
+  ],
+  "author": "BlueDev",
+  "license": "MIT"
+}
