@@ -5776,6 +5776,19 @@
                     this.setAttribute('aria-expanded', isCollapsed ? 'true' : 'false');
                 });
             });
+
+            // Permite expandir/recolher ao clicar no nome da seção (além da seta)
+            const sectionTitles = document.querySelectorAll('.community-filter-section-title');
+            sectionTitles.forEach(title => {
+                if (title.dataset.bound === '1') return;
+                title.dataset.bound = '1';
+                title.addEventListener('click', function(event) {
+                    if (event.target.closest('.community-filter-toggle')) return;
+                    const toggleBtn = this.querySelector('.community-filter-toggle[data-target]');
+                    if (!toggleBtn) return;
+                    toggleBtn.click();
+                });
+            });
         }
 
         function renderFilterCheckboxList(containerId, list, selectedSet, labelEmpty) {
