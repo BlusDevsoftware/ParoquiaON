@@ -2689,6 +2689,7 @@
             transition: all 0.2s ease;
             min-width: auto;
             color: #1e3a8a;
+            position: relative;
         }
         .community-filter-btn:hover {
             background: rgba(30, 58, 138, 0.08);
@@ -2696,6 +2697,27 @@
         .community-filter-btn i {
             font-size: 20px;
             color: #1e3a8a;
+        }
+        .community-filter-badge {
+            position: absolute;
+            top: 0;
+            right: -2px;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            border-radius: 9999px;
+            background: #dc2626;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 16px;
+            text-align: center;
+            border: 2px solid #ffffff;
+            display: none;
+            pointer-events: none;
+        }
+        .community-filter-badge.show {
+            display: inline-block;
         }
         .community-filter-summary {
             white-space: nowrap;
@@ -4803,6 +4825,7 @@
                             <div class="info-location-container">
                                 <button class="community-filter-btn" type="button" onclick="openCommunityFilter()" aria-label="Filtrar comunidades" title="Filtrar comunidades">
                                     <i class="fas fa-filter"></i>
+                                    <span class="community-filter-badge" id="communityFilterBadge">0</span>
                                 </button>
 
                                 <!-- Dropdown de filtros (abre abaixo do botão) -->
@@ -5653,7 +5676,7 @@
 
         function updateCommunityFilterSummary() {
             const el = document.getElementById('communityFilterSummary');
-            if (!el) return;
+            const badge = document.getElementById('communityFilterBadge');
 
             const counts = {
                 comunidades: selectedCommunityIds instanceof Set ? selectedCommunityIds.size : 0,
@@ -5667,15 +5690,27 @@
 
             const totalComunidades = Array.isArray(allCommunitiesList) ? allCommunitiesList.length : 0;
             if (totalComunidades === 0) {
-                el.textContent = 'Filtros';
+                if (el) el.textContent = 'Filtros';
+                if (badge) {
+                    badge.classList.remove('show');
+                    badge.textContent = '0';
+                }
                 return;
             }
 
             if (totalSelected === 0) {
-                el.textContent = 'Sem filtro';
+                if (el) el.textContent = 'Sem filtro';
+                if (badge) {
+                    badge.classList.remove('show');
+                    badge.textContent = '0';
+                }
                 return;
             }
-            el.textContent = `${totalSelected} filtro${totalSelected !== 1 ? 's' : ''}`;
+            if (el) el.textContent = `${totalSelected} filtro${totalSelected !== 1 ? 's' : ''}`;
+            if (badge) {
+                badge.textContent = String(totalSelected);
+                badge.classList.add('show');
+            }
         }
 
         function clearAllAgendaFilters() {
