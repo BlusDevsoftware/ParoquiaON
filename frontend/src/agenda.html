@@ -2708,23 +2708,23 @@
             max-width: 220px;
         }
 
+        /* Dropdown ancorado no botão */
+        .info-location-container {
+            position: relative;
+        }
         .community-filter-overlay {
             display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.45);
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
             z-index: 10002;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
         }
         .community-filter-overlay.open {
-            display: flex;
+            display: block;
         }
         .community-filter-panel {
-            width: 92vw;
-            max-width: 420px;
-            max-height: 80vh;
+            width: min(420px, 92vw);
+            max-height: min(78vh, 640px);
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 18px 40px rgba(0,0,0,0.25);
@@ -2900,6 +2900,15 @@
             }
             .community-filter-summary {
                 max-width: 180px;
+            }
+            /* No mobile, dropdown ocupa a largura do container */
+            .community-filter-overlay {
+                left: 0;
+                right: 0;
+            }
+            .community-filter-panel {
+                width: 92vw;
+                max-width: 92vw;
             }
         }
 
@@ -4771,6 +4780,73 @@
                                     <i class="fas fa-filter"></i>
                                     <span class="community-filter-summary" id="communityFilterSummary">Carregando...</span>
                                 </button>
+
+                                <!-- Dropdown de filtros (abre abaixo do botão) -->
+                                <div class="community-filter-overlay" id="communityFilterOverlay" aria-hidden="true">
+                                    <div class="community-filter-panel" role="dialog" aria-label="Filtros da agenda">
+                                        <div class="community-filter-header">
+                                            <div class="community-filter-title">
+                                                <i class="fas fa-filter"></i>
+                                                Filtros
+                                            </div>
+                                            <button class="community-filter-close" type="button" onclick="closeCommunityFilter()" aria-label="Fechar filtro">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        <div class="community-filter-actions">
+                                            <button class="community-filter-action" type="button" onclick="clearAllAgendaFilters()">Limpar filtros</button>
+                                        </div>
+
+                                        <div class="community-filter-sections">
+                                            <div class="community-filter-section">
+                                                <div class="community-filter-section-title">Comunidades</div>
+                                                <div class="community-filter-list" id="communityFilterList">
+                                                    <div class="community-filter-loading">Carregando comunidades...</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="community-filter-section">
+                                                <div class="community-filter-section-title">Pastorais</div>
+                                                <div class="community-filter-list" id="pastoralFilterList">
+                                                    <div class="community-filter-loading">Carregando pastorais...</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="community-filter-section">
+                                                <div class="community-filter-section-title">Pilares</div>
+                                                <div class="community-filter-list" id="pilarFilterList">
+                                                    <div class="community-filter-loading">Carregando pilares...</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="community-filter-section">
+                                                <div class="community-filter-section-title">Locais</div>
+                                                <div class="community-filter-list" id="localFilterList">
+                                                    <div class="community-filter-loading">Carregando locais...</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="community-filter-section">
+                                                <div class="community-filter-section-title">Ações</div>
+                                                <div class="community-filter-list" id="acaoFilterList">
+                                                    <div class="community-filter-loading">Carregando ações...</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="community-filter-section">
+                                                <div class="community-filter-section-title">Outros</div>
+                                                <div class="community-filter-list">
+                                                    <div class="community-filter-item">
+                                                        <label>
+                                                            <input type="checkbox" id="filterEventoParoquialOnly" />
+                                                            <span class="community-filter-name" title="Somente eventos paroquiais">Somente eventos paroquiais</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -4841,61 +4917,6 @@
                     <div class="calendar-body" id="calendarBody">
                         <!-- Horários e eventos serão inseridos via JavaScript -->
         </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filtros (multi-seleção) -->
-    <div class="community-filter-overlay" id="communityFilterOverlay" aria-hidden="true">
-        <div class="community-filter-panel" role="dialog" aria-modal="true" aria-label="Filtros da agenda">
-            <div class="community-filter-header">
-                <div class="community-filter-title">
-                    <i class="fas fa-filter"></i>
-                    Filtros
-                </div>
-                <button class="community-filter-close" type="button" onclick="closeCommunityFilter()" aria-label="Fechar filtro">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="community-filter-actions">
-                <button class="community-filter-action" type="button" onclick="clearAllAgendaFilters()">Limpar filtros</button>
-            </div>
-
-            <div class="community-filter-sections">
-                <div class="community-filter-section">
-                    <div class="community-filter-section-title">Comunidades</div>
-                    <div class="community-filter-list" id="communityFilterList">
-                        <div class="community-filter-loading">Carregando comunidades...</div>
-                    </div>
-                </div>
-
-                <div class="community-filter-section">
-                    <div class="community-filter-section-title">Pastorais</div>
-                    <div class="community-filter-list" id="pastoralFilterList">
-                        <div class="community-filter-loading">Carregando pastorais...</div>
-                    </div>
-                </div>
-
-                <div class="community-filter-section">
-                    <div class="community-filter-section-title">Pilares</div>
-                    <div class="community-filter-list" id="pilarFilterList">
-                        <div class="community-filter-loading">Carregando pilares...</div>
-                    </div>
-                </div>
-
-                <div class="community-filter-section">
-                    <div class="community-filter-section-title">Locais</div>
-                    <div class="community-filter-list" id="localFilterList">
-                        <div class="community-filter-loading">Carregando locais...</div>
-                    </div>
-                </div>
-
-                <div class="community-filter-section">
-                    <div class="community-filter-section-title">Ações</div>
-                    <div class="community-filter-list" id="acaoFilterList">
-                        <div class="community-filter-loading">Carregando ações...</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -5558,6 +5579,7 @@
         let selectedPilarIds = new Set();
         let selectedLocalIds = new Set();
         let selectedAcaoIds = new Set();
+        let filterEventoParoquialOnly = false;
 
         let allPastoraisList = [];
         let allPilaresList = [];
@@ -5589,7 +5611,8 @@
                 pastorais: selectedPastoralIds instanceof Set ? selectedPastoralIds.size : 0,
                 pilares: selectedPilarIds instanceof Set ? selectedPilarIds.size : 0,
                 locais: selectedLocalIds instanceof Set ? selectedLocalIds.size : 0,
-                acoes: selectedAcaoIds instanceof Set ? selectedAcaoIds.size : 0
+                acoes: selectedAcaoIds instanceof Set ? selectedAcaoIds.size : 0,
+                paroquial: filterEventoParoquialOnly ? 1 : 0
             };
             const totalSelected = Object.values(counts).reduce((acc, v) => acc + (Number(v) || 0), 0);
 
@@ -5612,6 +5635,7 @@
             selectedPilarIds = new Set();
             selectedLocalIds = new Set();
             selectedAcaoIds = new Set();
+            filterEventoParoquialOnly = false;
 
             // desmarcar checkboxes
             [
@@ -5625,9 +5649,25 @@
                 if (!el) return;
                 el.querySelectorAll('input[type="checkbox"]').forEach(inp => (inp.checked = false));
             });
+            const paroquialToggle = document.getElementById('filterEventoParoquialOnly');
+            if (paroquialToggle) paroquialToggle.checked = false;
 
             updateCommunityFilterSummary();
             filterEventsByCommunity();
+        }
+
+        function setupEventoParoquialFilterToggle() {
+            const el = document.getElementById('filterEventoParoquialOnly');
+            if (!el) return;
+            // evitar duplicar listener
+            if (el.dataset.bound === '1') return;
+            el.dataset.bound = '1';
+            el.checked = !!filterEventoParoquialOnly;
+            el.addEventListener('change', function() {
+                filterEventoParoquialOnly = !!this.checked;
+                updateCommunityFilterSummary();
+                filterEventsByCommunity();
+            });
         }
 
         function renderFilterCheckboxList(containerId, list, selectedSet, labelEmpty) {
@@ -5690,13 +5730,32 @@
         // Fechar filtro ao clicar fora do painel
         document.addEventListener('click', function(e) {
             const overlay = document.getElementById('communityFilterOverlay');
-            const panel = overlay ? overlay.querySelector('.community-filter-panel') : null;
             const btn = document.querySelector('.community-filter-btn');
+            const panel = overlay ? overlay.querySelector('.community-filter-panel') : null;
             if (!overlay || !panel) return;
             if (!overlay.classList.contains('open')) return;
 
             if (panel.contains(e.target) || (btn && btn.contains(e.target))) return;
             closeCommunityFilter();
+        });
+
+        // Impedir que clique no botão propague e feche no mesmo tick
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.querySelector('.community-filter-btn');
+            if (btn && !btn.dataset.boundStop) {
+                btn.dataset.boundStop = '1';
+                btn.addEventListener('click', function(ev) {
+                    ev.stopPropagation();
+                });
+            }
+            const overlay = document.getElementById('communityFilterOverlay');
+            const panel = overlay ? overlay.querySelector('.community-filter-panel') : null;
+            if (panel && !panel.dataset.boundStop) {
+                panel.dataset.boundStop = '1';
+                panel.addEventListener('click', function(ev) {
+                    ev.stopPropagation();
+                });
+            }
         });
 
         // Funções para controlar o spinner da agenda
@@ -5811,6 +5870,9 @@
                     loadAgendaExtraFilters(),
                     loadEventsFromApi()
                 ]);
+
+                // Bind do toggle "Somente eventos paroquiais"
+                setupEventoParoquialFilterToggle();
             } catch (error) {
                 console.error('❌ Erro ao carregar dados:', error);
             } finally {
@@ -8294,6 +8356,17 @@
                 filteredEvents = filteredEvents.filter(ev => {
                     const id = ev.acao_id ?? ev.acaoId ?? ev.acao?.id ?? ev.acoes?.id;
                     return id != null && selectedAcaoIds.has(Number(id));
+                });
+            }
+
+            // Somente eventos paroquiais
+            if (filterEventoParoquialOnly) {
+                filteredEvents = filteredEvents.filter(ev => {
+                    const flag = ev.evento_paroquial ?? ev.eventoParoquial ?? ev.paroquial;
+                    if (flag === true) return true;
+                    if (typeof flag === 'string') return flag.trim().toLowerCase() === 'true';
+                    if (typeof flag === 'number') return flag === 1;
+                    return false;
                 });
             }
             
