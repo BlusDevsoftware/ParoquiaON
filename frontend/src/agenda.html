@@ -2686,13 +2686,19 @@
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             min-width: auto;
             color: #1e3a8a;
             position: relative;
         }
         .community-filter-btn:hover {
-            background: rgba(30, 58, 138, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+            background: rgba(30, 58, 138, 0.10);
+        }
+        .community-filter-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(30, 58, 138, 0.2);
         }
         .community-filter-btn i {
             font-size: 20px;
