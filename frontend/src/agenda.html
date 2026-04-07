@@ -2617,6 +2617,14 @@
 
         /* Desktop: dropdown de visão abaixo do avatar (fixo) */
         @media (min-width: 769px) {
+            .header-past-toggle {
+                position: fixed;
+                right: 168px; /* ao lado esquerdo do seletor de visão */
+                top: 100px;
+                z-index: 110;
+                margin: 0;
+            }
+
             .header-view-dropdown {
                 position: fixed;
                 right: 30px; /* mesmo padding lateral do header */
@@ -5056,7 +5064,7 @@
                     </div>
 
                     <div class="calendar-controls-right">
-                        <label class="toggle-switch-wrapper" title="Exibir agendamentos anteriores">
+                        <label class="toggle-switch-wrapper header-past-toggle" title="Exibir agendamentos anteriores">
                             <input type="checkbox" id="togglePastEvents" class="toggle-switch">
                             <span class="toggle-slider"></span>
                         </label>
