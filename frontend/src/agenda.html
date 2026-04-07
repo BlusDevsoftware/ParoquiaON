@@ -1500,7 +1500,7 @@
         .mini-nav-btn {
             background: transparent;
             border: none;
-            color: #1e3a8a;
+            color: #000000;
             width: 20px;
             height: 20px;
             border-radius: 4px;
@@ -1511,10 +1511,20 @@
             font-size: 12px;
             font-weight: 500;
             transition: background 0.2s ease, color 0.2s ease;
+            outline: none;
+            box-shadow: none;
         }
 
         .mini-nav-btn:hover {
-            background: rgba(30, 58, 138, 0.08);
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .mini-nav-btn:focus,
+        .mini-nav-btn:focus-visible,
+        .mini-nav-btn:active {
+            outline: none;
+            box-shadow: none;
+            border: none;
         }
 
         .mini-calendar-weekdays {
