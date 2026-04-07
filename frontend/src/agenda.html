@@ -2615,6 +2615,16 @@
             z-index: 100; /* acima do calendário, abaixo de modais (z-index: 2000) */
         }
 
+        /* Desktop: dropdown de visão abaixo do avatar (fixo) */
+        @media (min-width: 769px) {
+            .header-view-dropdown {
+                position: fixed;
+                right: 30px; /* mesmo padding lateral do header */
+                top: 92px;   /* abaixo do header (80px) + 12px */
+                z-index: 110; /* acima do calendário, abaixo de modais/spinner */
+            }
+        }
+
         .view-dropdown-trigger {
             background: white;
             border: 2px solid #e0e0e0;
@@ -4865,6 +4875,8 @@
             </div>
         </div>
 
+        
+
         <!-- Spinner Centralizado de Carregamento -->
         <div id="loader-agenda" class="loader-overlay-main">
             <div class="spinner-main"></div>
@@ -5059,7 +5071,7 @@
                         </div>
                         <button class="info-today-btn" onclick="goToToday()">Hoje</button>
 
-                        <div class="view-dropdown">
+                        <div class="view-dropdown header-view-dropdown">
                             <div class="view-dropdown-trigger">
                                 <span id="currentViewText">Semana</span>
                                 <i class="fas fa-chevron-down"></i>
