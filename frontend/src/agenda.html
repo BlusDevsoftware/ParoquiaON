@@ -5837,8 +5837,17 @@
         let allLocaisList = [];
         let allAcoesList = [];
 
-        function openCommunityFilter() {
+        function ensureCommunityFilterOverlayRoot() {
             const overlay = document.getElementById('communityFilterOverlay');
+            if (!overlay) return null;
+            if (overlay.parentElement !== document.body) {
+                document.body.appendChild(overlay);
+            }
+            return overlay;
+        }
+
+        function openCommunityFilter() {
+            const overlay = ensureCommunityFilterOverlayRoot();
             if (overlay) {
                 // Ancorar o painel logo abaixo do botão visível (desktop: sidebar; mobile: topo)
                 const panel = overlay.querySelector('.community-filter-panel');
