@@ -2607,7 +2607,7 @@
         .view-dropdown {
             position: relative;
             display: inline-block;
-            z-index: 3000; /* acima do calendário, abaixo de overlays (spinner/modais) */
+            z-index: 100; /* acima do calendário, abaixo de modais (z-index: 2000) */
         }
 
         .view-dropdown-trigger {
@@ -2652,7 +2652,7 @@
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.2s ease;
-            z-index: 3010; /* acima de grades/headers com z-index */
+            z-index: 110; /* acima de grades/headers com z-index */
             border: 1px solid #e0e0e0;
         }
 
