@@ -1247,7 +1247,8 @@
 
         /* Espaço superior no mini calendário no container lateral */
         .calendar-sidebar-container .mini-calendar { 
-            margin-top: 30px; 
+            margin-top: 18px; 
+            max-height: 240px;
         }
 
         /* Efeito hover removido para manter consistência com o layout */
@@ -1470,6 +1471,26 @@
             justify-content: center;
             color: #333;
             font-weight: 400;
+        }
+
+        /* Mini calendário menor apenas na sidebar (não afeta o modal) */
+        .calendar-sidebar-container .mini-calendar-header {
+            padding: 8px 12px;
+        }
+
+        .calendar-sidebar-container .mini-calendar-title {
+            font-size: 13px;
+        }
+
+        .calendar-sidebar-container .mini-weekday {
+            padding: 4px 2px;
+            font-size: 10px;
+        }
+
+        .calendar-sidebar-container .mini-day {
+            padding: 4px 2px;
+            font-size: 11px;
+            min-height: 24px;
         }
 
         .mini-day:hover {
