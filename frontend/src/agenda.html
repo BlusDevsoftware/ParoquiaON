@@ -2118,9 +2118,9 @@
         }
 
         .info-date {
-            font-size: 18px;
-            color: #000;
-            font-weight: 400;
+            font-size: 16px;
+            color: #000000;
+            font-weight: 500;
             text-align: center;
             padding: 8px 16px;
         }
@@ -2132,10 +2132,10 @@
         }
 
         .date-nav-btn {
-            background: #1e3a8a;
-            color: white;
+            background: transparent;
+            color: #000000;
             border: none;
-            border-radius: 50%;
+            border-radius: 0;
             width: 32px;
             height: 32px;
             display: flex;
@@ -2144,11 +2144,21 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 14px;
+            box-shadow: none;
+            outline: none;
         }
 
         .date-nav-btn:hover {
-            background: #1e40af;
-            transform: scale(1.05);
+            background: rgba(0, 0, 0, 0.08);
+            transform: none;
+        }
+
+        .date-nav-btn:focus,
+        .date-nav-btn:focus-visible,
+        .date-nav-btn:active {
+            outline: none;
+            box-shadow: none;
+            border: none;
         }
 
         .date-nav-btn:active {
