@@ -2809,9 +2809,8 @@
         }
         .community-filter-overlay {
             display: none;
-            position: absolute;
-            top: calc(100% + 10px);
-            left: 0;
+            position: fixed;
+            inset: 0;
             z-index: 10002;
         }
         .community-filter-overlay.open {
@@ -2827,6 +2826,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            position: absolute; /* posicionado via JS abaixo do botão */
         }
         .community-filter-header {
             display: flex;
@@ -4852,7 +4852,6 @@
                         </button>
                         <button class="community-filter-btn" type="button" onclick="openCommunityFilter()" aria-label="Filtrar" title="Filtrar">
                             <i class="fas fa-filter"></i>
-                            <span>Filtrar</span>
                             <span class="community-filter-badge">0</span>
                         </button>
                     </div>
@@ -5755,6 +5754,23 @@
         function openCommunityFilter() {
             const overlay = document.getElementById('communityFilterOverlay');
             if (overlay) {
+                // Ancorar o painel logo abaixo do botão visível (desktop: sidebar; mobile: topo)
+                const panel = overlay.querySelector('.community-filter-panel');
+                const buttons = Array.from(document.querySelectorAll('.community-filter-btn'));
+                const anchor = buttons.find(btn => btn && btn.offsetParent !== null) || document.activeElement;
+                if (panel && anchor && typeof anchor.getBoundingClientRect === 'function') {
+                    const rect = anchor.getBoundingClientRect();
+                    // Posiciona abaixo do botão com um pequeno espaçamento
+                    const top = Math.round(rect.bottom + 10);
+                    // Calcula left com clamp para não estourar a viewport
+                    const desiredLeft = Math.round(rect.left);
+                    const panelWidth = Math.min(320, Math.round(window.innerWidth * 0.9));
+                    const maxLeft = Math.max(10, window.innerWidth - panelWidth - 10);
+                    const left = Math.min(Math.max(10, desiredLeft), maxLeft);
+
+                    panel.style.top = `${top}px`;
+                    panel.style.left = `${left}px`;
+                }
                 overlay.classList.add('open');
                 overlay.setAttribute('aria-hidden', 'false');
             }
