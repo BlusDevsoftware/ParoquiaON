@@ -7218,6 +7218,11 @@
         function updateCurrentWeekRange() {
             const rangeElement = document.getElementById('dateRange');
             if (!rangeElement) return; // Evita erro se o elemento não existir no layout
+
+            const capitalizePtBrMonth = (text) => String(text || '').replace(
+                /\b(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\b/g,
+                (m) => m.charAt(0).toUpperCase() + m.slice(1)
+            );
             
             // Atualizar texto do dropdown
             const currentViewText = document.getElementById('currentViewText');
@@ -7226,17 +7231,17 @@
             }
             
             if (currentView === 'dia') {
-                rangeElement.textContent = currentDate.toLocaleDateString('pt-BR', { 
+                rangeElement.textContent = capitalizePtBrMonth(currentDate.toLocaleDateString('pt-BR', { 
                     weekday: 'long',
                     day: 'numeric',
                     month: 'long', 
                     year: 'numeric' 
-                });
+                }));
             } else if (currentView === 'mês') {
-                rangeElement.textContent = currentDate.toLocaleDateString('pt-BR', { 
+                rangeElement.textContent = capitalizePtBrMonth(currentDate.toLocaleDateString('pt-BR', { 
                     month: 'long', 
                     year: 'numeric' 
-                });
+                }));
             } else if (currentView === 'ano') {
                 rangeElement.textContent = currentDate.getFullYear().toString();
             } else {
@@ -7249,8 +7254,8 @@
                 const weekStart = new Date(year, month, day - dayOfWeek);
                 const weekEnd = new Date(year, month, day - dayOfWeek + 6);
                 
-                const monthNames = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-                                  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+                const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                                  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
                 
                 const startDay = weekStart.getDate();
                 const endDay = weekEnd.getDate();
