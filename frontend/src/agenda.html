@@ -1293,10 +1293,38 @@
             .sidebar-action-buttons {
                 display: flex;
             }
-            .calendar-info-container .info-left-buttons,
-            .calendar-info-container .info-location {
-                display: none !important;
+            .calendar-controls-bar .calendar-controls-left {
+                display: none !important; /* no desktop, ações ficam na sidebar */
             }
+        }
+
+        /* Barra compacta de controles (substitui o container superior removido) */
+        .calendar-controls-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
+            margin: 10px 0 0 0;
+            background: #f8fafd;
+        }
+
+        .calendar-controls-left,
+        .calendar-controls-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .calendar-controls-left .search-button,
+        .calendar-controls-left .community-filter-btn {
+            margin: 0;
+        }
+
+        /* Deixa a navegação de datas mais compacta nessa barra */
+        .calendar-controls-bar .date-navigation {
+            margin: 0;
         }
 
         /* Efeito hover removido para manter consistência com o layout */
@@ -4994,28 +5022,20 @@
         <div class="main-area">
             <!-- Content Area -->
             <div class="content-area">
-                <!-- Container de Informações -->
-                <div class="calendar-info-container">
-                    <div class="info-left">
-                        <div class="info-left-buttons">
-                            <button class="create-button" onclick="openEventModalFromCreate()">
-                                <i class="fas fa-plus"></i>
-                                Criar
-                            </button>
-                            <button class="search-button" onclick="openSearchModal()" aria-label="Buscar eventos" title="Buscar eventos">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                        <div class="info-location">
-                            <div class="info-location-container">
-                                <button class="community-filter-btn" type="button" onclick="openCommunityFilter()" aria-label="Filtrar comunidades" title="Filtrar comunidades">
-                                    <i class="fas fa-filter"></i>
-                                    <span class="community-filter-badge">0</span>
-                                </button>
-                            </div>
-                        </div>
+                <!-- Container superior removido; controles migrados para barra compacta -->
+                <div class="calendar-controls-bar">
+                    <!-- Mobile: ações (Criar permanece no FAB; aqui ficam Pesquisa/Filtro) -->
+                    <div class="calendar-controls-left">
+                        <button class="search-button" onclick="openSearchModal()" aria-label="Buscar eventos" title="Buscar eventos">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button class="community-filter-btn" type="button" onclick="openCommunityFilter()" aria-label="Filtrar" title="Filtrar">
+                            <i class="fas fa-filter"></i>
+                            <span class="community-filter-badge">0</span>
+                        </button>
                     </div>
-                    <div class="info-right">
+
+                    <div class="calendar-controls-right">
                         <label class="toggle-switch-wrapper" title="Exibir agendamentos anteriores">
                             <input type="checkbox" id="togglePastEvents" class="toggle-switch">
                             <span class="toggle-slider"></span>
@@ -5030,11 +5050,11 @@
                             </button>
                         </div>
                         <button class="info-today-btn" onclick="goToToday()">Hoje</button>
-                        
+
                         <div class="view-dropdown">
                             <div class="view-dropdown-trigger">
                                 <span id="currentViewText">Semana</span>
-                            <i class="fas fa-chevron-down"></i>
+                                <i class="fas fa-chevron-down"></i>
                             </div>
                             <div class="view-dropdown-menu">
                                 <a href="#" class="view-dropdown-item" data-view="dia">Dia</a>
