@@ -2605,6 +2605,7 @@
         .view-dropdown {
             position: relative;
             display: inline-block;
+            z-index: 20010; /* garantir que o menu fique acima do calendário */
         }
 
         .view-dropdown-trigger {
@@ -2649,7 +2650,7 @@
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.2s ease;
-            z-index: 1;
+            z-index: 20020; /* acima de grades/headers com z-index */
             border: 1px solid #e0e0e0;
         }
 
