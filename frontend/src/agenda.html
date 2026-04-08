@@ -6363,6 +6363,8 @@
         function updateMiniCalendar() {
             const title = document.getElementById('miniCalendarTitle');
             const daysContainer = document.getElementById('miniCalendarDays');
+            // Mini calendário pode não existir no layout atual
+            if (!title || !daysContainer) return;
             
             title.textContent = miniCalendarDate.toLocaleDateString('pt-BR', { 
                 month: 'long', 
