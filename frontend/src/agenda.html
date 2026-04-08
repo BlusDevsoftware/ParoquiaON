@@ -1230,6 +1230,8 @@
         .left-sidebar {
             width: 280px;
             margin: 0;
+            /* Alinha topo da sidebar com o topo do .weekly-calendar */
+            margin-top: 78px;
             background: #f8fafd;
             border-radius: 0;
             overflow-y: auto;
@@ -1242,8 +1244,8 @@
             display: flex;
             flex-direction: column;
             min-height: 0;
-            height: calc(100vh - 54px);
-            max-height: calc(100vh - 54px);
+            height: calc(100vh - 54px - 78px);
+            max-height: calc(100vh - 54px - 78px);
             transition: all 0.3s ease;
         }
 
