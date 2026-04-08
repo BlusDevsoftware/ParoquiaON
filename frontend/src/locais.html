@@ -422,21 +422,55 @@
             border-radius: 8px;
         }
 
-        .spinner-main {
-            border: 8px solid #e3f2fd;
-            border-top: 8px solid #1976D2;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
+        .calendar-loader {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        .calendar-loader i {
+            font-size: 58px;
+            color: #fe6b45;
+            animation: calendarPulse 1.2s ease-in-out infinite;
+        }
+        .calendar-loader-leaf {
+            position: absolute;
+            top: 22px;
+            left: 24px;
+            width: 14px;
+            height: 10px;
+            border-radius: 2px;
+            background: linear-gradient(180deg, #ff9a7a 0%, #fe6b45 100%);
+            opacity: 0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+            animation: calendarLeafFall 1.8s ease-in infinite;
+        }
+        .calendar-loader-leaf:nth-child(2) { animation-delay: 0s; }
+        .calendar-loader-leaf:nth-child(3) { animation-delay: 0.28s; left: 30px; }
+        .calendar-loader-leaf:nth-child(4) { animation-delay: 0.56s; left: 20px; }
+        .calendar-loader-leaf:nth-child(5) { animation-delay: 0.84s; left: 34px; }
+        .calendar-loader-leaf:nth-child(6) { animation-delay: 1.12s; left: 16px; }
+        .calendar-loader-leaf:nth-child(7) { animation-delay: 1.4s; left: 28px; }
+        .calendar-loader-leaf:nth-child(odd) { background: linear-gradient(180deg, #ffb49e 0%, #fe6b45 100%); }
 
         .loading-text {
             margin-top: 20px;
-            color: #1976D2;
+            color: #fe6b45;
             font-size: 1.1rem;
             font-weight: 500;
             text-align: center;
+        }
+
+        @keyframes calendarLeafFall {
+            0% { transform: translate(0, 0) rotate(0deg) scale(0.9); opacity: 0; }
+            12% { opacity: 1; }
+            100% { transform: translate(-26px, 62px) rotate(230deg) scale(0.7); opacity: 0; }
+        }
+        @keyframes calendarPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
         }
 
         /* Scroll personalizado para a tabela completa */
@@ -1374,7 +1408,15 @@
 
         <div class="list-container">
             <div id="loader-locais" class="loader-overlay-locais" style="display:none; position:absolute; inset:0; background:rgba(248,250,253,.9); align-items:center; justify-content:center;">
-                <div class="spinner-main"></div>
+                <div class="calendar-loader" aria-hidden="true">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="calendar-loader-leaf"></span>
+                    <span class="calendar-loader-leaf"></span>
+                    <span class="calendar-loader-leaf"></span>
+                    <span class="calendar-loader-leaf"></span>
+                    <span class="calendar-loader-leaf"></span>
+                    <span class="calendar-loader-leaf"></span>
+                </div>
                 <div class="loading-text">Carregando locais...</div>
             </div>
             <div id="locaisRows" class="rows"></div>
