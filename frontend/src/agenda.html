@@ -4156,43 +4156,52 @@
 
         .calendar-loader i {
             font-size: 58px;
-            color: #1e3a8a;
+            color: #fe6b45;
             animation: calendarPulse 1.2s ease-in-out infinite;
         }
 
-        .calendar-loader-page {
+        .calendar-loader-leaf {
             position: absolute;
-            top: 20px;
-            left: 17px;
-            width: 38px;
-            height: 28px;
-            border-radius: 4px;
-            background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 100%);
-            transform-origin: top center;
-            animation: calendarPageFlip 1.2s ease-in-out infinite;
-            opacity: 0.9;
+            top: 22px;
+            left: 24px;
+            width: 14px;
+            height: 10px;
+            border-radius: 2px;
+            background: linear-gradient(180deg, #ff9a7a 0%, #fe6b45 100%);
+            opacity: 0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+            animation: calendarLeafFall 1.8s ease-in infinite;
+        }
+
+        .calendar-loader-leaf:nth-child(2) { animation-delay: 0s; }
+        .calendar-loader-leaf:nth-child(3) { animation-delay: 0.28s; left: 30px; }
+        .calendar-loader-leaf:nth-child(4) { animation-delay: 0.56s; left: 20px; }
+        .calendar-loader-leaf:nth-child(5) { animation-delay: 0.84s; left: 34px; }
+        .calendar-loader-leaf:nth-child(6) { animation-delay: 1.12s; left: 16px; }
+        .calendar-loader-leaf:nth-child(7) { animation-delay: 1.4s; left: 28px; }
+        .calendar-loader-leaf:nth-child(odd) {
+            background: linear-gradient(180deg, #ffb49e 0%, #fe6b45 100%);
         }
 
         .loading-text {
             margin-top: 20px;
-            color: #1e3a8a;
+            color: #fe6b45;
             font-size: 1.1rem;
             font-weight: 500;
             text-align: center;
         }
 
-        @keyframes calendarPageFlip {
+        @keyframes calendarLeafFall {
             0% {
-                transform: perspective(120px) rotateX(0deg);
-                opacity: 0.25;
+                transform: translate(0, 0) rotate(0deg) scale(0.9);
+                opacity: 0;
             }
-            40% {
-                transform: perspective(120px) rotateX(-88deg);
+            12% {
                 opacity: 1;
             }
             100% {
-                transform: perspective(120px) rotateX(-88deg);
-                opacity: 0.15;
+                transform: translate(-26px, 62px) rotate(230deg) scale(0.7);
+                opacity: 0;
             }
         }
 
@@ -5024,7 +5033,12 @@
         <div id="loader-agenda" class="loader-overlay-main">
             <div class="calendar-loader" aria-hidden="true">
                 <i class="fas fa-calendar-alt"></i>
-                <div class="calendar-loader-page"></div>
+                <span class="calendar-loader-leaf"></span>
+                <span class="calendar-loader-leaf"></span>
+                <span class="calendar-loader-leaf"></span>
+                <span class="calendar-loader-leaf"></span>
+                <span class="calendar-loader-leaf"></span>
+                <span class="calendar-loader-leaf"></span>
             </div>
             <div class="loading-text">Carregando agenda...</div>
         </div>
