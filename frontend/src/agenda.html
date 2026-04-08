@@ -1228,17 +1228,19 @@
 
         /* Container lateral do calendário */
         .left-sidebar {
-            width: 0;
+            width: 280px;
             margin: 0;
             background: #f8fafd;
             border-radius: 0;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             box-shadow: none;
             border: none;
             position: relative;
             z-index: 10;
-            flex: 0 0 0;
-            display: none;
+            flex: 0 0 280px;
+            display: flex;
+            flex-direction: column;
             min-height: 0;
             height: calc(100vh - 54px);
             transition: all 0.3s ease;
@@ -1846,8 +1848,8 @@
             flex-direction: column;
             background: #f8fafd;
             margin-top: 54px; /* Compensar altura da barra fixa */
-            margin-left: 0;
-            width: 100vw;
+            margin-left: 280px;
+            width: calc(100vw - 280px);
             min-height: calc(100vh - 54px);
             transition: all 0.3s ease;
         }
@@ -4333,12 +4335,13 @@
 
         @media (max-width: 1200px) {
             .left-sidebar {
-                width: 0;
+                width: 260px;
+                flex: 0 0 260px;
             }
             
             .main-area {
-                width: 100vw;
-                margin-left: 0;
+                width: calc(100vw - 260px);
+                margin-left: 260px;
             }
             
             .nav-links {
@@ -4352,7 +4355,8 @@
             }
             
             .left-sidebar {
-                width: 0;
+                width: 280px;
+                flex: 0 0 280px;
                 transform: translateX(-100%);
             }
             
@@ -5056,6 +5060,40 @@
 
         <!-- Sidebar Esquerda -->
         <div class="left-sidebar" id="leftSidebar">
+            <!-- Mini Calendário -->
+            <div class="mini-calendar">
+                <div class="mini-calendar-header">
+                    <div class="mini-calendar-title" id="miniCalendarTitle">Agosto 2024</div>
+                    <div class="mini-calendar-nav">
+                        <button class="mini-nav-btn" onclick="navigateMiniCalendar(-1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="mini-nav-btn" onclick="navigateMiniCalendar(1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mini-calendar-weekdays">
+                    <div class="mini-weekday">D</div>
+                    <div class="mini-weekday">S</div>
+                    <div class="mini-weekday">T</div>
+                    <div class="mini-weekday">Q</div>
+                    <div class="mini-weekday">Q</div>
+                    <div class="mini-weekday">S</div>
+                    <div class="mini-weekday">S</div>
+                </div>
+                <div class="mini-calendar-days" id="miniCalendarDays">
+                    <!-- Dias serão inseridos via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Seção de Últimos Agendamentos -->
+            <div class="recent-appointments-header">
+                <i class="fas fa-clock"></i> Últimos Agendamentos
+            </div>
+            <div class="appointments-list" id="recentAppointmentsList">
+                <!-- Agendamentos serão inseridos via JavaScript -->
+            </div>
         </div>
 
         <!-- Dropdown de filtros -->
