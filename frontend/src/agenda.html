@@ -1367,10 +1367,15 @@
         /* Deixa a navegação de datas mais compacta */
         .calendar-controls-right .date-navigation {
             margin: 0;
+            transform: translateY(-6px);
         }
 
         .calendar-controls-right {
             margin: 0;
+        }
+
+        .calendar-controls-right .info-today-btn {
+            transform: translateY(-6px);
         }
 
         /* Efeito hover removido para manter consistência com o layout */
@@ -3110,7 +3115,7 @@
             border: 1px solid #d1d5db; /* borda cinza para destacar */
             position: relative;
             z-index: 10;
-            max-height: calc(100vh - 100px);
+            max-height: calc(100vh - 80px);
             overflow-y: auto;
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
