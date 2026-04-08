@@ -1433,6 +1433,8 @@
             gap: 8px;
             min-height: 32px;
             align-items: center;
+            justify-content: flex-start;
+            width: 100%;
             position: relative;
             z-index: 60;
         }
@@ -3174,7 +3176,7 @@
             border-radius: 0;
             overflow: hidden;
             box-shadow: none;
-            flex: 1;
+            flex: 0 0 822px;
             display: flex;
             flex-direction: column;
             margin: 0 !important;
@@ -3182,8 +3184,9 @@
             border-right: none;
             position: relative;
             z-index: 1;
-            height: auto;
-            max-height: none;
+            min-height: 822px;
+            height: 822px;
+            max-height: 822px;
             overflow-y: auto;
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
