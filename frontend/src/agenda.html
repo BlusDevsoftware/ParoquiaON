@@ -1287,6 +1287,10 @@
             width: auto;
         }
 
+        .sidebar-action-buttons .view-dropdown {
+            min-width: 120px;
+        }
+
         .sidebar-action-buttons .create-button {
             width: auto;
             margin: 0; /* sobrescreve o margin:auto do botão padrão */
@@ -2649,21 +2653,14 @@
             z-index: 100; /* acima do calendário, abaixo de modais (z-index: 2000) */
         }
 
-        /* Desktop: dropdown de visão abaixo do avatar (fixo) */
+        /* Desktop: alinhamento do toggle de agendamentos anteriores */
         @media (min-width: 769px) {
             .header-past-toggle {
                 position: fixed;
-                right: 168px; /* ao lado esquerdo do seletor de visão */
+                right: 168px;
                 top: 100px;
                 z-index: 110;
                 margin: 0;
-            }
-
-            .header-view-dropdown {
-                position: fixed;
-                right: 30px; /* mesmo padding lateral do header */
-                top: 84px;   /* sobe o botão sem afetar o fluxo do calendário */
-                z-index: 110; /* acima do calendário, abaixo de modais/spinner */
             }
         }
 
@@ -4945,6 +4942,18 @@
                             <i class="fas fa-plus"></i>
                             Criar
                         </button>
+                        <div class="view-dropdown">
+                            <div class="view-dropdown-trigger">
+                                <span id="currentViewText">Semana</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="view-dropdown-menu">
+                                <a href="#" class="view-dropdown-item" data-view="dia">Dia</a>
+                                <a href="#" class="view-dropdown-item" data-view="semana">Semana</a>
+                                <a href="#" class="view-dropdown-item" data-view="mês">Mês</a>
+                                <a href="#" class="view-dropdown-item" data-view="ano">Ano</a>
+                            </div>
+                        </div>
                         <button class="search-button" onclick="openSearchModal()" aria-label="Buscar eventos" title="Buscar eventos">
                             <i class="fas fa-search"></i>
                             <span>Pesquisar</span>
@@ -5123,18 +5132,6 @@
                     </div>
                     <button class="info-today-btn" onclick="goToToday()">Hoje</button>
 
-                    <div class="view-dropdown header-view-dropdown">
-                        <div class="view-dropdown-trigger">
-                            <span id="currentViewText">Semana</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="view-dropdown-menu">
-                            <a href="#" class="view-dropdown-item" data-view="dia">Dia</a>
-                            <a href="#" class="view-dropdown-item" data-view="semana">Semana</a>
-                            <a href="#" class="view-dropdown-item" data-view="mês">Mês</a>
-                            <a href="#" class="view-dropdown-item" data-view="ano">Ano</a>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Calendário Semanal -->
