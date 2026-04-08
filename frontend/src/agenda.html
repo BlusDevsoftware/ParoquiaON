@@ -1511,7 +1511,8 @@
         }
 
         .left-sidebar.collapsed .mini-calendar,
-        .left-sidebar.collapsed .recent-appointments {
+        .left-sidebar.collapsed .recent-appointments-header,
+        .left-sidebar.collapsed .appointments-list {
             display: none;
         }
 
@@ -1751,33 +1752,20 @@
         }
 
         /* Seção de Últimos Agendamentos */
-        .recent-appointments {
-            margin: 20px;
-            background: #ffffff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border: 1px solid #d1d5db; /* borda cinza para destacar */
-            display: flex;
-            flex-direction: column;
-            flex: 1 1 auto; /* ocupar espaço restante da sidebar */
-            min-height: 0; /* permitir que a lista interna calcule altura */
-        }
-
         .recent-appointments-header {
-            background: #ffffff;
+            background: transparent;
             color: #333;
-            padding: 15px 20px;
-            text-align: center;
+            padding: 15px 20px 10px 20px;
+            text-align: left;
             font-weight: 600;
             font-size: 14px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: none;
         }
 
         .appointments-list {
-            padding: 0;
+            padding: 0 20px 20px 20px;
             margin: 0;
-            flex: 1 1 auto; /* preencher o restante dentro do card */
+            flex: 1 1 auto;
             min-height: 0;
             overflow-y: auto;
             /* Scroll invisível */
@@ -5197,13 +5185,11 @@
                     </div>
                     
                     <!-- Seção de Últimos Agendamentos -->
-                    <div class="recent-appointments">
-                        <div class="recent-appointments-header">
-                            <i class="fas fa-clock"></i> Últimos Agendamentos
-                        </div>
-                        <div class="appointments-list" id="recentAppointmentsList">
-                            <!-- Agendamentos serão inseridos via JavaScript -->
-                        </div>
+                    <div class="recent-appointments-header">
+                        <i class="fas fa-clock"></i> Últimos Agendamentos
+                    </div>
+                    <div class="appointments-list" id="recentAppointmentsList">
+                        <!-- Agendamentos serão inseridos via JavaScript -->
                     </div>
                     
                     
