@@ -1227,7 +1227,7 @@
 
 
         /* Container lateral do calendário */
-        .calendar-sidebar-container {
+        .left-sidebar {
             width: 350px;
             margin: 0;
             background: #f8fafd;
@@ -1247,7 +1247,7 @@
         }
 
         /* Espaço superior no mini calendário no container lateral */
-        .calendar-sidebar-container .mini-calendar { 
+        .left-sidebar .mini-calendar { 
             margin: 18px 20px 0 20px; /* mesma largura (recuo) do card de últimos agendamentos */
             max-height: 240px;
         }
@@ -1491,7 +1491,7 @@
             color: #1e3a8a;
         }
 
-        .calendar-sidebar-container.collapsed {
+        .left-sidebar.collapsed {
             width: 60px;
             overflow: hidden;
         }
@@ -1501,18 +1501,17 @@
             transform: translateX(-100%);
         }
 
-        .calendar-sidebar-container.collapsed .calendar-sidebar-header {
+        .left-sidebar.collapsed .calendar-sidebar-header {
             padding: 20px 15px;
             justify-content: center;
         }
 
-        .calendar-sidebar-container.collapsed .calendar-sidebar-title {
+        .left-sidebar.collapsed .calendar-sidebar-title {
             display: none;
         }
 
-        .calendar-sidebar-container.collapsed .mini-calendar,
-        .calendar-sidebar-container.collapsed .create-button,
-        .calendar-sidebar-container.collapsed .recent-appointments {
+        .left-sidebar.collapsed .mini-calendar,
+        .left-sidebar.collapsed .recent-appointments {
             display: none;
         }
 
@@ -1686,20 +1685,20 @@
         }
 
         /* Mini calendário menor apenas na sidebar (não afeta o modal) */
-        .calendar-sidebar-container .mini-calendar-header {
+        .left-sidebar .mini-calendar-header {
             padding: 8px 12px;
         }
 
-        .calendar-sidebar-container .mini-calendar-title {
+        .left-sidebar .mini-calendar-title {
             font-size: 13px;
         }
 
-        .calendar-sidebar-container .mini-weekday {
+        .left-sidebar .mini-weekday {
             padding: 4px 2px;
             font-size: 10px;
         }
 
-        .calendar-sidebar-container .mini-day {
+        .left-sidebar .mini-day {
             padding: 4px 2px;
             font-size: 11px;
             min-height: 24px;
@@ -1721,7 +1720,7 @@
         }
 
         /* Override: Hoje no mini calendário da sidebar deve ser preto, negrito e alinhado (sem círculo) */
-        .calendar-sidebar-container .mini-day.selected {
+        .left-sidebar .mini-day.selected {
             background: transparent;
             color: #1e3a8a; /* azul do sistema */
             font-weight: 700;
@@ -4351,10 +4350,6 @@
                 width: 320px;
             }
             
-            .calendar-sidebar-container {
-                width: 320px;
-            }
-            
             .main-area {
                 width: calc(100vw - 320px);
                 margin-left: 320px;
@@ -4373,10 +4368,6 @@
             .left-sidebar {
                 width: 320px;
                 transform: translateX(-100%);
-            }
-            
-            .calendar-sidebar-container {
-                width: 320px;
             }
             
             .left-sidebar.open {
@@ -4557,12 +4548,6 @@
                 flex-direction: column;
                 height: auto;
                 margin-top: 70px;
-            }
-            
-            .calendar-sidebar-container {
-                margin: 0;
-                min-width: auto;
-                box-shadow: none;
             }
             
             .content-header {
@@ -5085,35 +5070,6 @@
 
         <!-- Sidebar Esquerda -->
         <div class="left-sidebar" id="leftSidebar">
-                <!-- Container Lateral do Calendário -->
-                <div class="calendar-sidebar-container">
-                    <!-- Ações (apenas desktop via CSS) -->
-                    <div class="sidebar-action-buttons">
-                        <button class="create-button" onclick="openEventModalFromCreate()">
-                            <i class="fas fa-plus"></i>
-                            Criar
-                        </button>
-                        <div class="view-dropdown">
-                            <div class="view-dropdown-trigger">
-                                <span>Mês</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="view-dropdown-menu">
-                                <a href="#" class="view-dropdown-item" data-view="dia">Dia</a>
-                                <a href="#" class="view-dropdown-item" data-view="semana">Semana</a>
-                                <a href="#" class="view-dropdown-item" data-view="mês">Mês</a>
-                                <a href="#" class="view-dropdown-item" data-view="ano">Ano</a>
-                            </div>
-                        </div>
-                        <button class="search-button" onclick="openSearchModal()" aria-label="Buscar eventos" title="Buscar eventos">
-                            <i class="fas fa-search"></i>
-                            <span>Pesquisar</span>
-                        </button>
-                        <button class="community-filter-btn" type="button" onclick="openCommunityFilter()" aria-label="Filtrar" title="Filtrar">
-                            <i class="fas fa-filter"></i>
-                            <span class="community-filter-badge">0</span>
-                        </button>
-                    </div>
 
                     <!-- Dropdown de filtros (único; botão pode estar no topo ou na sidebar) -->
                     <div class="community-filter-overlay" id="communityFilterOverlay" aria-hidden="true">
@@ -5251,7 +5207,6 @@
                     </div>
                     
                     
-                </div>
         </div>
 
         <!-- Área Principal -->
