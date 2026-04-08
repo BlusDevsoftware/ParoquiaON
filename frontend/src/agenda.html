@@ -1264,7 +1264,8 @@
 
         .sidebar-action-buttons .create-button,
         .sidebar-action-buttons .search-button,
-        .sidebar-action-buttons .community-filter-btn {
+        .sidebar-action-buttons .community-filter-btn,
+        .sidebar-action-buttons .view-dropdown-trigger {
             height: 42px;
             justify-content: center;
         }
@@ -1289,6 +1290,26 @@
 
         .sidebar-action-buttons .view-dropdown {
             min-width: 120px;
+        }
+
+        .sidebar-action-buttons .view-dropdown-trigger {
+            width: auto;
+            margin: 0;
+            background: #e5e7eb;
+            color: #000000;
+            border: 1px solid #d1d5db;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+            padding: 10px 16px;
+            min-width: 120px;
+            justify-content: flex-start;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-action-buttons .view-dropdown-trigger:hover {
+            background: #d1d5db;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-action-buttons .create-button {
