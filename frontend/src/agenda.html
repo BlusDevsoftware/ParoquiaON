@@ -1228,19 +1228,17 @@
 
         /* Container lateral do calendário */
         .left-sidebar {
-            width: 260px;
+            width: 0;
             margin: 0;
             background: #f8fafd;
             border-radius: 0;
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow: hidden;
             box-shadow: none;
             border: none;
             position: relative;
             z-index: 10;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+            flex: 0 0 0;
+            display: none;
             min-height: 0;
             height: calc(100vh - 54px);
             transition: all 0.3s ease;
@@ -1848,8 +1846,8 @@
             flex-direction: column;
             background: #f8fafd;
             margin-top: 54px; /* Compensar altura da barra fixa */
-            margin-left: 260px;
-            width: calc(100vw - 260px);
+            margin-left: 0;
+            width: 100vw;
             min-height: calc(100vh - 54px);
             transition: all 0.3s ease;
         }
@@ -4335,12 +4333,12 @@
 
         @media (max-width: 1200px) {
             .left-sidebar {
-                width: 280px;
+                width: 0;
             }
             
             .main-area {
-                width: calc(100vw - 280px);
-                margin-left: 280px;
+                width: 100vw;
+                margin-left: 0;
             }
             
             .nav-links {
@@ -4354,7 +4352,7 @@
             }
             
             .left-sidebar {
-                width: 280px;
+                width: 0;
                 transform: translateX(-100%);
             }
             
@@ -5058,141 +5056,98 @@
 
         <!-- Sidebar Esquerda -->
         <div class="left-sidebar" id="leftSidebar">
+        </div>
 
-                    <!-- Dropdown de filtros (único; botão pode estar no topo ou na sidebar) -->
-                    <div class="community-filter-overlay" id="communityFilterOverlay" aria-hidden="true">
-                        <div class="community-filter-panel" role="dialog" aria-label="Filtros da agenda">
-                            <div class="community-filter-header">
-                                <div class="community-filter-title">
-                                    <i class="fas fa-filter"></i>
-                                    Filtros
-                                </div>
-                                <button class="community-filter-close" type="button" onclick="closeCommunityFilter()" aria-label="Fechar filtro">
-                                    <i class="fas fa-times"></i>
-                                </button>
+        <!-- Dropdown de filtros -->
+        <div class="community-filter-overlay" id="communityFilterOverlay" aria-hidden="true">
+            <div class="community-filter-panel" role="dialog" aria-label="Filtros da agenda">
+                <div class="community-filter-header">
+                    <div class="community-filter-title">
+                        <i class="fas fa-filter"></i>
+                        Filtros
+                    </div>
+                    <button class="community-filter-close" type="button" onclick="closeCommunityFilter()" aria-label="Fechar filtro">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="community-filter-actions">
+                    <button class="community-filter-action" type="button" onclick="clearAllAgendaFilters()">Limpar filtros</button>
+                </div>
+                <div class="community-filter-sections">
+                    <div class="community-filter-section">
+                        <div class="community-filter-section-title">
+                            <span>Comunidades</span>
+                            <button class="community-filter-toggle" type="button" data-target="communityFilterList" aria-expanded="false" aria-label="Expandir comunidades">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="community-filter-list collapsed" id="communityFilterList">
+                            <div class="community-filter-loading">Carregando comunidades...</div>
+                        </div>
+                    </div>
+                    <div class="community-filter-section">
+                        <div class="community-filter-section-title">
+                            <span>Pastorais</span>
+                            <button class="community-filter-toggle" type="button" data-target="pastoralFilterList" aria-expanded="false" aria-label="Expandir pastorais">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="community-filter-list collapsed" id="pastoralFilterList">
+                            <div class="community-filter-loading">Carregando pastorais...</div>
+                        </div>
+                    </div>
+                    <div class="community-filter-section">
+                        <div class="community-filter-section-title">
+                            <span>Pilares</span>
+                            <button class="community-filter-toggle" type="button" data-target="pilarFilterList" aria-expanded="false" aria-label="Expandir pilares">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="community-filter-list collapsed" id="pilarFilterList">
+                            <div class="community-filter-loading">Carregando pilares...</div>
+                        </div>
+                    </div>
+                    <div class="community-filter-section">
+                        <div class="community-filter-section-title">
+                            <span>Locais</span>
+                            <button class="community-filter-toggle" type="button" data-target="localFilterList" aria-expanded="false" aria-label="Expandir locais">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="community-filter-list collapsed" id="localFilterList">
+                            <div class="community-filter-loading">Carregando locais...</div>
+                        </div>
+                    </div>
+                    <div class="community-filter-section">
+                        <div class="community-filter-section-title">
+                            <span>Ações</span>
+                            <button class="community-filter-toggle" type="button" data-target="acaoFilterList" aria-expanded="false" aria-label="Expandir ações">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="community-filter-list collapsed" id="acaoFilterList">
+                            <div class="community-filter-loading">Carregando ações...</div>
+                        </div>
+                    </div>
+                    <div class="community-filter-section">
+                        <div class="community-filter-section-title">Outros</div>
+                        <div class="community-filter-list">
+                            <div class="community-filter-item">
+                                <label>
+                                    <input type="checkbox" id="filterEventoParoquialOnly" />
+                                    <span class="community-filter-name" title="Somente eventos paroquiais">Somente eventos paroquiais</span>
+                                </label>
                             </div>
-                            <div class="community-filter-actions">
-                                <button class="community-filter-action" type="button" onclick="clearAllAgendaFilters()">Limpar filtros</button>
-                            </div>
-
-                            <div class="community-filter-sections">
-                                <div class="community-filter-section">
-                                    <div class="community-filter-section-title">
-                                        <span>Comunidades</span>
-                                        <button class="community-filter-toggle" type="button" data-target="communityFilterList" aria-expanded="false" aria-label="Expandir comunidades">
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                    <div class="community-filter-list collapsed" id="communityFilterList">
-                                        <div class="community-filter-loading">Carregando comunidades...</div>
-                                    </div>
-                                </div>
-
-                                <div class="community-filter-section">
-                                    <div class="community-filter-section-title">
-                                        <span>Pastorais</span>
-                                        <button class="community-filter-toggle" type="button" data-target="pastoralFilterList" aria-expanded="false" aria-label="Expandir pastorais">
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                    <div class="community-filter-list collapsed" id="pastoralFilterList">
-                                        <div class="community-filter-loading">Carregando pastorais...</div>
-                                    </div>
-                                </div>
-
-                                <div class="community-filter-section">
-                                    <div class="community-filter-section-title">
-                                        <span>Pilares</span>
-                                        <button class="community-filter-toggle" type="button" data-target="pilarFilterList" aria-expanded="false" aria-label="Expandir pilares">
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                    <div class="community-filter-list collapsed" id="pilarFilterList">
-                                        <div class="community-filter-loading">Carregando pilares...</div>
-                                    </div>
-                                </div>
-
-                                <div class="community-filter-section">
-                                    <div class="community-filter-section-title">
-                                        <span>Locais</span>
-                                        <button class="community-filter-toggle" type="button" data-target="localFilterList" aria-expanded="false" aria-label="Expandir locais">
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                    <div class="community-filter-list collapsed" id="localFilterList">
-                                        <div class="community-filter-loading">Carregando locais...</div>
-                                    </div>
-                                </div>
-
-                                <div class="community-filter-section">
-                                    <div class="community-filter-section-title">
-                                        <span>Ações</span>
-                                        <button class="community-filter-toggle" type="button" data-target="acaoFilterList" aria-expanded="false" aria-label="Expandir ações">
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                    <div class="community-filter-list collapsed" id="acaoFilterList">
-                                        <div class="community-filter-loading">Carregando ações...</div>
-                                    </div>
-                                </div>
-
-                                <div class="community-filter-section">
-                                    <div class="community-filter-section-title">Outros</div>
-                                    <div class="community-filter-list">
-                                        <div class="community-filter-item">
-                                            <label>
-                                                <input type="checkbox" id="filterEventoParoquialOnly" />
-                                                <span class="community-filter-name" title="Somente eventos paroquiais">Somente eventos paroquiais</span>
-                                            </label>
-                                        </div>
-                                        <div class="community-filter-item">
-                                            <label>
-                                                <input type="checkbox" id="togglePastEvents" />
-                                                <span class="community-filter-name" title="Exibir agendamentos anteriores">Exibir agendamentos anteriores</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="community-filter-item">
+                                <label>
+                                    <input type="checkbox" id="togglePastEvents" />
+                                    <span class="community-filter-name" title="Exibir agendamentos anteriores">Exibir agendamentos anteriores</span>
+                                </label>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Mini Calendário -->
-                    <div class="mini-calendar">
-                        <div class="mini-calendar-header">
-                            <div class="mini-calendar-title" id="miniCalendarTitle">Agosto 2024</div>
-                            <div class="mini-calendar-nav">
-                                <button class="mini-nav-btn" onclick="navigateMiniCalendar(-1)">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button class="mini-nav-btn" onclick="navigateMiniCalendar(1)">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="mini-calendar-weekdays">
-                            <div class="mini-weekday">D</div>
-                            <div class="mini-weekday">S</div>
-                            <div class="mini-weekday">T</div>
-                            <div class="mini-weekday">Q</div>
-                            <div class="mini-weekday">Q</div>
-                            <div class="mini-weekday">S</div>
-                            <div class="mini-weekday">S</div>
-                        </div>
-                        <div class="mini-calendar-days" id="miniCalendarDays">
-                            <!-- Dias serão inseridos via JavaScript -->
-                        </div>
-                    </div>
-                    
-                    <!-- Seção de Últimos Agendamentos -->
-                    <div class="recent-appointments-header">
-                        <i class="fas fa-clock"></i> Últimos Agendamentos
-                    </div>
-                    <div class="appointments-list" id="recentAppointmentsList">
-                        <!-- Agendamentos serão inseridos via JavaScript -->
-                    </div>
-                    
-                    
+                </div>
+            </div>
         </div>
 
         <!-- Área Principal -->
