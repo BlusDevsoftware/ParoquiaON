@@ -1230,17 +1230,16 @@
         .left-sidebar {
             width: 280px;
             margin: 0;
+            /* Alinha topo da sidebar com o topo do .weekly-calendar */
+            margin-top: 78px;
             background: #f8fafd;
             border-radius: 0;
             overflow-y: auto;
             overflow-x: hidden;
             box-shadow: none;
             border: 1px solid #e5e7eb;
-            position: fixed;
-            left: 0;
-            /* 54px (header) + 78px (barra de controles do calendário) */
-            top: calc(54px + 78px);
-            z-index: 110;
+            position: relative;
+            z-index: 10;
             flex: 0 0 280px;
             display: flex;
             flex-direction: column;
@@ -3302,6 +3301,11 @@
         /* Ajuste de cabeçalho para visão mensal: 7 colunas iguais */
         .calendar-header.month-view {
             grid-template-columns: repeat(7, 1fr) !important;
+        }
+
+        /* Mês: remover linhas verticais entre os dias no header */
+        .calendar-header.month-view .day-header {
+            border-right: none !important;
         }
 
         .time-column-header {
