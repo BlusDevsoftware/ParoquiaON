@@ -1242,7 +1242,7 @@
             display: flex;
             flex-direction: column;
             min-height: 0;
-            height: 822px;
+            height: calc(100vh - 54px);
             transition: all 0.3s ease;
         }
 
@@ -3178,10 +3178,11 @@
             flex-direction: column;
             margin: 0 !important;
             border: 1px solid #e5e7eb;
+            border-right: none;
             position: relative;
             z-index: 1;
-            height: 822px;
-            max-height: 822px;
+            height: calc(100vh - 54px);
+            max-height: calc(100vh - 54px);
             overflow-y: auto;
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
