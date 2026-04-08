@@ -1356,6 +1356,8 @@
 
         .calendar-controls-left {
             gap: 4px;
+            position: relative;
+            z-index: 60;
         }
 
         /* Dropdown de visão alinhado à direita com o mesmo recuo do calendário */
@@ -1379,11 +1381,15 @@
             gap: 4px;
             min-height: 28px;
             align-items: flex-start;
+            position: relative;
+            z-index: 60;
         }
 
         .calendar-controls-right .info-today-btn {
             padding: 4px 10px;
             transform: translateY(-8px);
+            position: relative;
+            z-index: 61;
         }
 
         .calendar-controls-right .info-date {
@@ -2888,6 +2894,7 @@
             min-width: auto;
             color: #1e3a8a;
             position: relative;
+            z-index: 61;
         }
         .community-filter-btn:hover {
             transform: translateY(-2px);
