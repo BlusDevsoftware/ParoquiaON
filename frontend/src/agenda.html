@@ -6935,9 +6935,13 @@
                         eventElement.appendChild(datetimeElement);
                         
                         // Aplicar cor da comunidade no card (borda esquerda)
-                        if (event.color) {
-                            eventElement.style.borderLeft = `4px solid ${event.color}`;
-                        }
+                        const communityColor = event.color || '#1e3a8a';
+                        eventElement.style.borderLeft = `4px solid ${communityColor}`;
+                        // Fundo suave com a cor da comunidade
+                        eventElement.style.background = colorToRgba(communityColor, 0.12);
+                        eventElement.style.borderColor = colorToRgba(communityColor, 0.22);
+                        // Ajustar título para acompanhar a cor da comunidade
+                        titleElement.style.color = communityColor;
                         
                         // Calcular posição e altura baseada no horário
                         const startMinutes = startTime.getMinutes();
@@ -7241,7 +7245,8 @@
                     dayEvents.slice(0, 4).forEach(ev => {
                         const chip = document.createElement('div');
                         chip.className = 'month-event';
-                        chip.style.cssText = 'display:flex; align-items:center; gap:4px; padding:3px 5px; background:#fff; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow:hidden;';
+                        const chipColor = ev.color || '#1e3a8a';
+                        chip.style.cssText = `display:flex; align-items:center; gap:4px; padding:3px 5px; background:${colorToRgba(chipColor, 0.10)}; border:1px solid ${colorToRgba(chipColor, 0.20)}; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow:hidden;`;
 
                         const comunidadeNome = ev.comunidade_nome || 'Comunidade';
 
@@ -7249,14 +7254,14 @@
                         cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
 
                         const colorBar = document.createElement('div');
-                        colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${ev.color || '#1e3a8a'};`;
+                        colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${chipColor};`;
 
                         const textCol = document.createElement('div');
                         textCol.style.cssText = 'display:flex; flex-direction:column; gap:0; min-width:0;';
 
                         const titleDiv = document.createElement('div');
                         titleDiv.textContent = cleanTitle;
-                        titleDiv.style.cssText = 'font-weight:500; font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#1e3a8a;';
+                        titleDiv.style.cssText = `font-weight:500; font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:${chipColor};`;
 
                         // Ícone para evento paroquial OBS > icone so aparece (quando marcado)
                         if (ev && (ev.evento_paroquial === true || ev.evento_paroquial === 'true' || ev.paroquial === true)) {
@@ -7898,6 +7903,22 @@
             return date.getFullYear() === today.getFullYear() &&
                    date.getMonth() === today.getMonth() &&
                    date.getDate() === today.getDate();
+        }
+
+        function colorToRgba(color, alpha) {
+            if (!color) return `rgba(30, 58, 138, ${alpha})`;
+            const c = String(color).trim();
+            if (c.startsWith('#')) {
+                let hex = c.slice(1);
+                if (hex.length === 3) hex = hex.split('').map(ch => ch + ch).join('');
+                if (hex.length !== 6) return `rgba(30, 58, 138, ${alpha})`;
+                const r = parseInt(hex.slice(0, 2), 16);
+                const g = parseInt(hex.slice(2, 4), 16);
+                const b = parseInt(hex.slice(4, 6), 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            }
+            // Fallback: tentar usar a cor direto (sem opacidade)
+            return c;
         }
 
         function hasEventsOnDate(date) {
