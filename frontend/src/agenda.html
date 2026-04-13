@@ -7319,17 +7319,18 @@
 
                             // Lista completa de eventos
                             dayEvents.forEach(ev => {
+                                const cardColor = ev.color || '#1e3a8a';
                                 const item = document.createElement('div');
-                                item.style.cssText = 'display:flex; align-items:center; gap:10px; padding:8px; border:1px solid #f1f5f9; border-radius:8px; background:#fff;';
+                                item.style.cssText = `display:flex; align-items:center; gap:10px; padding:8px; border:1px solid ${colorToRgba(cardColor, 0.20)}; border-radius:8px; background:${colorToRgba(cardColor, 0.10)};`;
                                 item.style.position = 'relative';
 
                                 const colorBar = document.createElement('div');
-                                colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${ev.color || '#1e3a8a'};`;
+                                colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${cardColor};`;
 
                                 // Avatar/foto da comunidade
                                 let avatarEl;
                         const comunidadeNome = ev.comunidade_nome || 'Comunidade';
-                        const comunidadeColor = ev.color || '#1e3a8a';
+                        const comunidadeColor = cardColor;
                         if (ev.comunidades?.foto) {
                                     avatarEl = document.createElement('img');
                                     avatarEl.src = ev.comunidades.foto;
@@ -7781,7 +7782,7 @@
                 item.className = 'search-result-item';
                 item.setAttribute('data-event-id', ev.id || '');
                 item.setAttribute('data-event-date', d ? d.toISOString() : '');
-                item.style.cssText = 'display:flex; align-items:center; gap:10px; padding:8px; border:1px solid #f1f5f9; border-radius:8px; background:#fff; margin-bottom:6px; position:relative;';
+                item.style.cssText = `display:flex; align-items:center; gap:10px; padding:8px; border:1px solid ${colorToRgba(comunidadeColor, 0.20)}; border-radius:8px; background:${colorToRgba(comunidadeColor, 0.10)}; margin-bottom:6px; position:relative;`;
 
                 const colorBar = document.createElement('div');
                 colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${comunidadeColor};`;
