@@ -3911,7 +3911,7 @@
             background: linear-gradient(135deg, #fefefe 0%, #e9ecef 100%);
             color: #333;
             font-weight: 500;
-            border: 1px solid #dee2e6;
+            border: none;
             border-radius: 6px;
             padding: 8px;
             display: flex;
@@ -6939,7 +6939,7 @@
                         eventElement.style.borderLeft = `4px solid ${communityColor}`;
                         // Fundo suave com a cor da comunidade
                         eventElement.style.background = colorToRgba(communityColor, 0.12);
-                        eventElement.style.borderColor = colorToRgba(communityColor, 0.22);
+                        eventElement.style.borderColor = 'transparent';
                         // Manter texto do título sempre preto
                         titleElement.style.color = '#000000';
                         
@@ -7246,7 +7246,7 @@
                         const chip = document.createElement('div');
                         chip.className = 'month-event';
                         const chipColor = ev.color || '#1e3a8a';
-                        chip.style.cssText = `display:flex; align-items:center; gap:4px; padding:3px 5px; background:${colorToRgba(chipColor, 0.10)}; border:1px solid ${colorToRgba(chipColor, 0.20)}; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow:hidden;`;
+                        chip.style.cssText = `display:flex; align-items:center; gap:4px; padding:3px 5px; background:${colorToRgba(chipColor, 0.10)}; border:none; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04); overflow:hidden;`;
 
                         const comunidadeNome = ev.comunidade_nome || 'Comunidade';
 
@@ -7321,7 +7321,7 @@
                             dayEvents.forEach(ev => {
                                 const cardColor = ev.color || '#1e3a8a';
                                 const item = document.createElement('div');
-                                item.style.cssText = `display:flex; align-items:center; gap:10px; padding:8px; border:1px solid ${colorToRgba(cardColor, 0.20)}; border-radius:8px; background:${colorToRgba(cardColor, 0.10)};`;
+                                item.style.cssText = `display:flex; align-items:center; gap:10px; padding:8px; border:none; border-radius:8px; background:${colorToRgba(cardColor, 0.10)};`;
                                 item.style.position = 'relative';
 
                                 const colorBar = document.createElement('div');
@@ -7782,7 +7782,7 @@
                 item.className = 'search-result-item';
                 item.setAttribute('data-event-id', ev.id || '');
                 item.setAttribute('data-event-date', d ? d.toISOString() : '');
-                item.style.cssText = `display:flex; align-items:center; gap:10px; padding:8px; border:1px solid ${colorToRgba(comunidadeColor, 0.20)}; border-radius:8px; background:${colorToRgba(comunidadeColor, 0.10)}; margin-bottom:6px; position:relative;`;
+                item.style.cssText = `display:flex; align-items:center; gap:10px; padding:8px; border:none; border-radius:8px; background:${colorToRgba(comunidadeColor, 0.10)}; margin-bottom:6px; position:relative;`;
 
                 const colorBar = document.createElement('div');
                 colorBar.style.cssText = `width:4px; align-self:stretch; border-radius:2px; background:${comunidadeColor};`;
