@@ -666,38 +666,46 @@
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 6px;
             justify-content: center;
-            flex: 1;
+            flex: 0 0 auto;
+            background: #e9edf2;
+            border-radius: 12px;
+            padding: 6px;
+            max-width: fit-content;
+            position: absolute;
+            left: 50%;
+            top: 8px;
+            transform: translateX(-50%);
+            z-index: 5;
         }
 
         .nav-link {
-            color: #000000;
+            color: #64748b;
             text-decoration: none;
-            font-weight: 500;
-            padding: 12px 0;
+            font-weight: 600;
+            padding: 10px 18px;
             position: relative;
-            transition: opacity 0.2s ease;
+            transition: background 0.2s ease, color 0.2s ease;
             font-size: 16px;
+            border-radius: 12px;
+            line-height: 1;
+            white-space: nowrap;
         }
 
         .nav-link:hover {
-            opacity: 0.8;
+            color: #475569;
+            background: rgba(255, 255, 255, 0.45);
         }
 
         .nav-link.active {
             opacity: 1;
+            color: #ffffff;
+            background: #2196f3;
         }
 
         .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: #000000;
-            border-radius: 2px;
+            display: none;
         }
 
         /* Dropdown styles */
