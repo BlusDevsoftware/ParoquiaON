@@ -1806,6 +1806,20 @@
             background: #1e3a8a;
         }
 
+        .mini-day.today.selected,
+        .mini-day.today.selected.has-events {
+            background: #fe6b45;
+            color: #ffffff;
+        }
+
+        .mini-day.today:hover,
+        .mini-day.selected:hover,
+        .mini-day.today.selected:hover {
+            transform: translateY(-1px) scale(1.06);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.16);
+            filter: saturate(1.08);
+        }
+
         .mini-day.other-month {
             color: #999;
         }
