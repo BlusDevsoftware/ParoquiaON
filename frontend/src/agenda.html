@@ -1756,6 +1756,7 @@
             border-radius: 50%;
             width: 22px;
             height: 22px;
+            margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1763,11 +1764,12 @@
         }
 
         .mini-day.selected {
-            background: #fe6b45;
+            background: #1e3a8a;
             color: #ffffff;
             border-radius: 50%;
             width: 22px;
             height: 22px;
+            margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1793,8 +1795,15 @@
 
         .mini-day.today.has-events,
         .mini-day.selected.has-events {
-            background: #fe6b45;
             color: #ffffff;
+        }
+
+        .mini-day.today.has-events {
+            background: #fe6b45;
+        }
+
+        .mini-day.selected.has-events {
+            background: #1e3a8a;
         }
 
         .mini-day.other-month {
