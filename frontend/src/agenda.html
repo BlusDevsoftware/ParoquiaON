@@ -3937,7 +3937,7 @@
         .event-title {
             font-weight: 600;
             font-size: 12px;
-            color: #1e3a8a;
+            color: #000000;
             line-height: 1.2;
         }
 
@@ -3949,13 +3949,13 @@
 
         .event-date {
             font-size: 10px;
-            color: #6c757d;
+            color: #000000;
             font-weight: 500;
         }
 
         .event-time {
             font-size: 10px;
-            color: #495057;
+            color: #000000;
             font-weight: 600;
         }
 
@@ -3984,7 +3984,7 @@
 
         .event-community span {
             font-size: 9px;
-            color: #6c757d;
+            color: #000000;
             font-weight: 500;
         }
 
@@ -6940,8 +6940,8 @@
                         // Fundo suave com a cor da comunidade
                         eventElement.style.background = colorToRgba(communityColor, 0.12);
                         eventElement.style.borderColor = colorToRgba(communityColor, 0.22);
-                        // Ajustar título para acompanhar a cor da comunidade
-                        titleElement.style.color = communityColor;
+                        // Manter texto do título sempre preto
+                        titleElement.style.color = '#000000';
                         
                         // Calcular posição e altura baseada no horário
                         const startMinutes = startTime.getMinutes();
