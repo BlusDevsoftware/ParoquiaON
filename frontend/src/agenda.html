@@ -3964,6 +3964,35 @@
             line-height: 1.2;
         }
 
+        .paroquial-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1;
+            vertical-align: middle;
+            box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.25);
+            animation: paroquial-pill-pulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes paroquial-pill-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.25);
+            }
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2);
+            }
+        }
+
         .event-datetime {
             display: flex;
             flex-direction: column;
@@ -6902,9 +6931,9 @@
                         // Remover padrão antigo de horário no título: "Titulo (13:00 - 14:00)"
                         cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
                         
-                        // Adicionar ícone de paroquial se for evento paroquial
+                        // Adicionar selo de paroquial se for evento paroquial
                         if (event.evento_paroquial || event.eventoParoquial) {
-                            titleElement.innerHTML = `<i class="fas fa-church" style="color: #1e3a8a; margin-right: 4px;"></i>${cleanTitle}`;
+                            titleElement.innerHTML = `<span class="paroquial-pill" title="Evento paroquial">P</span>${cleanTitle}`;
                         } else {
                             titleElement.textContent = cleanTitle;
                         }
@@ -7373,12 +7402,12 @@
                                 const titleDiv = document.createElement('div');
                                 titleDiv.textContent = cleanTitle;
                                 titleDiv.style.cssText = 'font-weight:700; color:#000000; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
-                                // Ícone para evento paroquial também no card expandido (hover)
+                                // Selo para evento paroquial também no card expandido (hover)
                                 if (ev && (ev.evento_paroquial === true || ev.evento_paroquial === 'true' || ev.paroquial === true)) {
                                     const icon = document.createElement('span');
-                                    icon.textContent = '⛪';
+                                    icon.textContent = 'P';
                                     icon.title = 'Evento paroquial';
-                                    icon.style.cssText = 'margin-right:6px; color:#334155; opacity:0.85; font-size:12px;';
+                                    icon.className = 'paroquial-pill';
                                     titleDiv.prepend(icon);
                                 }
 
@@ -7833,12 +7862,12 @@
                 titleDiv.textContent = cleanTitle;
                 titleDiv.style.cssText = 'font-weight:700; color:#000000; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
 
-                // Ícone para evento paroquial (mesma regra do card expandido)
+                // Selo para evento paroquial (mesma regra do card expandido)
                 if (ev && (ev.evento_paroquial === true || ev.evento_paroquial === 'true' || ev.paroquial === true)) {
                     const icon = document.createElement('span');
-                    icon.textContent = '⛪';
+                    icon.textContent = 'P';
                     icon.title = 'Evento paroquial';
-                    icon.style.cssText = 'margin-right:6px; color:#334155; opacity:0.85; font-size:12px;';
+                    icon.className = 'paroquial-pill';
                     titleDiv.prepend(icon);
                 }
 
@@ -9215,7 +9244,7 @@
                     let cleanTitle = event.title || 'Agendamento';
                     cleanTitle = cleanTitle.replace(/\s*\(\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\)$/, '');
                     if (event.evento_paroquial || event.eventoParoquial) {
-                        titleElement.innerHTML = `<i class="fas fa-church" style="color: #1e3a8a; margin-right: 4px;"></i>${cleanTitle}`;
+                        titleElement.innerHTML = `<span class="paroquial-pill" title="Evento paroquial">P</span>${cleanTitle}`;
                     } else {
                         titleElement.textContent = cleanTitle;
                     }
