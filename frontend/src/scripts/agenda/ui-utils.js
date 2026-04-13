@@ -69,11 +69,12 @@
           ${communityPhoto ? `<img src="${communityPhoto}" alt="${communityName}" style="width:100%; height:100%; object-fit:cover;" />` : initials}
         </div>
         <div class="appointment-details" style="display:flex; flex-direction:column; gap:2px;">
-          <div class="appointment-title">${event.title || 'Agendamento'}</div>
-          <div class="appointment-type" style="display:flex; gap:6px; align-items:center; color:#666;">
-            <span style="color:#1e3a8a; font-weight:600;">${communityName}</span>
-            <span>• ${dateString}</span>
-            <span>• ${timeString}</span>
+          <div class="appointment-title-row">
+            <div class="appointment-title">${event.title || 'Agendamento'}</div>
+            <div class="appointment-datetime">${dateString} • ${timeString}</div>
+          </div>
+          <div class="appointment-type">
+            <span class="appointment-community">${communityName}</span>
           </div>
         </div>
       `;
