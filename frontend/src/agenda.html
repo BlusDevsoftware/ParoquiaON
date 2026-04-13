@@ -1254,16 +1254,6 @@
             margin: 18px 20px 0 20px; /* mesma largura (recuo) do card de últimos agendamentos */
             max-height: 240px;
             padding-bottom: 12px;
-            position: relative;
-        }
-
-        .left-sidebar .mini-calendar::after {
-            content: '';
-            position: absolute;
-            left: -20px;
-            right: -20px;
-            bottom: 0;
-            border-bottom: 1px solid #e5e7eb;
         }
 
         /* Ações da agenda na sidebar (somente desktop) */
@@ -1838,12 +1828,30 @@
         /* Seção de Últimos Agendamentos */
         .recent-appointments-header {
             background: transparent;
-            color: #333;
+            color: #1f2937;
             padding: 15px 20px 10px 20px;
             text-align: left;
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: 700;
+            font-size: 29px;
+            line-height: 1.2;
+            border-top: 1px solid #e5e7eb;
             border-bottom: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recent-appointments-header i {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e6f2ff;
+            color: #2b9df4;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex: 0 0 26px;
         }
 
         .appointments-list {
