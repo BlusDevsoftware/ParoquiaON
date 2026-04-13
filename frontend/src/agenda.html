@@ -1257,26 +1257,31 @@
             padding-bottom: 12px;
         }
 
-        .left-sidebar-create {
+        .left-sidebar-top-actions {
             display: none;
-            margin: 12px 20px 0 20px;
-            width: 86px;
-            height: 40px;
-            min-width: 86px;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .left-sidebar-top-actions .left-sidebar-create {
+            width: 80px;
+            height: 36px;
+            min-width: 80px;
             border-radius: 12px;
             justify-content: center;
             background: #2196f3;
             color: #ffffff;
             border: none;
             box-shadow: none;
-            gap: 6px;
-            font-size: 14px;
+            gap: 5px;
+            font-size: 13px;
             font-weight: 600;
-            padding: 0 14px;
+            padding: 0 12px;
+            margin: 0;
         }
 
-        .left-sidebar-create:hover,
-        .left-sidebar-create:active {
+        .left-sidebar-top-actions .left-sidebar-create:hover,
+        .left-sidebar-top-actions .left-sidebar-create:active {
             background: #1e88e5;
             transform: none;
             box-shadow: none;
@@ -1376,19 +1381,27 @@
             .calendar-controls-left {
                 display: flex !important;
             }
-            .left-sidebar-create {
+            .left-sidebar-top-actions {
                 display: inline-flex;
                 position: fixed;
                 top: 52px;
                 left: 20px;
-                width: 86px;
-                margin: 0;
                 z-index: 120;
+            }
+            .left-sidebar-top-actions .view-dropdown-trigger {
+                height: 36px;
+                min-height: 36px;
+                min-width: 84px;
+                border-radius: 12px;
+                padding: 6px 10px;
             }
             .calendar-controls-left .create-button {
                 display: none !important;
             }
-            .left-sidebar.collapsed .left-sidebar-create {
+            .calendar-controls-left .view-dropdown {
+                display: none !important;
+            }
+            body.sidebar-collapsed .left-sidebar-top-actions {
                 display: none !important;
             }
         }
@@ -5234,12 +5247,27 @@
             <div class="loading-text">Carregando agenda...</div>
         </div>
 
-        <!-- Sidebar Esquerda -->
-        <div class="left-sidebar" id="leftSidebar">
+        <div class="left-sidebar-top-actions">
             <button class="create-button left-sidebar-create" onclick="openEventModalFromCreate()">
                 <i class="fas fa-plus"></i>
                 Criar
             </button>
+            <div class="view-dropdown">
+                <div class="view-dropdown-trigger">
+                    <span class="current-view-text">Mês</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="view-dropdown-menu">
+                    <a href="#" class="view-dropdown-item" data-view="dia">Dia</a>
+                    <a href="#" class="view-dropdown-item" data-view="semana">Semana</a>
+                    <a href="#" class="view-dropdown-item" data-view="mês">Mês</a>
+                    <a href="#" class="view-dropdown-item" data-view="ano">Ano</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Esquerda -->
+        <div class="left-sidebar" id="leftSidebar">
             <!-- Mini Calendário -->
             <div class="mini-calendar">
                 <div class="mini-calendar-header">
