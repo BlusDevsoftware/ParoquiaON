@@ -55,7 +55,7 @@
             background: transparent;
             border: none;
             border-radius: 0;
-            color: #000000;
+            color: #2196f3;
             cursor: pointer;
             padding: 0;
             width: auto;
@@ -65,7 +65,7 @@
 
         .header-hamburger i {
             font-size: 18px;
-            color: #000000;
+            color: #2196f3;
         }
 
         .header-hamburger:hover {
@@ -2018,13 +2018,6 @@
             margin-bottom: 2px;
         }
 
-        .appointment-title-row {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: 8px;
-        }
-
         .appointment-datetime {
             font-size: 10px;
             font-weight: 600;
@@ -3681,7 +3674,7 @@
         }
 
         .calendar-body.month-view .day-badge.today-badge {
-            background: #1e3a8a;
+            background: #fe6b45;
             color: #fff;
             border-radius: 50%;
             width: 20px;
@@ -4454,7 +4447,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(248,250,253,0.95);
+            background: #fefefe;
             z-index: 9999;
             justify-content: center;
             align-items: center;
@@ -9330,7 +9323,12 @@
                 // No desktop, usar classe "collapsed" para esconder completamente a sidebar
                 const collapsed = sidebar.classList.toggle('collapsed');
                 document.body.classList.toggle('sidebar-collapsed', collapsed);
-                if (headerHamburger) headerHamburger.innerHTML = collapsed ? '<i class="fas fa-bars"></i>' : '<i class="fas fa-bars"></i>';
+                if (headerHamburger) {
+                    // Colapsada: seta para fora (expandir) | Aberta: seta para dentro (recolher)
+                    headerHamburger.innerHTML = collapsed
+                        ? '<i class="fas fa-chevron-right"></i>'
+                        : '<i class="fas fa-chevron-left"></i>';
+                }
             }
         }
 
@@ -9450,7 +9448,7 @@
                 headerHamburger && !headerHamburger.contains(event.target) &&
                 sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
-                headerHamburger.innerHTML = '<i class="fas fa-bars"></i>';
+                headerHamburger.innerHTML = '<i class="fas fa-chevron-left"></i>';
             }
         });
 
@@ -9461,7 +9459,7 @@
             
             if (window.innerWidth > 768) {
                 if (sidebar) sidebar.classList.remove('open');
-                if (headerHamburger) headerHamburger.innerHTML = '<i class="fas fa-bars"></i>';
+                if (headerHamburger) headerHamburger.innerHTML = '<i class="fas fa-chevron-left"></i>';
             }
         });
 

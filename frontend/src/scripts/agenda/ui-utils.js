@@ -69,13 +69,11 @@
           ${communityPhoto ? `<img src="${communityPhoto}" alt="${communityName}" style="width:100%; height:100%; object-fit:cover;" />` : initials}
         </div>
         <div class="appointment-details" style="display:flex; flex-direction:column; gap:2px;">
-          <div class="appointment-title-row">
-            <div class="appointment-title">${event.title || 'Agendamento'}</div>
-            <div class="appointment-datetime">${dateString} • ${timeString}</div>
-          </div>
+          <div class="appointment-title">${event.title || 'Agendamento'}</div>
           <div class="appointment-type">
             <span class="appointment-community">${communityName}</span>
           </div>
+          <div class="appointment-datetime">${dateString} • ${timeString}</div>
         </div>
       `;
       appointmentItem.addEventListener('click', () => {
