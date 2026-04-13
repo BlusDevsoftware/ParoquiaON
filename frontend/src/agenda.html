@@ -1901,7 +1901,7 @@
             transform: translateX(-50%);
             width: 3px;
             height: 3px;
-            background: #1e3a8a;
+            background: #fe6b45;
             border-radius: 50%;
         }
 
@@ -1980,11 +1980,11 @@
         .appointments-list::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
 
         .appointment-item {
-            padding: 12px 15px;
+            padding: 12px 0;
             border-bottom: 1px solid #fefefe;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transition: background 0.2s ease;
         }
 
@@ -2012,14 +2012,14 @@
         }
 
         .appointment-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: #333;
             margin-bottom: 2px;
         }
 
         .appointment-type {
-            font-size: 10px;
+            font-size: 9px;
             color: #666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -5562,7 +5562,7 @@
                             <div class="day-number">29</div>
                 </div>
                         <div class="day-header" id="day6">
-                            <div class="day-name">SAB</div>
+                            <div class="day-name">SÁB</div>
                             <div class="day-number">30</div>
                     </div>
                 </div>
@@ -6794,7 +6794,7 @@
                     <div class="day-header" id="day3"><div class="day-name">QUA</div><div class="day-number">-</div></div>
                     <div class="day-header" id="day4"><div class="day-name">QUI</div><div class="day-number">-</div></div>
                     <div class="day-header" id="day5"><div class="day-name">SEX</div><div class="day-number">-</div></div>
-                    <div class="day-header" id="day6"><div class="day-name">SAB</div><div class="day-number">-</div></div>
+                    <div class="day-header" id="day6"><div class="day-name">SÁB</div><div class="day-number">-</div></div>
                 `;
             }
 
@@ -6804,7 +6804,7 @@
             
 
             // Atualizar cabeçalhos dos dias
-            const dayNames = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+            const dayNames = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
             for (let i = 0; i < 7; i++) {
                 // Criar data para cada dia da semana
                 const dayDate = new Date(weekStart);
@@ -7170,7 +7170,7 @@
             }
 
             // Cabeçalhos dos dias (Dom-Sáb)
-            const dayNames = ['DOM','SEG','TER','QUA','QUI','SEX','SAB'];
+            const dayNames = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
             const header = document.querySelector('.calendar-header');
             if (header) {
                 // Garantir estado de mês
