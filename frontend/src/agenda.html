@@ -1260,10 +1260,26 @@
         .left-sidebar-create {
             display: none;
             margin: 12px 20px 0 20px;
-            width: calc(100% - 40px);
+            width: 86px;
             height: 40px;
-            border-radius: 10px;
+            min-width: 86px;
+            border-radius: 12px;
             justify-content: center;
+            background: #2196f3;
+            color: #ffffff;
+            border: none;
+            box-shadow: none;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 0 14px;
+        }
+
+        .left-sidebar-create:hover,
+        .left-sidebar-create:active {
+            background: #1e88e5;
+            transform: none;
+            box-shadow: none;
         }
 
         /* Ações da agenda na sidebar (somente desktop) */
@@ -1365,7 +1381,7 @@
                 position: fixed;
                 top: 58px;
                 left: 20px;
-                width: 240px;
+                width: 86px;
                 margin: 0;
                 z-index: 120;
             }
