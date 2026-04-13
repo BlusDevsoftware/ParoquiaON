@@ -1257,6 +1257,15 @@
             padding-bottom: 12px;
         }
 
+        .left-sidebar-create {
+            display: none;
+            margin: 12px 20px 0 20px;
+            width: calc(100% - 40px);
+            height: 40px;
+            border-radius: 10px;
+            justify-content: center;
+        }
+
         /* Ações da agenda na sidebar (somente desktop) */
         .sidebar-action-buttons {
             display: none; /* default: escondido (mobile) */
@@ -1350,6 +1359,12 @@
             }
             .calendar-controls-left {
                 display: flex !important;
+            }
+            .left-sidebar-create {
+                display: inline-flex;
+            }
+            .calendar-controls-left .create-button {
+                display: none !important;
             }
         }
 
@@ -5196,6 +5211,10 @@
 
         <!-- Sidebar Esquerda -->
         <div class="left-sidebar" id="leftSidebar">
+            <button class="create-button left-sidebar-create" onclick="openEventModalFromCreate()">
+                <i class="fas fa-plus"></i>
+                Criar
+            </button>
             <!-- Mini Calendário -->
             <div class="mini-calendar">
                 <div class="mini-calendar-header">
