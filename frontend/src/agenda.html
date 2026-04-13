@@ -1362,8 +1362,17 @@
             }
             .left-sidebar-create {
                 display: inline-flex;
+                position: fixed;
+                top: 58px;
+                left: 20px;
+                width: 240px;
+                margin: 0;
+                z-index: 120;
             }
             .calendar-controls-left .create-button {
+                display: none !important;
+            }
+            .left-sidebar.collapsed .left-sidebar-create {
                 display: none !important;
             }
         }
