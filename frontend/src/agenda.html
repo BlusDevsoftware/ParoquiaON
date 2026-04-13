@@ -1384,16 +1384,35 @@
             .left-sidebar-top-actions {
                 display: inline-flex;
                 position: fixed;
-                top: 52px;
+                top: 64px;
                 left: 20px;
                 z-index: 120;
             }
             .left-sidebar-top-actions .view-dropdown-trigger {
                 height: 36px;
                 min-height: 36px;
-                min-width: 84px;
+                min-width: 92px;
                 border-radius: 12px;
-                padding: 6px 10px;
+                padding: 0 12px;
+                background: #f1f5f9;
+                border: 1px solid #e5e7eb;
+                color: #64748b;
+                box-shadow: none;
+                gap: 8px;
+                justify-content: center;
+            }
+            .left-sidebar-top-actions .view-dropdown-trigger i {
+                font-size: 13px;
+                color: #64748b;
+            }
+            .left-sidebar-top-actions .view-dropdown-trigger .current-view-text {
+                font-size: 13px;
+                font-weight: 600;
+                color: #64748b;
+            }
+            .left-sidebar-top-actions .view-dropdown-trigger:hover {
+                background: #e9eef5;
+                border-color: #dbe4ee;
             }
             .calendar-controls-left .create-button {
                 display: none !important;
@@ -5254,8 +5273,8 @@
             </button>
             <div class="view-dropdown">
                 <div class="view-dropdown-trigger">
+                    <i class="far fa-calendar"></i>
                     <span class="current-view-text">Mês</span>
-                    <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="view-dropdown-menu">
                     <a href="#" class="view-dropdown-item" data-view="dia">Dia</a>
