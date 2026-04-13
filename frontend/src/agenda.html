@@ -1253,6 +1253,8 @@
         .left-sidebar .mini-calendar { 
             margin: 18px 20px 0 20px; /* mesma largura (recuo) do card de últimos agendamentos */
             max-height: 240px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
         }
 
         /* Ações da agenda na sidebar (somente desktop) */
@@ -3407,6 +3409,11 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 2px;
+        }
+
+        .calendar-header .day-header:first-of-type .day-name,
+        .calendar-header .day-header:last-of-type .day-name {
+            color: #fe6b45;
         }
 
         .day-number {
