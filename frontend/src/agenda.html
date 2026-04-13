@@ -1287,6 +1287,43 @@
             box-shadow: none;
         }
 
+        .left-sidebar-top-actions .search-button,
+        .left-sidebar-top-actions .community-filter-btn {
+            width: 36px;
+            min-width: 36px;
+            height: 36px;
+            min-height: 36px;
+            padding: 0;
+            border-radius: 0;
+            justify-content: center;
+            margin: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            color: #64748b;
+        }
+
+        .left-sidebar-top-actions .search-button i,
+        .left-sidebar-top-actions .community-filter-btn i {
+            font-size: 18px;
+            color: #64748b;
+        }
+
+        .left-sidebar-top-actions .community-filter-btn {
+            border-left: 1px solid #d1d5db;
+        }
+
+        .left-sidebar-top-actions .community-filter-btn .community-filter-badge {
+            display: none;
+        }
+
+        .left-sidebar-top-actions .search-button:hover,
+        .left-sidebar-top-actions .community-filter-btn:hover {
+            background: transparent;
+            transform: none;
+            box-shadow: none;
+        }
+
         /* Ações da agenda na sidebar (somente desktop) */
         .sidebar-action-buttons {
             display: none; /* default: escondido (mobile) */
@@ -1420,7 +1457,8 @@
             .calendar-controls-left .view-dropdown {
                 display: none !important;
             }
-            body.sidebar-collapsed .left-sidebar-top-actions {
+            .calendar-controls-left .search-button,
+            .calendar-controls-left .community-filter-btn {
                 display: none !important;
             }
         }
@@ -5283,6 +5321,13 @@
                     <a href="#" class="view-dropdown-item" data-view="ano">Ano</a>
                 </div>
             </div>
+            <button class="search-button" onclick="openSearchModal()" aria-label="Buscar eventos" title="Buscar eventos">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="community-filter-btn" type="button" onclick="openCommunityFilter()" aria-label="Filtrar" title="Filtrar">
+                <i class="fas fa-filter"></i>
+                <span class="community-filter-badge">0</span>
+            </button>
         </div>
 
         <!-- Sidebar Esquerda -->
