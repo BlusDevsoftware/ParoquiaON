@@ -1530,8 +1530,11 @@
         }
 
         .left-sidebar.collapsed {
-            width: 60px;
+            width: 0;
+            flex: 0 0 0;
             overflow: hidden;
+            border: none;
+            margin-top: 0;
         }
 
         /* Quando a sidebar estiver colapsada no desktop, esconda-a fora da tela */
@@ -1902,6 +1905,10 @@
         .left-sidebar.collapsed ~ .main-area {
             margin-left: 0;
             width: 100vw;
+        }
+
+        body.sidebar-collapsed .sidebar-actions-above {
+            display: none !important;
         }
 
 
@@ -9088,6 +9095,7 @@
             } else {
                 // No desktop, usar classe "collapsed" para esconder completamente a sidebar
                 const collapsed = sidebar.classList.toggle('collapsed');
+                document.body.classList.toggle('sidebar-collapsed', collapsed);
                 if (headerHamburger) headerHamburger.innerHTML = collapsed ? '<i class="fas fa-bars"></i>' : '<i class="fas fa-bars"></i>';
             }
         }
