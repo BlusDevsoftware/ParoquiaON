@@ -2105,11 +2105,16 @@
             display: flex;
             gap: 6px;
             justify-content: center;
-            flex: 1;
+            flex: 0 0 auto;
             background: #e9edf2;
             border-radius: 12px;
             padding: 6px;
             max-width: fit-content;
+            position: absolute;
+            left: 50%;
+            top: 8px;
+            transform: translateX(-50%);
+            z-index: 5;
         }
 
         .nav-link {
