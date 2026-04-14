@@ -1025,6 +1025,67 @@
         // Variáveis globais
         let pessoasChart, pastoraisChart, eventosChart, comunidadesChart;
         let minhaComunidadeData = {};
+        const avatarImageCache = new Map();
+
+        function obterAvatarImage(src) {
+            if (!src || typeof src !== 'string' || src.trim() === '') return null;
+            if (avatarImageCache.has(src)) return avatarImageCache.get(src);
+            const img = new Image();
+            img.src = src;
+            avatarImageCache.set(src, img);
+            return img;
+        }
+
+        // Plugin Chart.js: desenha avatar no eixo Y (no lugar do nome)
+        const avatarAxisPlugin = {
+            id: 'avatarAxisPlugin',
+            afterDraw(chart, _args, pluginOptions) {
+                if (!pluginOptions || !pluginOptions.enabled) return;
+                const yScale = chart?.scales?.y;
+                if (!yScale) return;
+
+                const labels = chart.data?.labels || [];
+                const avatars = pluginOptions.avatars || [];
+                const ctx = chart.ctx;
+                const radius = 10;
+                const x = (chart.chartArea?.left || 0) - 24;
+
+                labels.forEach((label, index) => {
+                    const y = yScale.getPixelForValue(index);
+                    const foto = avatars[index];
+                    const img = obterAvatarImage(foto);
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, Math.PI * 2);
+                    ctx.closePath();
+                    ctx.clip();
+
+                    if (img && img.complete && img.naturalWidth > 0) {
+                        ctx.drawImage(img, x - radius, y - radius, radius * 2, radius * 2);
+                    } else {
+                        const inicial = (label || '?').toString().trim().charAt(0).toUpperCase() || '?';
+                        ctx.fillStyle = '#e2e8f0';
+                        ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+                        ctx.fillStyle = '#334155';
+                        ctx.font = '600 10px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(inicial, x, y);
+                    }
+                    ctx.restore();
+
+                    // Borda do avatar
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#cbd5e1';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.restore();
+                });
+            }
+        };
 
         // Inicializar Minha Comunidade
         // Funções para controlar menu mobile
@@ -1180,7 +1241,8 @@
             const [comunidadesRes, pastoraisRes, pessoasRes, agendaRes] = await Promise.all([
                 window.api.get('/comunidades?leve=1'),
                 window.api.get('/pastorais?leve=1'),
-                window.api.get('/pessoas?leve=1'),
+                // Sem modo leve para termos foto/nome completos no gráfico por agendador
+                window.api.get('/pessoas'),
                 // Sem modo leve aqui para garantir pastoral_id no dashboard de pastorais
                 window.api.get('/agenda')
             ]);
@@ -1443,6 +1505,7 @@
                 const ctxComunidades = document.getElementById('comunidadesChart').getContext('2d');
                 comunidadesChart = new Chart(ctxComunidades, {
                     type: 'bar',
+                    plugins: [avatarAxisPlugin],
                     data: {
                         labels: dadosGraficos.comunidades.labels,
                         datasets: [{
@@ -1455,13 +1518,43 @@
                         indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {
+                            padding: { left: 18 }
+                        },
                         scales: {
                             x: {
                                 beginAtZero: true,
                                 ticks: { stepSize: 1 }
+                            },
+                            y: {
+                                ticks: {
+                                    // Esconde nome no eixo; avatar será desenhado via plugin
+                                    callback: function() { return ''; }
+                                },
+                                grid: {
+                                    display: false
+                                }
                             }
                         },
-                        plugins: { legend: { display: false } }
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(items) {
+                                        return items?.[0]?.label || '';
+                                    },
+                                    label: function(ctx) {
+                                        const valor = ctx.parsed?.x ?? ctx.parsed ?? 0;
+                                        const plural = valor === 1 ? 'agendamento' : 'agendamentos';
+                                        return `${valor} ${plural}`;
+                                    }
+                                }
+                            },
+                            avatarAxisPlugin: {
+                                enabled: true,
+                                avatars: dadosGraficos.comunidades.fotos || []
+                            }
+                        }
                     }
                 });
 
@@ -1474,7 +1567,7 @@
 
         // Monta o objeto usado pelos gráficos a partir dos dados brutos (evita segunda rodada de APIs)
         function montarDadosParaGraficos(raw) {
-            if (!raw) return { eventosPorComunidade: { labels: [], dados: [], cores: [] }, pastorais: { labels: ['Sem agendamentos'], dados: [0], cores: ['#cbd5e1'] }, eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] }, comunidades: { labels: ['Sem dados'], dados: [0] } };
+            if (!raw) return { eventosPorComunidade: { labels: [], dados: [], cores: [] }, pastorais: { labels: ['Sem agendamentos'], dados: [0], cores: ['#cbd5e1'] }, eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] }, comunidades: { labels: ['Sem dados'], dados: [0], fotos: [null] } };
             const { comunidades, pastorais, pessoas, agenda } = raw;
             return {
                 eventosPorComunidade: calcularEventosPorComunidade(agenda || [], comunidades || []),
@@ -1495,7 +1588,7 @@
                     eventosPorComunidade: { labels: ['Sem dados'], dados: [0], cores: ['#42a5f5'] },
                     pastorais: { labels: ['Sem agendamentos'], dados: [0], cores: ['#cbd5e1'] },
                     eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] },
-                    comunidades: { labels: ['Sem dados'], dados: [0] }
+                    comunidades: { labels: ['Sem dados'], dados: [0], fotos: [null] }
                 };
             }
         }
@@ -1652,13 +1745,17 @@
         // Top 5 pessoas com maior quantidade de agendamentos
         function calcularAgendamentosPorPessoa(agenda, pessoas) {
             const nomesPessoas = {};
+            const fotosPessoasPorNome = {};
             (pessoas || []).forEach((pessoa) => {
                 if (!pessoa || pessoa.id == null) return;
                 nomesPessoas[String(pessoa.id)] = pessoa.nome || `Pessoa ${pessoa.id}`;
+                const chaveNome = (pessoa.nome || '').toString().trim().toLowerCase();
+                if (chaveNome && pessoa.foto) fotosPessoasPorNome[chaveNome] = pessoa.foto;
             });
 
             const agendamentosPorPessoa = {};
             const labelsPorChave = {};
+            const fotosPorChave = {};
             (agenda || []).forEach((evento) => {
                 // Prioriza quem lançou o agendamento (usuário agendador)
                 const chaveAgendador =
@@ -1684,16 +1781,27 @@
                     evento?.usuario_lancamento_nome ??
                     evento?.usuario_lancamento_email ??
                     null;
+                const nomeFallback = (nomeAgendador || '').toString().trim().toLowerCase();
+                const fotoAgendador =
+                    evento?.usuario_lancamento_foto ??
+                    evento?.usuario_lancamento?.foto ??
+                    evento?.pessoas?.foto ??
+                    (nomeFallback ? fotosPessoasPorNome[nomeFallback] : null) ??
+                    null;
 
                 if (nomeAgendador) {
                     labelsPorChave[chave] = nomeAgendador;
                 } else if (!labelsPorChave[chave] && nomesPessoas[chave]) {
                     labelsPorChave[chave] = nomesPessoas[chave];
                 }
+                if (fotoAgendador && !fotosPorChave[chave]) {
+                    fotosPorChave[chave] = fotoAgendador;
+                }
             });
 
             const topPessoas = Object.entries(agendamentosPorPessoa)
                 .map(([id, qtd]) => ({
+                    chave: id,
                     nome: labelsPorChave[id] || nomesPessoas[id] || `Agendador ${id}`,
                     qtd
                 }))
@@ -1701,12 +1809,13 @@
                 .slice(0, 5);
 
             if (topPessoas.length === 0) {
-                return { labels: ['Sem dados'], dados: [0] };
+                return { labels: ['Sem dados'], dados: [0], fotos: [null] };
             }
 
             return {
                 labels: topPessoas.map((item) => item.nome),
-                dados: topPessoas.map((item) => item.qtd)
+                dados: topPessoas.map((item) => item.qtd),
+                fotos: topPessoas.map((item) => fotosPorChave[item.chave] || null)
             };
         }
 
