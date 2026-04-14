@@ -1013,7 +1013,7 @@
                 <canvas id="eventosChart"></canvas>
             </div>
             <div class="chart-container">
-                <h2>Top 5 Comunidades</h2>
+                <h2>Agendamentos por Pessoa</h2>
                 <canvas id="comunidadesChart"></canvas>
             </div>
         </div>
@@ -1439,14 +1439,14 @@
                     }
                 });
 
-                // Gráfico de top comunidades
+                // Gráfico de agendamentos por pessoa (top 5)
                 const ctxComunidades = document.getElementById('comunidadesChart').getContext('2d');
                 comunidadesChart = new Chart(ctxComunidades, {
                     type: 'bar',
                     data: {
                         labels: dadosGraficos.comunidades.labels,
                         datasets: [{
-                            label: 'Pessoas',
+                            label: 'Agendamentos',
                             data: dadosGraficos.comunidades.dados,
                             backgroundColor: '#66bb6a'
                         }]
@@ -1480,7 +1480,7 @@
                 eventosPorComunidade: calcularEventosPorComunidade(agenda || [], comunidades || []),
                 pastorais: calcularAgendamentosPorPastoral(agenda || [], pastorais || []),
                 eventos: calcularEventosPorMes(agenda || []),
-                comunidades: calcularTopComunidades(comunidades || [], pessoas || [])
+                comunidades: calcularAgendamentosPorPessoa(agenda || [], pessoas || [])
             };
         }
 
@@ -1649,38 +1649,41 @@
             return { labels, dados };
         }
 
-        // Função para calcular top comunidades
-        function calcularTopComunidades(comunidades, pessoas) {
-            // Criar mapa de pessoas por comunidade
-            const pessoasPorComunidade = {};
-            
-            pessoas.forEach(pessoa => {
-                if (pessoa.comunidade_id || pessoa.comunidade) {
-                    const comunidadeId = pessoa.comunidade_id || pessoa.comunidade;
-                    pessoasPorComunidade[comunidadeId] = (pessoasPorComunidade[comunidadeId] || 0) + 1;
-                }
+        // Top 5 pessoas com maior quantidade de agendamentos
+        function calcularAgendamentosPorPessoa(agenda, pessoas) {
+            const nomesPessoas = {};
+            (pessoas || []).forEach((pessoa) => {
+                if (!pessoa || pessoa.id == null) return;
+                nomesPessoas[String(pessoa.id)] = pessoa.nome || `Pessoa ${pessoa.id}`;
             });
 
-            // Criar mapa de nomes de comunidades
-            const nomesComunidades = {};
-            comunidades.forEach(comunidade => {
-                if (comunidade.id) {
-                    nomesComunidades[comunidade.id] = comunidade.nome || comunidade.descricao || 'Comunidade';
-                }
+            const agendamentosPorPessoa = {};
+            (agenda || []).forEach((evento) => {
+                const pessoaId =
+                    evento?.responsavel_id ??
+                    evento?.pessoa_id ??
+                    evento?.pessoas?.id ??
+                    null;
+                if (pessoaId == null || pessoaId === '') return;
+                const chave = String(pessoaId);
+                agendamentosPorPessoa[chave] = (agendamentosPorPessoa[chave] || 0) + 1;
             });
 
-            // Ordenar por número de pessoas
-            const topComunidades = Object.entries(pessoasPorComunidade)
-                .map(([id, count]) => ({
-                    nome: nomesComunidades[id] || `Comunidade ${id}`,
-                    count: count
+            const topPessoas = Object.entries(agendamentosPorPessoa)
+                .map(([id, qtd]) => ({
+                    nome: nomesPessoas[id] || `Pessoa ${id}`,
+                    qtd
                 }))
-                .sort((a, b) => b.count - a.count)
+                .sort((a, b) => b.qtd - a.qtd)
                 .slice(0, 5);
 
+            if (topPessoas.length === 0) {
+                return { labels: ['Sem dados'], dados: [0] };
+            }
+
             return {
-                labels: topComunidades.map(c => c.nome),
-                dados: topComunidades.map(c => c.count)
+                labels: topPessoas.map((item) => item.nome),
+                dados: topPessoas.map((item) => item.qtd)
             };
         }
 
@@ -1770,14 +1773,14 @@
                     }
                 });
 
-                // Gráfico de top comunidades
+                // Gráfico de agendamentos por pessoa (top 5)
                 const ctxComunidades = document.getElementById('comunidadesChart').getContext('2d');
                 comunidadesChart = new Chart(ctxComunidades, {
                     type: 'bar',
                     data: {
                         labels: ['Sem dados'],
                         datasets: [{
-                            label: 'Pessoas',
+                            label: 'Agendamentos',
                             data: [0],
                             backgroundColor: '#66bb6a'
                         }]
