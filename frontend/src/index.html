@@ -1181,7 +1181,8 @@
                 window.api.get('/comunidades?leve=1'),
                 window.api.get('/pastorais?leve=1'),
                 window.api.get('/pessoas?leve=1'),
-                window.api.get('/agenda?leve=1')
+                // Sem modo leve aqui para garantir pastoral_id no dashboard de pastorais
+                window.api.get('/agenda')
             ]);
             if (comunidadesRes?.error || pastoraisRes?.error || pessoasRes?.error || agendaRes?.error) {
                 throw new Error(comunidadesRes?.error?.message || pastoraisRes?.error?.message || pessoasRes?.error?.message || agendaRes?.error?.message || 'Erro ao carregar dados');
@@ -1586,7 +1587,11 @@
             });
 
             (agenda || []).forEach((evento) => {
-                const pastoralId = evento?.pastoral_id ?? evento?.pastoral ?? null;
+                const pastoralId =
+                    evento?.pastoral_id ??
+                    evento?.pastoral ??
+                    evento?.pastorais?.id ??
+                    null;
                 if (pastoralId == null || pastoralId === '') return;
                 const chave = String(pastoralId);
                 contagemPorPastoral[chave] = (contagemPorPastoral[chave] || 0) + 1;
