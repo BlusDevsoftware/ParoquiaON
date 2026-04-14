@@ -948,31 +948,8 @@
         <!-- Charts Section -->
         <div class="charts-section">
             <div class="chart-container" id="eventos-comunidade-card">
-                <div class="chart-header">
-                    <div>
-                        <h2>Eventos por Comunidade</h2>
-                        <p class="chart-subtitle">Distribuição de eventos entre as comunidades</p>
-                    </div>
-                    <div class="chart-total-badge" id="eventos-comunidade-total">- total</div>
-                </div>
-                <div class="chart-legend-chips" id="eventos-comunidade-chips"></div>
-                <div class="chart-body">
-                    <canvas id="pessoasChart"></canvas>
-                </div>
-                <div class="chart-footer-metrics" id="eventos-comunidade-metrics">
-                    <div class="metric">
-                        <span class="metric-label">Comunidades</span>
-                        <span class="metric-value" id="eventos-comunidade-qtd-comunidades">-</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Maior quantidade</span>
-                        <span class="metric-value" id="eventos-comunidade-maior-quantidade">-</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Média por comunidade</span>
-                        <span class="metric-value" id="eventos-comunidade-media">-</span>
-                    </div>
-                </div>
+                <h2>Distribuição por Comunidades</h2>
+                <canvas id="pessoasChart"></canvas>
             </div>
             <div class="chart-container">
                 <h2>Distribuição por Pastorais</h2>
@@ -1258,28 +1235,32 @@
 
                 // Gráfico de eventos por comunidade
                 const eventosPorComunidade = dadosGraficos.eventosPorComunidade || { labels: [], dados: [], cores: [] };
-                atualizarCardEventosPorComunidade(eventosPorComunidade);
 
                 const ctxPessoas = document.getElementById('pessoasChart').getContext('2d');
                 pessoasChart = new Chart(ctxPessoas, {
-                    type: 'bar',
+                    type: 'doughnut',
                     data: {
                         labels: dadosGraficos.eventosPorComunidade.labels,
                         datasets: [{
-                            label: 'Eventos',
+                            label: 'Comunidades',
                             data: dadosGraficos.eventosPorComunidade.dados,
-                            // Cada coluna usa a cor da própria comunidade
                             backgroundColor: dadosGraficos.eventosPorComunidade.cores,
-                            borderRadius: 12,
-                            borderSkipped: false,
-                            maxBarThickness: 40
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        cutout: '58%',
                         plugins: { 
-                            legend: { display: false },
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
                             tooltip: {
                                 backgroundColor: 'rgba(15, 23, 42, 0.96)',
                                 titleFont: { size: 13, weight: '600', family: 'system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif' },
@@ -1290,49 +1271,12 @@
                                 callbacks: {
                                     label: function(ctx) {
                                         const total = eventosPorComunidade.dados.reduce((sum, v) => sum + (v || 0), 0) || 0;
-                                        const value = ctx.parsed.y || 0;
+                                        const value = Number(ctx.parsed) || 0;
                                         const plural = value === 1 ? 'evento' : 'eventos';
                                         const base = `${value} ${plural}`;
                                         if (!total || !value) return base;
                                         const perc = ((value / total) * 100).toFixed(1);
                                         return [`${base}`, `${perc}% do total`];
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                },
-                                grid: {
-                                    color: 'rgba(148, 163, 184, 0.25)',
-                                    drawBorder: false
-                                }
-                            },
-                            x: {
-                                // Sobe um pouco a área útil para dar mais espaço visual aos labels
-                                offset: true,
-                                grid: {
-                                    display: false,
-                                    drawBorder: false
-                                },
-                                ticks: {
-                                    maxRotation: 45,
-                                    minRotation: 0,
-                                    autoSkip: true,
-                                    font: {
-                                        size: 11
-                                    },
-                                    // Encurta nomes muito longos para não vazar do card
-                                    callback: function(value) {
-                                        const label = this.getLabelForValue(value) || '';
-                                        const maxLength = 18;
-                                        if (label.length > maxLength) {
-                                            return label.slice(0, maxLength - 1) + '…';
-                                        }
-                                        return label;
                                     }
                                 }
                             }
@@ -1633,23 +1577,28 @@
                 // Gráfico de eventos por comunidade (padrão)
                 const ctxPessoas = document.getElementById('pessoasChart').getContext('2d');
                 pessoasChart = new Chart(ctxPessoas, {
-                    type: 'bar',
+                    type: 'doughnut',
                     data: {
                         labels: ['Sem dados'],
                         datasets: [{
-                            label: 'Eventos',
+                            label: 'Comunidades',
                             data: [0],
-                            backgroundColor: '#42a5f5'
+                            backgroundColor: ['#42a5f5'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { stepSize: 1 }
+                        cutout: '58%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
                             }
                         }
                     }
