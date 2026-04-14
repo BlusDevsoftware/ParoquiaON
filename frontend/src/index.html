@@ -1374,14 +1374,9 @@
                         labels: dadosGraficos.pastorais.labels,
                         datasets: [{
                             data: dadosGraficos.pastorais.dados,
-                            backgroundColor: [
-                                '#28a745', // Ativa
-                                '#ffc107', // Inativa
-                                '#3498db', // Em formação
-                                '#dc3545'  // Suspensa
-                            ],
+                            backgroundColor: dadosGraficos.pastorais.cores,
                             borderWidth: 4,
-                            borderColor: '#f3f4f6',
+                            borderColor: '#ffffff',
                             hoverOffset: 2
                         }]
                     },
@@ -1478,11 +1473,11 @@
 
         // Monta o objeto usado pelos gráficos a partir dos dados brutos (evita segunda rodada de APIs)
         function montarDadosParaGraficos(raw) {
-            if (!raw) return { eventosPorComunidade: { labels: [], dados: [], cores: [] }, pastorais: { labels: ['Ativa', 'Inativa'], dados: [0, 0] }, eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] }, comunidades: { labels: ['Sem dados'], dados: [0] } };
+            if (!raw) return { eventosPorComunidade: { labels: [], dados: [], cores: [] }, pastorais: { labels: ['Sem agendamentos'], dados: [0], cores: ['#cbd5e1'] }, eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] }, comunidades: { labels: ['Sem dados'], dados: [0] } };
             const { comunidades, pastorais, pessoas, agenda } = raw;
             return {
                 eventosPorComunidade: calcularEventosPorComunidade(agenda || [], comunidades || []),
-                pastorais: calcularDistribuicaoPastorais(pastorais || []),
+                pastorais: calcularAgendamentosPorPastoral(agenda || [], pastorais || []),
                 eventos: calcularEventosPorMes(agenda || []),
                 comunidades: calcularTopComunidades(comunidades || [], pessoas || [])
             };
@@ -1497,7 +1492,7 @@
                 console.error('Erro ao buscar dados dos gráficos:', error);
                 return {
                     eventosPorComunidade: { labels: ['Sem dados'], dados: [0], cores: ['#42a5f5'] },
-                    pastorais: { labels: ['Ativa', 'Inativa'], dados: [0, 0] },
+                    pastorais: { labels: ['Sem agendamentos'], dados: [0], cores: ['#cbd5e1'] },
                     eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] },
                     comunidades: { labels: ['Sem dados'], dados: [0] }
                 };
@@ -1580,32 +1575,46 @@
             return { labels, dados, cores };
         }
 
-        // Função para calcular distribuição por pastorais
-        function calcularDistribuicaoPastorais(pastorais) {
-            const status = {
-                ativa: 0,
-                inativa: 0,
-                formacao: 0,
-                suspensa: 0
-            };
+        // Gráfico "Distribuição por Pastorais": quantidade de agendamentos por pastoral
+        function calcularAgendamentosPorPastoral(agenda, pastorais) {
+            const contagemPorPastoral = {};
+            const nomesPastorais = {};
 
-            (pastorais || []).forEach(pastoral => {
-                const statusPastoral = (pastoral.status || pastoral.ativo || '').toString().trim().toLowerCase();
-                if (statusPastoral === 'ativo' || statusPastoral === 'true') {
-                    status.ativa++;
-                } else if (statusPastoral === 'em formação' || statusPastoral === 'formacao') {
-                    status.formacao++;
-                } else if (statusPastoral === 'suspensa' || statusPastoral === 'suspenso') {
-                    status.suspensa++;
-                } else {
-                    status.inativa++;
-                }
+            (pastorais || []).forEach((pastoral) => {
+                if (!pastoral || pastoral.id == null) return;
+                nomesPastorais[String(pastoral.id)] = pastoral.nome || `Pastoral ${pastoral.id}`;
             });
 
+            (agenda || []).forEach((evento) => {
+                const pastoralId = evento?.pastoral_id ?? evento?.pastoral ?? null;
+                if (pastoralId == null || pastoralId === '') return;
+                const chave = String(pastoralId);
+                contagemPorPastoral[chave] = (contagemPorPastoral[chave] || 0) + 1;
+            });
+
+            const ordenado = Object.entries(contagemPorPastoral)
+                .map(([id, qtd]) => ({
+                    id,
+                    nome: nomesPastorais[id] || `Pastoral ${id}`,
+                    qtd
+                }))
+                .sort((a, b) => b.qtd - a.qtd);
+
+            if (ordenado.length === 0) {
                 return {
-                labels: ['Ativa', 'Inativa', 'Em Formação', 'Suspensa'],
-                dados: [status.ativa, status.inativa, status.formacao, status.suspensa]
+                    labels: ['Sem agendamentos'],
+                    dados: [0],
+                    cores: ['#cbd5e1']
                 };
+            }
+
+            const paleta = ['#28a745', '#ffc107', '#3498db', '#dc3545', '#8b5cf6', '#14b8a6', '#f97316', '#22c55e'];
+
+            return {
+                labels: ordenado.map((item) => item.nome),
+                dados: ordenado.map((item) => item.qtd),
+                cores: ordenado.map((_, idx) => paleta[idx % paleta.length])
+            };
         }
 
         // Função para calcular eventos por mês
