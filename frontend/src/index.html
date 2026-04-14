@@ -491,7 +491,8 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            background: #f8fafd;
+            /* Igual ao fundo padrão dos outros gráficos (.chart-container) */
+            background: linear-gradient(135deg, #ffffff, #f3f4ff);
         }
 
         #eventos-comunidade-card .chart-header {
@@ -614,7 +615,8 @@
         
         /* Reduzir espaçamento entre cards e gráficos */
         .dashboard-cards {
-            margin-bottom: 12px !important;
+            gap: 20px !important;
+            margin-bottom: 20px !important;
         }
 
         /* Remover sombras dos cards */
@@ -624,8 +626,9 @@
         }
         
         .charts-section {
+            gap: 20px !important;
             margin-top: 0 !important;
-            margin-bottom: 12px !important;
+            margin-bottom: 20px !important;
         }
         
         .charts-section:last-child {
