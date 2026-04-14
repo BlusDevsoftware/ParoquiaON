@@ -142,37 +142,41 @@
     gap: 20px;
 }
 
-.header-icon {
-    width: 44px;
-    height: 44px;
-    background: rgba(30, 58, 138, 0.08);
-    border-radius: 8px;
+.top-header .header-icon {
+    width: 28px !important;
+    height: 28px !important;
+    background: transparent !important;
+    border-radius: 50% !important;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: color 0.2s ease;
     position: relative;
-    font-size: 16px;
-    color: #1e3a8a;
+    font-size: 18px !important;
+    color: #6b7280 !important;
 }
 
-.header-icon:hover {
-    background: rgba(30, 58, 138, 0.16);
+.top-header .header-icon:hover {
+    color: #4b5563 !important;
+    background: transparent !important;
 }
 
-.notification-badge {
+.top-header .notification-badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #f44336;
-    color: white;
+    top: -6px;
+    right: -10px;
+    background: #f59e0b;
+    color: #ffffff;
     font-size: 10px;
-    font-weight: bold;
-    padding: 2px 6px;
-    border-radius: 10px;
-    min-width: 18px;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
     text-align: center;
+    line-height: 14px;
 }
 
 .user-avatar-dropdown {
