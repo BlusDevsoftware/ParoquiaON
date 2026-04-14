@@ -553,12 +553,13 @@ body {
 }
 
 .chart-container {
-    background: linear-gradient(135deg, #ffffff, #f3f4ff);
+    background: #ffffff;
     padding: 1.5rem;
     border-radius: 18px;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+    box-shadow: none;
     height: 430px;
     border: 1px solid #e5e7eb;
+    filter: none;
 }
 
 .chart-container h2 {
