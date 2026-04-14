@@ -1658,20 +1658,43 @@
             });
 
             const agendamentosPorPessoa = {};
+            const labelsPorChave = {};
             (agenda || []).forEach((evento) => {
-                const pessoaId =
+                // Prioriza quem lançou o agendamento (usuário agendador)
+                const chaveAgendador =
+                    evento?.usuario_lancamento_id ??
+                    evento?.usuario_lancamento_email ??
+                    null;
+
+                // Fallback para manter compatibilidade com payloads antigos
+                const chavePessoaFallback =
                     evento?.responsavel_id ??
                     evento?.pessoa_id ??
                     evento?.pessoas?.id ??
                     null;
-                if (pessoaId == null || pessoaId === '') return;
-                const chave = String(pessoaId);
+
+                const chaveFinal = chaveAgendador ?? chavePessoaFallback;
+                if (chaveFinal == null || chaveFinal === '') return;
+
+                const chave = String(chaveFinal);
                 agendamentosPorPessoa[chave] = (agendamentosPorPessoa[chave] || 0) + 1;
+
+                // Label: nome do agendador vindo da API; depois email; por último ID
+                const nomeAgendador =
+                    evento?.usuario_lancamento_nome ??
+                    evento?.usuario_lancamento_email ??
+                    null;
+
+                if (nomeAgendador) {
+                    labelsPorChave[chave] = nomeAgendador;
+                } else if (!labelsPorChave[chave] && nomesPessoas[chave]) {
+                    labelsPorChave[chave] = nomesPessoas[chave];
+                }
             });
 
             const topPessoas = Object.entries(agendamentosPorPessoa)
                 .map(([id, qtd]) => ({
-                    nome: nomesPessoas[id] || `Pessoa ${id}`,
+                    nome: labelsPorChave[id] || nomesPessoas[id] || `Agendador ${id}`,
                     qtd
                 }))
                 .sort((a, b) => b.qtd - a.qtd)
