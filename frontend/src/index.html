@@ -883,6 +883,28 @@
                 flex-wrap: wrap;
                 row-gap: 8px;
             }
+
+            #agendamentos-pessoa-card {
+                height: auto;
+            }
+
+            #agendamentos-pessoa-card .agendamentos-heatmap {
+                height: 240px;
+                padding: 10px;
+            }
+
+            #agendamentos-pessoa-card .agendamentos-heatmap-grid {
+                gap: 12px;
+            }
+
+            #agendamentos-pessoa-card .agendamentos-heatmap-avatar {
+                width: 42px;
+                height: 42px;
+            }
+
+            #agendamentos-pessoa-card .agendamentos-heatmap-blocos {
+                height: 132px;
+            }
         }
 
         /* Media Query: Mobile pequeno (max-width: 480px) */
@@ -954,6 +976,32 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 6px;
+            }
+
+            #agendamentos-pessoa-card {
+                height: auto;
+            }
+
+            #agendamentos-pessoa-card .agendamentos-heatmap {
+                height: 210px;
+                padding: 8px;
+            }
+
+            #agendamentos-pessoa-card .agendamentos-heatmap-grid {
+                gap: 10px;
+            }
+
+            #agendamentos-pessoa-card .agendamentos-heatmap-coluna {
+                max-width: 86px;
+            }
+
+            #agendamentos-pessoa-card .agendamentos-heatmap-avatar {
+                width: 36px;
+                height: 36px;
+            }
+
+            #agendamentos-pessoa-card .agendamentos-heatmap-blocos {
+                height: 116px;
             }
         }
     </style>
@@ -1139,7 +1187,7 @@
                 <h2>Eventos por Mês</h2>
                 <canvas id="eventosChart"></canvas>
             </div>
-            <div class="chart-container">
+            <div class="chart-container" id="agendamentos-pessoa-card">
                 <h2>Agendamentos por Pessoa</h2>
                 <div id="comunidadesHeatmap" class="agendamentos-heatmap"></div>
             </div>
