@@ -1543,6 +1543,32 @@
             });
         }
 
+        // Função global para destruir gráficos existentes (necessária para ações fora do DOMContentLoaded)
+        function destruirGraficos() {
+            try {
+                if (pessoasChart && typeof pessoasChart.destroy === 'function') {
+                    pessoasChart.destroy();
+                    pessoasChart = null;
+                }
+                if (pastoraisChart && typeof pastoraisChart.destroy === 'function') {
+                    pastoraisChart.destroy();
+                    pastoraisChart = null;
+                }
+                if (eventosChart && typeof eventosChart.destroy === 'function') {
+                    eventosChart.destroy();
+                    eventosChart = null;
+                }
+                if (comunidadesChart && typeof comunidadesChart.destroy === 'function') {
+                    comunidadesChart.destroy();
+                    comunidadesChart = null;
+                }
+                const heatmap = document.getElementById('comunidadesHeatmap');
+                if (heatmap) heatmap.innerHTML = '';
+            } catch (error) {
+                console.error('Erro ao destruir gráficos:', error);
+            }
+        }
+
         // Inicializar Minha Comunidade
         // Funções para controlar menu mobile
         function openMobileMenu() {
