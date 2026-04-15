@@ -531,6 +531,7 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            margin-right: 42px;
         }
 
         #eventos-comunidade-card .chart-total-badge::before {
@@ -1239,7 +1240,7 @@
         <!-- Charts Section -->
         <div class="charts-section">
             <div class="chart-container" id="eventos-comunidade-card">
-                <div class="chart-filter" data-chart-filter>
+                <div class="chart-filter" data-chart-filter data-chart-key="eventosPorComunidade">
                     <button class="chart-filter-button" type="button" aria-label="Filtrar período dos gráficos">
                         <i class="fas fa-filter"></i>
                     </button>
@@ -1278,7 +1279,7 @@
                 </div>
             </div>
             <div class="chart-container" id="pastorais-distribuicao-card">
-                <div class="chart-filter" data-chart-filter>
+                <div class="chart-filter" data-chart-filter data-chart-key="pastorais">
                     <button class="chart-filter-button" type="button" aria-label="Filtrar período dos gráficos">
                         <i class="fas fa-filter"></i>
                     </button>
@@ -1300,7 +1301,7 @@
         <!-- Insights Adicionais -->
         <div class="charts-section">
             <div class="chart-container" id="eventos-mes-card">
-                <div class="chart-filter" data-chart-filter>
+                <div class="chart-filter" data-chart-filter data-chart-key="eventos">
                     <button class="chart-filter-button" type="button" aria-label="Filtrar período dos gráficos">
                         <i class="fas fa-filter"></i>
                     </button>
@@ -1316,7 +1317,7 @@
                 <canvas id="eventosChart"></canvas>
             </div>
             <div class="chart-container" id="agendamentos-pessoa-card">
-                <div class="chart-filter" data-chart-filter>
+                <div class="chart-filter" data-chart-filter data-chart-key="comunidades">
                     <button class="chart-filter-button" type="button" aria-label="Filtrar período dos gráficos">
                         <i class="fas fa-filter"></i>
                     </button>
@@ -1341,8 +1342,12 @@
         let pessoasChart, pastoraisChart, eventosChart, comunidadesChart;
         let minhaComunidadeData = {};
         const avatarImageCache = new Map();
-        let periodoFiltroGraficosDias = null;
-        let periodoFiltroGraficosSelecionado = 'todos';
+        const periodoFiltrosGraficos = {
+            eventosPorComunidade: 'todos',
+            pastorais: 'todos',
+            eventos: 'todos',
+            comunidades: 'todos'
+        };
 
         function obterAvatarImage(src) {
             if (!src || typeof src !== 'string' || src.trim() === '') return null;
@@ -1459,9 +1464,19 @@
         }
 
         function atualizarEstadoBotoesFiltroGraficos() {
-            document.querySelectorAll('.chart-filter-option').forEach((btn) => {
-                btn.classList.toggle('active', btn.dataset.periodo === periodoFiltroGraficosSelecionado);
+            document.querySelectorAll('[data-chart-filter]').forEach((filtro) => {
+                const chartKey = filtro.dataset.chartKey;
+                const periodoAtivo = periodoFiltrosGraficos[chartKey] || 'todos';
+                filtro.querySelectorAll('.chart-filter-option').forEach((btn) => {
+                    btn.classList.toggle('active', btn.dataset.periodo === periodoAtivo);
+                });
             });
+        }
+
+        function obterDiasDoPeriodo(periodo) {
+            if (!periodo || periodo === 'todos') return null;
+            const dias = Number(periodo);
+            return Number.isNaN(dias) ? null : dias;
         }
 
         async function aplicarFiltroPeriodoGraficos() {
@@ -1500,8 +1515,9 @@
                     opcao.addEventListener('click', async function(event) {
                         event.stopPropagation();
                         const valor = opcao.dataset.periodo || 'todos';
-                        periodoFiltroGraficosSelecionado = valor;
-                        periodoFiltroGraficosDias = valor === 'todos' ? null : Number(valor);
+                        const chartKey = filtro.dataset.chartKey;
+                        if (!chartKey) return;
+                        periodoFiltrosGraficos[chartKey] = valor;
                         atualizarEstadoBotoesFiltroGraficos();
                         fecharMenusFiltroGraficos();
                         await aplicarFiltroPeriodoGraficos();
@@ -2003,12 +2019,16 @@
         function montarDadosParaGraficos(raw) {
             if (!raw) return { eventosPorComunidade: { labels: [], dados: [], cores: [] }, pastorais: { labels: ['Sem agendamentos'], dados: [0], cores: ['#cbd5e1'] }, eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] }, comunidades: { labels: ['Sem dados'], dados: [0], fotos: [null] } };
             const { comunidades, pastorais, pessoas, agenda } = raw;
-            const agendaFiltrada = filtrarAgendaPorPeriodo(agenda || [], periodoFiltroGraficosDias);
+            const agendaBase = agenda || [];
+            const agendaEventosComunidade = filtrarAgendaPorPeriodo(agendaBase, obterDiasDoPeriodo(periodoFiltrosGraficos.eventosPorComunidade));
+            const agendaPastorais = filtrarAgendaPorPeriodo(agendaBase, obterDiasDoPeriodo(periodoFiltrosGraficos.pastorais));
+            const agendaEventos = filtrarAgendaPorPeriodo(agendaBase, obterDiasDoPeriodo(periodoFiltrosGraficos.eventos));
+            const agendaComunidades = filtrarAgendaPorPeriodo(agendaBase, obterDiasDoPeriodo(periodoFiltrosGraficos.comunidades));
             return {
-                eventosPorComunidade: calcularEventosPorComunidade(agendaFiltrada, comunidades || []),
-                pastorais: calcularAgendamentosPorPastoral(agendaFiltrada, pastorais || []),
-                eventos: calcularEventosPorMes(agendaFiltrada),
-                comunidades: calcularAgendamentosPorPessoa(agendaFiltrada, pessoas || [])
+                eventosPorComunidade: calcularEventosPorComunidade(agendaEventosComunidade, comunidades || []),
+                pastorais: calcularAgendamentosPorPastoral(agendaPastorais, pastorais || []),
+                eventos: calcularEventosPorMes(agendaEventos),
+                comunidades: calcularAgendamentosPorPessoa(agendaComunidades, pessoas || [])
             };
         }
 
