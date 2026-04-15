@@ -1036,22 +1036,22 @@
             return img;
         }
 
-        // Plugin Chart.js: desenha avatar no eixo Y (no lugar do nome)
+        // Plugin Chart.js: desenha avatar acima das colunas (eixo X)
         const avatarAxisPlugin = {
             id: 'avatarAxisPlugin',
             afterDraw(chart, _args, pluginOptions) {
                 if (!pluginOptions || !pluginOptions.enabled) return;
-                const yScale = chart?.scales?.y;
-                if (!yScale) return;
+                const xScale = chart?.scales?.x;
+                if (!xScale) return;
 
                 const labels = chart.data?.labels || [];
                 const avatars = pluginOptions.avatars || [];
                 const ctx = chart.ctx;
                 const radius = 10;
-                const x = (chart.chartArea?.left || 0) - 24;
+                const y = (chart.chartArea?.top || 0) - 14;
 
                 labels.forEach((label, index) => {
-                    const y = yScale.getPixelForValue(index);
+                    const x = xScale.getPixelForValue(index);
                     const foto = avatars[index];
                     const img = obterAvatarImage(foto);
 
@@ -1515,18 +1515,17 @@
                         }]
                     },
                     options: {
-                        indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
                         layout: {
-                            padding: { left: 18 }
+                            padding: { top: 28 }
                         },
                         scales: {
-                            x: {
+                            y: {
                                 beginAtZero: true,
                                 ticks: { stepSize: 1 }
                             },
-                            y: {
+                            x: {
                                 ticks: {
                                     // Esconde nome no eixo; avatar será desenhado via plugin
                                     callback: function() { return ''; }
@@ -1544,7 +1543,7 @@
                                         return items?.[0]?.label || '';
                                     },
                                     label: function(ctx) {
-                                        const valor = ctx.parsed?.x ?? ctx.parsed ?? 0;
+                                        const valor = ctx.parsed?.y ?? ctx.parsed ?? 0;
                                         const plural = valor === 1 ? 'agendamento' : 'agendamentos';
                                         return `${valor} ${plural}`;
                                     }
@@ -1918,11 +1917,10 @@
                         }]
                     },
                     options: {
-                        indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
                         scales: {
-                            x: {
+                            y: {
                                 beginAtZero: true,
                                 ticks: { stepSize: 1 }
                             }
