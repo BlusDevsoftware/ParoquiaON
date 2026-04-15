@@ -1465,10 +1465,19 @@
         }
 
         async function aplicarFiltroPeriodoGraficos() {
-            if (!minhaComunidadeData || !Array.isArray(minhaComunidadeData.agenda)) return;
-            const dadosGraficos = montarDadosParaGraficos(minhaComunidadeData);
-            destruirGraficos();
-            await inicializarGraficos(dadosGraficos);
+            try {
+                // Garante uma base de dados válida para filtrar, mesmo após recargas/parciais
+                if (!minhaComunidadeData || !Array.isArray(minhaComunidadeData.agenda)) {
+                    minhaComunidadeData = await buscarDadosUnificados();
+                }
+
+                const dadosGraficos = montarDadosParaGraficos(minhaComunidadeData);
+                destruirGraficos();
+                await inicializarGraficos(dadosGraficos);
+            } catch (error) {
+                console.error('Erro ao aplicar filtro de período dos gráficos:', error);
+                mostrarToast('Não foi possível aplicar o filtro de período', 'error');
+            }
         }
 
         function inicializarFiltrosGraficos() {
@@ -1520,7 +1529,15 @@
                     evento?.created_at ??
                     null;
                 if (!valorData) return false;
-                const dataEvento = new Date(valorData);
+                let dataEvento = new Date(valorData);
+                // Compatibilidade com datas no formato pt-BR (dd/mm/yyyy)
+                if (Number.isNaN(dataEvento.getTime()) && typeof valorData === 'string' && valorData.includes('/')) {
+                    const partes = valorData.split(' ')[0].split('/');
+                    if (partes.length === 3) {
+                        const [dia, mes, ano] = partes;
+                        dataEvento = new Date(`${ano}-${mes}-${dia}T00:00:00`);
+                    }
+                }
                 if (Number.isNaN(dataEvento.getTime())) return false;
                 return dataEvento >= inicio && dataEvento <= agora;
             });
