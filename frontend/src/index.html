@@ -1054,7 +1054,7 @@
                     if (!arc || typeof arc.getProps !== 'function') return;
                     const props = arc.getProps(['x', 'y', 'startAngle', 'endAngle', 'outerRadius'], true);
                     const meioAngulo = (props.startAngle + props.endAngle) / 2;
-                    const distancia = (props.outerRadius || 0) + 18;
+                    const distancia = (props.outerRadius || 0) + 10;
                     const x = props.x + (Math.cos(meioAngulo) * distancia);
                     const y = props.y + (Math.sin(meioAngulo) * distancia);
                     const foto = avatars[index];
@@ -1525,7 +1525,8 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         cutout: '56%',
-                        layout: { padding: { top: 6, bottom: 2 } },
+                        radius: '72%',
+                        layout: { padding: { top: 2, bottom: 0 } },
                         plugins: {
                             legend: {
                                 position: 'bottom',
@@ -1535,10 +1536,10 @@
                                     pointStyle: 'circle',
                                     boxWidth: 10,
                                     boxHeight: 10,
-                                    padding: 18,
+                                    padding: 10,
                                     color: '#64748b',
                                     font: {
-                                        size: 12,
+                                        size: 11,
                                         weight: '500'
                                     }
                                 }
@@ -1931,6 +1932,7 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         cutout: '56%',
+                        radius: '72%',
                         plugins: {
                             legend: {
                                 position: 'bottom',
