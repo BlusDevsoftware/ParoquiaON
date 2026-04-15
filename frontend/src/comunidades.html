@@ -101,34 +101,33 @@
                     : (comunidade.secretario || '');
                 
                 const cardHtml = `
-                    <div class="community-card" data-id="${comunidade.id}" style="overflow:hidden; border-radius:5px; padding:12px 6px 6px 6px; height:355px; display:flex; flex-direction:column; border-top: 4px solid ${comunidade.cor || '#1e3a8a'}">
-                        <div class="community-image" style="width:100%; height:150px; overflow:hidden; background:#f0f0f0; border-radius:5px; position:relative;">
-                            <img src="${fotoUrl}" alt="Foto da Comunidade" style="width:100%; height:100%; object-fit:cover; display:block;">
+                    <div class="community-card community-card--modelo" data-id="${comunidade.id}" style="--community-accent: ${comunidade.cor || '#2196f3'}">
+                        <div class="community-image">
+                            <img src="${fotoUrl}" alt="Foto da Comunidade">
                         </div>
-                        <div class="community-header" style="margin-top:4px;">
-                            <h3 class="community-card-title">${comunidade.nome || 'Sem nome'}</h3>
-                            <span class="status-badge ${comunidade.status === 'Ativo' ? 'active' : 'inactive'}">
-                                ${comunidade.status || 'Ativo'}
-                            </span>
-                        </div>
-                        <div class="community-info" style="margin-top:8px; font-size:10px; line-height:1.5; flex:1 1 auto;">
-                            <p style="margin:6px 0;"><i class="fas fa-phone"></i> ${comunidade.telefone || 'Não informado'}</p>
-                            ${membros > 0 ? `<p style="margin:6px 0;"><i class="fas fa-users"></i> ${membros} membros</p>` : ''}
-                            ${secretario ? `<p style="margin:6px 0;"><i class="fas fa-user"></i> Secretário: ${secretario}</p>` : ''}
-                            <p style="margin:6px 0;"><i class="fas fa-map-marker-alt"></i> ${comunidade.endereco || 'Não informado'}</p>
-                            <p style="margin:6px 0;"><i class="fas fa-calendar"></i> ${formatarData(comunidade.data_fundacao)}</p>
-                        </div>
-                        
-                        <div class="community-actions" style="margin-top:auto; display:flex; gap:6px;">
-                            <button class="btn-secondary" style="padding:4px 8px; font-size:10px;" onclick="visualizarComunidade(${comunidade.id})">
-                                <i class="fas fa-eye"></i> Visualizar
-                            </button>
-                            <button class="btn-primary" style="padding:4px 8px; font-size:10px;" onclick="editarComunidade(${comunidade.id})">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
-                            <button class="btn-delete" style="padding:4px 8px; font-size:10px;" onclick="excluirComunidade(${comunidade.id})">
-                                <i class="fas fa-trash"></i> Excluir
-                            </button>
+                        <div class="community-card-content">
+                            <div class="community-header">
+                                <h3 class="community-card-title">${comunidade.nome || 'Sem nome'}</h3>
+                                <span class="status-badge ${comunidade.status === 'Ativo' ? 'active' : 'inactive'}">
+                                    ${(comunidade.status || 'Ativo').toUpperCase()}
+                                </span>
+                            </div>
+                            <div class="community-info">
+                                <p><i class="fas fa-phone"></i> ${comunidade.telefone || 'Não informado'}</p>
+                                <p><i class="fas fa-map-marker-alt"></i> ${comunidade.endereco || 'Não informado'}</p>
+                                <p><i class="fas fa-calendar-alt"></i> ${formatarData(comunidade.data_fundacao)}</p>
+                            </div>
+                            <div class="community-actions">
+                                <button class="btn-secondary community-btn-view" onclick="visualizarComunidade(${comunidade.id})">
+                                    <i class="fas fa-eye"></i> Visualizar
+                                </button>
+                                <button class="btn-primary community-btn-edit" onclick="editarComunidade(${comunidade.id})">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="btn-delete community-btn-delete" onclick="excluirComunidade(${comunidade.id})">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </div>
                         </div>
                     </div>`;
                 
@@ -1503,14 +1502,16 @@
         .btn-nova-comunidade {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 12px 20px;
-            background: #1e3a8a;
+            gap: 10px;
+            padding: 0 18px;
+            height: 40px;
+            background: #3498e3;
             color: #ffffff;
             border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
+            border-radius: 12px;
+            font-size: 26px;
+            font-weight: 600;
+            line-height: 1;
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
@@ -1520,16 +1521,20 @@
             transform: translateY(-50%);
         }
         .btn-nova-comunidade:hover {
-            background: #2740a6;
+            background: #2d8fd8;
             transform: translateY(calc(-50% - 1px));
-            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3);
+            box-shadow: 0 4px 10px rgba(52, 152, 227, 0.28);
         }
         .btn-nova-comunidade:active {
             transform: translateY(-50%);
-            box-shadow: 0 1px 3px rgba(30, 58, 138, 0.2);
+            box-shadow: 0 2px 6px rgba(52, 152, 227, 0.22);
         }
         .btn-nova-comunidade i {
+            font-size: 16px;
+        }
+        .btn-nova-comunidade span {
             font-size: 14px;
+            font-weight: 600;
         }
 
         .toast {
@@ -2671,6 +2676,142 @@
 
         .community-actions .btn-delete:hover {
             background: #d32f2f;
+        }
+
+        /* Modelo visual do card de comunidade (referência enviada) */
+        .community-card.community-card--modelo {
+            border-radius: 12px;
+            border: 1px solid #d7dce2;
+            border-top: 3px solid var(--community-accent, #2196f3);
+            background: #ffffff;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+            padding: 0;
+            min-height: 338px;
+        }
+
+        .community-card.community-card--modelo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+        }
+
+        .community-card--modelo .community-image {
+            width: 100%;
+            height: 138px;
+            background: #d1d5db;
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        .community-card--modelo .community-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .community-card--modelo .community-card-content {
+            padding: 14px 16px 14px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .community-card--modelo .community-header {
+            margin: 0 0 10px;
+            align-items: center;
+        }
+
+        .community-card--modelo .community-card-title {
+            font-size: 16px;
+            color: #1f7fd3;
+            font-weight: 700;
+            max-width: calc(100% - 94px);
+        }
+
+        .community-card--modelo .status-badge {
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            border: 1px solid transparent;
+        }
+
+        .community-card--modelo .status-badge.active {
+            color: #f97316;
+            background: #fff7ed;
+            border-color: #fb923c;
+        }
+
+        .community-card--modelo .status-badge.inactive {
+            color: #ef4444;
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .community-card--modelo .community-info {
+            margin-bottom: 12px;
+            gap: 0;
+        }
+
+        .community-card--modelo .community-info p {
+            margin: 6px 0;
+            color: #5f6f86;
+            font-size: 14px;
+            line-height: 1.35;
+            gap: 8px;
+        }
+
+        .community-card--modelo .community-info i {
+            width: 18px;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .community-card--modelo .community-actions {
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid #e5e7eb;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .community-card--modelo .community-actions button {
+            min-width: 0;
+            padding: 7px 8px;
+            font-size: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            gap: 6px;
+        }
+
+        .community-card--modelo .community-btn-view {
+            background: #f8fafc;
+            color: #64748b;
+        }
+
+        .community-card--modelo .community-btn-view:hover {
+            background: #eef2f7;
+            color: #475569;
+        }
+
+        .community-card--modelo .community-btn-edit {
+            background: #3498e3;
+            color: #ffffff;
+        }
+
+        .community-card--modelo .community-btn-edit:hover {
+            background: #2f89cd;
+        }
+
+        .community-card--modelo .community-btn-delete {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .community-card--modelo .community-btn-delete:hover {
+            background: #dc2626;
         }
 
         /* Estilos para Toast */
