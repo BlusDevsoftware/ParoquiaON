@@ -1047,14 +1047,14 @@
                 const labels = chart.data?.labels || [];
                 const avatars = pluginOptions.avatars || [];
                 const ctx = chart.ctx;
-                const radius = 10;
+                const radius = 13;
 
                 labels.forEach((label, index) => {
                     const arc = datasetMeta.data[index];
                     if (!arc || typeof arc.getProps !== 'function') return;
                     const props = arc.getProps(['x', 'y', 'startAngle', 'endAngle', 'outerRadius'], true);
                     const meioAngulo = (props.startAngle + props.endAngle) / 2;
-                    const distancia = (props.outerRadius || 0) + 10;
+                    const distancia = (props.outerRadius || 0) + 18;
                     const x = props.x + (Math.cos(meioAngulo) * distancia);
                     const y = props.y + (Math.sin(meioAngulo) * distancia);
                     const foto = avatars[index];
@@ -1531,16 +1531,28 @@
                             legend: {
                                 position: 'bottom',
                                 align: 'center',
+                                maxHeight: 64,
                                 labels: {
                                     usePointStyle: true,
                                     pointStyle: 'circle',
-                                    boxWidth: 10,
-                                    boxHeight: 10,
-                                    padding: 10,
+                                    boxWidth: 8,
+                                    boxHeight: 8,
+                                    padding: 8,
                                     color: '#64748b',
                                     font: {
-                                        size: 11,
+                                        size: 10,
                                         weight: '500'
+                                    },
+                                    generateLabels: function(chart) {
+                                        const labelsOriginais = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                                        const tamanhoMaximo = 16;
+                                        return labelsOriginais.map((item) => {
+                                            const texto = String(item.text || '');
+                                            return {
+                                                ...item,
+                                                text: texto.length > tamanhoMaximo ? `${texto.slice(0, tamanhoMaximo - 1)}…` : texto
+                                            };
+                                        });
                                     }
                                 }
                             },
