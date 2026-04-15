@@ -905,6 +905,14 @@
             #agendamentos-pessoa-card .agendamentos-heatmap-blocos {
                 height: 132px;
             }
+
+            #eventos-mes-card {
+                height: auto;
+            }
+
+            #eventos-mes-card #eventosChart {
+                max-height: 220px;
+            }
         }
 
         /* Media Query: Mobile pequeno (max-width: 480px) */
@@ -1002,6 +1010,14 @@
 
             #agendamentos-pessoa-card .agendamentos-heatmap-blocos {
                 height: 116px;
+            }
+
+            #eventos-mes-card {
+                height: auto;
+            }
+
+            #eventos-mes-card #eventosChart {
+                max-height: 190px;
             }
         }
     </style>
@@ -1183,7 +1199,7 @@
 
         <!-- Insights Adicionais -->
         <div class="charts-section">
-            <div class="chart-container">
+            <div class="chart-container" id="eventos-mes-card">
                 <h2>Eventos por Mês</h2>
                 <canvas id="eventosChart"></canvas>
             </div>
