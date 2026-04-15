@@ -1039,19 +1039,22 @@
         // Plugin Chart.js: desenha avatar acima das colunas (eixo X)
         const avatarAxisPlugin = {
             id: 'avatarAxisPlugin',
-            afterDraw(chart, _args, pluginOptions) {
+            afterDatasetsDraw(chart, _args, pluginOptions) {
                 if (!pluginOptions || !pluginOptions.enabled) return;
-                const xScale = chart?.scales?.x;
-                if (!xScale) return;
+                const datasetMeta = chart?.getDatasetMeta?.(0);
+                if (!datasetMeta || !Array.isArray(datasetMeta.data)) return;
 
                 const labels = chart.data?.labels || [];
                 const avatars = pluginOptions.avatars || [];
                 const ctx = chart.ctx;
                 const radius = 10;
-                const y = (chart.chartArea?.top || 0) - 14;
+                const chartTop = chart.chartArea?.top || 0;
 
                 labels.forEach((label, index) => {
-                    const x = xScale.getPixelForValue(index);
+                    const bar = datasetMeta.data[index];
+                    if (!bar) return;
+                    const x = bar.x;
+                    const y = Math.max(chartTop + radius + 2, bar.y - radius - 6);
                     const foto = avatars[index];
                     const img = obterAvatarImage(foto);
 
@@ -1511,7 +1514,22 @@
                         datasets: [{
                             label: 'Agendamentos',
                             data: dadosGraficos.comunidades.dados,
-                            backgroundColor: '#66bb6a'
+                            backgroundColor: function(context) {
+                                const { chart } = context;
+                                const { ctx, chartArea } = chart;
+                                if (!chartArea) return '#66bb6a';
+                                const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                                gradient.addColorStop(0, '#34d399');
+                                gradient.addColorStop(1, '#22c55e');
+                                return gradient;
+                            },
+                            borderColor: '#16a34a',
+                            borderWidth: 1,
+                            borderRadius: 14,
+                            borderSkipped: false,
+                            maxBarThickness: 46,
+                            categoryPercentage: 0.72,
+                            barPercentage: 0.85
                         }]
                     },
                     options: {
@@ -1523,7 +1541,11 @@
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                ticks: { stepSize: 1 }
+                                ticks: { stepSize: 1 },
+                                grid: {
+                                    display: false,
+                                    drawBorder: false
+                                }
                             },
                             x: {
                                 ticks: {
@@ -1531,7 +1553,8 @@
                                     callback: function() { return ''; }
                                 },
                                 grid: {
-                                    display: false
+                                    display: false,
+                                    drawBorder: false
                                 }
                             }
                         },
@@ -1913,7 +1936,12 @@
                         datasets: [{
                             label: 'Agendamentos',
                             data: [0],
-                            backgroundColor: '#66bb6a'
+                            backgroundColor: '#66bb6a',
+                            borderColor: '#16a34a',
+                            borderWidth: 1,
+                            borderRadius: 14,
+                            borderSkipped: false,
+                            maxBarThickness: 46
                         }]
                     },
                     options: {
@@ -1922,7 +1950,17 @@
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                ticks: { stepSize: 1 }
+                                ticks: { stepSize: 1 },
+                                grid: {
+                                    display: false,
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false,
+                                    drawBorder: false
+                                }
                             }
                         },
                         plugins: { legend: { display: false } }
