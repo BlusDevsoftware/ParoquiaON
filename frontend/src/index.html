@@ -1036,7 +1036,7 @@
             return img;
         }
 
-        // Plugin Chart.js: desenha avatar acima das colunas (eixo X)
+        // Plugin Chart.js: desenha avatar ao redor do doughnut
         const avatarAxisPlugin = {
             id: 'avatarAxisPlugin',
             afterDatasetsDraw(chart, _args, pluginOptions) {
@@ -1048,13 +1048,15 @@
                 const avatars = pluginOptions.avatars || [];
                 const ctx = chart.ctx;
                 const radius = 10;
-                const chartTop = chart.chartArea?.top || 0;
 
                 labels.forEach((label, index) => {
-                    const bar = datasetMeta.data[index];
-                    if (!bar) return;
-                    const x = bar.x;
-                    const y = Math.max(chartTop + radius + 2, bar.y - radius - 6);
+                    const arc = datasetMeta.data[index];
+                    if (!arc || typeof arc.getProps !== 'function') return;
+                    const props = arc.getProps(['x', 'y', 'startAngle', 'endAngle', 'outerRadius'], true);
+                    const meioAngulo = (props.startAngle + props.endAngle) / 2;
+                    const distancia = (props.outerRadius || 0) + 18;
+                    const x = props.x + (Math.cos(meioAngulo) * distancia);
+                    const y = props.y + (Math.sin(meioAngulo) * distancia);
                     const foto = avatars[index];
                     const img = obterAvatarImage(foto);
 
@@ -1507,68 +1509,52 @@
                 // Gráfico de agendamentos por pessoa (top 5)
                 const ctxComunidades = document.getElementById('comunidadesChart').getContext('2d');
                 comunidadesChart = new Chart(ctxComunidades, {
-                    type: 'bar',
+                    type: 'doughnut',
                     plugins: [avatarAxisPlugin],
                     data: {
                         labels: dadosGraficos.comunidades.labels,
                         datasets: [{
-                            label: 'Agendamentos',
                             data: dadosGraficos.comunidades.dados,
-                            backgroundColor: function(context) {
-                                const { chart } = context;
-                                const { ctx, chartArea } = chart;
-                                if (!chartArea) return '#66bb6a';
-                                const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                                gradient.addColorStop(0, '#34d399');
-                                gradient.addColorStop(1, '#22c55e');
-                                return gradient;
-                            },
-                            borderColor: '#16a34a',
-                            borderWidth: 1,
-                            borderRadius: 14,
-                            borderSkipped: false,
-                            maxBarThickness: 46,
-                            categoryPercentage: 0.72,
-                            barPercentage: 0.85
+                            backgroundColor: ['#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#3b82f6'],
+                            borderWidth: 4,
+                            borderColor: '#ffffff',
+                            hoverOffset: 2
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        layout: {
-                            padding: { top: 28 }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { stepSize: 1 },
-                                grid: {
-                                    display: false,
-                                    drawBorder: false
+                        cutout: '56%',
+                        layout: { padding: { top: 6, bottom: 2 } },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                align: 'center',
+                                labels: {
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    boxWidth: 10,
+                                    boxHeight: 10,
+                                    padding: 18,
+                                    color: '#64748b',
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    }
                                 }
                             },
-                            x: {
-                                ticks: {
-                                    // Esconde nome no eixo; avatar será desenhado via plugin
-                                    callback: function() { return ''; }
-                                },
-                                grid: {
-                                    display: false,
-                                    drawBorder: false
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: { display: false },
                             tooltip: {
                                 callbacks: {
                                     title: function(items) {
                                         return items?.[0]?.label || '';
                                     },
                                     label: function(ctx) {
-                                        const valor = ctx.parsed?.y ?? ctx.parsed ?? 0;
+                                        const valor = ctx.parsed ?? 0;
                                         const plural = valor === 1 ? 'agendamento' : 'agendamentos';
-                                        return `${valor} ${plural}`;
+                                        const total = dadosGraficos.comunidades.dados.reduce((sum, item) => sum + (item || 0), 0) || 0;
+                                        if (!total || !valor) return `${valor} ${plural}`;
+                                        const perc = ((valor / total) * 100).toFixed(1);
+                                        return [`${valor} ${plural}`, `${perc}% do total`];
                                     }
                                 }
                             },
@@ -1930,40 +1916,30 @@
                 // Gráfico de agendamentos por pessoa (top 5)
                 const ctxComunidades = document.getElementById('comunidadesChart').getContext('2d');
                 comunidadesChart = new Chart(ctxComunidades, {
-                    type: 'bar',
+                    type: 'doughnut',
                     data: {
                         labels: ['Sem dados'],
                         datasets: [{
-                            label: 'Agendamentos',
                             data: [0],
-                            backgroundColor: '#66bb6a',
-                            borderColor: '#16a34a',
-                            borderWidth: 1,
-                            borderRadius: 14,
-                            borderSkipped: false,
-                            maxBarThickness: 46
+                            backgroundColor: ['#86efac'],
+                            borderWidth: 4,
+                            borderColor: '#ffffff',
+                            hoverOffset: 2
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { stepSize: 1 },
-                                grid: {
-                                    display: false,
-                                    drawBorder: false
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false,
-                                    drawBorder: false
+                        cutout: '56%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
                                 }
                             }
-                        },
-                        plugins: { legend: { display: false } }
+                        }
                     }
                 });
             } catch (error) {
