@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="template-menu-superior.css">
     <link rel="stylesheet" href="styles/login.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -22,6 +23,15 @@
         // Variáveis globais
         let comunidades = [];
         let comunidadeEditando = null;
+
+        function renderLucideIcons(target = document) {
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                window.lucide.createIcons({
+                    attrs: { 'stroke-width': 1.8 },
+                    root: target
+                });
+            }
+        }
         
         // Função para carregar comunidades do banco de dados
         async function carregarComunidades() {
@@ -81,7 +91,7 @@
                 const emptyDiv = document.createElement('div');
                 emptyDiv.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;';
                 emptyDiv.innerHTML = `
-                    <i class="fas fa-users" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                    <i data-lucide="users" style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
                     <h3>Nenhuma comunidade encontrada</h3>
                     <p>Clique em "Nova Comunidade" para cadastrar a primeira comunidade.</p>
                 `;
@@ -112,22 +122,22 @@
                             </span>
                         </div>
                         <div class="community-info" style="margin-top:8px; font-size:10px; line-height:1.5; flex:1 1 auto;">
-                            <p style="margin:6px 0;"><i class="fas fa-phone"></i> ${comunidade.telefone || 'Não informado'}</p>
-                            ${membros > 0 ? `<p style="margin:6px 0;"><i class="fas fa-users"></i> ${membros} membros</p>` : ''}
-                            ${secretario ? `<p style="margin:6px 0;"><i class="fas fa-user"></i> Secretário: ${secretario}</p>` : ''}
-                            <p style="margin:6px 0;"><i class="fas fa-map-marker-alt"></i> ${comunidade.endereco || 'Não informado'}</p>
-                            <p style="margin:6px 0;"><i class="fas fa-calendar"></i> ${formatarData(comunidade.data_fundacao)}</p>
+                            <p style="margin:6px 0;"><i data-lucide="phone"></i> ${comunidade.telefone || 'Não informado'}</p>
+                            ${membros > 0 ? `<p style="margin:6px 0;"><i data-lucide="users"></i> ${membros} membros</p>` : ''}
+                            ${secretario ? `<p style="margin:6px 0;"><i data-lucide="user"></i> Secretário: ${secretario}</p>` : ''}
+                            <p style="margin:6px 0;"><i data-lucide="map-pin"></i> ${comunidade.endereco || 'Não informado'}</p>
+                            <p style="margin:6px 0;"><i data-lucide="calendar-days"></i> ${formatarData(comunidade.data_fundacao)}</p>
                         </div>
                         
                         <div class="community-actions" style="margin-top:auto; display:flex; gap:6px;">
                             <button class="btn-secondary" style="padding:4px 8px; font-size:10px;" onclick="visualizarComunidade(${comunidade.id})">
-                                <i class="fas fa-eye"></i> Visualizar
+                                <i data-lucide="eye"></i> Visualizar
                             </button>
                             <button class="btn-primary" style="padding:4px 8px; font-size:10px;" onclick="editarComunidade(${comunidade.id})">
-                                <i class="fas fa-edit"></i> Editar
+                                <i data-lucide="pencil"></i> Editar
                             </button>
                             <button class="btn-delete" style="padding:4px 8px; font-size:10px;" onclick="excluirComunidade(${comunidade.id})">
-                                <i class="fas fa-trash"></i> Excluir
+                                <i data-lucide="trash-2"></i> Excluir
                             </button>
                         </div>
                     </div>`;
@@ -137,6 +147,8 @@
                 const card = tempDiv.firstElementChild;
                 container.appendChild(card);
             });
+
+            renderLucideIcons(container);
         }
         
         // Função para formatar data
@@ -2462,7 +2474,8 @@
             color: #666;
         }
 
-        .community-info-item i {
+        .community-info-item i,
+        .community-info-item .lucide {
             width: 18px;
             color: #7c8ea5;
             font-size: 13px;
@@ -2627,7 +2640,8 @@
             gap: 7px;
         }
 
-        .community-info i {
+        .community-info i,
+        .community-info .lucide {
             color: #7c8ea5;
             width: 18px;
             min-width: 18px;
@@ -3674,15 +3688,15 @@
                 <div class="community-card-body">
                     <div class="community-info">
                         <div class="community-info-item">
-                            <i class="fas fa-phone"></i>
+                            <i data-lucide="phone"></i>
                             <span>${community.telefone || 'Não informado'}</span>
                         </div>
                         <div class="community-info-item">
-                            <i class="fas fa-map-marker-alt"></i>
+                            <i data-lucide="map-pin"></i>
                             <span>${community.endereco || 'Endereço não informado'}</span>
                         </div>
                         <div class="community-info-item">
-                            <i class="fas fa-calendar-alt"></i>
+                            <i data-lucide="calendar-days"></i>
                             <span>Fundada em: ${community.data_fundacao || 'Data não informada'}</span>
                         </div>
                         <div class="community-info-item">
@@ -3693,17 +3707,18 @@
                     </div>
                     <div class="community-actions">
                         <button class="btn-action btn-view" onclick="viewCommunity(${community.codigo})">
-                            <i class="fas fa-eye"></i> Ver
+                            <i data-lucide="eye"></i> Ver
                         </button>
                         <button class="btn-action btn-edit" onclick="editCommunity(${community.codigo})">
-                            <i class="fas fa-edit"></i> Editar
+                            <i data-lucide="pencil"></i> Editar
                         </button>
                         <button class="btn-action btn-delete" onclick="deleteCommunity(${community.codigo})">
-                            <i class="fas fa-trash"></i> Excluir
+                            <i data-lucide="trash-2"></i> Excluir
                         </button>
                     </div>
                 </div>
             `;
+            renderLucideIcons(card);
             return card;
         }
 
@@ -3723,11 +3738,12 @@
                 emptyState.className = 'empty-state';
                 emptyState.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 40px;';
                 emptyState.innerHTML = `
-                    <i class="fas fa-church" style="font-size: 3em; color: #ccc; margin-bottom: 15px;"></i>
+                    <i data-lucide="building-2" style="width: 48px; height: 48px; color: #ccc; margin-bottom: 15px;"></i>
                     <h3 style="color: #666; margin-bottom: 10px;">Nenhuma comunidade cadastrada</h3>
                     <p style="color: #999;">Clique em "Nova Comunidade" para começar</p>
                 `;
                 container.appendChild(emptyState);
+                renderLucideIcons(emptyState);
                 return;
             }
 
