@@ -777,6 +777,82 @@
             background: #ffffff !important;
             filter: none !important;
         }
+
+        .chart-container {
+            position: relative;
+        }
+
+        .chart-filter {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 25;
+        }
+
+        .chart-filter-button {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #9ca3af;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 150ms ease;
+        }
+
+        .chart-filter-button:hover {
+            color: #6b7280;
+            border-color: #9ca3af;
+            background: #f9fafb;
+        }
+
+        .chart-filter.open .chart-filter-button {
+            color: #4b5563;
+            border-color: #94a3b8;
+        }
+
+        .chart-filter-menu {
+            display: none;
+            position: absolute;
+            top: 36px;
+            right: 0;
+            min-width: 130px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+            padding: 6px;
+        }
+
+        .chart-filter.open .chart-filter-menu {
+            display: block;
+        }
+
+        .chart-filter-option {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            border-radius: 8px;
+            text-align: left;
+            padding: 7px 9px;
+            font-size: 12px;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        .chart-filter-option:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .chart-filter-option.active {
+            background: #e2e8f0;
+            color: #0f172a;
+            font-weight: 600;
+        }
         
         .charts-section {
             gap: 20px !important;
@@ -1163,6 +1239,18 @@
         <!-- Charts Section -->
         <div class="charts-section">
             <div class="chart-container" id="eventos-comunidade-card">
+                <div class="chart-filter" data-chart-filter>
+                    <button class="chart-filter-button" type="button" aria-label="Filtrar período dos gráficos">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                    <div class="chart-filter-menu">
+                        <button type="button" class="chart-filter-option active" data-periodo="todos">Todo período</button>
+                        <button type="button" class="chart-filter-option" data-periodo="30">Últimos 30 dias</button>
+                        <button type="button" class="chart-filter-option" data-periodo="90">Últimos 90 dias</button>
+                        <button type="button" class="chart-filter-option" data-periodo="180">Últimos 6 meses</button>
+                        <button type="button" class="chart-filter-option" data-periodo="365">Últimos 12 meses</button>
+                    </div>
+                </div>
                 <div class="chart-header">
                     <div>
                         <h2>Eventos por Comunidade</h2>
@@ -1190,6 +1278,18 @@
                 </div>
             </div>
             <div class="chart-container" id="pastorais-distribuicao-card">
+                <div class="chart-filter" data-chart-filter>
+                    <button class="chart-filter-button" type="button" aria-label="Filtrar período dos gráficos">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                    <div class="chart-filter-menu">
+                        <button type="button" class="chart-filter-option active" data-periodo="todos">Todo período</button>
+                        <button type="button" class="chart-filter-option" data-periodo="30">Últimos 30 dias</button>
+                        <button type="button" class="chart-filter-option" data-periodo="90">Últimos 90 dias</button>
+                        <button type="button" class="chart-filter-option" data-periodo="180">Últimos 6 meses</button>
+                        <button type="button" class="chart-filter-option" data-periodo="365">Últimos 12 meses</button>
+                    </div>
+                </div>
                 <h2>Distribuição por Pastorais</h2>
                 <div class="pastorais-chart-body">
                     <canvas id="pastoraisChart"></canvas>
@@ -1200,10 +1300,34 @@
         <!-- Insights Adicionais -->
         <div class="charts-section">
             <div class="chart-container" id="eventos-mes-card">
+                <div class="chart-filter" data-chart-filter>
+                    <button class="chart-filter-button" type="button" aria-label="Filtrar período dos gráficos">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                    <div class="chart-filter-menu">
+                        <button type="button" class="chart-filter-option active" data-periodo="todos">Todo período</button>
+                        <button type="button" class="chart-filter-option" data-periodo="30">Últimos 30 dias</button>
+                        <button type="button" class="chart-filter-option" data-periodo="90">Últimos 90 dias</button>
+                        <button type="button" class="chart-filter-option" data-periodo="180">Últimos 6 meses</button>
+                        <button type="button" class="chart-filter-option" data-periodo="365">Últimos 12 meses</button>
+                    </div>
+                </div>
                 <h2>Eventos por Mês</h2>
                 <canvas id="eventosChart"></canvas>
             </div>
             <div class="chart-container" id="agendamentos-pessoa-card">
+                <div class="chart-filter" data-chart-filter>
+                    <button class="chart-filter-button" type="button" aria-label="Filtrar período dos gráficos">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                    <div class="chart-filter-menu">
+                        <button type="button" class="chart-filter-option active" data-periodo="todos">Todo período</button>
+                        <button type="button" class="chart-filter-option" data-periodo="30">Últimos 30 dias</button>
+                        <button type="button" class="chart-filter-option" data-periodo="90">Últimos 90 dias</button>
+                        <button type="button" class="chart-filter-option" data-periodo="180">Últimos 6 meses</button>
+                        <button type="button" class="chart-filter-option" data-periodo="365">Últimos 12 meses</button>
+                    </div>
+                </div>
                 <h2>Agendamentos por Pessoa</h2>
                 <div id="comunidadesHeatmap" class="agendamentos-heatmap"></div>
             </div>
@@ -1217,6 +1341,8 @@
         let pessoasChart, pastoraisChart, eventosChart, comunidadesChart;
         let minhaComunidadeData = {};
         const avatarImageCache = new Map();
+        let periodoFiltroGraficosDias = null;
+        let periodoFiltroGraficosSelecionado = 'todos';
 
         function obterAvatarImage(src) {
             if (!src || typeof src !== 'string' || src.trim() === '') return null;
@@ -1328,6 +1454,78 @@
             container.appendChild(grade);
         }
 
+        function fecharMenusFiltroGraficos() {
+            document.querySelectorAll('[data-chart-filter]').forEach((el) => el.classList.remove('open'));
+        }
+
+        function atualizarEstadoBotoesFiltroGraficos() {
+            document.querySelectorAll('.chart-filter-option').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.periodo === periodoFiltroGraficosSelecionado);
+            });
+        }
+
+        async function aplicarFiltroPeriodoGraficos() {
+            if (!minhaComunidadeData || !Array.isArray(minhaComunidadeData.agenda)) return;
+            const dadosGraficos = montarDadosParaGraficos(minhaComunidadeData);
+            destruirGraficos();
+            await inicializarGraficos(dadosGraficos);
+        }
+
+        function inicializarFiltrosGraficos() {
+            const filtros = Array.from(document.querySelectorAll('[data-chart-filter]'));
+            if (filtros.length === 0) return;
+
+            filtros.forEach((filtro) => {
+                const botao = filtro.querySelector('.chart-filter-button');
+                const opcoes = filtro.querySelectorAll('.chart-filter-option');
+                if (!botao || opcoes.length === 0) return;
+
+                botao.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    const estavaAberto = filtro.classList.contains('open');
+                    fecharMenusFiltroGraficos();
+                    if (!estavaAberto) filtro.classList.add('open');
+                });
+
+                opcoes.forEach((opcao) => {
+                    opcao.addEventListener('click', async function(event) {
+                        event.stopPropagation();
+                        const valor = opcao.dataset.periodo || 'todos';
+                        periodoFiltroGraficosSelecionado = valor;
+                        periodoFiltroGraficosDias = valor === 'todos' ? null : Number(valor);
+                        atualizarEstadoBotoesFiltroGraficos();
+                        fecharMenusFiltroGraficos();
+                        await aplicarFiltroPeriodoGraficos();
+                    });
+                });
+            });
+
+            document.addEventListener('click', fecharMenusFiltroGraficos);
+            atualizarEstadoBotoesFiltroGraficos();
+        }
+
+        function filtrarAgendaPorPeriodo(agenda, dias) {
+            if (!Array.isArray(agenda) || agenda.length === 0) return [];
+            if (!dias || Number.isNaN(dias)) return agenda;
+
+            const agora = new Date();
+            const inicio = new Date(agora);
+            inicio.setHours(0, 0, 0, 0);
+            inicio.setDate(inicio.getDate() - dias + 1);
+
+            return agenda.filter((evento) => {
+                const valorData =
+                    evento?.data_inicio ??
+                    evento?.data ??
+                    evento?.created_at ??
+                    null;
+                if (!valorData) return false;
+                const dataEvento = new Date(valorData);
+                if (Number.isNaN(dataEvento.getTime())) return false;
+                return dataEvento >= inicio && dataEvento <= agora;
+            });
+        }
+
         // Inicializar Minha Comunidade
         // Funções para controlar menu mobile
         function openMobileMenu() {
@@ -1373,6 +1571,8 @@
             if (overlay) {
                 overlay.addEventListener('click', closeMobileMenu);
             }
+
+            inicializarFiltrosGraficos();
 
             // Limpar gráficos apenas quando a página for fechada/recarregada
             window.addEventListener('beforeunload', function() {
@@ -1432,6 +1632,7 @@
                 
                 // Buscar dados uma única vez e reutilizar para cards e gráficos
                 const raw = await buscarDadosUnificados();
+                minhaComunidadeData = raw || {};
                 const dadosCards = montarDadosParaCards(raw);
                 const dadosGraficos = montarDadosParaGraficos(raw);
                 carregarDadosCards(dadosCards);
@@ -1759,11 +1960,12 @@
         function montarDadosParaGraficos(raw) {
             if (!raw) return { eventosPorComunidade: { labels: [], dados: [], cores: [] }, pastorais: { labels: ['Sem agendamentos'], dados: [0], cores: ['#cbd5e1'] }, eventos: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] }, comunidades: { labels: ['Sem dados'], dados: [0], fotos: [null] } };
             const { comunidades, pastorais, pessoas, agenda } = raw;
+            const agendaFiltrada = filtrarAgendaPorPeriodo(agenda || [], periodoFiltroGraficosDias);
             return {
-                eventosPorComunidade: calcularEventosPorComunidade(agenda || [], comunidades || []),
-                pastorais: calcularAgendamentosPorPastoral(agenda || [], pastorais || []),
-                eventos: calcularEventosPorMes(agenda || []),
-                comunidades: calcularAgendamentosPorPessoa(agenda || [], pessoas || [])
+                eventosPorComunidade: calcularEventosPorComunidade(agendaFiltrada, comunidades || []),
+                pastorais: calcularAgendamentosPorPastoral(agendaFiltrada, pastorais || []),
+                eventos: calcularEventosPorMes(agendaFiltrada),
+                comunidades: calcularAgendamentosPorPessoa(agendaFiltrada, pessoas || [])
             };
         }
 
