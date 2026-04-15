@@ -1529,9 +1529,10 @@
                         layout: { padding: { top: 2, bottom: 0 } },
                         plugins: {
                             legend: {
-                                position: 'bottom',
+                                position: 'right',
                                 align: 'center',
-                                maxHeight: 64,
+                                maxWidth: 120,
+                                fullSize: false,
                                 labels: {
                                     usePointStyle: true,
                                     pointStyle: 'circle',
@@ -1545,7 +1546,7 @@
                                     },
                                     generateLabels: function(chart) {
                                         const labelsOriginais = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                                        const tamanhoMaximo = 16;
+                                        const tamanhoMaximo = 14;
                                         return labelsOriginais.map((item) => {
                                             const texto = String(item.text || '');
                                             return {
@@ -1947,7 +1948,9 @@
                         radius: '72%',
                         plugins: {
                             legend: {
-                                position: 'bottom',
+                                position: 'right',
+                                maxWidth: 120,
+                                fullSize: false,
                                 labels: {
                                     usePointStyle: true,
                                     pointStyle: 'circle'
