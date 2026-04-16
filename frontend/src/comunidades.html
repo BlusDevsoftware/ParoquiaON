@@ -111,8 +111,8 @@
                     : (comunidade.secretario || '');
                 
                 const cardHtml = `
-                    <div class="community-card" data-id="${comunidade.id}" style="overflow:hidden; border-radius:5px; padding:12px 0 6px 0; height:355px; display:flex; flex-direction:column; border-top: 4px solid ${comunidade.cor || '#1e3a8a'}">
-                        <div class="community-image" style="width:100%; height:150px; overflow:hidden; background:#f0f0f0; border-radius:0; position:relative;">
+                    <div class="community-card" data-id="${comunidade.id}" style="overflow:hidden; border-radius:5px; padding:0 0 6px 0; height:355px; display:flex; flex-direction:column; border-top: 4px solid ${comunidade.cor || '#1e3a8a'}">
+                        <div class="community-image" style="width:100%; height:150px; overflow:hidden; background:#f0f0f0; border-radius:5px 5px 0 0; position:relative;">
                             <img src="${fotoUrl}" alt="Foto da Comunidade" style="width:100%; height:100%; object-fit:cover; display:block;">
                         </div>
                         <div class="community-header" style="margin-top:4px; padding:0 6px;">
