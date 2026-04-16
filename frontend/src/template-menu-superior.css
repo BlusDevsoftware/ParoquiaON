@@ -52,17 +52,12 @@
 
 .nav-link.active {
     opacity: 1;
+    color: #ffffff;
+    background: #2196f3;
 }
 
 .nav-link.active::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: #000000;
-    border-radius: 2px;
+    display: none;
 }
 
 /* Dropdown styles */

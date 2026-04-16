@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="template-menu-superior.css">
     <link rel="stylesheet" href="styles/login.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Fonte usada na aba Pastorais -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Scripts de autenticação -->
     <script src="scripts/auth-guard.js"></script>
@@ -1163,6 +1165,17 @@
         html, body { width: 100%; max-width: 100%; }
         *, *::before, *::after { box-sizing: border-box; }
         .top-header, .main-content, .search-wrapper, .list-container { width: 100%; max-width: 100%; }
+
+        /* Plus Jakarta Sans (escopo Pastorais; evita quebrar ícones <i>) */
+        .top-header :not(i),
+        .main-content :not(i),
+        .search-wrapper :not(i),
+        .list-container :not(i),
+        .modal-content :not(i),
+        .toast :not(i),
+        .mobile-menu :not(i) {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -1180,7 +1193,7 @@
                 <a href="index.html" class="nav-link">Minha Comunidade</a>
                 <a href="agenda.html" class="nav-link">Agenda</a>
                 <div class="nav-dropdown">
-                    <a href="#" class="nav-link dropdown-trigger">Cadastros <i class="fas fa-chevron-down"></i></a>
+                    <a href="#" class="nav-link dropdown-trigger active">Cadastros <i class="fas fa-chevron-down"></i></a>
                     <div class="dropdown-menu">
                         <a href="comunidades.html" class="dropdown-item">Comunidades</a>
                         <a href="pastorais.html" class="dropdown-item">Pastorais</a>
