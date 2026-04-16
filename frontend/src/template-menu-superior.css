@@ -129,6 +129,19 @@
     color: #1976d2;
 }
 
+/* Mobile menu (hamburger) */
+.mobile-menu-header h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.mobile-menu-links a {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.mobile-menu-links .beta-tag {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
 .beta-tag {
     background: #ff9800;
     color: white;
