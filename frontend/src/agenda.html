@@ -5261,6 +5261,35 @@
             color: white;
         }
 
+        /* Botão do Google Agenda: apenas ícone (sem fundo) */
+        .modal-view-btn-google {
+            flex: 0;
+            min-width: auto;
+            padding: 0;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .modal-view-btn-google:hover {
+            transform: none;
+            box-shadow: none;
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .modal-view-btn-google:active {
+            transform: none;
+        }
+
+        .modal-view-btn-google img {
+            width: 22px !important;
+            height: 22px !important;
+            display: block;
+        }
+
         /* Responsivo */
         @media (max-width: 768px) {
             .modal-view-container {
