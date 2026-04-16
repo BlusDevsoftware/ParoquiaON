@@ -129,7 +129,7 @@
                             <p style="margin:1px 0;"><i data-lucide="calendar-days"></i> ${formatarData(comunidade.data_fundacao)}</p>
                         </div>
                         
-                        <div class="community-actions" style="margin-top:auto; display:flex; gap:6px; padding:0 16px;">
+                        <div class="community-actions" style="margin-top:auto; display:flex; gap:6px; padding:10px 16px 0 16px; --divider-inset:16px;">
                             <button class="btn-secondary" style="padding:6px 6px; font-size:10px;" onclick="visualizarComunidade(${comunidade.id})">
                                 <i data-lucide="eye"></i> Visualizar
                             </button>
@@ -2656,6 +2656,18 @@
             gap: 8px;
             flex-wrap: wrap;
             margin-top: auto;
+            position: relative;
+            padding-top: 10px;
+        }
+
+        .community-actions::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: var(--divider-inset, 0);
+            right: var(--divider-inset, 0);
+            height: 1px;
+            background: #bdbdbd;
         }
 
         .community-actions button {
