@@ -3138,10 +3138,10 @@
         .top-header, .main-content, .search-wrapper { width: 100%; max-width: 100%; }
 
         /* Substitui a fonte Poppins global deste app (escopado na aba Comunidades) */
-        .top-header *,
-        .main-content *,
-        .modal-content *,
-        .toast * {
+        .top-header :not(i),
+        .main-content :not(i),
+        .modal-content :not(i),
+        .toast :not(i) {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
     </style>
