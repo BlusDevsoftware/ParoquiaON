@@ -1007,7 +1007,7 @@
                 height: calc(100vh - 60px);
             }
             .list-container {
-                padding: 0 16px 16px 16px;
+                padding: 0 16px calc(96px + env(safe-area-inset-bottom, 0px)) 16px;
             }
             .row-card {
                 padding: 10px 10px;
@@ -1053,7 +1053,7 @@
                 font-size: 13px;
             }
             .list-container {
-                padding: 0 12px 80px 12px; /* padding extra no mobile pequeno para não cortar o último card */
+                padding: 0 12px calc(96px + env(safe-area-inset-bottom, 0px)) 12px; /* padding extra no mobile pequeno para não cortar o último card */
             }
             .row-card {
                 padding: 8px 8px;
@@ -1083,6 +1083,7 @@
             margin: 0;
             background: #f8fafd;
             flex: 1 1 auto;
+            min-height: 0;
             overflow-y: auto;
             overflow-x: hidden;
             position: relative;
@@ -1227,6 +1228,18 @@
         html, body { width: 100%; max-width: 100%; }
         *, *::before, *::after { box-sizing: border-box; }
         .top-header, .main-content, .search-wrapper, .list-container { width: 100%; max-width: 100%; }
+
+        /* Usa viewport dinâmica em mobile para evitar corte no final da lista */
+        @supports (height: 100dvh) {
+            .main-content {
+                height: calc(100dvh - 75px);
+            }
+            @media (max-width: 768px) {
+                .main-content {
+                    height: calc(100dvh - 60px);
+                }
+            }
+        }
 
         /* Plus Jakarta Sans (escopo Pastorais; evita quebrar ícones <i>) */
         .top-header :not(i),
