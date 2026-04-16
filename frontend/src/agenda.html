@@ -497,6 +497,11 @@
         }
 
         @media (max-width: 768px) {
+            /* No mobile, esconder totalmente a barra lateral com mini calendário */
+            .left-sidebar {
+                display: none !important;
+            }
+
             .modal-content {
                 margin: 20px;
                 max-width: calc(100% - 40px);
