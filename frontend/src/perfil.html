@@ -1116,7 +1116,13 @@
                 font-size: 13px;
             }
             .list-container {
-                padding: 0 12px 16px 12px;
+                padding: 0 12px 24px 12px;
+            }
+            .list-container::after {
+                content: "";
+                display: block;
+                height: 220px !important;
+                width: 100%;
             }
             .row-card {
                 padding: 8px 8px;
@@ -1218,7 +1224,10 @@
                 height: calc(100vh - 60px);
             }
             .list-container {
-                padding: 0 16px 16px 16px;
+                padding: 0 16px 24px 16px;
+            }
+            .list-container::after {
+                height: 180px;
             }
             .row-card {
                 padding: 10px 10px;
@@ -1247,6 +1256,7 @@
             margin: 0;
             background: #f8fafd;
             flex: 1 1 auto;
+            min-height: 0;
             overflow-y: auto;
             overflow-x: hidden;
             position: relative;
