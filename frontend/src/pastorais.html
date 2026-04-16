@@ -1007,7 +1007,13 @@
                 height: calc(100vh - 60px);
             }
             .list-container {
-                padding: 0 16px calc(180px + env(safe-area-inset-bottom, 0px)) 16px;
+                padding: 0 16px 24px 16px;
+            }
+            .list-container::after {
+                content: "";
+                display: block;
+                height: 180px;
+                width: 100%;
             }
             .row-card {
                 padding: 10px 10px;
@@ -1053,7 +1059,10 @@
                 font-size: 13px;
             }
             .list-container {
-                padding: 0 12px calc(200px + env(safe-area-inset-bottom, 0px)) 12px; /* padding extra no mobile pequeno para não cortar o último card */
+                padding: 0 12px 24px 12px; /* padding extra no mobile pequeno para não cortar o último card */
+            }
+            .list-container::after {
+                height: 220px;
             }
             .row-card {
                 padding: 8px 8px;
