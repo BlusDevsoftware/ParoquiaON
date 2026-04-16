@@ -5124,6 +5124,38 @@
             line-height: 1.4;
         }
 
+        .modal-view-integrations {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .modal-view-integration-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .modal-view-integration-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .modal-view-integration-btn img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            display: block;
+        }
+
         /* Seção Objetivo destacada */
         .modal-view-objetivo-box {
             margin-top: 24px;
@@ -5259,35 +5291,6 @@
         .modal-view-btn-delete:hover {
             background: #ef4444;
             color: white;
-        }
-
-        /* Botão do Google Agenda: apenas ícone (sem fundo) */
-        .modal-view-btn-google {
-            flex: 0;
-            min-width: auto;
-            padding: 0;
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            background: transparent;
-            border: none;
-            box-shadow: none;
-        }
-
-        .modal-view-btn-google:hover {
-            transform: none;
-            box-shadow: none;
-            background: rgba(0, 0, 0, 0.04);
-        }
-
-        .modal-view-btn-google:active {
-            transform: none;
-        }
-
-        .modal-view-btn-google img {
-            width: 22px !important;
-            height: 22px !important;
-            display: block;
         }
 
         /* Responsivo */
