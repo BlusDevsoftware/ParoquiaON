@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
 /* Barra superior ocupando toda a largura */
 .top-header {
     position: fixed;
@@ -41,6 +43,7 @@
     position: relative;
     transition: opacity 0.2s ease;
     font-size: 16px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .nav-link:hover {
@@ -114,6 +117,7 @@
     font-weight: 500;
     transition: background 0.2s ease;
     border-bottom: 1px solid #f0f0f0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .dropdown-item:last-child {
@@ -134,6 +138,7 @@
     border-radius: 10px;
     margin-left: 8px;
     text-transform: uppercase;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .header-right {
