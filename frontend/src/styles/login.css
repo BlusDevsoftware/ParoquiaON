@@ -55,7 +55,13 @@ html.login-page, body.login-page {
 
 .login-page .login-box > * {
     width: 100%;
-    max-width: 700px;
+    max-width: 560px;
+}
+
+.login-page .login-form,
+.login-page .password-change-form {
+    width: 100%;
+    max-width: 520px;
 }
 
 .brand-row {
@@ -424,6 +430,15 @@ html.login-page, body.login-page {
         flex-basis: 56%;
         width: 56%;
         padding: 32px 42px;
+    }
+
+    .login-page .login-box > * {
+        max-width: 520px;
+    }
+
+    .login-page .login-form,
+    .login-page .password-change-form {
+        max-width: 500px;
     }
 
     .login-page .login-message {
