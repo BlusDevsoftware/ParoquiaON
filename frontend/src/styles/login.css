@@ -41,8 +41,8 @@ html.login-page, body.login-page {
 
 .login-box {
     flex: 1;
-    width: 50%;
-    padding: 40px 56px;
+    width: 58%;
+    padding: 48px 72px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -52,7 +52,7 @@ html.login-page, body.login-page {
 
 .login-box > * {
     width: 100%;
-    max-width: 560px;
+    max-width: 700px;
 }
 
 .brand-row {
@@ -71,8 +71,15 @@ html.login-page, body.login-page {
 .brand-name {
     font-size: 33px;
     font-weight: 700;
-    color: #f28c22;
     line-height: 1;
+}
+
+.brand-paroquia {
+    color: #1f8fe5;
+}
+
+.brand-on {
+    color: #f28c22;
 }
 
 .login-header {
@@ -299,7 +306,7 @@ html.login-page, body.login-page {
 
 .login-message {
     flex: 1;
-    width: 50%;
+    width: 42%;
     background: linear-gradient(150deg, #1ea0ff 0%, #0e5fa8 100%);
     padding: 48px;
     display: flex;
@@ -409,10 +416,12 @@ html.login-page, body.login-page {
     }
 
     .login-box {
-        padding: 32px 36px;
+        width: 56%;
+        padding: 32px 42px;
     }
 
     .login-message {
+        width: 44%;
         padding: 30px;
     }
 
