@@ -64,9 +64,13 @@
 
     <div class="login-container">
         <div class="login-box">
+            <div class="brand-row">
+                <img src="assets/images/logo2.png" alt="ParoquiaON Logo" class="brand-logo">
+                <span class="brand-name">ParóquiaON</span>
+            </div>
             <div class="login-header">
-                <h2>Bem vindo ao <span class="highlight">ParoquiaON</span></h2>
-                <p>Preencha os dados do login para acessar</p>
+                <h2>Bem-vindo de volta <span class="emoji-wave">👋</span></h2>
+                <p>Acesse sua conta para gerenciar sua comunidade paroquial.</p>
             </div>
             
             <div class="error-message" style="display: none;"></div>
@@ -91,15 +95,21 @@
                 <div class="form-options">
                     <label class="remember-me">
                         <input type="checkbox" name="remember">
-                        <span>Lembrar-me</span>
+                        <span>Manter-me conectado</span>
                     </label>
-                    
+                    <a href="#" class="forgot-password">Esqueci minha senha</a>
                 </div>
                 <button type="submit" class="btn-entrar">
                     <span class="btn-text">Entrar</span>
                     <i class="fas fa-arrow-right btn-icon"></i>
                     <i class="fas fa-spinner loading-spinner"></i>
                 </button>
+                <div class="divider"><span>OU</span></div>
+                <button type="button" class="btn-google">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                    <span>Entrar com Google</span>
+                </button>
+                <p class="signup-text">Não tem uma conta? <a href="#">Cadastre-se</a></p>
             </form>
 
             <!-- Formulário de Alteração de Senha (Primeiro Acesso) -->
@@ -146,13 +156,20 @@
             </form>
         </div>
         <div class="login-message">
-            <div class="logo-container">
-                <img src="assets/images/logo2.png" alt="BlueDev Logo" class="login-logo">
+            <div class="message-content">
+                <div class="hero-icon">
+                    <img src="assets/images/logo2.png" alt="ParoquiaON Logo" class="login-logo">
+                </div>
+                <h2>Gestão paroquial <span>simples</span> e moderna</h2>
+                <p>Organize agenda, comunidades, pastorais e relatórios em um só lugar.</p>
+                <div class="feature-grid">
+                    <div class="feature-card"><i class="fas fa-calendar-check"></i>Agenda inteligente</div>
+                    <div class="feature-card"><i class="fas fa-users"></i>Comunidades</div>
+                    <div class="feature-card"><i class="fas fa-church"></i>Pastorais</div>
+                    <div class="feature-card"><i class="fas fa-file-alt"></i>Relatórios</div>
+                </div>
+                <small class="copyright">© 2026 ParóquiaON • Todos os direitos reservados</small>
             </div>
-            <h2>Faça o Login em nossa<br>Plataforma</h2>
-        </div>
-        <div class="developer-credit">
-            Desenvolvido por <span>Magno Michel</span>
         </div>
     </div>
 
@@ -218,7 +235,7 @@
             // Atualizar header
             const header = document.querySelector('.login-header h2');
             const subheader = document.querySelector('.login-header p');
-            header.innerHTML = 'Alterar <span class="highlight">Senha</span>';
+            header.innerHTML = 'Alterar senha de acesso';
             subheader.textContent = `Olá! Você precisa alterar sua senha temporária para continuar.`;
         }
 
@@ -232,8 +249,8 @@
             // Resetar header
             const header = document.querySelector('.login-header h2');
             const subheader = document.querySelector('.login-header p');
-            header.innerHTML = 'Bem vindo ao <span class="highlight">ParoquiaON</span>';
-            subheader.textContent = 'Preencha os dados do login para acessar';
+            header.innerHTML = 'Bem-vindo de volta <span class="emoji-wave">👋</span>';
+            subheader.textContent = 'Acesse sua conta para gerenciar sua comunidade paroquial.';
         }
 
         // Inicializações ao carregar a página
