@@ -25,6 +25,26 @@ html.login-page, body.login-page {
     overflow: hidden;
 }
 
+@keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideRight {
+    from { opacity: 0; transform: translateX(-28px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeSlideLeft {
+    from { opacity: 0; transform: translateX(28px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes zoomSoft {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+}
+
 .login-container {
     display: flex;
     position: fixed;
@@ -37,6 +57,7 @@ html.login-page, body.login-page {
     overflow: hidden;
     box-shadow: none;
     border: 0;
+    animation: zoomSoft 0.55s ease-out both;
 }
 
 .login-page .login-box {
@@ -51,6 +72,7 @@ html.login-page, body.login-page {
     justify-content: center;
     align-items: center;
     background: #ffffff;
+    animation: fadeSlideRight 0.7s ease-out both;
 }
 
 .login-page .login-box > * {
@@ -62,13 +84,23 @@ html.login-page, body.login-page {
 .login-page .password-change-form {
     width: 100%;
     max-width: 460px;
+    animation: fadeSlideUp 0.5s ease-out 0.2s both;
 }
+
+.login-page .login-form .form-group:nth-child(1) { animation: fadeSlideUp 0.45s ease-out 0.24s both; }
+.login-page .login-form .form-group:nth-child(2) { animation: fadeSlideUp 0.45s ease-out 0.3s both; }
+.login-page .login-form .form-options { animation: fadeSlideUp 0.45s ease-out 0.36s both; }
+.login-page .login-form .btn-entrar { animation: fadeSlideUp 0.45s ease-out 0.42s both; }
+.login-page .login-form .divider { animation: fadeSlideUp 0.45s ease-out 0.48s both; }
+.login-page .login-form .btn-google { animation: fadeSlideUp 0.45s ease-out 0.54s both; }
+.login-page .login-form .signup-text { animation: fadeSlideUp 0.45s ease-out 0.6s both; }
 
 .brand-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
     margin-bottom: 28px;
+    animation: fadeSlideUp 0.45s ease-out 0.08s both;
 }
 
 .brand-logo {
@@ -93,6 +125,7 @@ html.login-page, body.login-page {
 
 .login-header {
     margin-bottom: 24px;
+    animation: fadeSlideUp 0.45s ease-out 0.14s both;
 }
 
 .login-header h2 {
@@ -325,6 +358,7 @@ html.login-page, body.login-page {
     justify-content: center;
     position: relative;
     overflow: hidden;
+    animation: fadeSlideLeft 0.8s ease-out 0.08s both;
 }
 
 .login-message::before {
@@ -345,6 +379,7 @@ html.login-page, body.login-page {
     flex-direction: column;
     align-items: center;
     gap: 16px;
+    animation: fadeSlideUp 0.6s ease-out 0.2s both;
 }
 
 .hero-icon {
@@ -358,6 +393,7 @@ html.login-page, body.login-page {
     justify-content: center;
     backdrop-filter: blur(5px);
     margin-bottom: 4px;
+    animation: zoomSoft 0.55s ease-out 0.34s both;
 }
 
 .login-logo {
@@ -412,6 +448,11 @@ html.login-page, body.login-page {
     color: #ff9f57;
     font-size: 14px;
 }
+
+.feature-card:nth-child(1) { animation: fadeSlideUp 0.45s ease-out 0.46s both; }
+.feature-card:nth-child(2) { animation: fadeSlideUp 0.45s ease-out 0.54s both; }
+.feature-card:nth-child(3) { animation: fadeSlideUp 0.45s ease-out 0.62s both; }
+.feature-card:nth-child(4) { animation: fadeSlideUp 0.45s ease-out 0.7s both; }
 
 .copyright {
     margin-top: 10px;
