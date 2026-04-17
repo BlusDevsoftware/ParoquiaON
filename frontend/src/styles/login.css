@@ -72,8 +72,8 @@ html.login-page, body.login-page {
 }
 
 .brand-logo {
-    width: 52px;
-    height: 52px;
+    width: 58px;
+    height: 58px;
     object-fit: contain;
 }
 
@@ -348,9 +348,9 @@ html.login-page, body.login-page {
 }
 
 .hero-icon {
-    width: 108px;
-    height: 108px;
-    border-radius: 28px;
+    width: 120px;
+    height: 120px;
+    border-radius: 32px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.18);
     display: flex;
@@ -361,8 +361,8 @@ html.login-page, body.login-page {
 }
 
 .login-logo {
-    width: 78px;
-    height: 78px;
+    width: 88px;
+    height: 88px;
     object-fit: contain;
 }
 
