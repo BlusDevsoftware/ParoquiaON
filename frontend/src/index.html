@@ -638,7 +638,7 @@
         .agendamentos-heatmap {
             height: 330px;
             background: #ffffff;
-            border: 1px solid #e2e8f0;
+            border: 0;
             border-radius: 12px;
             padding: 12px;
             overflow-x: auto;
@@ -919,17 +919,16 @@
             overflow: hidden;
         }
 
-        /* Desktop: linha vertical única sem sobrepor o gráfico */
-        .charts-section .chart-container:nth-child(2n) {
-            border-left: 1px solid #d1d5db !important;
+        /* Desktop: linha vertical usando o lado direito da coluna esquerda
+           (mesma lógica visual dos totalizadores, para alinhar no centro) */
+        .charts-section .chart-container:nth-child(2n-1) {
+            border-right: 1px solid #d1d5db !important;
         }
 
         /* Evitar borda dupla em cards que já tinham borda própria */
         #pastorais-distribuicao-card {
             border: 0 !important;
             border-radius: 0 !important;
-            /* Garantir a divisória vertical entre os dois gráficos do 1º bloco */
-            border-left: 1px solid #d1d5db !important;
         }
         
         .charts-section:last-child {
