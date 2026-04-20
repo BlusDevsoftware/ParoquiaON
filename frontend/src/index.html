@@ -881,11 +881,17 @@
         .charts-section {
             gap: 0 !important;
             margin-top: 0 !important;
-            margin-bottom: 16px !important;
+            margin-bottom: 0 !important;
             background: #ffffff !important;
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             overflow: hidden;
+        }
+
+        /* Quando houver duas seções de gráficos seguidas, remover o “vão” e evitar borda dupla */
+        .charts-section + .charts-section {
+            margin-top: 0 !important;
+            border-top: 0 !important;
         }
 
         /* Separadores internos dos blocos de gráficos (mantém organização) */
@@ -894,8 +900,9 @@
             border: 0 !important;
             margin: 0 !important;
             background: #ffffff !important;
-            border-right: 1px solid #e5e7eb;
-            border-bottom: 1px solid #e5e7eb;
+            /* Linha vertical/horizontal de separação entre blocos */
+            border-right: 1px solid #d1d5db !important;
+            border-bottom: 1px solid #d1d5db !important;
         }
 
         /* Desktop: 2 colunas → segunda coluna sem linha direita */
