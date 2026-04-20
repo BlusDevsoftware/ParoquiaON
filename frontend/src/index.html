@@ -1135,6 +1135,17 @@
                 padding: 0.75rem 0.5rem;
             }
 
+            /* Mobile pequeno: manter uma única linha horizontal entre as 2 linhas */
+            .dashboard-cards .card:nth-child(2n) {
+                border-right: 0 !important;
+            }
+            .dashboard-cards .card:nth-child(-n+2) {
+                border-bottom: 1px solid #d1d5db !important;
+            }
+            .dashboard-cards .card:nth-child(n+3) {
+                border-bottom: 0 !important;
+            }
+
             .charts-section {
                 grid-template-columns: 1fr;
                 gap: 0 !important;
