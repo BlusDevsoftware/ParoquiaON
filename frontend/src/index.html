@@ -886,6 +886,7 @@
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             overflow: hidden;
+            position: relative;
         }
 
         /* Quando houver duas seções de gráficos seguidas, remover o “vão” e evitar borda dupla */
@@ -900,19 +901,22 @@
             border: 0 !important;
             margin: 0 !important;
             background: #ffffff !important;
-            /* Linha vertical/horizontal de separação entre blocos */
-            border-right: 1px solid #d1d5db !important;
-            border-bottom: 1px solid #d1d5db !important;
+            /* sem bordas aqui (evita linha dupla); a divisória fica no pseudo-elemento do container */
+            border-right: 0 !important;
+            border-bottom: 0 !important;
         }
 
-        /* Desktop: 2 colunas → segunda coluna sem linha direita */
-        .charts-section .chart-container:nth-child(2n) {
-            border-right: 0;
-        }
-
-        /* Desktop: primeira linha (2 itens) sem linha inferior */
-        .charts-section .chart-container:nth-child(-n+2) {
-            border-bottom: 0;
+        /* Desktop: linha vertical única no meio (entre as 2 colunas) */
+        .charts-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 1px;
+            background: #d1d5db;
+            pointer-events: none;
+            z-index: 1;
         }
 
         /* Evitar borda dupla em cards que já tinham borda própria */
@@ -987,6 +991,20 @@
                 gap: 0 !important;
                 padding: 0;
                 margin-bottom: 8px !important;
+                position: relative;
+            }
+
+            /* Linha horizontal única separando a 1ª e 2ª linha dos totalizadores */
+            .dashboard-cards::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 50%;
+                height: 1px;
+                background: #d1d5db;
+                pointer-events: none;
+                z-index: 1;
             }
             
             .dashboard-cards .card {
@@ -1008,6 +1026,11 @@
             }
             .charts-section .chart-container:last-child {
                 border-bottom: 0 !important;
+            }
+
+            /* Em 1 coluna, não precisa do separador vertical central */
+            .charts-section::before {
+                display: none;
             }
 
             /* Tablet/Mobile: 2 colunas nos cards → linhas verticais/horizontais corretas */
@@ -1107,6 +1130,19 @@
                 gap: 0 !important;
                 padding: 0;
                 margin-bottom: 6px !important;
+                position: relative;
+            }
+
+            .dashboard-cards::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 50%;
+                height: 1px;
+                background: #d1d5db;
+                pointer-events: none;
+                z-index: 1;
             }
 
             .dashboard-cards .card {
@@ -1119,6 +1155,10 @@
                 padding: 0;
                 margin-top: 0 !important;
                 margin-bottom: 6px !important;
+            }
+
+            .charts-section::before {
+                display: none;
             }
             
             .charts-section:last-child {
