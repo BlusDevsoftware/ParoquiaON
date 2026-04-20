@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="template-menu-superior.css">
     <link rel="stylesheet" href="styles/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="scripts/auth-guard.js"></script>
@@ -371,7 +372,9 @@
 
         .panel.config-panel .panel-footer {
             position: sticky;
-            bottom: 0;
+            bottom: 10px;
+            background: #ffffff;
+            z-index: 3;
         }
 
         .form-row {
@@ -645,7 +648,10 @@
             gap: 6px;
             padding: 6px 8px;
             border-top: 1px solid #e5e7eb;
-            background: transparent;
+            background: #ffffff;
+            position: sticky;
+            bottom: 0;
+            z-index: 3;
         }
 
         .results-footer .kpis {
@@ -1000,7 +1006,7 @@
     <!-- Spinner Centralizado de Carregamento -->
     <div id="loader-relatorio-dinamico" class="loader-overlay-main">
         <div class="calendar-loader" aria-hidden="true">
-            <i data-lucide="calendar"></i>
+            <i class="fas fa-calendar-alt"></i>
             <span class="calendar-loader-leaf"></span>
             <span class="calendar-loader-leaf"></span>
             <span class="calendar-loader-leaf"></span>
