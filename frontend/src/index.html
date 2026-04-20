@@ -42,7 +42,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(248, 250, 253, 0.9);
+            background: rgba(255, 255, 255, 0.9);
             z-index: 2;
             justify-content: center;
             align-items: center;
@@ -56,7 +56,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(248, 250, 253, 0.95);
+            background: rgba(255, 255, 255, 0.95);
             z-index: 9999;
             justify-content: center;
             align-items: center;
@@ -674,14 +674,14 @@
         }
 
         .agendamentos-heatmap-coluna:hover .agendamentos-heatmap-avatar {
-            border-color: #93c5fd;
+            border-color: transparent;
         }
 
         .agendamentos-heatmap-avatar {
             width: 48px;
             height: 48px;
             border-radius: 999px;
-            border: 2px solid #dbeafe;
+            border: 0;
             background: #e2e8f0;
             color: #334155;
             display: flex;
@@ -692,10 +692,10 @@
             font-weight: 700;
         }
 
-        .agendamentos-heatmap-coluna.nivel-1 .agendamentos-heatmap-avatar { border-color: #93c5fd; }
-        .agendamentos-heatmap-coluna.nivel-2 .agendamentos-heatmap-avatar { border-color: #60a5fa; }
-        .agendamentos-heatmap-coluna.nivel-3 .agendamentos-heatmap-avatar { border-color: #fb923c; }
-        .agendamentos-heatmap-coluna.nivel-4 .agendamentos-heatmap-avatar { border-color: #f97316; }
+        .agendamentos-heatmap-coluna.nivel-1 .agendamentos-heatmap-avatar { border-color: transparent; }
+        .agendamentos-heatmap-coluna.nivel-2 .agendamentos-heatmap-avatar { border-color: transparent; }
+        .agendamentos-heatmap-coluna.nivel-3 .agendamentos-heatmap-avatar { border-color: transparent; }
+        .agendamentos-heatmap-coluna.nivel-4 .agendamentos-heatmap-avatar { border-color: transparent; }
 
         .agendamentos-heatmap-avatar img {
             width: 100%;
@@ -898,6 +898,11 @@
         /* Quando houver duas seções de gráficos seguidas, remover o “vão” e evitar borda dupla */
         .charts-section + .charts-section {
             margin-top: 0 !important;
+            border-top: 0 !important;
+        }
+
+        /* Entre totalizadores e 1º bloco de gráficos: evitar linha dupla */
+        .dashboard-cards + .charts-section {
             border-top: 0 !important;
         }
 
