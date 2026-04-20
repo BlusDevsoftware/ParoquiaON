@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="template-menu-superior.css">
     <link rel="stylesheet" href="styles/login.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="scripts/auth-guard.js"></script>
     <script src="scripts/apply-auth-protection.js"></script>
@@ -132,7 +132,8 @@
             background: #e3f2fd;
             color: #2196f3;
         }
-        .mobile-menu-links a i {
+        .mobile-menu-links a i,
+        .mobile-menu-links a svg {
             margin-right: 12px;
             width: 20px;
             text-align: center;
@@ -330,6 +331,10 @@
             justify-content: space-between;
             gap: 8px;
             background: transparent;
+        }
+
+        .panel.config-panel .panel-header {
+            border-bottom: 0;
         }
 
         .panel-header h2 {
@@ -891,6 +896,13 @@
             box-sizing: border-box;
         }
 
+        svg.lucide {
+            width: 1em;
+            height: 1em;
+            stroke-width: 2;
+            vertical-align: middle;
+        }
+
         .top-header,
         .main-content {
             width: 100%;
@@ -906,7 +918,7 @@
         <div class="header-left">
             <div class="logo-section">
                 <button class="hamburger-menu" id="hamburgerMenu" aria-label="Menu">
-                    <i class="fas fa-bars"></i>
+                    <i data-lucide="menu"></i>
                 </button>
                 <span style="font-size: 20px; font-weight: 600;"><span style="color:#2196f3;">Paróquia</span><span style="color:#fe6b45;">ON</span></span>
             </div>
@@ -914,7 +926,7 @@
                 <a href="index.html" class="nav-link">Minha Comunidade</a>
                 <a href="agenda.html" class="nav-link">Agenda</a>
                 <div class="nav-dropdown">
-                    <a href="#" class="nav-link dropdown-trigger">Cadastros <i class="fas fa-chevron-down"></i></a>
+                    <a href="#" class="nav-link dropdown-trigger">Cadastros <i data-lucide="chevron-down"></i></a>
                     <div class="dropdown-menu">
                         <a href="comunidades.html" class="dropdown-item">Comunidades</a>
                         <a href="pastorais.html" class="dropdown-item">Pastorais</a>
@@ -927,7 +939,7 @@
                     </div>
                 </div>
                 <div class="nav-dropdown">
-                    <a href="#" class="nav-link dropdown-trigger">Relatórios <i class="fas fa-chevron-down"></i></a>
+                    <a href="#" class="nav-link dropdown-trigger">Relatórios <i data-lucide="chevron-down"></i></a>
                     <div class="dropdown-menu">
                         <a href="Relatorio_Dinamico.html" class="dropdown-item">Dinâmico</a>
                         <a href="auditoria.html" class="dropdown-item">Auditoria</a>
@@ -937,7 +949,7 @@
         </div>
         <div class="header-right">
             <div class="header-icon">
-                <i class="fas fa-bell"></i>
+                <i data-lucide="bell"></i>
                 <span class="notification-badge">3</span>
             </div>
             <div class="user-avatar-dropdown">
@@ -952,7 +964,7 @@
                     </div>
                     <div class="user-dropdown-divider"></div>
                     <a href="#" class="user-dropdown-item logout" id="logoutBtn">
-                        <i class="fas fa-sign-out-alt"></i>
+                        <i data-lucide="log-out"></i>
                         <span>Sair</span>
                     </a>
                 </div>
@@ -966,29 +978,29 @@
         <div class="mobile-menu-header">
             <h3>Menu</h3>
             <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Fechar menu">
-                <i class="fas fa-times"></i>
+                <i data-lucide="x"></i>
             </button>
         </div>
         <ul class="mobile-menu-links">
-            <li><a href="index.html"><i class="fas fa-home"></i> Minha Comunidade</a></li>
-            <li><a href="agenda.html"><i class="fas fa-calendar"></i> Agenda</a></li>
-            <li><a href="comunidades.html"><i class="fas fa-users"></i> Comunidades</a></li>
-            <li><a href="pastorais.html"><i class="fas fa-church"></i> Pastorais</a></li>
-            <li><a href="pilares.html"><i class="fas fa-layer-group"></i> Pilares</a></li>
-            <li><a href="locais.html"><i class="fas fa-map-marker-alt"></i> Locais</a></li>
-            <li><a href="acoes.html"><i class="fas fa-tasks"></i> Ações</a></li>
-            <li><a href="pessoas.html"><i class="fas fa-user-friends"></i> Pessoas</a></li>
-            <li><a href="usuarios.html"><i class="fas fa-user-cog"></i> Usuários</a></li>
-            <li><a href="perfil.html"><i class="fas fa-user-circle"></i> Perfil</a></li>
-            <li><a href="Relatorio_Dinamico.html"><i class="fas fa-file-invoice-dollar"></i> Dinâmico</a></li>
-            <li><a href="auditoria.html"><i class="fas fa-clipboard-check"></i> Auditoria</a></li>
+            <li><a href="index.html"><i data-lucide="house"></i> Minha Comunidade</a></li>
+            <li><a href="agenda.html"><i data-lucide="calendar"></i> Agenda</a></li>
+            <li><a href="comunidades.html"><i data-lucide="users"></i> Comunidades</a></li>
+            <li><a href="pastorais.html"><i data-lucide="church"></i> Pastorais</a></li>
+            <li><a href="pilares.html"><i data-lucide="layers"></i> Pilares</a></li>
+            <li><a href="locais.html"><i data-lucide="map-pin"></i> Locais</a></li>
+            <li><a href="acoes.html"><i data-lucide="list-todo"></i> Ações</a></li>
+            <li><a href="pessoas.html"><i data-lucide="users"></i> Pessoas</a></li>
+            <li><a href="usuarios.html"><i data-lucide="user-cog"></i> Usuários</a></li>
+            <li><a href="perfil.html"><i data-lucide="circle-user"></i> Perfil</a></li>
+            <li><a href="Relatorio_Dinamico.html"><i data-lucide="file-text"></i> Dinâmico</a></li>
+            <li><a href="auditoria.html"><i data-lucide="clipboard-check"></i> Auditoria</a></li>
         </ul>
     </div>
 
     <!-- Spinner Centralizado de Carregamento -->
     <div id="loader-relatorio-dinamico" class="loader-overlay-main">
         <div class="calendar-loader" aria-hidden="true">
-            <i class="fas fa-calendar-alt"></i>
+            <i data-lucide="calendar"></i>
             <span class="calendar-loader-leaf"></span>
             <span class="calendar-loader-leaf"></span>
             <span class="calendar-loader-leaf"></span>
@@ -1005,7 +1017,7 @@
             <div class="builder">
                 <div class="panel config-panel">
                     <div class="panel-header">
-                        <h2><i class="fas fa-sliders-h"></i> Configuração</h2>
+                        <h2><i data-lucide="sliders-horizontal"></i> Configuração</h2>
                     </div>
                     <div class="panel-body">
                         <div class="form-row one">
@@ -1014,7 +1026,7 @@
                                 <div class="rd-select-wrapper" id="rdModuleWrapper">
                                     <button type="button" class="rd-select-display" id="rdModuleDisplay">
                                         <span class="rd-select-display-label rd-select-display-placeholder">Selecione o módulo</span>
-                                        <span class="rd-select-display-icon"><i class="fas fa-chevron-down"></i></span>
+                                        <span class="rd-select-display-icon"><i data-lucide="chevron-down"></i></span>
                                     </button>
                                     <select id="rdModule" class="rd-select-native"></select>
                                     <div class="rd-select-list" id="rdModuleList"></div>
@@ -1035,7 +1047,7 @@
                                 <div class="rd-select-wrapper" id="rdDateFieldWrapper">
                                     <button type="button" class="rd-select-display" id="rdDateFieldDisplay">
                                         <span class="rd-select-display-label rd-select-display-placeholder">(sem filtro)</span>
-                                        <span class="rd-select-display-icon"><i class="fas fa-chevron-down"></i></span>
+                                        <span class="rd-select-display-icon"><i data-lucide="chevron-down"></i></span>
                                     </button>
                                     <select id="rdDateField" class="rd-select-native">
                                         <option value="">(sem filtro)</option>
@@ -1059,10 +1071,10 @@
                                 <div class="cols-search">
                                     <input id="rdColsSearch" type="text" placeholder="Filtrar colunas..." />
                                     <button class="btn btn-secondary" id="rdSelectAllBtn" type="button" title="Selecionar tudo">
-                                        <i class="fas fa-check-double"></i>
+                                        <i data-lucide="check-check"></i>
                                     </button>
                                     <button class="btn btn-secondary" id="rdClearColsBtn" type="button" title="Limpar seleção">
-                                        <i class="fas fa-eraser"></i>
+                                        <i data-lucide="eraser"></i>
                                     </button>
                                 </div>
                                 <div class="cols-list" id="rdColsList"></div>
@@ -1074,21 +1086,21 @@
                     <div class="panel-footer">
                         <div class="actions actions-main">
                             <button class="btn btn-primary" id="rdRunBtn" type="button">
-                                <i class="fas fa-play"></i> Gerar
+                                <i data-lucide="play"></i> Gerar
                             </button>
                         </div>
                         <div class="actions actions-secondary">
                             <button class="btn btn-secondary" id="rdReloadBtn" type="button">
-                                <i class="fas fa-sync-alt"></i> Recarregar dados
+                                <i data-lucide="refresh-cw"></i> Recarregar dados
                             </button>
                             <button class="btn btn-secondary" id="rdExportCsvBtn" type="button" disabled>
-                                <i class="fas fa-file-excel"></i> Exportar Excel
+                                <i data-lucide="file-spreadsheet"></i> Exportar Excel
                             </button>
                             <button class="btn btn-secondary" id="rdExportPdfBtn" type="button" disabled>
-                                <i class="fas fa-file-pdf"></i> Exportar PDF
+                                <i data-lucide="file-text"></i> Exportar PDF
                             </button>
                             <button class="btn btn-danger" id="rdClearFiltersBtn" type="button">
-                                <i class="fas fa-broom"></i> Limpar filtros
+                                <i data-lucide="eraser"></i> Limpar filtros
                             </button>
                         </div>
                     </div>
@@ -1109,10 +1121,10 @@
                         <div class="pagination-info" id="rdPaginationInfo"></div>
                         <div class="pagination-buttons">
                             <button type="button" id="rdPrevPageBtn">
-                                <i class="fas fa-chevron-left"></i> Anterior
+                                <i data-lucide="chevron-left"></i> Anterior
                             </button>
                             <button type="button" id="rdNextPageBtn">
-                                Próxima <i class="fas fa-chevron-right"></i>
+                                Próxima <i data-lucide="chevron-right"></i>
                             </button>
                         </div>
                     </div>
@@ -1155,6 +1167,10 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                window.lucide.createIcons();
+            }
+
             const hamburgerBtn = document.getElementById('hamburgerMenu');
             const closeBtn = document.getElementById('mobileMenuClose');
             const overlay = document.getElementById('mobileMenuOverlay');
