@@ -910,19 +910,13 @@
             /* sem bordas aqui (evita linha dupla); a divisória fica no pseudo-elemento do container */
             border-right: 0 !important;
             border-bottom: 0 !important;
+            min-width: 0;
+            overflow: hidden;
         }
 
-        /* Desktop: linha vertical única no meio (entre as 2 colunas) */
-        .charts-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            width: 1px;
-            background: #d1d5db;
-            pointer-events: none;
-            z-index: 1;
+        /* Desktop: linha vertical única sem sobrepor o gráfico */
+        .charts-section .chart-container:nth-child(2n) {
+            border-left: 1px solid #d1d5db !important;
         }
 
         /* Evitar borda dupla em cards que já tinham borda própria */
@@ -1027,16 +1021,12 @@
 
             /* Tablet/Mobile: 1 coluna → separador só embaixo */
             .charts-section .chart-container {
+                border-left: 0 !important;
                 border-right: 0 !important;
                 border-bottom: 1px solid #e5e7eb !important;
             }
             .charts-section .chart-container:last-child {
                 border-bottom: 0 !important;
-            }
-
-            /* Em 1 coluna, não precisa do separador vertical central */
-            .charts-section::before {
-                display: none;
             }
 
             /* Tablet/Mobile: 2 colunas nos cards → linhas verticais/horizontais corretas */
