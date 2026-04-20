@@ -953,7 +953,7 @@
                 overflow-x: hidden;
                 margin-top: 60px;
                 height: calc(100vh - 60px);
-                padding: 12px 0 0 0 !important;
+                padding: 0 !important;
                 margin-left: 0 !important;
                 margin-right: 0 !important;
             }
@@ -1000,17 +1000,9 @@
                 position: relative;
             }
 
-            /* Linha horizontal única separando a 1ª e 2ª linha dos totalizadores */
+            /* Mobile/Tablet: remover pseudo-linha para evitar duplicidade */
             .dashboard-cards::after {
-                content: '';
-                position: absolute;
-                left: 0;
-                right: 0;
-                top: 50%;
-                height: 1px;
-                background: #d1d5db;
-                pointer-events: none;
-                z-index: 1;
+                display: none !important;
             }
             
             .dashboard-cards .card {
@@ -1040,7 +1032,7 @@
                 border-right: 0 !important;
             }
             .dashboard-cards .card:nth-child(-n+2) {
-                border-bottom: 0 !important;
+                border-bottom: 1px solid #d1d5db !important;
             }
             .dashboard-cards .card:nth-child(n+3) {
                 border-bottom: 0 !important;
@@ -1109,7 +1101,7 @@
 
             .main-content {
                 margin-top: 60px;
-                padding: 10px 0 0 0 !important;
+                padding: 0 !important;
                 width: 100%;
                 margin-left: 0 !important;
                 margin-right: 0 !important;
@@ -1136,15 +1128,7 @@
             }
 
             .dashboard-cards::after {
-                content: '';
-                position: absolute;
-                left: 0;
-                right: 0;
-                top: 50%;
-                height: 1px;
-                background: #d1d5db;
-                pointer-events: none;
-                z-index: 1;
+                display: none !important;
             }
 
             .dashboard-cards .card {
