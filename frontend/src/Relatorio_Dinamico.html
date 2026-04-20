@@ -22,13 +22,14 @@
         }
 
         .main-content {
-            margin-top: 54px;
-            padding: 8px 0 0 0;
+            margin-top: 78px;
+            padding: 8px 0 10px 0;
             width: 100%;
             max-width: 100%;
-            height: calc(100vh - 54px);
+            height: calc(100vh - 78px);
             box-sizing: border-box;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             background: #ffffff;
             border-top: 1px solid #d1d5db;
         }
@@ -235,8 +236,9 @@
                 gap: 12px;
             }
             .main-content {
-                margin-top: 60px;
+                margin-top: 84px;
                 padding-top: 8px;
+                height: calc(100vh - 84px);
             }
             .nav-links { display: none; }
             .hamburger-menu { display: inline-flex; }
@@ -311,6 +313,7 @@
             flex-direction: column;
             max-height: none;
             height: 100%;
+            min-height: 0;
         }
 
         .panel.results-panel { /* classe reservada para estilos futuros */ }
