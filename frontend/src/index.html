@@ -483,7 +483,8 @@
             overflow-y: auto;
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE e Edge */
-            background: var(--menu-surface-bg) !important;
+            /* Tudo no fundo branco (conteúdo contínuo) */
+            background: #ffffff !important;
         }
 
         /* Estilos específicos do card "Eventos por Comunidade" (Minha Comunidade) */
@@ -765,18 +766,40 @@
             display: none; /* Chrome, Safari, Opera */
         }
         
-        /* Reduzir espaçamento entre cards e gráficos */
+        /* Layout contínuo (sem gaps): métricas + gráficos com separadores */
         .dashboard-cards {
-            gap: 20px !important;
-            margin-bottom: 20px !important;
+            gap: 0 !important;
+            margin-bottom: 16px !important;
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
         }
 
-        /* Remover sombras dos cards */
+        /* “Remover cards”: tirar cara de card e usar divisórias */
         .dashboard-cards .card,
         .chart-container {
             box-shadow: none !important;
             background: #ffffff !important;
             filter: none !important;
+        }
+
+        .dashboard-cards .card {
+            border-radius: 0 !important;
+            border: 0 !important;
+            margin: 0 !important;
+            /* separadores */
+            border-right: 1px solid #e5e7eb !important;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+
+        /* Desktop: 4 colunas → última coluna sem linha direita */
+        .dashboard-cards .card:nth-child(4n) {
+            border-right: 0 !important;
+        }
+        /* Desktop: apenas 1 linha (4 cards) → remover linha de baixo */
+        .dashboard-cards .card:nth-child(n+1):nth-child(-n+4) {
+            border-bottom: 0 !important;
         }
 
         .chart-container {
@@ -856,9 +879,39 @@
         }
         
         .charts-section {
-            gap: 20px !important;
+            gap: 0 !important;
             margin-top: 0 !important;
-            margin-bottom: 20px !important;
+            margin-bottom: 16px !important;
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Separadores internos dos blocos de gráficos (mantém organização) */
+        .charts-section .chart-container {
+            border-radius: 0 !important;
+            border: 0 !important;
+            margin: 0 !important;
+            background: #ffffff !important;
+            border-right: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        /* Desktop: 2 colunas → segunda coluna sem linha direita */
+        .charts-section .chart-container:nth-child(2n) {
+            border-right: 0;
+        }
+
+        /* Desktop: primeira linha (2 itens) sem linha inferior */
+        .charts-section .chart-container:nth-child(-n+2) {
+            border-bottom: 0;
+        }
+
+        /* Evitar borda dupla em cards que já tinham borda própria */
+        #pastorais-distribuicao-card {
+            border: 0 !important;
+            border-radius: 0 !important;
         }
         
         .charts-section:last-child {
@@ -924,7 +977,7 @@
             /* Cards do dashboard - 2 cards por linha */
             .dashboard-cards {
                 grid-template-columns: repeat(2, 1fr) !important;
-                gap: 8px;
+                gap: 0 !important;
                 padding: 0;
                 margin-bottom: 8px !important;
             }
@@ -935,10 +988,30 @@
 
             .charts-section {
                 grid-template-columns: 1fr;
-                gap: 16px;
+                gap: 0 !important;
                 padding: 0;
                 margin-top: 0 !important;
                 margin-bottom: 8px !important;
+            }
+
+            /* Tablet/Mobile: 1 coluna → separador só embaixo */
+            .charts-section .chart-container {
+                border-right: 0 !important;
+                border-bottom: 1px solid #e5e7eb !important;
+            }
+            .charts-section .chart-container:last-child {
+                border-bottom: 0 !important;
+            }
+
+            /* Tablet/Mobile: 2 colunas nos cards → linhas verticais/horizontais corretas */
+            .dashboard-cards .card:nth-child(2n) {
+                border-right: 0 !important;
+            }
+            .dashboard-cards .card:nth-child(-n+2) {
+                border-bottom: 1px solid #e5e7eb !important;
+            }
+            .dashboard-cards .card:nth-child(n+3) {
+                border-bottom: 0 !important;
             }
             
             .charts-section:last-child {
@@ -1024,7 +1097,7 @@
             /* Cards do dashboard - 2 cards por linha */
             .dashboard-cards {
                 grid-template-columns: repeat(2, 1fr) !important;
-                gap: 6px;
+                gap: 0 !important;
                 padding: 0;
                 margin-bottom: 6px !important;
             }
@@ -1035,7 +1108,7 @@
 
             .charts-section {
                 grid-template-columns: 1fr;
-                gap: 12px;
+                gap: 0 !important;
                 padding: 0;
                 margin-top: 0 !important;
                 margin-bottom: 6px !important;
