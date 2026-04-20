@@ -16,7 +16,7 @@
     <style>
         body {
             margin: 0;
-            background: #f1f3f6;
+            background: #ffffff;
             overflow-x: hidden;
             overflow-y: hidden;
         }
@@ -29,6 +29,7 @@
             height: calc(100vh - 54px);
             box-sizing: border-box;
             overflow: hidden;
+            background: #ffffff;
         }
 
         /* Menu Hamburger e Menu Mobile (mesmo padrão das telas CRUD) */
@@ -246,6 +247,7 @@
             display: flex;
             flex-direction: column;
             gap: 0;
+            background: #ffffff;
         }
 
         .page-title {
@@ -276,6 +278,7 @@
             align-items: stretch;
             flex: 1 1 auto;
             min-height: 0;
+            background: #ffffff;
         }
 
         @media (max-width: 1024px) {
@@ -288,13 +291,17 @@
                 gap: 8px;
             }
             .panel {
+                border: 1px solid #d1d5db;
                 border-radius: 8px;
+            }
+            .panel.config-panel {
+                border-right: 1px solid #d1d5db;
             }
         }
 
         .panel {
-            background: #ffffff;
-            border: 1px solid #d7dbe2;
+            background: transparent;
+            border: 0;
             border-radius: 0;
             box-shadow: none;
             overflow: hidden;
@@ -306,6 +313,10 @@
 
         .panel.results-panel { /* classe reservada para estilos futuros */ }
 
+        .panel.config-panel {
+            border-right: 1px solid #d1d5db;
+        }
+
         .panel-header {
             padding: 10px 12px;
             border-bottom: 1px solid #e5e7eb;
@@ -313,6 +324,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
+            background: transparent;
         }
 
         .panel-header h2 {
@@ -344,7 +356,7 @@
         .panel-footer {
             padding: 8px 10px 10px 10px;
             border-top: 1px solid #e5e7eb;
-            background: #ffffff;
+            background: transparent;
         }
 
         .panel.config-panel .panel-footer {
@@ -623,12 +635,12 @@
             gap: 6px;
             padding: 6px 8px;
             border-bottom: 1px solid #e5e7eb;
-            background: #f8fafc;
+            background: transparent;
         }
 
         .results-top .kpis {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: nowrap;
             align-items: center;
         }
@@ -648,6 +660,7 @@
             width: 100%;
             overflow: auto;
             flex: 1 1 auto;
+            background: #ffffff;
         }
 
         table {
@@ -660,7 +673,7 @@
         thead th {
             position: sticky;
             top: 0;
-            background: #f8fafc;
+            background: #ffffff;
             z-index: 1;
             border-bottom: 1px solid #e5e7eb;
             font-size: 10px;
