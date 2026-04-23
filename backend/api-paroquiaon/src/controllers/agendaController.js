@@ -301,7 +301,8 @@ async function criarEvento(req, res) {
         if (!bloqueioParoquial.valido) {
             return res.status(409).json({
                 error: 'Não é possível efetuar agendamento durante período paroquial. Contate o responsável.',
-                code: 'PAROQUIAL_PERIOD_BLOCKED'
+                code: 'PAROQUIAL_PERIOD_BLOCKED',
+                conflito: bloqueioParoquial.conflito || null
             });
         }
         
@@ -464,7 +465,8 @@ async function atualizarEvento(req, res) {
         if (!bloqueioParoquial.valido) {
             return res.status(409).json({
                 error: 'Não é possível efetuar agendamento durante período paroquial. Contate o responsável.',
-                code: 'PAROQUIAL_PERIOD_BLOCKED'
+                code: 'PAROQUIAL_PERIOD_BLOCKED',
+                conflito: bloqueioParoquial.conflito || null
             });
         }
         

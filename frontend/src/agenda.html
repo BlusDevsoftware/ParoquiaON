@@ -5303,6 +5303,102 @@
             color: white;
         }
 
+        .paroquial-block-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 11000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .paroquial-block-overlay.open {
+            display: flex;
+        }
+
+        .paroquial-block-modal {
+            width: 100%;
+            max-width: 560px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .paroquial-block-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+            color: #fff;
+        }
+
+        .paroquial-block-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .paroquial-block-close {
+            border: none;
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+
+        .paroquial-block-body {
+            padding: 18px 20px;
+            color: #1f2937;
+        }
+
+        .paroquial-block-message {
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .paroquial-block-card {
+            border: 1px solid #dbeafe;
+            background: #f8fbff;
+            border-radius: 10px;
+            padding: 12px;
+            display: grid;
+            gap: 6px;
+        }
+
+        .paroquial-block-item {
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .paroquial-block-item strong {
+            color: #0f172a;
+        }
+
+        .paroquial-block-actions {
+            padding: 0 20px 18px 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .paroquial-block-btn {
+            border: none;
+            border-radius: 8px;
+            background: #1e3a8a;
+            color: white;
+            padding: 10px 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
         /* Responsivo */
         @media (max-width: 768px) {
             .modal-view-container {
@@ -5360,6 +5456,32 @@
             </div>
             <div class="search-results" id="searchResultsContainer">
                 <div class="search-results-empty" id="searchResultsEmpty">Digite para buscar eventos</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="paroquial-block-overlay" id="paroquialBlockOverlay" onclick="if(event.target===this) closeParoquialBlockModal()">
+        <div class="paroquial-block-modal">
+            <div class="paroquial-block-header">
+                <div class="paroquial-block-title">
+                    <i class="fas fa-church"></i>
+                    <span>Período Paroquial Bloqueado</span>
+                </div>
+                <button class="paroquial-block-close" type="button" onclick="closeParoquialBlockModal()" aria-label="Fechar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="paroquial-block-body">
+                <p class="paroquial-block-message">Não é possível efetuar agendamento durante período paroquial. Contate o responsável.</p>
+                <div class="paroquial-block-card">
+                    <div class="paroquial-block-item"><strong>Título:</strong> <span id="paroquialBlockTitle">-</span></div>
+                    <div class="paroquial-block-item"><strong>Data:</strong> <span id="paroquialBlockDate">-</span></div>
+                    <div class="paroquial-block-item"><strong>Horário:</strong> <span id="paroquialBlockTime">-</span></div>
+                    <div class="paroquial-block-item"><strong>Comunidade:</strong> <span id="paroquialBlockCommunity">-</span></div>
+                </div>
+            </div>
+            <div class="paroquial-block-actions">
+                <button type="button" class="paroquial-block-btn" onclick="closeParoquialBlockModal()">Entendi</button>
             </div>
         </div>
     </div>
@@ -5822,6 +5944,50 @@
             return false;
         }
 
+        function formatParoquialDateTime(dateLike) {
+            const d = new Date(dateLike);
+            if (isNaN(d)) return '-';
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            const hh = String(d.getHours()).padStart(2, '0');
+            const min = String(d.getMinutes()).padStart(2, '0');
+            return {
+                date: `${dd}/${mm}/${yyyy}`,
+                time: `${hh}:${min}`
+            };
+        }
+
+        function openParoquialBlockModal(eventoConflito) {
+            const overlay = document.getElementById('paroquialBlockOverlay');
+            if (!overlay) return;
+            const ev = eventoConflito || {};
+            const inicio = formatParoquialDateTime(ev.startTime || ev.data_inicio || ev.inicio || ev.start);
+            const fim = formatParoquialDateTime(ev.endTime || ev.data_fim || ev.fim || ev.end || ev.startTime || ev.data_inicio);
+            const titulo = ev.title || ev.titulo || 'Evento paroquial';
+            const comunidade = ev.comunidade_nome || ev.comunidades?.nome || 'Não informado';
+
+            const titleEl = document.getElementById('paroquialBlockTitle');
+            const dateEl = document.getElementById('paroquialBlockDate');
+            const timeEl = document.getElementById('paroquialBlockTime');
+            const communityEl = document.getElementById('paroquialBlockCommunity');
+
+            if (titleEl) titleEl.textContent = titulo;
+            if (dateEl) dateEl.textContent = inicio.date;
+            if (timeEl) timeEl.textContent = `${inicio.time} - ${fim.time}`;
+            if (communityEl) communityEl.textContent = comunidade;
+
+            overlay.classList.add('open');
+        }
+
+        function closeParoquialBlockModal() {
+            const overlay = document.getElementById('paroquialBlockOverlay');
+            if (overlay) overlay.classList.remove('open');
+        }
+
+        window.openParoquialBlockModal = openParoquialBlockModal;
+        window.closeParoquialBlockModal = closeParoquialBlockModal;
+
         // Override: loadEventsFromApi using AgendaAPI + normalization
         window.loadEventsFromApi = async function() {
             try {
@@ -6102,6 +6268,7 @@
                 return;
             }
 
+            let eventoParoquialEmConflito = null;
             const possuiConflitoComParoquial = horarios.some((h) => {
                 const dateStr = h.data || formData.dataInicio;
                 if (!dateStr || !h.hora_inicio || !h.hora_fim) return false;
@@ -6120,13 +6287,16 @@
                     const fimExistente = new Date(ev.endTime || ev.data_fim || ev.fim || ev.end || ev.startTime || ev.data_inicio);
                     if (isNaN(inicioExistente) || isNaN(fimExistente)) return false;
 
-                    return inicioNovo < fimExistente && fimNovo > inicioExistente;
+                    const temConflito = inicioNovo < fimExistente && fimNovo > inicioExistente;
+                    if (temConflito && !eventoParoquialEmConflito) {
+                        eventoParoquialEmConflito = ev;
+                    }
+                    return temConflito;
                 });
             });
 
             if (possuiConflitoComParoquial) {
-                const msg = 'Não é possível efetuar agendamento durante período paroquial. Contate o responsável.';
-                if (typeof showToast === 'function') showToast(msg, 'error');
+                openParoquialBlockModal(eventoParoquialEmConflito);
                 restaurarBotao();
                 return;
             }
@@ -6349,7 +6519,12 @@
                 editingEventPeriods = [];
             } catch (error) {
                 console.error('Erro ao criar evento:', error);
-                if (typeof showToast === 'function') showToast('Erro ao criar evento', 'error');
+                const apiErrorBody = error && error.body ? error.body : null;
+                if (apiErrorBody && apiErrorBody.code === 'PAROQUIAL_PERIOD_BLOCKED') {
+                    openParoquialBlockModal(apiErrorBody.conflito || null);
+                } else if (typeof showToast === 'function') {
+                    showToast('Erro ao criar evento', 'error');
+                }
             } finally {
                 // Garantir que o botão sempre seja restaurado, mesmo se houver erro ou return antecipado
                 restaurarBotao();
