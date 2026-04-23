@@ -5810,6 +5810,18 @@
             window.open(url, '_blank', 'noopener,noreferrer');
         };
 
+        function isEventoParoquialBloqueante(evento) {
+            if (!evento) return false;
+            const flag = evento.evento_paroquial ?? evento.eventoParoquial ?? evento.paroquial;
+            if (flag === true) return true;
+            if (typeof flag === 'number') return flag === 1;
+            if (typeof flag === 'string') {
+                const normalized = flag.trim().toLowerCase();
+                return ['true', '1', 'sim', 's'].includes(normalized);
+            }
+            return false;
+        }
+
         // Override: loadEventsFromApi using AgendaAPI + normalization
         window.loadEventsFromApi = async function() {
             try {
@@ -6086,6 +6098,35 @@
             }
             if (horarios.length === 0) {
                 if (typeof showToast === 'function') showToast('Adicione pelo menos um horário.', 'error');
+                restaurarBotao();
+                return;
+            }
+
+            const possuiConflitoComParoquial = horarios.some((h) => {
+                const dateStr = h.data || formData.dataInicio;
+                if (!dateStr || !h.hora_inicio || !h.hora_fim) return false;
+                const [y, m, d] = dateStr.split('-');
+                const [sh, sm] = h.hora_inicio.split(':');
+                const [eh, em] = h.hora_fim.split(':');
+                const inicioNovo = buildDateFromYmdHm(y, m, d, sh, sm);
+                const fimNovo = buildDateFromYmdHm(y, m, d, eh, em);
+                if (isNaN(inicioNovo) || isNaN(fimNovo)) return false;
+
+                return (Array.isArray(allEvents) ? allEvents : []).some((ev) => {
+                    if (!ev || !isEventoParoquialBloqueante(ev)) return false;
+                    if (isEditing && editingEvent && ev.id === editingEvent.id) return false;
+
+                    const inicioExistente = new Date(ev.startTime || ev.data_inicio || ev.inicio || ev.start);
+                    const fimExistente = new Date(ev.endTime || ev.data_fim || ev.fim || ev.end || ev.startTime || ev.data_inicio);
+                    if (isNaN(inicioExistente) || isNaN(fimExistente)) return false;
+
+                    return inicioNovo < fimExistente && fimNovo > inicioExistente;
+                });
+            });
+
+            if (possuiConflitoComParoquial) {
+                const msg = 'Não é possível efetuar agendamento durante período paroquial. Contate o responsável.';
+                if (typeof showToast === 'function') showToast(msg, 'error');
                 restaurarBotao();
                 return;
             }

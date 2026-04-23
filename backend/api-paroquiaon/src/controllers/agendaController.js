@@ -1,5 +1,56 @@
 const { supabase } = require('../config/supabase');
 
+function normalizarDataParaComparacao(value) {
+    if (!value) return null;
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+function periodosSeSobrepoem(inicioA, fimA, inicioB, fimB) {
+    return inicioA < fimB && fimA > inicioB;
+}
+
+async function validarBloqueioParoquial({ dataInicio, dataFim, eventoIdIgnorar = null }) {
+    const inicioNovo = normalizarDataParaComparacao(dataInicio);
+    const fimNovo = normalizarDataParaComparacao(dataFim || dataInicio);
+
+    if (!inicioNovo || !fimNovo) {
+        return {
+            valido: false,
+            motivo: 'Datas inválidas para validação de conflito'
+        };
+    }
+
+    let query = supabase
+        .from('agendamentos')
+        .select('id, titulo, data_inicio, data_fim, evento_paroquial')
+        .eq('evento_paroquial', true)
+        .lt('data_inicio', fimNovo.toISOString());
+
+    if (eventoIdIgnorar) {
+        query = query.neq('id', eventoIdIgnorar);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    const conflitos = (Array.isArray(data) ? data : []).filter((ev) => {
+        const inicioExistente = normalizarDataParaComparacao(ev.data_inicio);
+        const fimExistente = normalizarDataParaComparacao(ev.data_fim || ev.data_inicio);
+        if (!inicioExistente || !fimExistente) return false;
+        return periodosSeSobrepoem(inicioNovo, fimNovo, inicioExistente, fimExistente);
+    });
+
+    if (conflitos.length > 0) {
+        return {
+            valido: false,
+            conflito: conflitos[0]
+        };
+    }
+
+    return { valido: true };
+}
+
 async function listarEventos(req, res) {
     try {
         const leve = req.query.leve === '1' || req.query.leve === 'true';
@@ -242,6 +293,17 @@ async function criarEvento(req, res) {
             visibilidade: visibilidadeCorreta,
             usuario_lancamento_id: dados.usuario_lancamento_id || req.user?.id || null
         };
+
+        const bloqueioParoquial = await validarBloqueioParoquial({
+            dataInicio: dadosCompletos.data_inicio,
+            dataFim: dadosCompletos.data_fim
+        });
+        if (!bloqueioParoquial.valido) {
+            return res.status(409).json({
+                error: 'Não é possível efetuar agendamento durante período paroquial. Contate o responsável.',
+                code: 'PAROQUIAL_PERIOD_BLOCKED'
+            });
+        }
         
         // OTIMIZAÇÃO: Remover validações de FK - o banco já valida com constraints
         // Se houver FK inválida, o Supabase retornará erro e tratamos abaixo
@@ -393,6 +455,18 @@ async function atualizarEvento(req, res) {
                 ? dados.acao_id
                 : eventoOriginal.acao_id
         };
+
+        const bloqueioParoquial = await validarBloqueioParoquial({
+            dataInicio: dadosAtualizados.data_inicio,
+            dataFim: dadosAtualizados.data_fim,
+            eventoIdIgnorar: id
+        });
+        if (!bloqueioParoquial.valido) {
+            return res.status(409).json({
+                error: 'Não é possível efetuar agendamento durante período paroquial. Contate o responsável.',
+                code: 'PAROQUIAL_PERIOD_BLOCKED'
+            });
+        }
         
         // Atualizar evento
         const { data: updatedData, error } = await supabase
